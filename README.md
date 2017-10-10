@@ -34,6 +34,8 @@ gradle build
 ```
 This will package a zip archive of the jenkins_home folder.
 
+Note: Developping with the Jenkins_home component requires to use `git clean -Xdf`. Please read the [note for developpers](jenkins_home/README.md) first.
+
 ## The 'jobs' component
 
 To be implemented
