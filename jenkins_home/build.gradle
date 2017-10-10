@@ -1,1 +1,9 @@
 version = "1.0.0-SNAPSHOT"
+
+apply plugin: 'java'
+
+task build(type: Zip) {
+
+  from 'jenkins_home'
+  baseName = "jenkins_home"
+}
