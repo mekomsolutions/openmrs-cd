@@ -1,1 +1,39 @@
 version = "1.0.0-SNAPSHOT"
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.bmuschko:gradle-docker-plugin:3.2.0'
+    }
+}
+
+apply plugin: 'com.bmuschko.docker-remote-api'
+
+// import task classes
+import com.bmuschko.gradle.docker.tasks.image.*
+
+repositories {
+    mavenCentral()
+}
+
+def dockerHubRepo = "mekomsolutions/openmrsci"
+
+task buildDockerImage(type: DockerBuildImage) {
+  inputDir = file('.')
+  tags = [dockerHubRepo + ':' + version]
+}
+
+task pushDockerImage(type: DockerPushImage) {
+  imageName = dockerHubRepo + ':' + version
+}
+
+task build() {
+  dependsOn buildDockerImage
+}
+
+task deploy() {
+  dependsOn buildDockerImage, pushDockerImage
+}
