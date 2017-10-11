@@ -31,7 +31,7 @@
       <submoduleCfg class="list"/>
       <extensions/>
     </scm>
-    <scriptPath>jobs/buildAndDeploy.jenkinsfile</scriptPath>
+    <scriptPath>jobs/pipelines/buildAndDeploy.jenkinsfile</scriptPath>
     <lightweight>true</lightweight>
   </definition>
   <triggers/>
