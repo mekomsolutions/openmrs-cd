@@ -1,11 +1,11 @@
-# OpenMRS CI
-A Jenkins CI server configured to provide tools to manage OpenMRS servers
+# OpenMRS CD
+A Jenkins server configured to provide tools to manage OpenMRS servers
 
-Gradle is used to build all the needed artifacts that make the OpenMRS CI.
+Gradle is used to build all the needed artifacts that make the OpenMRS CD.
 
 ## The parent project: root folder
 
-In order to build all components of the OpenMRS CI simply run the following command from the root directory:
+In order to build all components of the OpenMRS CD simply run the following command from the root directory:
 ```
 gradle build
 ```
@@ -17,7 +17,7 @@ Each subproject's 'build' tasks will run.
 cd docker/
 gradle build
 ```
-This task builds the Docker image used as a base for the OpenMRS CI. It uses the Dockerfile provided in the `docker/` folder.
+This task builds the Docker image used as a base for the OpenMRS CD. It uses the Dockerfile provided in the `docker/` folder.
 
 ```
 gradle deploy
@@ -26,7 +26,7 @@ This deploys the Docker image on the Mekom Solutions Docker Hub repository. This
 
 ## The 'jenkins_home' component
 
-OpenMRS CI needs not only to use a Docker image for its binaries but it also requires a Jenkins Home folder to provide the base configuration.
+OpenMRS CD needs not only to use a Docker image for its binaries but it also requires a Jenkins Home folder to provide the base configuration.
 
 ```
 cd jenkins_home
