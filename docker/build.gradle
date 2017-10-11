@@ -1,4 +1,4 @@
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0"
 
 buildscript {
     repositories {
@@ -19,7 +19,7 @@ repositories {
     mavenCentral()
 }
 
-def dockerHubRepo = "mekomsolutions/openmrsci"
+def dockerHubRepo = "mekomsolutions/openmrscd"
 
 task buildDockerImage(type: DockerBuildImage) {
   inputDir = file('.')
