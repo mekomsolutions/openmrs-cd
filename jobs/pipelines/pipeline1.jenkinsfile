@@ -1,0 +1,20 @@
+pipeline {
+  agent any
+  tools {
+        maven 'Maven 3.5.0' 
+        nodejs 'NodeJS 8.6.0'
+  }
+  stages {
+    stage ('Checkout') {
+      steps {
+        git url: url, branch: branch
+      }
+    }
+    stage ('Build') {
+      steps {
+        sh 'node /opt/resources/$JOB_NAME/build.js'
+        sh '$WORKSPACE/build.sh'
+      }
+    }
+  }
+}
