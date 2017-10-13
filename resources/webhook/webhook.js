@@ -3,6 +3,7 @@
 *
 */
 var fs = require('fs');
+var utils = require('../utils/utils')
 
 // The PayloadParser is loaded based on what the SCM service is
 var payloadParser = require('./' + process.env.service)
@@ -26,18 +27,6 @@ fs.writeFile(process.env.WORKSPACE + "/envvars", convertToEnvVar(metadata), func
   }
 });
 
-console.log(convertToEnvVar(metadata))
+console.log(utils.convertToEnvVar(metadata))
 
 
-/**
-* @return Returns a concatenated string of all the properties of the passed object
-*/
-function convertToEnvVar(object) {
-  var envvars = ""
-  for (var property in object) {
-    if (object.hasOwnProperty(property)) {
-      envvars = envvars + property + "=" + object[property] + "\n";
-    }
-  }
-  return envvars
-}

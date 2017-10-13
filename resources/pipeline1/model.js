@@ -1,9 +1,9 @@
 module.exports = {
 
-  BuildScript: function (type, comments, script) {
+  BuildScript: function (type, comments, buildScript) {
     this.scriptType = type;
     this.comments = comments
-    this.value = script;
+    this.buildProject = buildScript;
   },
 
   /**
@@ -12,14 +12,22 @@ module.exports = {
   * This is an interface and each field should be implemented for each type of project
   *
   */
-  Project: function (artficat) {
+  Project: function (artifact) {
     this.getBuildScript = function () {
       return "This method is not implemented. Please provide an implementation."
     }
     this.getBuildScriptAsString = function () {
       return "This method is not implemented. Please provide an implementation."
     }
-    this.artficat = artficat;
+    this.getArtifact = function  () {
+      return "This method is not implemented. Please provide an implementation."
+    }
+    
+  },
+
+  Artifact: function(path, name) {
+    this.path = path;
+    this.name = name;
   }
 
 }
