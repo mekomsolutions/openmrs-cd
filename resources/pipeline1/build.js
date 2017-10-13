@@ -17,10 +17,5 @@ fs.writeFile(process.env.WORKSPACE + "/build.sh", project.getBuildScriptAsString
 fs.chmodSync(process.env.WORKSPACE + "/build.sh", 0755);
 
 // Export the artifact details in order for the pipeline to use it
-var artifact = project.getArtifact();
-fs.writeFile(process.env.WORKSPACE + "/artifact.env", utils.convertToEnvVar(artifact) , function(err) {
-  if (err) {
-    return console.log(err);
-  }
-});
+fs.writeFileSync(process.env.WORKSPACE + "/artifact.env", utils.convertToEnvVar(project.getArtifact()))
 

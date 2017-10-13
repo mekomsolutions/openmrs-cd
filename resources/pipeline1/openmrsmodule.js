@@ -1,5 +1,6 @@
 var model = require('./model')
 var utils = require('../utils/utils')
+var fs = require('fs')
 
 module.exports = {
 
@@ -15,8 +16,16 @@ module.exports = {
       return getBuildScript();
     }
     openmrsModule.getArtifact = function () {
-      var name = "lfhcforms"
-      return new model.Artifact("./omod/target", name + "-*" + ".omod")
+      var artifact = new model.Artifact();
+
+      artifact.extension = "omod"
+      artifact.path = "./omod/target"
+
+      var pom = utils.getPom();
+      artifact.version = pom.version
+      artifact.name = pom.artifactId
+
+      return artifact
     }
 
     return openmrsModule
@@ -48,3 +57,4 @@ var getBuildScriptAsString = function() {
 
   return string
 }
+

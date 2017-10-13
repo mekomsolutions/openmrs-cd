@@ -25,9 +25,11 @@ module.exports = {
     
   },
 
-  Artifact: function(path, name) {
+  Artifact: function(path, name, extension, version) {
     this.path = path;
     this.name = name;
+    this.extension = extension;
+    this.version = version;
   }
 
 }
