@@ -1,5 +1,5 @@
-var model = require('./model')
-var utils = require('../utils/utils')
+var model = require('../model')
+var utils = require('../../utils/utils')
 var fs = require('fs')
 
 module.exports = {

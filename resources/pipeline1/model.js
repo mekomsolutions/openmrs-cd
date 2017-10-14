@@ -1,5 +1,9 @@
 module.exports = {
 
+  /**
+  * An object that describes the script to build the project
+  *
+  */
   BuildScript: function (type, comments, buildScript) {
     this.scriptType = type;
     this.comments = comments
@@ -7,29 +11,31 @@ module.exports = {
   },
 
   /**
-  *
-  * An object that represents a source code project 
-  * This is an interface and each field should be implemented for each type of project
+  * An object that describes the artifcat that will be built
   *
   */
-  Project: function (artifact) {
-    this.getBuildScript = function () {
-      return "This method is not implemented. Please provide an implementation."
-    }
-    this.getBuildScriptAsString = function () {
-      return "This method is not implemented. Please provide an implementation."
-    }
-    this.getArtifact = function  () {
-      return "This method is not implemented. Please provide an implementation."
-    }
-    
-  },
-
   Artifact: function(path, name, extension, version) {
     this.path = path;
     this.name = name;
     this.extension = extension;
     this.version = version;
+  },
+
+  /**
+  * An object that represents a source code project 
+  * This is an interface to document which field should be implemented when creating a new project type
+  *
+  */
+  Project: function (artifact) {
+    this.getBuildScript = function () {
+      return new BuildScript()
+    }
+    this.getBuildScriptAsString = function () {
+      return new String()
+    }
+    this.getArtifact = function  () {
+      return new Artifact()
+    }   
   }
 
 }
