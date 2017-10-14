@@ -14,7 +14,7 @@ pipeline {
       steps {
         sh 'node /opt/resources/$JOB_NAME/build.js'
         sh '$WORKSPACE/build.sh'
-        sh '. $WORKSPACE/artifact.env ; mv $path/$name $WORKSPACE/'
+        sh '. $WORKSPACE/artifact.env ; mv $path/$name-$version.$extension $WORKSPACE/'
       }
     }
   }

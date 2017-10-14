@@ -16,16 +16,11 @@ module.exports = {
     }
     return envvars
   },
-  getPom: function (callback) {
-    return getPom(callback);
+  getPom: function () {
+
+    var file = fs.readFileSync('./pom.xml', 'utf8')
+    var parsedPom = XML.parse(file)
+
+    return parsedPom;
   }
-}
-
-
-var getPom = function () {
-
-  var file = fs.readFileSync('./pom.xml', 'utf8')
-  var parsedPom = XML.parse(file)
-  
-  return parsedPom;
 }
