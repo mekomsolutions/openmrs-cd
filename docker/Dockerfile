@@ -7,6 +7,18 @@ RUN apt-get update
 RUN apt-get -y install nano
 RUN apt-get -y install openssh-server
 
+# These packages are needed for Jenkins to build some projects.
+# This is because the Jenkins server is used as its own agent. Build tasks are running directly on it.
+RUN apt-get -y install ruby-full
+RUN apt-get -y install ruby-compass
+RUN apt-get -y install xvfb
+RUN apt-get -y install firefox-esr
+RUN apt-get -y install sudo
+
+# Jenkins needs to be a sudo to execute some build tasks (particularly Bahmni Apps)
+RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+
 USER jenkins
 
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
