@@ -24,6 +24,8 @@ module.exports = {
       var pom = utils.getPom();
       artifact.version = pom.version
       artifact.name = pom.artifactId
+      
+      artifact.filename = artifact.name + "-" + artifact.version + "." + artifact.extension
 
       return artifact
     }

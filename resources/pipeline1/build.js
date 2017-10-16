@@ -10,6 +10,7 @@ var project = require('./impl/' + process.env.type).getInstance();
 
 // Retrieve the script to run in order to build the project
 var buildScript = project.getBuildScriptAsString()
+console.log(buildScript)
 fs.writeFileSync(process.env.WORKSPACE + "/build.sh", buildScript)
 
 fs.chmodSync(process.env.WORKSPACE + "/build.sh", 0755);

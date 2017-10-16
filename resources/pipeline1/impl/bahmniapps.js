@@ -19,10 +19,13 @@ module.exports = {
       var artifact = new model.Artifact();
 
       artifact.extension = "zip"
-      artifact.path = "./target"
+      artifact.path = "./ui/target"
 
+      // Version is not managed through npm or maven project
       artifact.version = ""
       artifact.name = "bahmniapps"
+
+      artifact.filename = artifact.name + "." + artifact.extension
 
       return artifact
     }

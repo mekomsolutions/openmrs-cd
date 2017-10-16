@@ -14,11 +14,12 @@ module.exports = {
   * An object that describes the artifcat that will be built
   *
   */
-  Artifact: function(path, name, extension, version) {
+  Artifact: function(path, name, extension, version, filename) {
     this.path = path;
     this.name = name;
     this.extension = extension;
     this.version = version;
+    this.filename = filename
   },
 
   /**
