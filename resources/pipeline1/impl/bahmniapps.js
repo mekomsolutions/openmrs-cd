@@ -6,16 +6,16 @@ module.exports = {
 
   getInstance: function() {
 
-    var openmrsModule = new model.Project();
+    var project = new model.Project();
 
     // Implement here the Project object methods
-    openmrsModule.getBuildScriptAsString = function () {
+    project.getBuildScriptAsString = function () {
       return getBuildScriptAsString();
     }
-    openmrsModule.getBuildScript = function () {
+    project.getBuildScript = function () {
       return getBuildScript();
     }
-    openmrsModule.getArtifact = function () {
+    project.getArtifact = function () {
       var artifact = new model.Artifact();
 
       artifact.extension = "zip"
@@ -30,7 +30,7 @@ module.exports = {
       return artifact
     }
 
-    return openmrsModule
+    return project
   } 
 }
 
