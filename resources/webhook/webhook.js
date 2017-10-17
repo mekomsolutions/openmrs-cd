@@ -6,7 +6,7 @@ var fs = require('fs');
 var utils = require('../utils/utils')
 
 // The PayloadParser is loaded based on what the SCM service is
-var payloadParser = require('./' + process.env.service)
+var payloadParser = require('./impl/' + process.env.service)
 
 /**
 * NOTE FOR DEVS:
