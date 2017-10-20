@@ -27,7 +27,7 @@ module.exports = {
   * This is an interface to document which field should be implemented when creating a new project type
   *
   */
-  Project: function (artifact) {
+  Project: function () {
     this.getBuildScript = function () {
       return new BuildScript()
     }

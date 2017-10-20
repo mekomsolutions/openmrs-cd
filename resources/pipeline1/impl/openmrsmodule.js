@@ -15,13 +15,13 @@ module.exports = {
     openmrsModule.getBuildScript = function () {
       return getBuildScript();
     }
-    openmrsModule.getArtifact = function () {
+    openmrsModule.getArtifact = function (pomPath) {
       var artifact = new model.Artifact();
 
       artifact.extension = "omod"
       artifact.path = "./omod/target"
 
-      var pom = utils.getPom();
+      var pom = utils.getPom(pomPath);
       artifact.version = pom.version
       artifact.name = pom.artifactId
 

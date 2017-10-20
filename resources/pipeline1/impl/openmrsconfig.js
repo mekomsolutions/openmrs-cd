@@ -15,13 +15,13 @@ module.exports = {
     project.getBuildScript = function () {
       return getBuildScript();
     }
-    project.getArtifact = function () {
+    project.getArtifact = function (pomPath) {
       var artifact = new model.Artifact();
 
       artifact.extension = "zip"
       artifact.path = "./target"
 
-      var pom = utils.getPom();
+      var pom = utils.getPom(pomPath);
       artifact.version = pom.version
       artifact.name = pom.artifactId
       

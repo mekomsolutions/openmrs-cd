@@ -16,9 +16,9 @@ module.exports = {
     }
     return envvars
   },
-  getPom: function () {
+  getPom: function (pomPath) {
 
-    var file = fs.readFileSync('./pom.xml', 'utf8')
+    var file = fs.readFileSync(pomPath + 'pom.xml', 'utf8')
     var parsedPom = XML.parse(file)
 
     return parsedPom;
