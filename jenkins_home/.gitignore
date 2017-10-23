@@ -1,4 +1,8 @@
 jenkins_home/.m2/
+jenkins_home/.cache/
+jenkins_home/.config/
+jenkins_home/.mozilla/
+jenkins_home/.npm/
 jenkins_home/.java
 jenkins_home/.ivy2/
 jenkins_home/.sbt/
