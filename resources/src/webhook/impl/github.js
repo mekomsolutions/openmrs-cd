@@ -2,8 +2,7 @@
 * @author Romain Buisson (romain@mekomsolutions.com)
 *
 */
-
-var model = require('./model')
+var model = require('../model')
 
 module.exports = {
 
