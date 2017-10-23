@@ -22,5 +22,17 @@ module.exports = {
     var parsedPom = XML.parse(file)
 
     return parsedPom;
+  },
+  getScriptAsString: function (script) {
+
+    var string = ""
+
+    string = script.type
+    string = string + "\n\n"
+    string = string + script.comments
+    string = string + "\n\n"
+    string = string + script.value
+
+    return string
   }
 }

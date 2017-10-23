@@ -12,9 +12,14 @@ pipeline {
     }
     stage ('Build') {
       steps {
-        sh 'node /opt/resources/$JOB_NAME/build.js'
+        sh 'node /opt/resources/$JOB_NAME/build.js /tmp/metadata.json'
         sh '$WORKSPACE/build.sh'
-        sh '. $WORKSPACE/artifact.env ; mv $WORKSPACE/$path/$filename $WORKSPACE/'
+        sh '. /tmp/artifact.env ; mv $WORKSPACE/$path/$filename $WORKSPACE/$destFilename'
+      }
+    }
+    stage ('Deploy') {
+      steps {
+        sh '$WORKSPACE/deploy.sh'
       }
     }
   }
