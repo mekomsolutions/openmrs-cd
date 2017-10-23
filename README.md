@@ -29,7 +29,7 @@ This deploys the Docker image on the Mekom Solutions Docker Hub repository. This
 OpenMRS CD needs not only to use a Docker image for its binaries but it also requires a Jenkins Home folder to provide the base configuration.
 
 ```
-cd jenkins_home
+cd jenkins_home/
 gradle build
 ```
 This will package a zip archive of the jenkins_home folder.
@@ -43,4 +43,12 @@ To be implemented
 
 ## The 'resources' component
 
-To be implemented
+The 'resources' folder is here to bring script and resources that will be used by the Jenkins pipelines or jobs.
+```
+cd resources/
+gradle build
+```
+This will run tests tasks configured for this build and output a zip file of all resources if successful.
+
+The zip archive is located at the default Gradle location for build artifacts, **./resources/build/distributions/resources-1.0.0-SNAPSHOT.zip**
+

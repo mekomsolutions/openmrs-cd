@@ -1,9 +1,17 @@
 version = "1.0.0-SNAPSHOT"
 
-task jasmine(type:Exec) {
+apply plugin: 'java'
+
+task jasmine(type: Exec) {
   commandLine 'npm', 'test'
 }
 
-task build() {
+task archive(type: Zip) {
+  from ('./src')
+  baseName = "resources"
   dependsOn jasmine
+}
+
+task build() {
+  dependsOn jasmine, archive
 }

@@ -1,19 +1,16 @@
 
 describe('Tests suite for Pipeline1 ', function () {
 
-  beforeEach( function() {
-
-  })
-
   it('should implement the interface functions', function () {
 
     const fs = require('fs');
+    
+    var folderInTest = __dirname + '/../../src/pipeline1/'
 
-    fs.readdirSync(__dirname + '/../impl/').forEach(file => {
+    fs.readdirSync(folderInTest + 'impl/').forEach(file => {
 
       var type = file.split('.')[0]
-      console.log(type)
-      var project = new require('../impl/' + type).getInstance()
+      var project = new require(folderInTest + 'impl/' + type).getInstance()
 
       var artifact = project.getArtifact(__dirname + '/resources/' + type + "/")
 
