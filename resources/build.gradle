@@ -1,1 +1,9 @@
 version = "1.0.0-SNAPSHOT"
+
+task jasmine(type:Exec) {
+  commandLine 'npm', 'test'
+}
+
+task build() {
+  dependsOn jasmine
+}

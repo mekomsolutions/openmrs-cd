@@ -1,8 +1,7 @@
 {
   "name": "resources",
-  "version": "1.0.0-SNAPSHOT",
-  "description": "Resource script for the OpenMRS CD",
-  "main": "index.js",
+  "version": "0.0.0",
+  "description": "Resource scripts for the OpenMRS CD",
   "dependencies": {
     "jasmine": "^2.8.0",
     "karma": "^1.7.1"
