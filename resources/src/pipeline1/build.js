@@ -15,19 +15,19 @@ try {
   console.log("Optional object passed as first argument could not be fetched. Skipping")
 }
 
+// Retrieve the details of the artifact that will be built
+var artifact = project.getArtifact('./', metadata)
+
 // Retrieve the script to build the project
 var buildScript = project.getBuildScriptAsString()
 fs.writeFileSync(process.env.WORKSPACE + "/build.sh", buildScript)
 fs.chmodSync(process.env.WORKSPACE + "/build.sh", 0755);
 
 // Retrieve the script to deploy the project
-var deployScript = project.getDeployScriptAsString()
+var deployScript = project.getDeployScriptAsString(artifact)
 fs.writeFileSync(process.env.WORKSPACE + "/deploy.sh", deployScript)
 fs.chmodSync(process.env.WORKSPACE + "/deploy.sh", 0755);
 
-// Retrieve the details of the artifact that will be built
-var artifact = project.getArtifact('./', metadata)
 // Export the artifact info in order for the pipeline and other jobs to use it
 fs.writeFileSync("/tmp/artifact.env", utils.convertToEnvVar(artifact))
 fs.writeFileSync("/tmp/artifact.json", JSON.stringify(artifact))
-

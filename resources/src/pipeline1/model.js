@@ -13,7 +13,7 @@ module.exports = {
   },
 
   /**
-  * An object that describes the artifcat that will be built
+  * An object that describes the artifact that will be built
   *
   */
   Artifact: function(path, name, extension, version, filename, destFilename) {
@@ -26,8 +26,8 @@ module.exports = {
   },
 
   /**
-  * An object that represents a source code project
-  * This is an interface to document which field should be implemented when creating a new project type
+  * An object that represents a source code project to be built and deployed.
+  * This is an interface to document which field should be implemented when creating a new project type.
   *
   */
   Project: function () {
@@ -41,12 +41,12 @@ module.exports = {
     this.getArtifact = function  () {
       return new Artifact()
     }  
-    this.getDeployScript = function () {
+    this.getDeployScript = function (artifact) {
       return new Script()
     }
-    this.getDeployScriptAsString = function () {
+    this.getDeployScriptAsString = function (artifact) {
       // A default implementation is provided
-      return utils.getScriptAsString(this.getDeployScript())
+      return utils.getScriptAsString(this.getDeployScript(artifact))
     }
   }
 

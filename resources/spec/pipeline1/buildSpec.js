@@ -14,7 +14,10 @@ describe('Tests suite for Pipeline1 ', function () {
       console.log("#  " + type)
       var project = new require(folderInTest + 'impl/' + type).getInstance()
 
-      var artifact = project.getArtifact(__dirname + '/resources/' + type + "/")
+      var metadata = {
+        commit: 123456
+      }
+      var artifact = project.getArtifact(__dirname + '/resources/' + type + "/", metadata)
 
       expect(artifact.extension).not.toEqual(undefined);
       expect(artifact.path).not.toEqual(undefined);
@@ -26,9 +29,9 @@ describe('Tests suite for Pipeline1 ', function () {
       expect(project.getBuildScript().value).not.toEqual(undefined)
       expect(project.getBuildScript().type).not.toEqual(undefined)
       expect(project.getBuildScriptAsString()).not.toEqual("")
-      expect(project.getDeployScript().value).not.toEqual(undefined)
-      expect(project.getDeployScript().type).not.toEqual(undefined)
-      expect(project.getDeployScriptAsString()).not.toEqual("")
+      expect(project.getDeployScript(artifact).value).not.toEqual(undefined)
+      expect(project.getDeployScript(artifact).type).not.toEqual(undefined)
+      expect(project.getDeployScriptAsString(artifact)).not.toEqual("")
    })    
   });
 
