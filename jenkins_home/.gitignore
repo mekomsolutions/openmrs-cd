@@ -1,4 +1,5 @@
-jenkins_home/.m2/
+jenkins_home/.m2/*
+!jenkins_home/.m2/.gitignore
 jenkins_home/.cache/
 jenkins_home/.config/
 jenkins_home/.mozilla/
