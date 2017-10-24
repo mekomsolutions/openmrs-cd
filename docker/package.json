@@ -1,0 +1,15 @@
+{
+  "name": "docker",
+  "version": "0.0.0",
+  "description": "",
+  "dependencies": {
+    "prompt": "^1.0.0",
+    "swig": "^1.4.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mekom Solutions",
+  "license": "MIT"
+}
