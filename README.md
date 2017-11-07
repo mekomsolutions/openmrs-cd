@@ -1,6 +1,27 @@
 # OpenMRS CD
 A Jenkins server configured to provide tools to manage OpenMRS servers
 
+# User guide
+
+Here is how to start a new OpenMRS CD server
+
+Git clone the 'openmrs-cd' repository
+```
+cd ~/repos/
+git clone https://github.com/mekomsolutions/openmrs-cd
+cd ~/repos/openmrs-cd
+```
+
+Run a new container:
+```
+docker run --name myjenkins  -p 8080:8080 -v ~/repos/openmrs-cd/resources/src/:/opt/resources -v ~/repos/openmrs-cd/jenkins_home/jenkins_home:/var/jenkins_home mekomsolutions/openmrscd:1.0.1-SNAPSHOT
+```
+where 'myjenkins' is the name of the container. Could be anything.
+
+_Note: For now *not* all components are deployed on a remote repo. That is why we use the '~/repos/openmrs-cd/' sources as mounted volumes._
+
+# Dev guide
+
 Gradle is used to build all the needed artifacts that make the OpenMRS CD.
 
 ## The parent project: root folder
@@ -38,8 +59,7 @@ Note: Developping with the Jenkins_home component requires to use `git clean -Xd
 
 ## The 'jobs' component
 
-To be implemented
-
+This folder holds the Pipelines that the Jenkins server will fetch directly from GitHub. They do not need to be packaged and deployed. That is why, unlike the other components, 'jobs' does not implement any build task. 
 
 ## The 'resources' component
 
