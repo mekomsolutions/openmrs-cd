@@ -56,11 +56,17 @@ var nexusUrls = function() {
   schema.properties = {}
 
   var arrayLength = json.artifact_types.length;
+
+  schema.properties["NEXUS_REPO_ID"] = {
+    message: "Nexus repository ID",
+    default: "mks-nexus"
+  }
   for (var i = 0; i < arrayLength; i++) {
     schema.properties["NEXUS_URL_" + json.artifact_types[i]] = {
       message: "'" + json.artifact_types[i] + "' Nexus URL"
     }
   }
+
 
   prompt.message = ""
   prompt.delimiter = ":"
@@ -69,9 +75,9 @@ var nexusUrls = function() {
   prompt.start()
 
   prompt.get(schema, function (err, result) {
-    fs.writeFileSync(outputDir + "nexus_urls.env", convertToEnvVar(result))
-    fs.writeFileSync(outputDir + "nexus_urls.json", JSON.stringify(result))
-    console.log("Saved in "+ outputDir + "nexus_urls.env and "+ outputDir + "nexus_urls.json")
+    fs.writeFileSync(outputDir + "artifact_repository.env", convertToEnvVar(result))
+    fs.writeFileSync(outputDir + "artifact_repository.json", JSON.stringify(result))
+    console.log("Saved in "+ outputDir + "artifact_repository.env and "+ outputDir + "artifact_repository.json")
   });
 }
 

@@ -12,6 +12,7 @@ var metadata = ""
 try {
   metadata = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'))
 } catch (err) {
+  console.log("Artifact metadata file not present (usually created by a webhook upstream job)")
   console.log("Optional object passed as first argument could not be fetched. Skipping")
 }
 

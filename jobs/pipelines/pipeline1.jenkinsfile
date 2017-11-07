@@ -15,13 +15,13 @@ pipeline {
         sh 'node /opt/resources/$JOB_NAME/build.js /tmp/metadata.json'
         sh 'cat $WORKSPACE/build.sh'
         sh '$WORKSPACE/build.sh'
-        sh 'source /tmp/artifact.env ; mv $WORKSPACE/$path/$filename $WORKSPACE/$destFilename'
+        sh '. /tmp/artifact.env ; mv $WORKSPACE/$path/$filename $WORKSPACE/$destFilename'
       }
     }
     stage ('Deploy') {
       steps {
         sh 'cat $WORKSPACE/deploy.sh'
-        sh '$WORKSPACE/deploy.sh'
+        sh '$WORKSPACE/deploy.sh $JENKINS_HOME/artifact_repository.env'
       }
     }
   }
