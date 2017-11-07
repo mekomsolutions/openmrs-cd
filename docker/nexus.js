@@ -6,7 +6,7 @@ var nexusCredentials = function() {
 
   var prompt = require('prompt');
   var outputDir = "/var/jenkins_home/.m2/"
-  var template = swig.compileFile('/usr/share/jenkins/ref/m2.settings.xml.j2');
+  var template = swig.compileFile('/usr/share/jenkins/m2.settings.xml.j2');
 
   console.log("Fetching MKS Nexus server credentials...")
   var schema = {
@@ -50,7 +50,7 @@ var nexusUrls = function() {
   var outputDir = "/var/jenkins_home/"
 
   console.log("Configuring Nexus URLs...")
-  var json = JSON.parse(fs.readFileSync('/usr/share/jenkins/ref/artifact_types.json', 'utf8'))
+  var json = JSON.parse(fs.readFileSync('/usr/share/jenkins/artifact_types.json', 'utf8'))
   
   var schema = {};
   schema.properties = {}
@@ -71,7 +71,7 @@ var nexusUrls = function() {
   prompt.get(schema, function (err, result) {
     fs.writeFileSync(outputDir + "nexus_config.env", convertToEnvVar(result))
     fs.writeFileSync(outputDir + "nexus_config.json", JSON.stringify(result))
-    console.log("Saved in "+ outputDir + "nexus_config.env and nexus_config.json")
+    console.log("Saved in "+ outputDir + "nexus_config.env and "+ outputDir + "nexus_config.json")
   });
 }
 
