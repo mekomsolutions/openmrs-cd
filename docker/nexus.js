@@ -57,7 +57,7 @@ var nexusUrls = function() {
 
   var arrayLength = json.artifact_types.length;
   for (var i = 0; i < arrayLength; i++) {
-    schema.properties[json.artifact_types[i]] = {
+    schema.properties["NEXUS_URL_" + json.artifact_types[i]] = {
       message: "'" + json.artifact_types[i] + "' Nexus URL"
     }
   }
@@ -69,9 +69,9 @@ var nexusUrls = function() {
   prompt.start()
 
   prompt.get(schema, function (err, result) {
-    fs.writeFileSync(outputDir + "nexus_config.env", convertToEnvVar(result))
-    fs.writeFileSync(outputDir + "nexus_config.json", JSON.stringify(result))
-    console.log("Saved in "+ outputDir + "nexus_config.env and "+ outputDir + "nexus_config.json")
+    fs.writeFileSync(outputDir + "nexus_urls.env", convertToEnvVar(result))
+    fs.writeFileSync(outputDir + "nexus_urls.json", JSON.stringify(result))
+    console.log("Saved in "+ outputDir + "nexus_urls.env and "+ outputDir + "nexus_urls.json")
   });
 }
 
