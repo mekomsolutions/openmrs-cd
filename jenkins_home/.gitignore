@@ -1,8 +1,6 @@
 jenkins_home/.m2/*
 !jenkins_home/.m2/.gitignore
-jenkins_home/nexus.js
-jenkins_home/nexus_config.json
-jenkins_home/package.json
+jenkins_home/artifact_repository*
 jenkins_home/.cache/
 jenkins_home/.config/
 jenkins_home/.mozilla/

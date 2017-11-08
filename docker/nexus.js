@@ -13,6 +13,7 @@ var nexusCredentials = function() {
     properties: {
       username: {
         message: 'Nexus username',
+        default: 'jenkins',
         required: true
       },
       password: {
@@ -62,8 +63,8 @@ var nexusUrls = function() {
     default: "mks-nexus"
   }
   for (var i = 0; i < arrayLength; i++) {
-    schema.properties["NEXUS_URL_" + json.artifact_types[i]] = {
-      message: "'" + json.artifact_types[i] + "' Nexus URL"
+    schema.properties["ARTIFACT_UPLOAD_URL_" + json.artifact_types[i]] = {
+      message: "'" + json.artifact_types[i] + "' artifact upload URL"
     }
   }
 
