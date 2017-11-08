@@ -38,3 +38,4 @@ COPY ./nexus.js /usr/share/jenkins/nexus.js
 COPY ./package.json /usr/share/jenkins/package.json
 COPY ./m2.settings.xml.j2 /usr/share/jenkins/m2.settings.xml.j2
 COPY ./artifact_types.json /usr/share/jenkins/artifact_types.json
+COPY ./webhook_triggers.json /usr/share/jenkins/webhook_triggers.json
