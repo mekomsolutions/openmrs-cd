@@ -18,7 +18,19 @@ docker run --name myjenkins  -p 8080:8080 -v ~/repos/openmrs-cd/resources/src/:/
 ```
 where 'myjenkins' is the name of the container. Could be anything.
 
-_Note: For now *not* all components are deployed on a remote repo. That is why we use the '~/repos/openmrs-cd/' sources as mounted volumes._
+_Note: **Not** all components are deployed on a remote repo yet. That is why we use the `~/repos/openmrs-cd/` sources as mounted volumes._
+
+Run the **nexus.js** script to configure the Nexus credentials and artifact upload URLs
+```
+docker exec -it myjenkins bash -c "cd /usr/share/jenkins/ && npm install && node nexus.js"
+```
+
+Answer the different questions asked:
+<p align="left  ">
+  <img width="700" src="./readme/nexus_creds_and_urls.png">
+</p>
+
+_Note: If you do not want to enter the artifact URL details by hand (through the CLI) you can just interrupt the program right after the nexus credentials are saved and then manually provide the files **artifact_repository.env** and **artifact_repository.json** in `/var/jenkins_home/`_
 
 # Dev guide
 
