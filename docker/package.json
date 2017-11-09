@@ -4,7 +4,7 @@
   "description": "",
   "dependencies": {
     "prompt": "^1.0.0",
-    "swig": "^1.4.2"
+    "mustache": "2.3.0"
   },
   "devDependencies": {},
   "scripts": {

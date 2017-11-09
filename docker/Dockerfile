@@ -1,5 +1,5 @@
 FROM jenkins/jenkins:2.82
-MAINTAINER Mekom Solutions <info@mekomsolutions.com> 
+MAINTAINER Mekom Solutions <support@mekomsolutions.com> 
 
 USER root
 
@@ -34,8 +34,9 @@ COPY security.groovy /usr/share/jenkins/init.groovy.d/security.groovy
 COPY ./plugins.txt /usr/share/jenkins/plugins.txt
 RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/plugins.txt
 
-COPY ./nexus.js /usr/share/jenkins/nexus.js
+COPY ./artifact_repo.js /usr/share/jenkins/artifact_repo.js
+COPY ./artifact_repo_default.json /usr/share/jenkins/artifact_repo_default.json
 COPY ./package.json /usr/share/jenkins/package.json
-COPY ./m2.settings.xml.j2 /usr/share/jenkins/m2.settings.xml.j2
+COPY ./m2_settings.xml.template /usr/share/jenkins/m2_settings.xml.template
 COPY ./artifact_types.json /usr/share/jenkins/artifact_types.json
 COPY ./webhook_triggers.json /usr/share/jenkins/webhook_triggers.json

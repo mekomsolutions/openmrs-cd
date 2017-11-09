@@ -3,9 +3,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <servers>
     <server>
-      <id>mks-nexus</id>
-      <username>{{m2_username}}</username>
-      <password>{{m2_password}}</password>
+      <id>{{repo_id}}</id>
+      <username>{{repo_username}}</username>
+      <password>{{repo_password}}</password>
     </server>
   </servers>
 </settings>
