@@ -23,6 +23,26 @@ module.exports = {
 
     return parsedPom;
   },
+  sortByArtifact: function (dependenciesByServer) {
+
+    var dependenciesByArtifact = {}
+
+    for (var property in dependenciesByServer) {
+      if (dependenciesByServer.hasOwnProperty(property)) {
+        var dependenciesForAServer = dependenciesByServer[property].dependencies
+        for (var i = 0; i < dependenciesForAServer.length; i++) {
+          var dep = dependenciesForAServer[i]
+          var key = dep.groupId + "." + dep.artifactId + "_" + dep.version
+          if(dependenciesByArtifact.hasOwnProperty(key)) {
+            dependenciesByArtifact[key].push(property)
+          } else {
+            dependenciesByArtifact[key] = [property]
+          }
+        }
+      }
+    }
+    return dependenciesByArtifact
+  },
   getScriptAsString: function (script) {
 
     var string = ""

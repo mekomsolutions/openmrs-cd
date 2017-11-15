@@ -1,0 +1,28 @@
+pipeline {
+  agent any
+  tools {
+    maven 'Maven 3.5.0' 
+    nodejs 'NodeJS 8.6.0'
+  }
+  stages {
+    stage ('Fetch server descriptors') {
+      steps {
+        sh 'node fetch.js $JENKINS_HOME/servers.json'
+      }
+    }
+    stage ('Parse the descriptors') {
+      steps {
+        sh 'node parse.js'
+      }
+    }
+    stage ('Compare dependencies to given artifact') {
+      steps {
+        sh 'node compare.js'
+      }
+    }
+    stage ('Log result in stack') {
+      steps {
+      }
+    }
+  }
+}

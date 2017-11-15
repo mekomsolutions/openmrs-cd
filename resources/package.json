@@ -4,7 +4,9 @@
   "description": "Resource scripts for the OpenMRS CD",
   "dependencies": {
     "jasmine": "^2.8.0",
-    "karma": "^1.7.1"
+    "karma": "^1.7.1",
+    "request":"^2.83.0",
+    "pixl-xml":"^1.0.13"
   },
   "devDependencies": {
     "jasmine": "^2.8.0"
