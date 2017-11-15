@@ -1,0 +1,8 @@
+{ "path": "./target",
+  "name": "rulesengine-omod",
+  "groupId": "org.openmrs.module",
+  "extension": "zip",
+  "version": "0.89-SNAPSHOT",
+  "filename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip",
+  "destFilename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
+}

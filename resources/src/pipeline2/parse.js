@@ -16,6 +16,5 @@ descriptors.forEach(function(item) {
   dependenciesByServer[item.id] = descriptor.getDependencies()
 
 });
-fs.writeFileSync('/tmp/dependenciesByServer.json', JSON.stringify(dependenciesByServer))
 
 fs.writeFileSync('/tmp/dependencies.json', JSON.stringify(utils.sortByArtifact(dependenciesByServer)))

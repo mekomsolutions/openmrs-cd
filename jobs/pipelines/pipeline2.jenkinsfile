@@ -15,13 +15,9 @@ pipeline {
         sh 'node parse.js'
       }
     }
-    stage ('Compare dependencies to given artifact') {
+    stage ('Identify servers that depends on the given artifact') {
       steps {
         sh 'node compare.js'
-      }
-    }
-    stage ('Log result in stack') {
-      steps {
       }
     }
   }
