@@ -1,1 +1,325 @@
-{"id1":{"dependencies":[{"groupId":"net.mekomsolutions","artifactId":"openmrs-config-cambodia","version":"1.0-SNAPSHOT"},{"groupId":"net.mekomsolutions","artifactId":"bahmni-config-cambodia","version":"1.0-SNAPSHOT"},{"groupId":"org.openmrs.web","artifactId":"openmrs-webapp","version":"2.1.0"},{"groupId":"org.openmrs.module","artifactId":"rulesengine-omod","version":"0.89-SNAPSHOT"},{"groupId":"org.bahmni.module","artifactId":"bahmnicore-omod","version":"0.89-SNAPSHOT"},{"groupId":"org.bahmni.module","artifactId":"reference-data-omod","version":"0.89-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"episodes-omod","version":"1.0-SNAPSHOT"},{"groupId":"org.bahmni.module","artifactId":"bahmni.ie.apps-omod","version":"0.89-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"bedmanagement-omod","version":"5.6-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"appframework-omod","version":"2.10.0"},{"groupId":"org.openmrs.module","artifactId":"legacyui-omod","version":"1.3.1"},{"groupId":"org.openmrs.module","artifactId":"uiframework-omod","version":"3.8"},{"groupId":"org.openmrs.module","artifactId":"uicommons-omod","version":"2.3.0"},{"groupId":"org.openmrs.module","artifactId":"emrapi-omod","version":"1.22.1"},{"groupId":"org.openmrs.module","artifactId":"providermanagement-omod","version":"2.5.0"},{"groupId":"org.openmrs.module","artifactId":"reporting-omod","version":"1.14.0-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"mksreports-omod","version":"1.1.1-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"metadatasharing-omod","version":"1.2.2"},{"groupId":"org.openmrs.module","artifactId":"uilibrary-omod","version":"2.0.5"},{"groupId":"org.openmrs.module","artifactId":"htmlwidgets-omod","version":"1.8.0"},{"groupId":"org.openmrs.module","artifactId":"calculation-omod","version":"1.2"},{"groupId":"org.openmrs.module","artifactId":"metadatamapping-omod","version":"1.3.1"},{"groupId":"org.openmrs.module","artifactId":"serialization.xstream-omod","version":"0.2.12"},{"groupId":"org.openmrs","artifactId":"event-omod","version":"2.5"},{"groupId":"org.openmrs.module","artifactId":"idgen-omod","version":"4.4.1"},{"groupId":"org.openmrs.module","artifactId":"idgen-webservices-omod","version":"1.2-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"addresshierarchy-omod","version":"2.11.0-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"webservices.rest-omod","version":"2.20.0"},{"groupId":"org.openmrs.module","artifactId":"bacteriology-omod","version":"1.1-SNAPSHOT"},{"groupId":"org.ict4h.openmrs","artifactId":"openmrs-atomfeed-omod","version":"2.5.5-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"initializer-omod","version":"1.0.1-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"exti18n-omod","version":"1.0.0"}]},"id253":{"dependencies":[{"groupId":"org.globalhealthcoalition","artifactId":"openmrs-config-haiti","version":"1.0-SNAPSHOT"},{"groupId":"org.globalhealthcoalition","artifactId":"bahmni-config-haiti","version":"1.0-SNAPSHOT"},{"groupId":"org.openmrs.web","artifactId":"openmrs-webapp","version":"2.1.0"},{"groupId":"org.openmrs.module","artifactId":"rulesengine-omod","version":"0.89-SNAPSHOT"},{"groupId":"org.bahmni.module","artifactId":"bahmnicore-omod","version":"0.89-SNAPSHOT"},{"groupId":"org.bahmni.module","artifactId":"reference-data-omod","version":"0.89-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"episodes-omod","version":"1.0-SNAPSHOT"},{"groupId":"org.bahmni.module","artifactId":"bahmni.ie.apps-omod","version":"0.89-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"bedmanagement-omod","version":"5.6-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"appframework-omod","version":"2.10.0"},{"groupId":"org.openmrs.module","artifactId":"legacyui-omod","version":"1.3.1"},{"groupId":"org.openmrs.module","artifactId":"uiframework-omod","version":"3.8"},{"groupId":"org.openmrs.module","artifactId":"uicommons-omod","version":"2.3.0"},{"groupId":"org.openmrs.module","artifactId":"emrapi-omod","version":"1.22.1"},{"groupId":"org.openmrs.module","artifactId":"providermanagement-omod","version":"2.5.0"},{"groupId":"org.openmrs.module","artifactId":"reporting-omod","version":"1.12.0"},{"groupId":"org.openmrs.module","artifactId":"metadatasharing-omod","version":"1.2.2"},{"groupId":"org.openmrs.module","artifactId":"uilibrary-omod","version":"2.0.5"},{"groupId":"org.openmrs.module","artifactId":"htmlwidgets-omod","version":"1.8.0"},{"groupId":"org.openmrs.module","artifactId":"calculation-omod","version":"1.2"},{"groupId":"org.openmrs.module","artifactId":"metadatamapping-omod","version":"1.3.1"},{"groupId":"org.openmrs.module","artifactId":"serialization.xstream-omod","version":"0.2.12"},{"groupId":"org.openmrs","artifactId":"event-omod","version":"2.5"},{"groupId":"org.openmrs.module","artifactId":"idgen-omod","version":"4.4.1"},{"groupId":"org.openmrs.module","artifactId":"idgen-webservices-omod","version":"1.2-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"addresshierarchy-omod","version":"2.10.0"},{"groupId":"org.openmrs.module","artifactId":"webservices.rest-omod","version":"2.20.0"},{"groupId":"org.openmrs.module","artifactId":"bacteriology-omod","version":"1.1-SNAPSHOT"},{"groupId":"org.ict4h.openmrs","artifactId":"openmrs-atomfeed-omod","version":"2.5.5-SNAPSHOT"},{"groupId":"org.openmrs.module","artifactId":"exti18n-omod","version":"1.0.0"},{"groupId":"org.openmrs.module","artifactId":"initializer-omod","version":"1.0.1-SNAPSHOT"}]}}
+{
+  "id1": {
+    "dependencies": [
+      {
+        "groupId": "net.mekomsolutions",
+        "artifactId": "openmrs-config-cambodia",
+        "version": "1.0-SNAPSHOT"
+      },
+      {
+        "groupId": "net.mekomsolutions",
+        "artifactId": "bahmni-config-cambodia",
+        "version": "1.0-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.web",
+        "artifactId": "openmrs-webapp",
+        "version": "2.1.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "rulesengine-omod",
+        "version": "0.89-SNAPSHOT"
+      },
+      {
+        "groupId": "org.bahmni.module",
+        "artifactId": "bahmnicore-omod",
+        "version": "0.89-SNAPSHOT"
+      },
+      {
+        "groupId": "org.bahmni.module",
+        "artifactId": "reference-data-omod",
+        "version": "0.89-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "episodes-omod",
+        "version": "1.0-SNAPSHOT"
+      },
+      {
+        "groupId": "org.bahmni.module",
+        "artifactId": "bahmni.ie.apps-omod",
+        "version": "0.89-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "bedmanagement-omod",
+        "version": "5.6-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "appframework-omod",
+        "version": "2.10.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "legacyui-omod",
+        "version": "1.3.1"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "uiframework-omod",
+        "version": "3.8"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "uicommons-omod",
+        "version": "2.3.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "emrapi-omod",
+        "version": "1.22.1"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "providermanagement-omod",
+        "version": "2.5.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "reporting-omod",
+        "version": "1.14.0-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "mksreports-omod",
+        "version": "1.1.1-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "metadatasharing-omod",
+        "version": "1.2.2"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "uilibrary-omod",
+        "version": "2.0.5"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "htmlwidgets-omod",
+        "version": "1.8.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "calculation-omod",
+        "version": "1.2"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "metadatamapping-omod",
+        "version": "1.3.1"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "serialization.xstream-omod",
+        "version": "0.2.12"
+      },
+      {
+        "groupId": "org.openmrs",
+        "artifactId": "event-omod",
+        "version": "2.5"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "idgen-omod",
+        "version": "4.4.1"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "idgen-webservices-omod",
+        "version": "1.2-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "addresshierarchy-omod",
+        "version": "2.11.0-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "webservices.rest-omod",
+        "version": "2.20.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "bacteriology-omod",
+        "version": "1.1-SNAPSHOT"
+      },
+      {
+        "groupId": "org.ict4h.openmrs",
+        "artifactId": "openmrs-atomfeed-omod",
+        "version": "2.5.5-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "initializer-omod",
+        "version": "1.0.1-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "exti18n-omod",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "id253": {
+    "dependencies": [
+      {
+        "groupId": "org.globalhealthcoalition",
+        "artifactId": "openmrs-config-haiti",
+        "version": "1.0-SNAPSHOT"
+      },
+      {
+        "groupId": "org.globalhealthcoalition",
+        "artifactId": "bahmni-config-haiti",
+        "version": "1.0-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.web",
+        "artifactId": "openmrs-webapp",
+        "version": "2.1.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "rulesengine-omod",
+        "version": "0.89-SNAPSHOT"
+      },
+      {
+        "groupId": "org.bahmni.module",
+        "artifactId": "bahmnicore-omod",
+        "version": "0.89-SNAPSHOT"
+      },
+      {
+        "groupId": "org.bahmni.module",
+        "artifactId": "reference-data-omod",
+        "version": "0.89-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "episodes-omod",
+        "version": "1.0-SNAPSHOT"
+      },
+      {
+        "groupId": "org.bahmni.module",
+        "artifactId": "bahmni.ie.apps-omod",
+        "version": "0.89-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "bedmanagement-omod",
+        "version": "5.6-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "appframework-omod",
+        "version": "2.10.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "legacyui-omod",
+        "version": "1.3.1"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "uiframework-omod",
+        "version": "3.8"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "uicommons-omod",
+        "version": "2.3.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "emrapi-omod",
+        "version": "1.22.1"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "providermanagement-omod",
+        "version": "2.5.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "reporting-omod",
+        "version": "1.12.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "metadatasharing-omod",
+        "version": "1.2.2"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "uilibrary-omod",
+        "version": "2.0.5"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "htmlwidgets-omod",
+        "version": "1.8.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "calculation-omod",
+        "version": "1.2"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "metadatamapping-omod",
+        "version": "1.3.1"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "serialization.xstream-omod",
+        "version": "0.2.12"
+      },
+      {
+        "groupId": "org.openmrs",
+        "artifactId": "event-omod",
+        "version": "2.5"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "idgen-omod",
+        "version": "4.4.1"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "idgen-webservices-omod",
+        "version": "1.2-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "addresshierarchy-omod",
+        "version": "2.10.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "webservices.rest-omod",
+        "version": "2.20.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "bacteriology-omod",
+        "version": "1.1-SNAPSHOT"
+      },
+      {
+        "groupId": "org.ict4h.openmrs",
+        "artifactId": "openmrs-atomfeed-omod",
+        "version": "2.5.5-SNAPSHOT"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "exti18n-omod",
+        "version": "1.0.0"
+      },
+      {
+        "groupId": "org.openmrs.module",
+        "artifactId": "initializer-omod",
+        "version": "1.0.1-SNAPSHOT"
+      }
+    ]
+  }
+}
