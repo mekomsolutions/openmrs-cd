@@ -58,6 +58,7 @@ var getArtifact = function (pomPath, metadata) {
   artifact.path = "./ui/target"
   artifact.name = "bahmniapps"
   artifact.groupId = ""
+  artifact.module = ""        
 
       // Version is not managed through npm or maven project. Using the commit id instead.
   if (typeof metadata != 'undefined' && metadata != null && metadata.commit != "") {

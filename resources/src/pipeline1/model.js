@@ -16,9 +16,10 @@ module.exports = {
   * An object that describes the artifact that will be built
   *
   */
-  Artifact: function(path, name, groupId, extension, version, filename, destFilename) {
+  Artifact: function(path, name, module, groupId, extension, version, filename, destFilename) {
     this.path = path
     this.name = name
+    this.modules = module
     this.groupId = groupId
     this.extension = extension
     this.version = version

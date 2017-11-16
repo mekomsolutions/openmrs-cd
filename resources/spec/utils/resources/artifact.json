@@ -1,5 +1,6 @@
 { "path": "./target",
-  "name": "rulesengine-omod",
+  "name": "rulesengine",
+  "module":"omod",
   "groupId": "org.openmrs.module",
   "extension": "zip",
   "version": "0.89-SNAPSHOT",

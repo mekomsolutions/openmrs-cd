@@ -56,11 +56,12 @@ module.exports = {
     return string
   },
   /*
-  * identifies the servers that have a dependency on the 'artficat' and updates the 'history' 
+  * identifies the servers that have a dependency on the 'artifact' and updates the 'history' 
   *
   */
-  setMatchingServersAndUpdateHistory: function (artifact, dependencies, history) {    
-    var key = artifact.groupId + "." + artifact.name + "_" + artifact.version
+  setMatchingServersAndUpdateHistory: function (artifact, dependencies, history) {
+    var suffix = artifact.module ? "-" + artifact.module : ""    
+    var key = artifact.groupId + "." + artifact.name + suffix + "_" + artifact.version
     var servers = dependencies[key]
     if (servers) {
       for (var i = 0; i < servers.length; i++) {
@@ -73,6 +74,9 @@ module.exports = {
           history[servers[i]].artifacts_history.push(artifact)
         }
       }
+    } else {
+      console.log("[WARN] No server found matching the provided artifact")
+      console.log("Artifact: " + key)
     }
   }
 }

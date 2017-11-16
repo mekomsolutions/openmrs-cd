@@ -24,11 +24,11 @@ module.exports = {
       var pom = utils.getPom(pomPath);
       artifact.version = pom.version
       artifact.name = pom.artifactId
+      artifact.module = "omod"        
       artifact.groupId = pom.groupId
 
       artifact.filename = artifact.name + "-" + artifact.version + "." + artifact.extension
       artifact.destFilename = artifact.filename
-      
       return artifact
     }
     project.getDeployScript = function (artifact) {
