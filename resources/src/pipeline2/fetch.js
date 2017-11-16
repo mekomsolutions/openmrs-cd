@@ -12,11 +12,13 @@ var servers = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'))
 descriptorService.fetchRemoteDistroDescriptors(servers, function (errors, result) {
   if (errors.length != 0) {
     console.log("Errors have been encountered while downlading descriptors.")
+    console.log("One or more server(s) may have an invalid descriptor URL.")
     console.dir(errors)
     process.exit(1); 
   }
   var descriptors = result
 
+  console.log(descriptors)
   fs.writeFileSync('/tmp/descriptors.json', JSON.stringify(descriptors))
 
 })

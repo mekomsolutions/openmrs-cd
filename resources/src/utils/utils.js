@@ -65,12 +65,12 @@ module.exports = {
     if (servers) {
       for (var i = 0; i < servers.length; i++) {
         if (history[servers[i]]) {
-          history[servers[i]].artifacts.push(artifact.name)
+          history[servers[i]].artifacts_history.push(artifact)
         } else {
           history[servers[i]] = {
-            "artifacts": []
+            "artifacts_history": []
           }
-          history[servers[i]].artifacts.push(artifact.name)
+          history[servers[i]].artifacts_history.push(artifact)
         }
       }
     }
