@@ -36,8 +36,8 @@ Currently only &apos;github&apos; is supported.</description>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>node /opt/resources/webhook/webhook.js
-node /opt/resources/webhook/trigger.js</command>
+      <command>node /opt/resources/src/webhook/webhook.js
+node /opt/resources/src/webhook/trigger.js</command>
     </hudson.tasks.Shell>
     <EnvInjectBuilder plugin="envinject@2.1.5">
       <info>

@@ -14,7 +14,7 @@ cd ~/repos/openmrs-cd
 
 Run a new container:
 ```
-docker run --name myjenkins  -p 8080:8080 -v ~/repos/openmrs-cd/resources/src/:/opt/resources -v ~/repos/openmrs-cd/jenkins_home/jenkins_home:/var/jenkins_home mekomsolutions/openmrscd:1.0.1-SNAPSHOT
+docker run --name myjenkins  -p 8080:8080 -v ~/repos/openmrs-cd/resources:/opt/resources -v ~/repos/openmrs-cd/jenkins_home/jenkins_home:/var/jenkins_home mekomsolutions/openmrscd:1.0.1-SNAPSHOT
 ```
 where 'myjenkins' is the name of the container. Could be anything.
 
