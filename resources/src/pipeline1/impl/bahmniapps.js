@@ -60,9 +60,13 @@ var getArtifact = function (pomPath, metadata) {
   artifact.groupId = ""
   artifact.module = ""        
 
-      // Version is not managed through npm or maven project. Using the commit id instead.
+  // Version is not managed through npm or maven project. Using the commit id (or branch if present) instead.
   if (typeof metadata != 'undefined' && metadata != null && metadata.commit != "") {
-    artifact.version = metadata.commit
+    if (metadata.branch) {
+      artifact.version = metadata.branch
+    } else {
+      artifact.version = metadata.commit
+    }
     artifact.filename = artifact.name + "." + artifact.extension
     artifact.destFilename = artifact.name + "-" + artifact.version + "." + artifact.extension
   } else {
