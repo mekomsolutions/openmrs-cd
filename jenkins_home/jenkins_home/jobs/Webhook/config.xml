@@ -67,6 +67,18 @@ node /opt/resources/src/webhook/trigger.js</command>
       </buildStep>
       <runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$Fail" plugin="run-condition@1.0"/>
     </org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
+    <EnvInjectBuilder plugin="envinject@2.1.5">
+      <info>
+        <propertiesFilePath>/tmp/metadata.env</propertiesFilePath>
+      </info>
+    </EnvInjectBuilder>
+    <org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater plugin="build-name-setter@1.6.7">
+      <buildName></buildName>
+      <macroTemplate>#${BUILD_NUMBER} - ${ENV,var=&quot;repo&quot;} - ${ENV,var=&quot;branch&quot;} (${ENV,var=&quot;commit&quot;})</macroTemplate>
+      <fromFile>false</fromFile>
+      <fromMacro>true</fromMacro>
+      <macroFirst>false</macroFirst>
+    </org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater>
   </builders>
   <publishers/>
   <buildWrappers>
