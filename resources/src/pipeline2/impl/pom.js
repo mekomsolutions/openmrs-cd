@@ -1,4 +1,4 @@
-var model = require('../model')
+var model = require('../../models/model')
 var utils = require('../../utils/utils')
 var fs = require('fs')
 var XML = require('pixl-xml')
