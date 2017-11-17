@@ -17,7 +17,7 @@ try {
 }
 
 // Retrieve the details of the artifact that will be built
-var artifact = project.getArtifact('./', metadata)
+var artifact = project.getArtifactFile('./', metadata)
 
 // Retrieve the script to build the project
 var buildScript = project.getBuildScriptAsString()

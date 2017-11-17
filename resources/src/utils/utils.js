@@ -46,13 +46,13 @@ module.exports = {
   getScriptAsString: function (script) {
 
     var string = ""
-
-    string = script.type
-    string = string + "\n\n"
-    string = string + script.comments
-    string = string + "\n\n"
-    string = string + script.value
-
+    if (script != null) {
+      string = script.type
+      string = string + "\n\n"
+      string = string + script.comments
+      string = string + "\n\n"
+      string = string + script.value
+    }
     return string
   },
   /*

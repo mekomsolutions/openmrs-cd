@@ -12,7 +12,7 @@ module.exports = {
     project.getBuildScript = function () {
       return getBuildScript();
     }
-    project.getArtifact = function (pomPath, metadata) {
+    project.getArtifactFile = function (pomPath, metadata) {
       return getArtifact(pomPath, metadata)
     }
     project.getDeployScript = function (artifact) {
@@ -52,7 +52,7 @@ var getDeployScript = function(artifact) {
 
 var getArtifact = function (pomPath, metadata) {
 
-  var artifact = new model.Artifact();
+  var artifact = new model.ArtifactFile();
 
   artifact.extension = "zip"
   artifact.path = "./ui/target"

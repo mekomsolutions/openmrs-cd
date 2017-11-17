@@ -3,6 +3,22 @@ describe('Tests suite for Pipeline2 ', function () {
   var folderInTest = __dirname + '/../../src/pipeline2/'
   var fs = require('fs')
 
+  it('should implement all required functions from model', function () {
+
+    var folderInTest = __dirname + '/../../src/pipeline2/'
+    
+    const fs = require('fs');
+    const model = require(__dirname + '/../../src/models/model')
+    const modelTestUtils = require(__dirname + '/../models/modelTestUtils')
+    
+    fs.readdirSync(folderInTest + 'impl/').forEach(file => {
+      var type = file.split('.')[0]
+      var descriptor = new require(folderInTest + 'impl/' + type).getInstance(null, null)
+
+      modelTestUtils.ensureImplmentedFunctions(descriptor, model.Descriptor)
+    })
+  })
+
   it ('should fetch each server descriptor (ex, pom.xml) based on the URLs provided in the servers.json file', function (done) {
 
     var fs = require('fs');

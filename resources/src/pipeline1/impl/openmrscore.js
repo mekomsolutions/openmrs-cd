@@ -12,8 +12,8 @@ module.exports = {
     project.getBuildScript = function () {
       return getBuildScript();
     }
-    project.getArtifact = function (pomPath) {
-      var artifact = new model.Artifact();
+    project.getArtifactFile = function (pomPath) {
+      var artifact = new model.ArtifactFile();
 
       artifact.extension = "omod"
       artifact.path = "./omod/target"

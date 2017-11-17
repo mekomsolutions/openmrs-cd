@@ -1,9 +1,6 @@
-{ "path": "./target",
+{
   "name": "openmrs-config-cambodia",
-  "modules":"",
+  "module":"",
   "groupId": "net.mekomsolutions",
-  "extension": "zip",
-  "version": "1.0-SNAPSHOT",
-  "filename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip",
-  "destFilename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
+  "version": "1.0-SNAPSHOT"
 }
