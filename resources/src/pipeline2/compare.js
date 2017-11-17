@@ -4,6 +4,7 @@
 */
 var fs = require('fs');
 var utils = require('../utils/utils')
+var model = require('../models/model')
 
 var dependenciesDir = "/tmp"
 var historyDir = "/var/jenkins_home"
@@ -27,7 +28,7 @@ try {
 }
 
 // 'history' is passed by reference so it will be updated in the function
-utils.setMatchingServersAndUpdateHistory(artifact, dependencies, history)
 
-fs.writeFileSync(historyDir + '/history.json', JSON.stringify(history))
-console.log(JSON.stringify(history, null, 4))
+utils.setMatchingServersAndUpdateHistory(dependencies, history, new model.ServerEvent(Date.now(), artifact))
+
+fs.writeFileSync(historyDir + '/history.json', JSON.stringify(history, null, 2))

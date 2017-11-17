@@ -23,6 +23,7 @@ pipeline {
     stage ('Identify servers that depends on the given artifact') {
       steps {
         sh 'node /opt/resources/src/$JOB_NAME/compare.js'
+        sh 'cat $JENKINS_HOME/history.json'
       }
     }
   }

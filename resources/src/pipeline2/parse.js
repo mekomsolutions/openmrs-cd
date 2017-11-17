@@ -19,4 +19,4 @@ descriptors.forEach(function(item) {
 
 var byArtifact = utils.sortByArtifact(dependenciesByServer)
 console.log(byArtifact)
-fs.writeFileSync('/tmp/dependencies.json', JSON.stringify(byArtifact))
+fs.writeFileSync('/tmp/dependencies.json', JSON.stringify(byArtifact, null, 2))

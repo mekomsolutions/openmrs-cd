@@ -25,6 +25,6 @@ descriptorService.fetchRemoteDistroDescriptors(servers, function (errors, result
   var descriptors = result
 
   console.log(descriptors)
-  fs.writeFileSync('/tmp/descriptors.json', JSON.stringify(descriptors))
+  fs.writeFileSync('/tmp/descriptors.json', JSON.stringify(descriptors, null, 2))
 
 })

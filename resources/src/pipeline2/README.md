@@ -1,13 +1,13 @@
-[Pipeline2](../../../jobs/pipelines/pipeline2.jenkinsfile) will identify which server is affected by an occuring artifact modification..
+[Pipeline2](../../../jobs/pipelines/pipeline2.jenkinsfile) will identify which server is affected by an occuring artifact modification.
 
-To do so, each server is mapped with a descriptor and type.
-A descriptor is a file that describes what makes a server, ie what are its dependencies. Most of the time the descriptor will be the distro pom.xml the server is built on.
+To do so, each server is mapped with a descriptor and a type.
+A descriptor is a file that describes what makes a server, ie what are its dependencies. Most of the time the descriptor will be the distro pom.xml the server is built on ("type": "pom").
 However, other formats could be implemented if needed.
 This configuration is found in the **servers.json** file (see section below for more details)
 
-The pipeline first fetches the descriptors (**fetch.js**) and then parses them (**parse.js**) to produce a list of dependencies sorted by artifact. See the sample (test) resource [dependenciesByArtifact.json](../../spec/utils/resources/dependenciesByArtifact.json)
+The pipeline first fetches the descriptors ([fetch.js](./parse.js)) and then parses them ([parse.js](./parse.js)) to produce a list of dependencies sorted by artifact. See the sample (test) resource [dependenciesByArtifact.json](../../spec/utils/resources/dependenciesByArtifact.json)
 
-From there, **compare.js** will compare the artifact provided as input to the dependency list just created and update the **history.json** file which is a stack of all builds that have affected a given server (see below)
+From there, [compare.js](./compare.js) will compare the artifact provided as input to the dependency list just created and update the **history.json** file which is a stack of all builds that have affected a given server (see below)
 
 In details:
 
@@ -46,68 +46,56 @@ See below an example of the **artifact.json** file.
 (Another example can be found in the Jasmine specs [here](../../spec/utils/resources/artifact.json))
 ```
 {
-  "path": "./target",
-  "name": "openmrs-config-cambodia",
-  "groupId": "net.mekomsolutions",
-  "extension": "zip",
-  "version": "1.0-SNAPSHOT",
-  "filename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip",
-  "destFilename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
+  "name": "rulesengine",
+  "module":"omod",
+  "groupId": "org.openmrs.module",
+  "version": "0.89-SNAPSHOT"
 }
-
 ```
 
 
 ## Output produced by pipeline2
 
+### **history.json**
+
 The output of this pipeline will be a log/history object that contains a list of the servers that have been affected by an artifact modification.
 Each new modification will create a new line for the server that depends on this artifact.
 
-Note that the `artifact_history` list contains **Artifact** objects (such as defined [here](../models/model.js#L19-L27))
 For example:
 ```
 {
-    "server1": {
-        "artifacts_history": [
+    "id1": {
+        "serverEvents": [
             {
-                "path": "./target",
-                "name": "openmrs-config-cambodia",
-                "groupId": "net.mekomsolutions",
-                "extension": "zip",
-                "version": "1.0-SNAPSHOT",
-                "filename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip",
-                "destFilename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
+                "timestamp": 1510936225021,
+                "artifact": {
+                    "name": "rulesengine",
+                    "module": "omod",
+                    "groupId": "org.openmrs.module",
+                    "version": "0.89-SNAPSHOT"
+                }
             },
             {
-                "path": "./target",
-                "name": "openmrs-config-cambodia",
-                "groupId": "net.mekomsolutions",
-                "extension": "zip",
-                "version": "1.0-SNAPSHOT",
-                "filename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip",
-                "destFilename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
-            },
-            {
-                "path": "./target",
-                "name": "rulesengine-omod",
-                "groupId": "org.openmrs.module",
-                "extension": "zip",
-                "version": "0.89-SNAPSHOT",
-                "filename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip",
-                "destFilename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
+                "timestamp": 1510936225021,
+                "artifact": {
+                    "name": "openmrs-config-cambodia",
+                    "module": "",
+                    "groupId": "net.mekomsolutions",
+                    "version": "1.0-SNAPSHOT"
+                }
             }
         ]
     },
-    "server2": {
-        "artifacts_history": [
+    "id253": {
+        "serverEvents": [
             {
-                "path": "./target",
-                "name": "rulesengine-omod",
-                "groupId": "org.openmrs.module",
-                "extension": "zip",
-                "version": "0.89-SNAPSHOT",
-                "filename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip",
-                "destFilename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
+                "timestamp": 1510936225021,
+                "artifact": {
+                    "name": "rulesengine",
+                    "module": "omod",
+                    "groupId": "org.openmrs.module",
+                    "version": "0.89-SNAPSHOT"
+                }
             }
         ]
     }

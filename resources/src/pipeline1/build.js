@@ -31,4 +31,4 @@ fs.chmodSync(process.env.WORKSPACE + "/deploy.sh", 0755);
 
 // Export the artifact info in order for the pipeline and other jobs to use it
 fs.writeFileSync("/tmp/artifact.env", utils.convertToEnvVar(artifact))
-fs.writeFileSync("/tmp/artifact.json", JSON.stringify(artifact))
+fs.writeFileSync("/tmp/artifact.json", JSON.stringify(artifact, null, 2))

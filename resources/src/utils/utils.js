@@ -59,19 +59,21 @@ module.exports = {
   * identifies the servers that have a dependency on the 'artifact' and updates the 'history' 
   *
   */
-  setMatchingServersAndUpdateHistory: function (artifact, dependencies, history) {
+  setMatchingServersAndUpdateHistory: function (dependencies, history, serverEvent) {
+    var artifact = serverEvent.artifact
     var suffix = artifact.module ? "-" + artifact.module : ""    
     var key = artifact.groupId + "." + artifact.name + suffix + "_" + artifact.version
     var servers = dependencies[key]
+
     if (servers) {
-      for (var i = 0; i < servers.length; i++) {
-        if (history[servers[i]]) {
-          history[servers[i]].artifacts_history.push(artifact)
+      for (var server of servers) {
+        if (history[server]) {
+          history[server].serverEvents.push(serverEvent)
         } else {
-          history[servers[i]] = {
-            "artifacts_history": []
+          history[server] = {
+            "serverEvents": []
           }
-          history[servers[i]].artifacts_history.push(artifact)
+          history[server].serverEvents.push(serverEvent)
         }
       }
     } else {
