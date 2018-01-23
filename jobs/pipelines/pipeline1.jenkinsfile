@@ -12,7 +12,7 @@ pipeline {
     }
     stage ('Build') {
       steps {
-        sh 'node /opt/resources/src/$JOB_NAME/build.js /tmp/metadata.json'
+        sh 'node /opt/app/src/$JOB_NAME/build.js /tmp/metadata.json'
         sh 'cat $WORKSPACE/build.sh'
         sh '$WORKSPACE/build.sh'
         sh '. /tmp/artifact.env ; mv $WORKSPACE/$path/$filename $WORKSPACE/$destFilename'

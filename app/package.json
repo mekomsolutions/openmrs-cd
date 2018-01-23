@@ -1,5 +1,5 @@
 {
-  "name": "resources",
+  "name": "app",
   "version": "0.0.0",
   "description": "Resource scripts for the OpenMRS CD",
   "dependencies": {

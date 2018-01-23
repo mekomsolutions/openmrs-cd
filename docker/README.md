@@ -35,7 +35,7 @@ mekomsolutions/openmrscd   1.0.1-SNAPSHOT          e248d7f7805b        4 seconds
 Then run/start a new container from this new image and confirm all works as you expect. This is an important step to make sure you have not forgotten to put any declaration in the Dockerfile.
 
 ```
-docker run --name myjenkins  -p 8080:8080 -v ~/repos/openmrs-cd/resources/src/:/opt/resources -v ~/repos/openmrs-cd/jenkins_home/jenkins_home:/var/jenkins_home mekomsolutions/openmrscd:1.0.1-SNAPSHOT
+docker run --name myjenkins  -p 8080:8080 -v ~/repos/openmrs-cd/app:/opt/app -v ~/repos/openmrs-cd/jenkins_home/jenkins_home:/var/jenkins_home mekomsolutions/openmrscd:1.0.1-SNAPSHOT
 ```
 
 Where **1.0.1-SNAPSHOT** is the version your new image, specified in the [build.gradle](./build.gradle) file.

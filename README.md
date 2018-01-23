@@ -14,7 +14,7 @@ cd ~/repos/openmrs-cd
 
 Run a new container:
 ```
-docker run --name myjenkins  -p 8080:8080 -v ~/repos/openmrs-cd/resources:/opt/resources -v ~/repos/openmrs-cd/jenkins_home/jenkins_home:/var/jenkins_home mekomsolutions/openmrscd:1.0.1-SNAPSHOT
+docker run --name myjenkins  -p 8080:8080 -v ~/repos/openmrs-cd/app:/opt/app -v ~/repos/openmrs-cd/jenkins_home/jenkins_home:/var/jenkins_home mekomsolutions/openmrscd:1.0.1-SNAPSHOT
 ```
 where 'myjenkins' is the name of the container. Could be anything.
 
@@ -71,14 +71,14 @@ Note: Developping with the Jenkins_home component requires to use `git clean -Xd
 
 This folder holds the Pipelines that the Jenkins server will fetch directly from GitHub. They do not need to be packaged and deployed. That is why, unlike the other components, 'jobs' does not implement any build task. 
 
-## The 'resources' component
+## The 'app' component
 
-The 'resources' folder is here to bring script and resources that will be used by the Jenkins pipelines or jobs.
+The 'app' folder is here to bring script and resources that will be used by the Jenkins pipelines or jobs.
 ```
-cd resources/
+cd app/
 gradle build
 ```
 This will run tests tasks configured for this build and output a zip file of all resources if successful.
 
-The zip archive is located at the default Gradle location for build artifacts, **./resources/build/distributions/resources-1.0.0-SNAPSHOT.zip**
+The zip archive is located at the default Gradle location for build artifacts, **./app/build/distributions/app-1.0.0-SNAPSHOT.zip**
 

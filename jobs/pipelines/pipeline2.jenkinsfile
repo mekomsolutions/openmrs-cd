@@ -7,22 +7,22 @@ pipeline {
   stages {
     stage ('Install npm dependencies') {
       steps {
-        sh 'cd /opt/resources/; npm install'
+        sh 'cd /opt/app/; npm install'
       }
     }
     stage ('Fetch server descriptors') {
       steps {
-        sh 'node /opt/resources/src/$JOB_NAME/fetch.js $JENKINS_HOME/servers.json'
+        sh 'node /opt/app/src/$JOB_NAME/fetch.js $JENKINS_HOME/servers.json'
       }
     }
     stage ('Parse the descriptors') {
       steps {
-        sh 'node /opt/resources/src/$JOB_NAME/parse.js'
+        sh 'node /opt/app/src/$JOB_NAME/parse.js'
       }
     }
     stage ('Identify servers that depends on the given artifact') {
       steps {
-        sh 'node /opt/resources/src/$JOB_NAME/compare.js'
+        sh 'node /opt/app/src/$JOB_NAME/compare.js'
         sh 'cat $JENKINS_HOME/history.json'
       }
     }
