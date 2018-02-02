@@ -1,1 +1,1 @@
-include 'docker', 'jenkins_home', 'resources', 'jobs'
+include 'docker', 'jenkins_home', 'resources', 'jobs', 'app'

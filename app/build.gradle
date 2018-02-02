@@ -1,9 +1,7 @@
 version = "1.0.0-SNAPSHOT"
 
-apply plugin: 'java'
-
 task jasmine(type: Exec) {
-  commandLine 'npm', 'install', 'test'
+  commandLine 'npm', 'install-test'
 }
 
 task archive(type: Zip) {
