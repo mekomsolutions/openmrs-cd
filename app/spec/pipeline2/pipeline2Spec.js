@@ -21,7 +21,26 @@ describe('Tests suite for Pipeline2 ', function () {
 
   it ('should fetch each server descriptor (ex, pom.xml) based on the URLs provided in the servers.json file', function (done) {
 
+    var nock = require('nock');
     var fs = require('fs');
+
+    // Mock the HTTPS calls using 'nock' module
+    nock('https://repo.mekomsolutions.net')
+                .get('/cambodia/master/pom.xml')
+                .reply(200, {
+                  type: 'pom'
+                });
+
+    nock('https://repo.mekomsolutions.net')
+                .get('/cambodia/unexistingref/pom.xml')
+                .reply(404, {});
+
+    nock('https://repo.mekomsolutions.net')
+                .get('/haiti/master/pom.xml')
+                .reply(200, {
+                  type: 'pom'
+                });
+
     var descriptorService = require(folderInTest + 'descriptorService')
     var servers = JSON.parse(fs.readFileSync(__dirname + '/resources/servers.json', 'utf8'))
     descriptorService.fetchRemoteDistroDescriptors(servers, function (errors, result) {

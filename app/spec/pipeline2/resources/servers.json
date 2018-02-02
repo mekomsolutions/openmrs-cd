@@ -1,21 +1,21 @@
 {
   "id1": {
     "descriptor": {
-      "url": "https://raw.githubusercontent.com/mekomsolutions/openmrs-distro-cambodia/master/pom.xml",
+      "url": "https://repo.mekomsolutions.net/cambodia/master/pom.xml",
       "type": "pom"
     },
     "type": "dev"
   }, 
   "id2": {
     "descriptor": {
-      "url": "https://raw.githubusercontent.com/mekomsolutions/openmrs-distro-cambodia/unexistingref/pom.xml",
+      "url": "https://repo.mekomsolutions.net/cambodia/unexistingref/pom.xml",
       "type": "pom"
     },
     "type": "production"
   },
   "id253": {
     "descriptor": {
-      "url":"https://raw.githubusercontent.com/globalhealthcoalition/openmrs-distro-haiti/master/pom.xml",
+      "url":"https://repo.mekomsolutions.net/haiti/master/pom.xml",
       "type": "pom"
     },
     "type": "dev"
