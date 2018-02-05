@@ -1,5 +1,6 @@
 'use strict'
 var utils = require('../utils/utils')
+var constants = require('../constants/constants')
 
 /**
 * An object that describes the script to build the project
@@ -51,17 +52,17 @@ class ArtifactFile {
 class Project {
 
   getBuildScript () {
-    return "To be implemented"
+    return constants.ABSTRACT + "This method should be implemented"
   } 
   getBuildScriptAsString () {
     // A default implementation is provided
     return utils.getScriptAsString(this.getBuildScript())
   }
   getArtifactFile () {
-    return "To be implemented"
+    return constants.ABSTRACT + "This method should be implemented"
   }  
   getDeployScript (artifact) {
-    return "To be implemented"
+    return constants.ABSTRACT + "This method should be implemented"
   }
   getDeployScriptAsString (artifact) {
     // A default implementation is provided
@@ -100,7 +101,7 @@ class Descriptor {
     this.rawData = rawData
   }
   getDependencies () {
-    return "To be implemented"
+    return constants.ABSTRACT + "This method should be implemented"
   }
 }
 

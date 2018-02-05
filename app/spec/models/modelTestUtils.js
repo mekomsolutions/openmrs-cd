@@ -12,13 +12,15 @@
 * So any method in the prototype that retuns "To be implemented" is considered as method to implement
 * 
 */
+var constants = require(__dirname + '/../../src/constants/constants')
+
 var ensureImplmentedFunctions = function (instance, objectClass) {
 
   var properties = Object.getOwnPropertyNames(objectClass.prototype)
   var object = new objectClass()
   for (var property of properties) {        
     if (property != "constructor") {
-      if (object[property]() == "To be implemented") {
+      if (object[property]().startsWith(constants.ABSTRACT)) {
         var implemented = true
         if (instance[property].toString() == object[property].toString()) {
           console.log("[" + property + "] is not implemented. Verify that you provide an implementation to all required methods of this class. Class: " + objectClass)
