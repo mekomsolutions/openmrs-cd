@@ -1,6 +1,6 @@
 {
   "name": "rulesengine",
-  "module":"omod",
+  "module": "omod",
   "groupId": "org.openmrs.module",
   "version": "0.89-SNAPSHOT"
 }

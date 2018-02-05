@@ -1,20 +1,18 @@
 /**
-* @author Romain Buisson (romain@mekomsolutions.com)
-*
-*/
+ * @author Romain Buisson (romain@mekomsolutions.com)
+ *
+ */
 
-var model = require('./model')
+var model = require("./model");
 
 module.exports = {
-
   /**
-  * Parses a GitHub payload to return a @see{WebhookMetadata} object
-  *
-  * @return the @see{WebhookMetadata} object 
-  */
-  parsePayload: function (payload) {
-
-  // If no payload was received there is nothing to do. Not allowed to use "null".
+   * Parses a GitHub payload to return a @see{WebhookMetadata} object
+   *
+   * @return the @see{WebhookMetadata} object
+   */
+  parsePayload: function(payload) {
+    // If no payload was received there is nothing to do. Not allowed to use "null".
     if (payload === "") {
       return 0;
     }
@@ -23,7 +21,7 @@ module.exports = {
 
     var parsedData = new model.WebhookMetadata();
 
-    parsedData.url = payloadObject.repository.html_url
+    parsedData.url = payloadObject.repository.html_url;
     parsedData.repo = payloadObject.repository.name;
 
     if (payloadObject.ref != null) {
@@ -39,6 +37,6 @@ module.exports = {
       process.exit(0);
     }
 
-    return parsedData
+    return parsedData;
   }
-}
+};

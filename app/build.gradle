@@ -1,15 +1,16 @@
 version = "1.0.0-SNAPSHOT"
 
-task jasmine(type: Exec) {
-  commandLine 'npm', 'install-test'
+task npmBuild(type: Exec) {
+  commandLine 'npm', 'install'
+  commandLine 'npm', 'run', 'build'
 }
 
 task archive(type: Zip) {
   from ('./src')
-  baseName = "app"
-  dependsOn jasmine
+  baseName = "target/app"
+  dependsOn npmBuild
 }
 
 task build() {
-  dependsOn jasmine, archive
+  dependsOn npmBuild, archive
 }

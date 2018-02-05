@@ -1,8 +1,8 @@
 {
   "id1": {
     "serverEvents": [
-      { 
-        "timestamp" : "2016",
+      {
+        "timestamp": "2016",
         "artifact": "someartifact1"
       }
     ]
@@ -10,11 +10,11 @@
   "id253": {
     "serverEvents": [
       {
-        "timestamp" : "2017",
+        "timestamp": "2017",
         "artifact": "someartifact2"
       },
       {
-        "timestamp" : "2017-11",
+        "timestamp": "2017-11",
         "artifact": "someartifact3"
       }
     ]

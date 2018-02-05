@@ -1,3 +1,3 @@
 module.exports = {
-  "ABSTRACT":"__abstract__"
-}
+  ABSTRACT: "__abstract__"
+};
