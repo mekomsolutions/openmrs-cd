@@ -1,8 +1,12 @@
 version = "1.0.0-SNAPSHOT"
 
-task npmBuild(type: Exec) {
+task npmInstall(type: Exec) {
   commandLine 'npm', 'install'
+}
+
+task npmBuild(type: Exec) {
   commandLine 'npm', 'run', 'build'
+  dependsOn npmInstall
 }
 
 task archive(type: Zip) {
