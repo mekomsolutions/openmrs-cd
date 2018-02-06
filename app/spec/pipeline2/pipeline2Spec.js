@@ -72,26 +72,21 @@ describe("Tests suite for Pipeline2 ", function() {
         item.descriptor
       );
       var serverDeps = descriptor.getDependencies();
-
       allDeps[item.serverId] = serverDeps;
     });
 
-    var id1Server = allDeps.id1.dependencies;
+    var id1Server = allDeps.id1;
     expect(id1Server[0].version).toEqual("1.0-SNAPSHOT");
     expect(id1Server[0].groupId).toEqual("net.mekomsolutions");
     expect(id1Server[0].artifactId).toEqual("openmrs-config-cambodia");
     expect(id1Server[4].version).toEqual("0.89-SNAPSHOT");
     expect(id1Server[5].version).toEqual("0.89-SNAPSHOT");
 
-    var id2Server = allDeps.id2.dependencies;
+    var id2Server = allDeps.id2;
     expect(id2Server[0].version).toEqual("1.0-SNAPSHOT");
     expect(id2Server[0].groupId).toEqual("org.globalhealthcoalition");
     expect(id2Server[0].artifactId).toEqual("openmrs-config-haiti");
     expect(id2Server[4].version).toEqual("0.89-SNAPSHOT");
     expect(id2Server[5].version).toEqual("0.89-SNAPSHOT");
   });
-
-  // it ('should return a matching server', function () {
-
-  // })
 });

@@ -18,7 +18,7 @@ class Script {
  * An object that describes an artifact
  *
  */
-class Artifact {
+class Project {
   constructor(name, module, groupId, version) {
     this.name = name;
     this.module = module;
@@ -31,21 +31,9 @@ class Artifact {
  * An object that describes an artifact and its details as a file
  *
  */
-class ArtifactFile {
-  constructor(
-    name,
-    module,
-    groupId,
-    version,
-    path,
-    extension,
-    filename,
-    destFilename
-  ) {
-    this.name = name;
-    this.module = module;
-    this.groupId = groupId;
-    this.version = version;
+class Artifact {
+  constructor(project, path, extension, filename, destFilename) {
+    this.project = project;
     this.path = path;
     this.extension = extension;
     this.filename = filename;
@@ -58,7 +46,7 @@ class ArtifactFile {
  * This is an interface to document which field should be implemented when creating a new project type.
  *
  */
-class Project {
+class ProjectBuild {
   getBuildScript() {
     return constants.ABSTRACT + "This method should be implemented";
   }
@@ -66,39 +54,18 @@ class Project {
     // A default implementation is provided
     return utils.getScriptAsString(this.getBuildScript());
   }
-  getArtifactFile() {
+  getArtifact() {
     return constants.ABSTRACT + "This method should be implemented";
   }
-  getDeployScript(artifact) {
+  getDeployScript(project) {
     return constants.ABSTRACT + "This method should be implemented";
   }
-  getDeployScriptAsString(artifact) {
+  getDeployScriptAsString(project) {
     // A default implementation is provided
-    return utils.getScriptAsString(this.getDeployScript(artifact));
+    return utils.getScriptAsString(this.getDeployScript(project));
   }
 }
 
-/**
- * An object that represents a dependency.
- *
- */
-class Dependency {
-  constructor(groupId, artifactId, version) {
-    this.groupId = groupId;
-    this.artifactId = artifactId;
-    this.version = version;
-  }
-}
-
-/**
- * An object that represents all the dependencies of a given server.
- *
- */
-class Dependencies {
-  constructor(dependencies) {
-    this.dependencies = dependencies;
-  }
-}
 /**
  * An object that represents an given server (an OpenMRS distro + ref) (such as a pom.xml file).
  *
@@ -125,11 +92,9 @@ class ServerEvent {
 
 module.exports = {
   Script: Script,
-  Artifact: Artifact,
-  ArtifactFile: ArtifactFile,
   Project: Project,
-  Dependency: Dependency,
-  Dependencies: Dependencies,
+  Artifact: Artifact,
+  ProjectBuild: ProjectBuild,
   Descriptor: Descriptor,
   ServerEvent: ServerEvent
 };

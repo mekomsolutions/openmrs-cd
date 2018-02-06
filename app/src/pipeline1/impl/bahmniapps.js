@@ -4,20 +4,20 @@ var fs = require("fs");
 
 module.exports = {
   getInstance: function() {
-    var project = new model.Project();
+    var projectBuild = new model.ProjectBuild();
 
     // Implement here the Project object methods
-    project.getBuildScript = function() {
+    projectBuild.getBuildScript = function() {
       return getBuildScript();
     };
-    project.getArtifactFile = function(pomPath, metadata) {
+    projectBuild.getArtifact = function(pomPath, metadata) {
       return getArtifact(pomPath, metadata);
     };
-    project.getDeployScript = function(artifact) {
-      return getDeployScript(artifact);
+    projectBuild.getDeployScript = function(project) {
+      return getDeployScript(project);
     };
 
-    return project;
+    return projectBuild;
   }
 };
 
@@ -61,13 +61,12 @@ var getDeployScript = function(artifact) {
 };
 
 var getArtifact = function(pomPath, metadata) {
-  var artifact = new model.ArtifactFile();
+  var project = new model.Project();
+  project.name = "bahmniapps";
+  project.groupId = "";
+  project.module = "";
 
-  artifact.extension = "zip";
-  artifact.path = "./ui/target";
-  artifact.name = "bahmniapps";
-  artifact.groupId = "";
-  artifact.module = "";
+  var artifact = new model.Artifact();
 
   // Version is not managed through npm or maven project. Using the commit id (or branch if present) instead.
   if (
@@ -76,18 +75,22 @@ var getArtifact = function(pomPath, metadata) {
     metadata.commit != ""
   ) {
     if (metadata.branch) {
-      artifact.version = metadata.branch;
+      project.version = metadata.branch;
     } else {
-      artifact.version = metadata.commit;
+      project.version = metadata.commit;
     }
-    artifact.filename = artifact.name + "." + artifact.extension;
+    artifact.filename = project.name + "." + artifact.extension;
     artifact.destFilename =
-      artifact.name + "-" + artifact.version + "." + artifact.extension;
+      artifact.name + "-" + project.version + "." + artifact.extension;
   } else {
-    artifact.version = "";
-    artifact.filename = artifact.name + "." + artifact.extension;
+    project.version = "";
+    artifact.filename = project.name + "." + artifact.extension;
     artifact.destFilename = artifact.filename;
   }
+
+  artifact.project = project;
+  artifact.extension = "zip";
+  artifact.path = "./ui/target";
 
   return artifact;
 };

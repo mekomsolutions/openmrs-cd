@@ -4,37 +4,40 @@ var fs = require("fs");
 
 module.exports = {
   getInstance: function() {
-    var project = new model.Project();
+    var projectBuild = new model.ProjectBuild();
 
-    // Implement here the Project object methods
-    project.getBuildScriptAsString = function() {
+    // Implement here the ProjectBuild object methods
+    projectBuild.getBuildScriptAsString = function() {
       return utils.getScriptAsString(getBuildScript());
     };
-    project.getBuildScript = function() {
+    projectBuild.getBuildScript = function() {
       return getBuildScript();
     };
-    project.getArtifactFile = function(pomPath) {
-      var artifact = new model.ArtifactFile();
+    projectBuild.getArtifact = function(pomPath) {
+      var pom = utils.getPom(pomPath);
+      var project = new model.Project();
+      project.version = pom.version;
+      project.name = pom.artifactId;
+      project.module = "omod";
+      project.groupId = pom.groupId;
 
+      var artifact = new model.Artifact();
       artifact.extension = "omod";
       artifact.path = "./omod/target";
 
-      var pom = utils.getPom(pomPath);
-      artifact.version = pom.version;
-      artifact.name = pom.artifactId;
-      artifact.module = "omod";
-      artifact.groupId = pom.groupId;
-
       artifact.filename =
-        artifact.name + "-" + artifact.version + "." + artifact.extension;
+        project.name + "-" + project.version + "." + artifact.extension;
       artifact.destFilename = artifact.filename;
+
+      artifact.project = project;
+
       return artifact;
     };
-    project.getDeployScript = function(artifact) {
+    projectBuild.getDeployScript = function(artifact) {
       return getDeployScript(artifact);
     };
 
-    return project;
+    return projectBuild;
   }
 };
 

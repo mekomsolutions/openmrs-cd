@@ -5,8 +5,8 @@
 var fs = require("fs");
 var utils = require("../utils/utils");
 
-// The Project is loaded based on what the project type value
-var project = require("./impl/" + process.env.type).getInstance();
+// The Project is loaded based on what the projectBuild type value
+var projectBuild = require("./impl/" + process.env.type).getInstance();
 
 var metadata = "";
 try {
@@ -21,15 +21,15 @@ try {
 }
 
 // Retrieve the details of the artifact that will be built
-var artifact = project.getArtifactFile("./", metadata);
+var artifact = projectBuild.getArtifact("./", metadata);
 
-// Retrieve the script to build the project
-var buildScript = project.getBuildScriptAsString();
+// Retrieve the script to build the projectBuild
+var buildScript = projectBuild.getBuildScriptAsString();
 fs.writeFileSync(process.env.WORKSPACE + "/build.sh", buildScript);
 fs.chmodSync(process.env.WORKSPACE + "/build.sh", 0755);
 
-// Retrieve the script to deploy the project
-var deployScript = project.getDeployScriptAsString(artifact);
+// Retrieve the script to deploy the projectBuild
+var deployScript = projectBuild.getDeployScriptAsString(artifact);
 fs.writeFileSync(process.env.WORKSPACE + "/deploy.sh", deployScript);
 fs.chmodSync(process.env.WORKSPACE + "/deploy.sh", 0755);
 

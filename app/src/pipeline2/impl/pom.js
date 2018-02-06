@@ -18,20 +18,13 @@ module.exports = {
       var newPomAsXML = replaceVersionNumber(properties, this.rawData);
       pomAsObject = XML.parse(newPomAsXML);
 
-      // Fetch the dependencies from the new POM XML and convert into JS object
-      var dependencies = pomAsObject.dependencies.dependency;
-
-      // return a Dependencies object that maps a server Id with its dependencies
-      return new model.Dependencies(convertAsDependencyObjects(dependencies));
+      // return a list of dependencies that maps a server Id with its dependencies
+      return convertAsProjectObjects(pomAsObject.dependencies.dependency);
     };
     return descriptor;
   }
 };
 
-/*
-* 
-*
-*/
 var replaceVersionNumber = function(properties, pom) {
   var newPom = pom;
   for (var property in properties) {
@@ -46,14 +39,13 @@ var replaceVersionNumber = function(properties, pom) {
   return newPom;
 };
 
-var convertAsDependencyObjects = function(dependencies) {
+var convertAsProjectObjects = function(dependencies) {
   var newDependenciesArray = [];
   for (var i = 0; i < dependencies.length; i++) {
-    var dependency = new model.Dependency(
-      dependencies[i].groupId,
-      dependencies[i].artifactId,
-      dependencies[i].version
-    );
+    var dependency = new model.Project();
+    dependency.groupId = dependencies[i].groupId;
+    dependency.artifactId = dependencies[i].artifactId;
+    dependency.version = dependencies[i].version;
     newDependenciesArray.push(dependency);
   }
 
