@@ -7,10 +7,10 @@ module.exports = {
    */
   convertToEnvVar: function(object) {
     var envvars = "";
-
-    for (var property in object) {
-      if (object.hasOwnProperty(property)) {
-        envvars = envvars + property + "=" + object[property] + "\n";
+    var flat = flattenObject(object);
+    for (var property in flat) {
+      if (flat.hasOwnProperty(property)) {
+        envvars = envvars + property + "=" + flat[property] + "\n";
       }
     }
     return envvars;
@@ -62,9 +62,14 @@ module.exports = {
     serverEvent
   ) {
     var artifact = serverEvent.artifact;
-    var suffix = artifact.module ? "-" + artifact.module : "";
+    var suffix = artifact.project.module ? "-" + artifact.project.module : "";
     var key =
-      artifact.groupId + "." + artifact.name + suffix + "_" + artifact.version;
+      artifact.project.groupId +
+      "." +
+      artifact.project.name +
+      suffix +
+      "_" +
+      artifact.project.version;
     var servers = dependencies[key];
 
     if (servers) {
@@ -80,7 +85,32 @@ module.exports = {
       }
     } else {
       console.log("[WARN] No server found matching the provided artifact");
+      console.dir(serverEvent);
       console.log("Artifact: " + key);
     }
   }
+};
+
+/**
+ * https://gist.github.com/penguinboy/762197
+ *
+ */
+var flattenObject = function(ob) {
+  var toReturn = {};
+
+  for (var i in ob) {
+    if (!ob.hasOwnProperty(i)) continue;
+
+    if (typeof ob[i] == "object") {
+      var flatObject = flattenObject(ob[i]);
+      for (var x in flatObject) {
+        if (!flatObject.hasOwnProperty(x)) continue;
+
+        toReturn[i + "_" + x] = flatObject[x];
+      }
+    } else {
+      toReturn[i] = ob[i];
+    }
+  }
+  return toReturn;
 };

@@ -4,6 +4,35 @@ describe("Tests suite for Utils ", function() {
   const utils = require(folderInTest + "utils");
   const model = require(folderInTest + "../models/model");
 
+  it("should flatten environment variables", function() {
+    var realDeepObject = {
+      level1: {
+        level2: {
+          level3: {
+            more: "stuff",
+            other: "stuff",
+            level4: {
+              the: "end"
+            }
+          }
+        },
+        level2still: {
+          last: "one"
+        },
+        am: "bored"
+      },
+      more: "stuff",
+      ipsum: {
+        lorem: "latin"
+      }
+    };
+
+    var expectedResult =
+      "level1_level2_level3_more=stuff\nlevel1_level2_level3_other=stuff\nlevel1_level2_level3_level4_the=end\nlevel1_level2still_last=one\nlevel1_am=bored\nmore=stuff\nipsum_lorem=latin\n";
+    var envvar = utils.convertToEnvVar(realDeepObject);
+    expect(envvar).toEqual(expectedResult);
+  });
+
   it("should convert a list of dependencies sorted by serverId into a by artifact list", function() {
     var dependenciesByServer = JSON.parse(
       fs.readFileSync(

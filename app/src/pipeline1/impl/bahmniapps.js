@@ -67,6 +67,8 @@ var getArtifact = function(pomPath, metadata) {
   project.module = "";
 
   var artifact = new model.Artifact();
+  artifact.extension = "zip";
+  artifact.path = "./ui/target";
 
   // Version is not managed through npm or maven project. Using the commit id (or branch if present) instead.
   if (
@@ -81,7 +83,7 @@ var getArtifact = function(pomPath, metadata) {
     }
     artifact.filename = project.name + "." + artifact.extension;
     artifact.destFilename =
-      artifact.name + "-" + project.version + "." + artifact.extension;
+      project.name + "-" + project.version + "." + artifact.extension;
   } else {
     project.version = "";
     artifact.filename = project.name + "." + artifact.extension;
@@ -89,8 +91,6 @@ var getArtifact = function(pomPath, metadata) {
   }
 
   artifact.project = project;
-  artifact.extension = "zip";
-  artifact.path = "./ui/target";
 
   return artifact;
 };

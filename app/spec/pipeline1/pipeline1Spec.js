@@ -45,17 +45,20 @@ describe("Tests suite for Pipeline1 ", function() {
     };
 
     var artifact = projectBuild.getArtifact("./", mockMetadata);
+
     expect(artifact.project.name).toEqual("bahmniapps");
     expect(artifact.project.version).toEqual("dev");
     expect(artifact.project.module).toEqual("");
     expect(artifact.project.groupId).toEqual("");
 
     expect(artifact.extension).toEqual("zip");
+    expect(artifact.filename).toEqual("bahmniapps.zip");
+    expect(artifact.destFilename).toEqual("bahmniapps-dev.zip");
     expect(artifact.path).toEqual("./ui/target");
 
     mockMetadata.branch = "";
     artifact = projectBuild.getArtifact("./", mockMetadata);
-    expect(artifact.project.version).toEqual("12fe45");
+    expect(artifact.destFilename).toEqual("bahmniapps-12fe45.zip");
 
     var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
@@ -84,6 +87,15 @@ describe("Tests suite for Pipeline1 ", function() {
     expect(artifact.project.module).toEqual("");
     expect(artifact.project.groupId).toEqual("net.mekomsolutions");
 
+    expect(artifact.extension).toEqual("zip");
+    expect(artifact.filename).toEqual(
+      "bahmni-config-cambodia-1.0-SNAPSHOT.zip"
+    );
+    expect(artifact.destFilename).toEqual(
+      "bahmni-config-cambodia-1.0-SNAPSHOT.zip"
+    );
+    expect(artifact.path).toEqual("./target");
+
     var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
     expect(buildScript.value).toEqual("mvn clean install\n");
@@ -106,10 +118,20 @@ describe("Tests suite for Pipeline1 ", function() {
       __dirname + "/resources/" + projectBuildType + "/",
       null
     );
+
     expect(artifact.project.name).toEqual("openmrs-config-cambodia");
     expect(artifact.project.version).toEqual("1.0-SNAPSHOT");
     expect(artifact.project.module).toEqual("");
     expect(artifact.project.groupId).toEqual("net.mekomsolutions");
+
+    expect(artifact.extension).toEqual("zip");
+    expect(artifact.filename).toEqual(
+      "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
+    );
+    expect(artifact.destFilename).toEqual(
+      "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
+    );
+    expect(artifact.path).toEqual("./target");
 
     var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
@@ -133,10 +155,16 @@ describe("Tests suite for Pipeline1 ", function() {
       __dirname + "/resources/" + projectBuildType + "/",
       null
     );
+
     expect(artifact.project.name).toEqual("openmrs");
     expect(artifact.project.version).toEqual("2.2.0-SNAPSHOT");
     expect(artifact.project.module).toEqual("webapp");
     expect(artifact.project.groupId).toEqual("org.openmrs");
+
+    expect(artifact.extension).toEqual("omod");
+    expect(artifact.filename).toEqual("openmrs-2.2.0-SNAPSHOT.omod");
+    expect(artifact.destFilename).toEqual("openmrs-2.2.0-SNAPSHOT.omod");
+    expect(artifact.path).toEqual("./omod/target");
 
     var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
@@ -160,10 +188,16 @@ describe("Tests suite for Pipeline1 ", function() {
       __dirname + "/resources/" + projectBuildType + "/",
       null
     );
+
     expect(artifact.project.name).toEqual("exti18n");
     expect(artifact.project.version).toEqual("1.1.0-SNAPSHOT");
     expect(artifact.project.module).toEqual("omod");
     expect(artifact.project.groupId).toEqual("org.openmrs.module");
+
+    expect(artifact.extension).toEqual("omod");
+    expect(artifact.filename).toEqual("exti18n-1.1.0-SNAPSHOT.omod");
+    expect(artifact.destFilename).toEqual("exti18n-1.1.0-SNAPSHOT.omod");
+    expect(artifact.path).toEqual("./omod/target");
 
     var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");

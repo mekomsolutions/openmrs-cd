@@ -1,6 +1,12 @@
 {
-  "name": "openmrs-config-cambodia",
-  "module": "",
-  "groupId": "net.mekomsolutions",
-  "version": "1.0-SNAPSHOT"
+  "project": {
+    "name": "openmrs-config-cambodia",
+    "module": "",
+    "groupId": "net.mekomsolutions",
+    "version": "1.0-SNAPSHOT"
+  },
+  "path": "",
+  "extension": "",
+  "filename": "",
+  "destFilename": ""
 }

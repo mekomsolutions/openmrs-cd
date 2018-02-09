@@ -1,6 +1,12 @@
 {
-  "name": "rulesengine",
-  "module": "omod",
-  "groupId": "org.openmrs.module",
-  "version": "0.89-SNAPSHOT"
+  "project": {
+    "name": "rulesengine",
+    "module": "omod",
+    "groupId": "org.openmrs.module",
+    "version": "0.89-SNAPSHOT"
+  },
+  "path": "",
+  "extension": "",
+  "filename": "",
+  "destFilename": ""
 }
