@@ -10,18 +10,21 @@
           <name>payload</name>
           <description>There must be a &apos;payload&apos; POST parameter since it is provided by GitHub when it appends parameters to the webhook URL. We have no control on that aspect of GitHub&apos;s webhook service.</description>
           <defaultValue></defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>type</name>
           <description>The type of the project hooked.
 Type can be values such as &apos;distro&apos;, &apos;openmrsmodule&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;...</description>
           <defaultValue></defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>service</name>
           <description>The SCM service used. Based on this parameter the payload parsing can be implemented differently
 Currently only &apos;github&apos; is supported.</description>
           <defaultValue>github</defaultValue>
+          <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
@@ -36,8 +39,8 @@ Currently only &apos;github&apos; is supported.</description>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>node /opt/resources/src/webhook/webhook.js
-node /opt/resources/src/webhook/trigger.js</command>
+      <command>node /opt/app/src/webhook/webhook.js
+node /opt/app/src/webhook/trigger.js</command>
     </hudson.tasks.Shell>
     <EnvInjectBuilder plugin="envinject@2.1.5">
       <info>
