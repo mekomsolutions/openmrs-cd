@@ -1,4 +1,4 @@
-describe("Tests suite for Utils ", function() {
+describe("Tests suite for Utils", function() {
   const folderInTest = __dirname + "/../../src/utils/";
   const fs = require("fs");
   const utils = require(folderInTest + "utils");

@@ -2,8 +2,9 @@
  * @author Romain Buisson (romain@mekomsolutions.com)
  *
  */
-var fs = require("fs");
-var utils = require("../utils/utils");
+const fs = require("fs");
+const utils = require("../utils/utils");
+const log = require("npmlog");
 
 var metadata = JSON.parse(fs.readFileSync("/tmp/metadata.json", "utf8"));
 
@@ -33,4 +34,4 @@ fs.writeFileSync(
   JSON.stringify(project)
 );
 
-console.log(utils.convertToEnvVar(project));
+log.info("", utils.convertToEnvVar(project));

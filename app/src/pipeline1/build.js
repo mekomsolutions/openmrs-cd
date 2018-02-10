@@ -2,22 +2,28 @@
  * @author Romain Buisson (romain@mekomsolutions.com)
  *
  */
-var fs = require("fs");
-var utils = require("../utils/utils");
+const fs = require("fs");
+const utils = require("../utils/utils");
+const log = require("npmlog");
 
 // The Project is loaded based on what the projectBuild type value
 var projectBuild = require("./impl/" + process.env.type).getInstance();
 
-var metadata = "";
+var metadata = {}; // artifact's metadata, for example this could be a SCM webhook payload file
 try {
-  metadata = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+  if (process.argv[2] !== undefined) {
+    metadata = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+  } else {
+    log.info("", "The build process is continuing with no artifact metadata.");
+    log.info("", "There was no optional argument passed to " + __filename);
+  }
 } catch (err) {
-  console.log(
+  log.error(
+    "",
     "Artifact metadata file not present (usually created by a webhook upstream job)"
   );
-  console.log(
-    "Optional object passed as first argument could not be fetched. Skipping"
-  );
+  log.error("", err);
+  process.exit(1);
 }
 
 // Retrieve the details of the artifact that will be built

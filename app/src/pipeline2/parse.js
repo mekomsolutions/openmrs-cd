@@ -2,8 +2,9 @@
  * @author Romain Buisson (romain@mekomsolutions.com)
  *
  */
-var fs = require("fs");
-var utils = require("../utils/utils");
+const fs = require("fs");
+const utils = require("../utils/utils");
+const log = require("npmlog");
 
 var descriptorsDir = "/tmp";
 var descriptors = JSON.parse(
@@ -21,5 +22,5 @@ descriptors.forEach(function(item) {
 });
 
 var byArtifact = utils.sortByArtifact(dependenciesByServer);
-console.log(byArtifact);
+log.info("", byArtifact);
 fs.writeFileSync("/tmp/dependencies.json", JSON.stringify(byArtifact, null, 2));

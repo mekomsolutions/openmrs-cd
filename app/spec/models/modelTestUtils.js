@@ -8,13 +8,14 @@
 * @params 'instance' is an instance of 'objectClass'
 *
 * In order to identify which superclass methods of the prototype should be implemented, this test assumes 
-* that non-implemented methods declared in the model definition are returning "To be implemented"
-* So any method in the prototype that retuns "To be implemented" is considered as method to implement
+* that non-implemented methods declared in the model definition are returning a special string.
+* Any method in the prototype that retuns that string is considered as a method to be implemented.
 * 
 */
 var constants = require(__dirname + "/../../src/constants/constants");
+var log = require("npmlog");
 
-var ensureImplmentedFunctions = function(instance, objectClass) {
+var ensureImplementedFunctions = function(instance, objectClass) {
   var properties = Object.getOwnPropertyNames(objectClass.prototype);
   var object = new objectClass();
   for (var property of properties) {
@@ -22,10 +23,11 @@ var ensureImplmentedFunctions = function(instance, objectClass) {
       if (object[property]().startsWith(constants.ABSTRACT)) {
         var implemented = true;
         if (instance[property].toString() == object[property].toString()) {
-          console.log(
+          log.error(
+            "",
             "[" +
               property +
-              "] is not implemented. Verify that you provide an implementation to all required methods of this class. Class: " +
+              "] is not implemented. You must provide an implementation to all abstract methods of this class: " +
               objectClass
           );
         }
@@ -36,5 +38,5 @@ var ensureImplmentedFunctions = function(instance, objectClass) {
 };
 
 module.exports = {
-  ensureImplmentedFunctions: ensureImplmentedFunctions
+  ensureImplementedFunctions: ensureImplementedFunctions
 };

@@ -1,11 +1,8 @@
 describe("Tests suite for Pipeline2 ", function() {
-  var folderInTest = __dirname + "/../../src/pipeline2/";
-  var fs = require("fs");
+  const folderInTest = __dirname + "/../../src/pipeline2/";
+  const fs = require("fs");
 
   it("should implement all required functions from model", function() {
-    var folderInTest = __dirname + "/../../src/pipeline2/";
-
-    const fs = require("fs");
     const model = require(__dirname + "/../../src/models/model");
     const modelTestUtils = require(__dirname + "/../models/modelTestUtils");
 
@@ -16,13 +13,12 @@ describe("Tests suite for Pipeline2 ", function() {
         null
       );
 
-      modelTestUtils.ensureImplmentedFunctions(descriptor, model.Descriptor);
+      modelTestUtils.ensureImplementedFunctions(descriptor, model.Descriptor);
     });
   });
 
   it("should fetch each server descriptor (ex, pom.xml) based on the URLs provided in the servers.json file", function(done) {
-    var nock = require("nock");
-    var fs = require("fs");
+    const nock = require("nock");
 
     // Mock the HTTPS calls using 'nock' module
     nock("https://repo.mekomsolutions.net")
@@ -41,7 +37,7 @@ describe("Tests suite for Pipeline2 ", function() {
         type: "pom"
       });
 
-    var descriptorService = require(folderInTest + "descriptorService");
+    const descriptorService = require(folderInTest + "descriptorService");
     var servers = JSON.parse(
       fs.readFileSync(__dirname + "/resources/servers.json", "utf8")
     );

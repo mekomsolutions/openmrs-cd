@@ -2,8 +2,9 @@
  * @author Romain Buisson (romain@mekomsolutions.com)
  *
  */
-var fs = require("fs");
-var utils = require("../utils/utils");
+const fs = require("fs");
+const utils = require("../utils/utils");
+const log = require("npmlog");
 
 // The PayloadParser is loaded based on what the SCM service is
 var payloadParser = require("./impl/" + process.env.service);
@@ -18,4 +19,4 @@ metadata.type = process.env.type;
 fs.writeFileSync("/tmp/metadata.env", utils.convertToEnvVar(metadata));
 fs.writeFileSync("/tmp/metadata.json", JSON.stringify(metadata));
 
-console.log(utils.convertToEnvVar(metadata));
+log.info("", utils.convertToEnvVar(metadata));

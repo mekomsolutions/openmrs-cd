@@ -1,5 +1,46 @@
 "use strict";
 describe("Tests suite for Pipeline1 ", function() {
+  it("should generate build and deploy scripts", function() {
+    // deps
+    const r3quire = require("proxyquire");
+    const model = require(__dirname + "/../../src/models/model");
+    const os = require("os");
+    const fs = require("fs");
+
+    // setup
+    process.env.type = "artifact_type";
+    process.env.WORKSPACE = os.tmpdir();
+
+    const buildScript = "__build_script__";
+    const deployScript = "__deploy_script__";
+    var mockBuild = new model.ProjectBuild();
+    mockBuild.getBuildScriptAsString = function() {
+      return buildScript;
+    };
+    mockBuild.getDeployScriptAsString = function(project) {
+      return deployScript;
+    };
+
+    var stubs = {};
+    stubs["./impl/" + process.env.type] = {
+      getInstance: function() {
+        return mockBuild;
+      },
+      "@noCallThru": true
+    };
+
+    // replay
+    r3quire(__dirname + "/../../src/pipeline1/build.js", stubs);
+
+    // verif
+    expect(
+      fs.readFileSync(process.env.WORKSPACE + "/build.sh", "utf8")
+    ).toEqual(buildScript);
+    expect(
+      fs.readFileSync(process.env.WORKSPACE + "/deploy.sh", "utf8")
+    ).toEqual(deployScript);
+  });
+
   it("should implement all required functions from model", function() {
     var folderInTest = __dirname + "/../../src/pipeline1/";
 
@@ -14,7 +55,7 @@ describe("Tests suite for Pipeline1 ", function() {
         folderInTest + "impl/" + type
       ).getInstance();
 
-      modelTestUtils.ensureImplmentedFunctions(
+      modelTestUtils.ensureImplementedFunctions(
         projectBuild,
         model.ProjectBuild
       );
@@ -28,7 +69,7 @@ describe("Tests suite for Pipeline1 ", function() {
         metadata
       );
 
-      modelTestUtils.ensureImplmentedFunctions(artifact, model.Artifact);
+      modelTestUtils.ensureImplementedFunctions(artifact, model.Artifact);
     });
   });
 

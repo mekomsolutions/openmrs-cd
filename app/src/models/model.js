@@ -48,17 +48,17 @@ class Artifact {
  */
 class ProjectBuild {
   getBuildScript() {
-    return constants.ABSTRACT + "This method should be implemented";
+    return constants.ABSTRACT;
   }
   getBuildScriptAsString() {
     // A default implementation is provided
     return utils.getScriptAsString(this.getBuildScript());
   }
   getArtifact() {
-    return constants.ABSTRACT + "This method should be implemented";
+    return constants.ABSTRACT;
   }
   getDeployScript(project) {
-    return constants.ABSTRACT + "This method should be implemented";
+    return constants.ABSTRACT;
   }
   getDeployScriptAsString(project) {
     // A default implementation is provided
@@ -76,7 +76,7 @@ class Descriptor {
     this.rawData = rawData;
   }
   getDependencies() {
-    return constants.ABSTRACT + "This method should be implemented";
+    return constants.ABSTRACT;
   }
 }
 
