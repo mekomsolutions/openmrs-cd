@@ -1,63 +1,65 @@
 # OpenMRS CD
-A Jenkins server configured to provide tools to manage OpenMRS servers
+> A dockerized [Jenkins](https://jenkins.io/) server ready to manage [OpenMRS](https://openmrs.org/) and [Bahmni](https://www.bahmni.org/) instances.
 
-# User guide
+## User guide
 
-Here is how to start a new OpenMRS CD server
+To start a new OpenMRS CD server
 
-Git clone the 'openmrs-cd' repository
+**1** - Clone the openmrs-cd repository:
+
+**Note:** _we assume that all cloned repositories are saved in the home `~/repos` folder._
 ```
 cd ~/repos/
-git clone https://github.com/mekomsolutions/openmrs-cd
-cd ~/repos/openmrs-cd
+git clone https://github.com/mekomsolutions/openmrs-cd && cd openmrs-cd
 ```
 
-Run a new container:
+**2** - Run a new container:
 ```
-docker run --name myjenkins  -p 8080:8080 -v ~/repos/openmrs-cd/app:/opt/app -v ~/repos/openmrs-cd/jenkins_home/jenkins_home:/var/jenkins_home mekomsolutions/openmrscd:1.0.1-SNAPSHOT
+docker run --name openmrscd  -p 8080:8080 \
+  -v ~/repos/openmrs-cd/app:/opt/app \
+  -v ~/repos/openmrs-cd/jenkins/jenkins_home:/var/jenkins_home \
+  mekomsolutions/openmrscd:1.0.1-SNAPSHOT
 ```
-where 'myjenkins' is the name of the container. Could be anything.
+Where `openmrscd` is the name of the Jenkins container.
 
-_Note: **Not** all components are deployed on a remote repo yet. That is why we use the `~/repos/openmrs-cd/` sources as mounted volumes._
+**Note:** _Not all components are deployed on a remote repo yet. That is why we use the `~/repos/openmrs-cd/` sources as mounted volumes._
 
-Run the **artifact_repo.js** script to configure the artifact repository credentials and artifact upload URLs
+**3** - Launch the **artifact_repo.js** script to configure the artifacts repository credentials and artifact upload URLs:
 ```
-docker exec -it myjenkins bash -c "cd /usr/share/jenkins/ && npm install && node artifact_repo.js"
+docker exec -it openmrscd \
+  bash -c "cd /usr/share/jenkins/ && npm install && node artifact_repo.js"
 ```
+And answer the prompted questions.
 
-Answer the questions asked...
+**Note:** _If you do not want to enter the artifacts repository URLs and authentication details by hand (through the CLI) you can just edit **usr/share/jenkins/artifact_repo_default.json** (see the default one [here](docker/config/artifact_repo_default.json) as an example) with your own repo URLs and ID and then run the script again. It will detect the file and ask you to use it with the values provided in it._
 
-_Note: If you do not want to enter the artifact URL and ID details by hand (through the CLI) you can just replace the **artifact_repo_default.json** file contents at `usr/share/jenkins` ([see the existing one](docker/artifact_repo_default.json)) with your own repo URLs and ID and then run the script again. It will detect the file and ask you to use it with the values provided in it._
+## Developer guide
 
+Gradle is used to build all the artifacts that make the OpenMRS CD.
 
-# Dev guide
+### The parent project (root folder)
 
-Gradle is used to build all the needed artifacts that make the OpenMRS CD.
-
-## The parent project: root folder
-
-In order to build all components of the OpenMRS CD simply run the following command from the root directory:
+In order to build all components of the OpenMRS CD run the following command from the root folder:
 ```
 gradle build
 ```
 Each subproject's 'build' tasks will run.
 
-
-## The 'docker' component
+### The 'docker' component
 ```
 cd docker/
 gradle build
 ```
-This task builds the Docker image used as a base for the OpenMRS CD. It uses the Dockerfile provided in the `docker/` folder.
+This task builds the Docker image used as a base for the OpenMRS CD. See the [Dockerfile](docker/Dockerfile).
 
 ```
 gradle deploy
 ```
 This deploys the Docker image on the Mekom Solutions Docker Hub repository. This is not run by default when running the `gradle build` of the parent Gradle project
 
-## The 'jenkins_home' component
+### The 'jenkins_home' component
 
-OpenMRS CD needs not only to use a Docker image for its binaries but it also requires a Jenkins Home folder to provide the base configuration.
+OpenMRS CD not only needs a Docker image for its binaries but also requires a Jenkins Home folder providing the base Jenkins configuration.
 
 ```
 cd jenkins_home/
@@ -65,20 +67,19 @@ gradle build
 ```
 This will package a zip archive of the jenkins_home folder.
 
-Note: Developping with the Jenkins_home component requires to use `git clean -Xdf`. Please read the [note for developpers](jenkins_home/README.md) first.
+**Note:** _Developing with the Jenkins_home component requires to use `git clean -Xdf`. Please read the [note for developpers](jenkins/README.md) first._
 
-## The 'jobs' component
+### The 'jobs' component
 
 This folder holds the Pipelines that the Jenkins server will fetch directly from GitHub. They do not need to be packaged and deployed. That is why, unlike the other components, 'jobs' does not implement any build task. 
 
-## The 'app' component
+### The 'app' component
 
-The 'app' folder is here to bring script and resources that will be used by the Jenkins pipelines or jobs.
+The 'app' folder provides scripts and resources run by the Jenkins pipelines and jobs.
 ```
 cd app/
 gradle build
 ```
-This will run tests tasks configured for this build and output a zip file of all resources if successful.
+This will run tests tasks configured for this build and generate a zip packaged file of all scripts and resources if successful.
 
-The zip archive is located at the default Gradle location for build artifacts, **./app/build/distributions/app-1.0.0-SNAPSHOT.zip**
-
+The zip package is located at the default Gradle location for build artifacts: **./app/build/distributions/**

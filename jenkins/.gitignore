@@ -1,5 +1,6 @@
 jenkins_home/.m2/*
 !jenkins_home/.m2/.gitignore
+jenkins_home/tools
 jenkins_home/artifact_repository*
 jenkins_home/.cache/
 jenkins_home/.config/
@@ -16,6 +17,7 @@ jenkins_home/.gitconfig
 jenkins_home/.viminfo
 jenkins_home/.bash_history
 jenkins_home/log
+jenkins_home/jenkins-tests
 jenkins_home/*.log
 jenkins_home/*.tmp
 jenkins_home/*.old
@@ -27,7 +29,13 @@ jenkins_home/terracotta/
 jenkins_home/updates/
 jenkins_home/fingerprints/
 jenkins_home/config-history/
-jenkins_home/# Only get the config.xml from any Jobs directory
+jenkins_home/queue.xml
+jenkins_home/org.jenkinsci.plugins.workflow.flow.FlowExecutionList.xml
+
+# Specific to pipeline2
+jenkins_home/history.json
+
+# Only get the config.xml from any Jobs directory
 jenkins_home/jobs/*/builds
 jenkins_home/jobs/*/modules
 jenkins_home/jobs/*/htmlreports
@@ -38,7 +46,8 @@ jenkins_home/jobs/*/*.txt
 jenkins_home/jobs/*/*.log
 jenkins_home/jobs/*/workspace
 jenkins_home/jobs/*/modules
-jenkins_home/# Process jobs that exist in folders
+
+# Process jobs that exist in folders
 jenkins_home/jobs/**/jobs/*/builds
 jenkins_home/jobs/**/jobs/*/modules
 jenkins_home/jobs/**/jobs/*/htmlreports
@@ -49,7 +58,8 @@ jenkins_home/jobs/**/jobs/*/*.txt
 jenkins_home/jobs/**/jobs/*/*.log
 jenkins_home/jobs/**/jobs/*/workspace
 jenkins_home/jobs/**/jobs/*/modules
-jenkins_home/# More files
+
+# More files
 jenkins_home/war
 jenkins_home/workspace
 jenkins_home/secrets
@@ -59,7 +69,8 @@ jenkins_home/identity.key
 jenkins_home/identity.key.enc
 jenkins_home/plugins
 jenkins_home/plugins.txt
-jenkins_home/# Contains local info and secrets; don’t want this in Git
+
+# Contain local info and secrets
 jenkins_home/jenkins.model.JenkinsLocationConfiguration.xml
 jenkins_home/jenkins.mvn.GlobalMavenConfig.xml
 jenkins_home/credentials.xml
