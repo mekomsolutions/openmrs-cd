@@ -1,6 +1,6 @@
-var XML = require("pixl-xml");
-var fs = require("fs");
-var log = require("npmlog");
+const XML = require("pixl-xml");
+const fs = require("fs");
+const log = require("npmlog");
 
 module.exports = {
   /**
@@ -85,7 +85,10 @@ module.exports = {
         }
       }
     } else {
-      log.warn("", "No server was found that matches the provided artifact: " + key);
+      log.warn(
+        "",
+        "No server was found that matches the provided artifact: " + key
+      );
       console.dir(serverEvent);
     }
   }

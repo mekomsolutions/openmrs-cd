@@ -1,22 +1,34 @@
 /**
- * @author Romain Buisson (romain@mekomsolutions.com)
+ * First script of the Webhook job.
  *
+ * It parses the HTTP payload in order to generate a reusable metadata object for downstream scripts.
+ *
+ * @param {string} process.env.service The SCM service (eg. 'github', ..)
+ * @param {string} process.env.type The project type (eg. 'openmrsmodule', ..)
+ * @param {string} process.env.payload The HTTP payload, typically some JSON data.
  */
+
+"use strict";
 const fs = require("fs");
 const utils = require("../utils/utils");
+const config = require("../utils/config");
 const log = require("npmlog");
 
-// The PayloadParser is loaded based on what the SCM service is
-var payloadParser = require("./impl/" + process.env.service);
+// The ad-hoc PayloadParser instance is loaded based on the SCM service
+const payloadParser = require("./impl/" + process.env.service);
 
-var payloadString = process.env.payload;
+var metadata = payloadParser.parsePayload(process.env.payload);
+metadata.projectType = process.env.type;
 
-metadata = payloadParser.parsePayload(payloadString);
+// For downstream reuse:
+fs.writeFileSync(
+  config.getTempDirPath() + "/metadata.env",
+  utils.convertToEnvVar(metadata)
+); // as envvars
+fs.writeFileSync(config.getCommitMetadataFilePath(), JSON.stringify(metadata)); // and ALSO as a JSON file
 
-metadata.type = process.env.type;
-
-// Export the environment variables
-fs.writeFileSync("/tmp/metadata.env", utils.convertToEnvVar(metadata));
-fs.writeFileSync("/tmp/metadata.json", JSON.stringify(metadata));
-
+log.info(
+  "",
+  "The '" + process.env.service + "' payload produced the following metadata:"
+);
 log.info("", utils.convertToEnvVar(metadata));

@@ -7,9 +7,9 @@ const utils = require("../utils/utils");
 const log = require("npmlog");
 
 // The Project is loaded based on what the projectBuild type value
-var projectBuild = require("./impl/" + process.env.type).getInstance();
+var projectBuild = require("./impl/" + process.env.projectType).getInstance();
 
-var metadata = {}; // artifact's metadata, for example this could be a SCM webhook payload file
+var metadata = {}; // the commit metadata, parsed out from the SCM service commit payload
 try {
   if (process.argv[2] !== undefined) {
     metadata = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));

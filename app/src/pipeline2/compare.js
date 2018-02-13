@@ -18,7 +18,10 @@ try {
     fs.readFileSync(dependenciesDir + "/artifact.json")
   );
 } catch (err) {
-  log.error("", "Unable to retrieve the 'artifact.json' file. This file is supposed to be created by upstream job(s) to describe the current artifact being built.");
+  log.error(
+    "",
+    "Unable to retrieve the 'artifact.json' file. This file is supposed to be created by upstream job(s) to describe the current artifact being built."
+  );
   log.error("", "Please run the needed upstream job(s) first.");
   log.error("", err);
   process.exit(1);
@@ -28,7 +31,10 @@ var history = {};
 try {
   history = JSON.parse(fs.readFileSync(historyDir + "/history.json"));
 } catch (err) {
-  log.warn("", "No history file found or unable to retrieve it. This may not be an error if you are running this for the first time");
+  log.warn(
+    "",
+    "No history file found or unable to retrieve it. This may not be an error if you are running this for the first time"
+  );
   log.warn("", err);
 }
 

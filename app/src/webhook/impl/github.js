@@ -6,9 +6,13 @@ var model = require("../model");
 
 module.exports = {
   /**
-   * Parses a GitHub payload to return a @see{WebhookMetadata} object
+   * Parses a GitHub payload to return a @see{CommitMetadata} object
    *
-   * @return the @see{WebhookMetadata} object
+   * @return the @see{CommitMetadata} object's
+   *    - repoUrl
+   *    - repoName
+   *    - branchName
+   *    - commitId
    */
   parsePayload: function(payload) {
     // If no payload was received there is nothing to do. Not allowed to use "null".
@@ -18,24 +22,24 @@ module.exports = {
 
     var payloadObject = JSON.parse(payload);
 
-    var parsedData = new model.WebhookMetadata();
+    var metadata = new model.CommitMetadata();
 
-    parsedData.url = payloadObject.repository.html_url;
-    parsedData.repo = payloadObject.repository.name;
+    metadata.repoUrl = payloadObject.repository.html_url;
+    metadata.repoName = payloadObject.repository.name;
 
     if (payloadObject.ref != null) {
       var refPath = payloadObject.ref.split("/");
-      parsedData.branch = refPath[refPath.length - 1];
+      metadata.branchName = refPath[refPath.length - 1];
     } else {
       process.exit(0);
     }
 
     if (payloadObject.head_commit != null) {
-      parsedData.commit = payloadObject.head_commit.id.slice(0, 7);
+      metadata.commitId = payloadObject.head_commit.id.slice(0, 7);
     } else {
       process.exit(0);
     }
 
-    return parsedData;
+    return metadata;
   }
 };

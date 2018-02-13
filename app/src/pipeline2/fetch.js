@@ -21,7 +21,10 @@ descriptorService.fetchRemoteDistroDescriptors(servers, function(
   result
 ) {
   if (errors.length != 0) {
-    log.error("", "Errors have been encountered while downloading descriptors.");
+    log.error(
+      "",
+      "Errors have been encountered while downloading descriptors."
+    );
     log.error("", "One or more server(s) may have an invalid descriptor URL.");
     console.dir(errors);
     process.exit(1);

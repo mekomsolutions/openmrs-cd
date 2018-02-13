@@ -1,14 +1,14 @@
 "use strict";
 describe("Tests suite for Pipeline1 ", function() {
-  it("should generate build and deploy scripts", function() {
+  it("should generate build and deploy scripts.", function() {
     // deps
-    const r3quire = require("proxyquire");
+    const proxyquire = require("proxyquire");
     const model = require(__dirname + "/../../src/models/model");
     const os = require("os");
     const fs = require("fs");
 
     // setup
-    process.env.type = "artifact_type";
+    process.env.projectType = "artifact_type";
     process.env.WORKSPACE = os.tmpdir();
 
     const buildScript = "__build_script__";
@@ -22,7 +22,7 @@ describe("Tests suite for Pipeline1 ", function() {
     };
 
     var stubs = {};
-    stubs["./impl/" + process.env.type] = {
+    stubs["./impl/" + process.env.projectType] = {
       getInstance: function() {
         return mockBuild;
       },
@@ -30,7 +30,7 @@ describe("Tests suite for Pipeline1 ", function() {
     };
 
     // replay
-    r3quire(__dirname + "/../../src/pipeline1/build.js", stubs);
+    proxyquire(__dirname + "/../../src/pipeline1/build.js", stubs);
 
     // verif
     expect(
@@ -41,7 +41,7 @@ describe("Tests suite for Pipeline1 ", function() {
     ).toEqual(deployScript);
   });
 
-  it("should implement all required functions from model", function() {
+  it("should implement all required functions from model.", function() {
     var folderInTest = __dirname + "/../../src/pipeline1/";
 
     const fs = require("fs");
@@ -73,7 +73,7 @@ describe("Tests suite for Pipeline1 ", function() {
     });
   });
 
-  it("should getArtifact, getBuildScript and getDeployScript for 'bahmniapps'", function() {
+  it("should getArtifact, getBuildScript and getDeployScript for 'bahmniapps'.", function() {
     var projectBuildType = "bahmniapps";
     var folderInTest = __dirname + "/../../src/pipeline1/";
     var projectBuild = require(folderInTest +
@@ -112,7 +112,7 @@ describe("Tests suite for Pipeline1 ", function() {
     );
   });
 
-  it("should getArtifact, getBuildScript and getDeployScript for 'bahmniconfig'", function() {
+  it("should getArtifact, getBuildScript and getDeployScript for 'bahmniconfig'.", function() {
     var projectBuildType = "bahmniconfig";
     var folderInTest = __dirname + "/../../src/pipeline1/";
     var projectBuild = require(folderInTest +
@@ -148,7 +148,7 @@ describe("Tests suite for Pipeline1 ", function() {
     );
   });
 
-  it("should getArtifact, getBuildScript and getDeployScript for 'openmrsconfig'", function() {
+  it("should getArtifact, getBuildScript and getDeployScript for 'openmrsconfig'.", function() {
     var projectBuildType = "openmrsconfig";
     var folderInTest = __dirname + "/../../src/pipeline1/";
     var projectBuild = require(folderInTest +
@@ -185,7 +185,7 @@ describe("Tests suite for Pipeline1 ", function() {
     );
   });
 
-  it("should getArtifact, getBuildScript and getDeployScript for 'openmrscore'", function() {
+  it("should getArtifact, getBuildScript and getDeployScript for 'openmrscore'.", function() {
     var projectBuildType = "openmrscore";
     var folderInTest = __dirname + "/../../src/pipeline1/";
     var projectBuild = require(folderInTest +
@@ -218,7 +218,7 @@ describe("Tests suite for Pipeline1 ", function() {
     );
   });
 
-  it("should getArtifact, getBuildScript and getDeployScript for 'openmrsmodule'", function() {
+  it("should getArtifact, getBuildScript and getDeployScript for 'openmrsmodule'.", function() {
     var projectBuildType = "openmrsmodule";
     var folderInTest = __dirname + "/../../src/pipeline1/";
     var projectBuild = require(folderInTest +

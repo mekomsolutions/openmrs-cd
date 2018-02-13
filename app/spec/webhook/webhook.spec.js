@@ -1,22 +1,107 @@
-var fs = require("fs");
+"use strict";
+describe("Test suite for Webhook scripts ", function() {
+  it("should parse a GitHub HTTP payload", function() {
+    // deps
+    const fs = require("fs");
 
-describe("Tests suite for Webhook", function() {
-  it("Github: should parse the payload", function() {
-    var type = "github";
-
+    // setup
     var folderInTest = __dirname + "/../../src/webhook/";
 
+    var type = "github";
     var payloadParser = new require(folderInTest + "impl/" + type);
 
+    // replay
     var metadata = payloadParser.parsePayload(
-      fs.readFileSync(__dirname + "/payload_example.json", "utf8")
+      fs.readFileSync(__dirname + "/test_github_payload.json", "utf8")
     );
-    metadata.type = type;
 
-    expect(metadata.branch).toBe("BAHMNI-17");
-    expect(metadata.commit).toBe("ac67634");
-    expect(metadata.url).toBe(
+    // verif
+    expect(metadata.branchName).toBe("BAHMNI-17");
+    expect(metadata.commitId).toBe("ac67634");
+    expect(metadata.repoUrl).toBe(
       "https://github.com/mekomsolutions/bahmni-config-cambodia"
     );
+  });
+
+  it("should pass the commit metadata as both envvars and temp JSON file.", function() {
+    // deps
+    const proxyquire = require("proxyquire");
+    const os = require("os");
+    const fs = require("fs");
+
+    // setup
+    var folderInTest = __dirname + "/../../src/webhook";
+    var fileInTest = folderInTest + "/webhook";
+
+    process.env.service = "gotlub";
+    process.env.type = "openmrsmodule";
+    var expectedMetadata = {
+      projectType: process.env.type,
+      repoUrl: "https://github.com/openmrs/openmrs-module-attachments",
+      repoName: "openmrs-module-attachments",
+      branchName: "master",
+      commitId: "c71670e"
+    };
+
+    var mockConfig = {};
+    mockConfig.getTempDirPath = function() {
+      return os.tmpdir();
+    };
+    mockConfig.getCommitMetadataFilePath = function() {
+      return __dirname + "/test_commit_metadata.json";
+    };
+    var stubs = {
+      "../utils/config": mockConfig
+    };
+    stubs["./impl/" + process.env.service] = {
+      parsePayload: function(payload) {
+        return expectedMetadata;
+      },
+      "@noCallThru": true
+    };
+
+    // replay
+    proxyquire(fileInTest, stubs);
+
+    // verif
+    const utils = require(folderInTest + "../../utils/utils");
+    expect(
+      fs.readFileSync(mockConfig.getCommitMetadataFilePath(), "utf8")
+    ).toEqual(JSON.stringify(expectedMetadata));
+    expect(
+      fs.readFileSync(mockConfig.getTempDirPath() + "/metadata.env", "utf8")
+    ).toEqual(utils.convertToEnvVar(expectedMetadata));
+  });
+
+  it("should save the downstream jobs as a key-value properties file", function() {
+    // deps
+    const proxyquire = require("proxyquire");
+    const os = require("os");
+    const fs = require("fs");
+
+    // setup
+    var folderInTest = __dirname + "/../../src/webhook";
+    var fileInTest = folderInTest + "/trigger";
+
+    var mockConfig = {};
+    mockConfig.getCommitMetadataFilePath = function() {
+      return __dirname + "/test_commit_metadata.json";
+    };
+    mockConfig.getWebhookTriggersFilePath = function() {
+      return __dirname + "/test_webhook_triggers.json";
+    };
+    var stubs = {
+      "../utils/config": mockConfig
+    };
+
+    process.env.WORKSPACE = os.tmpdir();
+
+    // replay
+    proxyquire(fileInTest, stubs);
+
+    // verif
+    expect(
+      fs.readFileSync(process.env.WORKSPACE + "/trigger.env", "utf8")
+    ).toEqual("downstream_job=pipeline1\n");
   });
 });
