@@ -17,7 +17,8 @@
   "scripts": {
     "code-format": "prettier --find-config-path --write '{src,spec}/**/*.{js,json}'",
     "test": "jasmine",
-    "build": "npm run code-format && npm run test"
+    "build": "npm install && npm run code-format && npm run test",
+    "all": "npm install && npm run build"
   },
   "author": "Mekom Solutions",
   "license": "MIT"

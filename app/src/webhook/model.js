@@ -4,7 +4,7 @@
  * that is sent out and processed by a webhook job.
  */
 
- /* Example:
+/* Example:
     {
       "projectType": "openmrsmodule",
       "repoUrl": "https://github.com/openmrs/openmrs-module-attachments",
