@@ -9,7 +9,7 @@ module.exports = {
     return "/tmp";
   },
   getCommitMetadataFilePath: function() {
-    return "/tmp/metadata.json";
+    return "/tmp/commit_metadata.json";
   },
   getWebhookTriggersFilePath: function() {
     return "/usr/share/jenkins/webhook_triggers.json";

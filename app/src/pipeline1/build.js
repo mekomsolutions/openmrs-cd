@@ -6,28 +6,31 @@ const fs = require("fs");
 const utils = require("../utils/utils");
 const log = require("npmlog");
 
-// The Project is loaded based on what the projectBuild type value
-var projectBuild = require("./impl/" + process.env.projectType).getInstance();
-
-var metadata = {}; // the commit metadata, parsed out from the SCM service commit payload
+var commitMetadata = {}; // the commit metadata, parsed out from the SCM service commit payload
 try {
   if (process.argv[2] !== undefined) {
-    metadata = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+    commitMetadata = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
   } else {
-    log.info("", "The build process is continuing with no artifact metadata.");
+    log.info(
+      "",
+      "The build process is continuing with no commit metadata provided."
+    );
     log.info("", "There was no optional argument passed to " + __filename);
   }
 } catch (err) {
   log.error(
     "",
-    "Artifact metadata file not present (usually created by a webhook upstream job)"
+    "The commit metadata file is either missing at the specified path or is malformed (it is usually created by an upstream webhook job.)"
   );
   log.error("", err);
   process.exit(1);
 }
 
+// The ProjectBuild is loaded based on the project type
+var projectBuild = require("./impl/" + process.env.projectType).getInstance();
+
 // Retrieve the details of the artifact that will be built
-var artifact = projectBuild.getArtifact("./", metadata);
+var artifact = projectBuild.getArtifact("./", commitMetadata);
 
 // Retrieve the script to build the projectBuild
 var buildScript = projectBuild.getBuildScriptAsString();

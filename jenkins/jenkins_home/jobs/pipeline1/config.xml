@@ -8,38 +8,48 @@
       <parameters/>
     </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
   </actions>
-  <description></description>
+  <description>Flexible job that is able to fetch and build the code of any project in order to retrieve its built artifacts.&#xd;
+Those built artifacts are then deployed on the configured artifact repository (such as Nexus typically.)&#xd;
+&#xd;
+It takes as an input a bunch of &apos;commit metadata&apos;, so all the information about a specific code commit that is triggering the current buid and deployment job.</description>
+  <displayName>Project Build and Artifact Deployment</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>projectType</name>
-          <description></description>
-          <defaultValue></defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>repoName</name>
-          <description></description>
-          <defaultValue></defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>branchName</name>
-          <description></description>
-          <defaultValue></defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>commitId</name>
-          <description></description>
+          <description>The type of the code project.
+
+Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;, &apos;distribution&apos;.</description>
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>repoUrl</name>
           <description></description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>repoName</name>
+          <description>The name of the repository of the code project.
+
+Eg. &quot;openmrs-core&quot;, &quot;bahmni-config-cambodia&quot;, &quot;openmrs-module-webservices.rest&quot;, ...</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>branchName</name>
+          <description>The branch that should be built.</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>commitId</name>
+          <description>The commit that should be built.
+
+Certain projects require to pinpoint to an exact commit rather than using the tip of a branch.</description>
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>

@@ -4,6 +4,7 @@
   <description>&apos;Catch all&apos; job that parses HTTP payloads posted by remote SCM services (such as GitHub... etc).&#xd;
 &#xd;
 IMPORTANT: We expect the SCM service to allow the configuration of its webhooks URLs in such a way that custom parameters can be posted alongside the HTTP payload. For example by appending the expected parameters to a configurable URL, such as &apos;?service=github&amp;type=openmrsmodule&apos;</description>
+  <displayName>Webhook for SCM Payloads</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -16,15 +17,15 @@ Typically some JSON data containing all the information about a code commit.</de
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>type</name>
+          <name>projectType</name>
           <description>The type of the code project that is emitting the payload.
 
-Supported values: &apos;distro&apos;, &apos;openmrsmodule&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos; ...etc.</description>
+Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;, &apos;distribution&apos;.</description>
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>service</name>
+          <name>scmService</name>
           <description>The SCM service emitting the payload. This parameter guides the implementation of the payload parser.
 
 Supported values: &apos;github&apos;.</description>
@@ -45,11 +46,11 @@ Supported values: &apos;github&apos;.</description>
   <builders>
     <hudson.tasks.Shell>
       <command>node /opt/app/src/webhook/webhook.js
-# the output of this job is exported in metadata.env</command>
+# the output of this job is exported in commit_metadata.env</command>
     </hudson.tasks.Shell>
     <EnvInjectBuilder plugin="envinject@2.1.5">
       <info>
-        <propertiesFilePath>/tmp/metadata.env</propertiesFilePath>
+        <propertiesFilePath>/tmp/commit_metadata.env</propertiesFilePath>
       </info>
     </EnvInjectBuilder>
     <hudson.tasks.Shell>
@@ -68,7 +69,7 @@ Supported values: &apos;github&apos;.</description>
           <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
             <configs>
               <hudson.plugins.parameterizedtrigger.FileBuildParameters>
-                <propertiesFile>/tmp/metadata.env</propertiesFile>
+                <propertiesFile>/tmp/commit_metadata.env</propertiesFile>
                 <failTriggerOnMissing>true</failTriggerOnMissing>
                 <useMatrixChild>false</useMatrixChild>
                 <onlyExactRuns>false</onlyExactRuns>

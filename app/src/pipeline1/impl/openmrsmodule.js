@@ -52,7 +52,7 @@ var getBuildScript = function() {
   return buildScript;
 };
 
-var getDeployScript = function(artifact) {
+var getDeployScript = function() {
   var deployScript = new model.Script();
   deployScript.type = "#!/bin/bash";
   deployScript.comments =

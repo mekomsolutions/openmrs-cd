@@ -17,7 +17,7 @@ describe("Tests suite for Pipeline1 ", function() {
     mockBuild.getBuildScriptAsString = function() {
       return buildScript;
     };
-    mockBuild.getDeployScriptAsString = function(project) {
+    mockBuild.getDeployScriptAsString = function(artifact) {
       return deployScript;
     };
 

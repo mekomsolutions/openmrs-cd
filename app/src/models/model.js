@@ -54,15 +54,15 @@ class ProjectBuild {
     // A default implementation is provided
     return utils.getScriptAsString(this.getBuildScript());
   }
-  getArtifact() {
+  getArtifact(pomPath, commitMetadata) {
     return constants.ABSTRACT;
   }
-  getDeployScript(project) {
+  getDeployScript(artifact) {
     return constants.ABSTRACT;
   }
-  getDeployScriptAsString(project) {
+  getDeployScriptAsString(artifact) {
     // A default implementation is provided
-    return utils.getScriptAsString(this.getDeployScript(project));
+    return utils.getScriptAsString(this.getDeployScript(artifact));
   }
 }
 

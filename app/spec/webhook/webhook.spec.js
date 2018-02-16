@@ -1,5 +1,5 @@
 "use strict";
-describe("Test suite for Webhook scripts ", function() {
+describe("Test suite for webhook scripts", function() {
   it("should parse a GitHub HTTP payload", function() {
     // deps
     const fs = require("fs");
@@ -33,8 +33,8 @@ describe("Test suite for Webhook scripts ", function() {
     var folderInTest = __dirname + "/../../src/webhook";
     var fileInTest = folderInTest + "/webhook";
 
-    process.env.service = "gotlub";
-    process.env.type = "openmrsmodule";
+    process.env.scmService = "gotlub";
+    process.env.projectType = "openmrsmodule";
     var expectedMetadata = {
       projectType: process.env.type,
       repoUrl: "https://github.com/openmrs/openmrs-module-attachments",
@@ -53,7 +53,7 @@ describe("Test suite for Webhook scripts ", function() {
     var stubs = {
       "../utils/config": mockConfig
     };
-    stubs["./impl/" + process.env.service] = {
+    stubs["./impl/" + process.env.scmService] = {
       parsePayload: function(payload) {
         return expectedMetadata;
       },
@@ -69,7 +69,7 @@ describe("Test suite for Webhook scripts ", function() {
       fs.readFileSync(mockConfig.getCommitMetadataFilePath(), "utf8")
     ).toEqual(JSON.stringify(expectedMetadata));
     expect(
-      fs.readFileSync(mockConfig.getTempDirPath() + "/metadata.env", "utf8")
+      fs.readFileSync(mockConfig.getTempDirPath() + "/commit_metadata.env", "utf8")
     ).toEqual(utils.convertToEnvVar(expectedMetadata));
   });
 

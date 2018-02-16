@@ -5,12 +5,12 @@ pipeline {
         nodejs 'NodeJS 8.6.0'
   }
   stages {
-    stage ('Checkout') {
+    stage ('Project Code Checkout') {
       steps {
         git url: repoUrl, branch: branchName
       }
     }
-    stage ('Build') {
+    stage ('Project Build') {
       steps {
         sh 'node /opt/app/src/$JOB_NAME/build.js /tmp/metadata.json'
         sh 'cat $WORKSPACE/build.sh'
@@ -18,7 +18,7 @@ pipeline {
         sh '. /tmp/artifact.env ; mv $WORKSPACE/$path/$filename $WORKSPACE/$destFilename'
       }
     }
-    stage ('Deploy') {
+    stage ('Artifact Deployment') {
       steps {
         sh 'cat $WORKSPACE/deploy.sh'
         sh '$WORKSPACE/deploy.sh $JENKINS_HOME/artifact_repository.env'
