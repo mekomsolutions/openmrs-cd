@@ -2,6 +2,7 @@
  * @author Romain Buisson (romain@mekomsolutions.com)
  *
  */
+"use strict";
 const fs = require("fs");
 const utils = require("../utils/utils");
 const log = require("npmlog");

@@ -1,6 +1,32 @@
+"use strict";
+
 const XML = require("pixl-xml");
 const fs = require("fs");
 const log = require("npmlog");
+const _ = require("lodash");
+
+/**
+ * https://gist.github.com/penguinboy/762197
+ */
+var flattenObject = function(ob) {
+  var toReturn = {};
+
+  for (var i in ob) {
+    if (!ob.hasOwnProperty(i)) continue;
+
+    if (typeof ob[i] == "object") {
+      var flatObject = flattenObject(ob[i]);
+      for (var x in flatObject) {
+        if (!flatObject.hasOwnProperty(x)) continue;
+
+        toReturn[i + "_" + x] = flatObject[x];
+      }
+    } else {
+      toReturn[i] = ob[i];
+    }
+  }
+  return toReturn;
+};
 
 module.exports = {
   /**
@@ -16,12 +42,14 @@ module.exports = {
     }
     return envvars;
   },
+
   getPom: function(pomPath) {
     var file = fs.readFileSync(pomPath + "pom.xml", "utf8");
     var parsedPom = XML.parse(file);
 
     return parsedPom;
   },
+
   sortByArtifact: function(dependenciesByServer) {
     var dependenciesByArtifact = {};
 
@@ -42,6 +70,7 @@ module.exports = {
     }
     return dependenciesByArtifact;
   },
+
   getScriptAsString: function(script) {
     var string = "";
     if (script != null) {
@@ -53,25 +82,28 @@ module.exports = {
     }
     return string;
   },
+
   /*
-  * identifies the servers that have a dependency on the 'artifact' and updates the 'history' 
-  *
-  */
+   * identifies the servers that have a dependency on the 'artifact' and updates the 'history' 
+   */
   setMatchingServersAndUpdateHistory: function(
     dependencies,
     history,
     serverEvent
   ) {
     var artifact = serverEvent.artifact;
-    var suffix = artifact.project.module ? "-" + artifact.project.module : "";
+    var suffix = artifact.mavenProject.module
+      ? "-" + artifact.mavenProject.module
+      : "";
     var key =
-      artifact.project.groupId +
+      artifact.mavenProject.groupId +
       "." +
-      artifact.project.name +
+      artifact.mavenProject.artifactId +
       suffix +
       "_" +
-      artifact.project.version;
-    var servers = dependencies[key];
+      artifact.mavenProject.version;
+
+    var servers = module.exports.getServersByArtifactKey(dependencies, key);
 
     if (servers) {
       for (var server of servers) {
@@ -91,29 +123,66 @@ module.exports = {
       );
       console.dir(serverEvent);
     }
-  }
-};
+  },
 
-/**
- * https://gist.github.com/penguinboy/762197
- *
- */
-var flattenObject = function(ob) {
-  var toReturn = {};
-
-  for (var i in ob) {
-    if (!ob.hasOwnProperty(i)) continue;
-
-    if (typeof ob[i] == "object") {
-      var flatObject = flattenObject(ob[i]);
-      for (var x in flatObject) {
-        if (!flatObject.hasOwnProperty(x)) continue;
-
-        toReturn[i + "_" + x] = flatObject[x];
-      }
-    } else {
-      toReturn[i] = ob[i];
+  /**
+   * Artifact keys are strings such as 'org.openmrs.module.mksreports_1.1.1-SNAPSHOT', 'org.openmrs.module.metadatasharing-omod_1.2.2', ...
+   * So a concatenation of group ID + artifact ID + version.
+   *
+   * @param {String} serversByArtifactKeys, a map with keys=artifact keys and values=servers running affected by those artifact keys
+   * @param {String} artifactKey, an artifact key to match
+   *
+   * @return {String Array} An array of the servers affected by the input artifact key
+   */
+  getServersByArtifactKey: function(serversByArtifactKeys, artifactKey) {
+    var res = artifactKey.split("_");
+    if (!_.isArray(res) || res.length != 2) {
+      log.error(
+        "",
+        "Could not extract the artifact information from " + artifactKey
+      );
+      log.error(
+        "",
+        "This is an example of a valid artifact key: " +
+          "org.openmrs.module.mksreports_1.1.1-SNAPSHOT"
+      );
+      throw new Error();
     }
+    var artifact = res[0]; // that's the group id + artifact id concatenated
+    var artifactVersion = res[1];
+
+    var matchedServers = [];
+
+    _.forOwn(serversByArtifactKeys, function(servers, serversArtifactKey) {
+      var res = serversArtifactKey.split("_");
+      if (!_.isArray(res) || res.length != 2) {
+        log.error(
+          "",
+          "Could not extract the artifact information from " +
+            serversArtifactKey
+        );
+        log.error(
+          "",
+          "This is an example of a valid artifact key: " +
+            "org.openmrs.module.mksreports_1.1.1-SNAPSHOT"
+        );
+        throw new Error();
+      }
+      var serversArtifact = res[0];
+      var serversArtifactVersion = res[1];
+
+      if (
+        serversArtifact.startsWith(artifact) &&
+        serversArtifactVersion == artifactVersion
+      ) {
+        log.info(
+          "",
+          artifactKey + " was found to affect server(s): " + servers
+        );
+        matchedServers = _.merge(matchedServers, servers);
+      }
+    });
+
+    return matchedServers;
   }
-  return toReturn;
 };

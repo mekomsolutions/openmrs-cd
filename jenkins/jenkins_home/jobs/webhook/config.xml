@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>&apos;Catch all&apos; job that parses HTTP payloads posted by remote SCM services (such as GitHub... etc).&#xd;
+&#xd;
+IMPORTANT: We expect the SCM service to allow the configuration of its webhooks URLs in such a way that custom parameters can be posted alongside the HTTP payload. For example by appending the expected parameters to a configurable URL, such as &apos;?service=github&amp;type=openmrsmodule&apos;</description>
+  <displayName>Webhook for SCM Payloads</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>payload</name>
+          <description>The SCM service HTTP payload.
+Typically some JSON data containing all the information about a code commit.</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>projectType</name>
+          <description>The type of the code project that is emitting the payload.
+
+Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;, &apos;distribution&apos;.</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>scmService</name>
+          <description>The SCM service emitting the payload. This parameter guides the implementation of the payload parser.
+
+Supported values: &apos;github&apos;.</description>
+          <defaultValue>github</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <authToken>669b165b0c061c78f1d6e7c23f93f263</authToken>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>node /opt/app/src/webhook/webhook.js
+# the output of this job is exported in commit_metadata.env</command>
+    </hudson.tasks.Shell>
+    <EnvInjectBuilder plugin="envinject@2.1.5">
+      <info>
+        <propertiesFilePath>/tmp/commit_metadata.env</propertiesFilePath>
+      </info>
+    </EnvInjectBuilder>
+    <hudson.tasks.Shell>
+      <command>node /opt/app/src/webhook/trigger.js
+# the output of this job is exported in trigger.env</command>
+    </hudson.tasks.Shell>
+    <EnvInjectBuilder plugin="envinject@2.1.5">
+      <info>
+        <propertiesFilePath>$WORKSPACE/trigger.env</propertiesFilePath>
+      </info>
+    </EnvInjectBuilder>
+    <org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.3.6">
+      <condition class="org.jenkins_ci.plugins.run_condition.core.AlwaysRun" plugin="run-condition@1.0"/>
+      <buildStep class="hudson.plugins.parameterizedtrigger.TriggerBuilder" plugin="parameterized-trigger@2.35.1">
+        <configs>
+          <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+            <configs>
+              <hudson.plugins.parameterizedtrigger.FileBuildParameters>
+                <propertiesFile>/tmp/commit_metadata.env</propertiesFile>
+                <failTriggerOnMissing>true</failTriggerOnMissing>
+                <useMatrixChild>false</useMatrixChild>
+                <onlyExactRuns>false</onlyExactRuns>
+              </hudson.plugins.parameterizedtrigger.FileBuildParameters>
+            </configs>
+            <projects>$downstream_job</projects>
+            <condition>ALWAYS</condition>
+            <triggerWithNoParameters>false</triggerWithNoParameters>
+            <triggerFromChildProjects>false</triggerFromChildProjects>
+            <buildAllNodesWithLabel>false</buildAllNodesWithLabel>
+          </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+        </configs>
+      </buildStep>
+      <runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$Fail" plugin="run-condition@1.0"/>
+    </org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
+    <org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater plugin="build-name-setter@1.6.7">
+      <buildName></buildName>
+      <macroTemplate>#${BUILD_NUMBER} - ${ENV,var=&quot;repoName&quot;} - ${ENV,var=&quot;branchName&quot;} (${ENV,var=&quot;commitId&quot;})</macroTemplate>
+      <fromFile>false</fromFile>
+      <fromMacro>true</fromMacro>
+      <macroFirst>false</macroFirst>
+    </org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <jenkins.plugins.nodejs.NodeJSBuildWrapper plugin="nodejs@1.2.4">
+      <nodeJSInstallationName>NodeJS 8.6.0</nodeJSInstallationName>
+    </jenkins.plugins.nodejs.NodeJSBuildWrapper>
+  </buildWrappers>
+</project>

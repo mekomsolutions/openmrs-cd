@@ -1,4 +1,7 @@
 "use strict";
+
+const config = require("../utils/config");
+
 /**
  * An object that collects the commit metadata out of an HTTP payload
  * that is sent out and processed by a webhook job.
@@ -22,10 +25,10 @@ module.exports = {
     branchName,
     commitId
   ) {
-    this.projectType = projectType;
-    this.repoUrl = repoUrl;
-    this.repoName = repoName;
-    this.branchName = branchName;
-    this.commitId = commitId;
+    this[config.varProjectType()] = projectType;
+    this[config.varRepoUrl()] = repoUrl;
+    this[config.varRepoName()] = repoName;
+    this[config.varBranchName()] = branchName;
+    this[config.varCommitId()] = commitId;
   }
 };

@@ -1,11 +1,10 @@
 {
-  "project": {
-    "name": "openmrs-config-cambodia",
-    "module": "",
+  "mavenProject": {
     "groupId": "net.mekomsolutions",
+    "artifactId": "openmrs-config-cambodia",
     "version": "1.0-SNAPSHOT"
   },
-  "path": "",
+  "buildPath": "",
   "extension": "",
   "filename": "",
   "destFilename": ""

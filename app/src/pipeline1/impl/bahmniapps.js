@@ -1,24 +1,63 @@
-var model = require("../../models/model");
-var utils = require("../../utils/utils");
-var fs = require("fs");
+"use strict";
+const model = require("../../models/model");
+const utils = require("../../utils/utils");
+const fs = require("fs");
+const _ = require("lodash");
+const log = require("npmlog");
 
 module.exports = {
   getInstance: function() {
     var projectBuild = new model.ProjectBuild();
 
-    // Implement here the Project object methods
     projectBuild.getBuildScript = function() {
       return getBuildScript();
     };
-    projectBuild.getArtifact = function(pomPath, metadata) {
-      return getArtifact(pomPath, metadata);
+
+    projectBuild.getArtifact = function(pomPath, commitMetadata) {
+      return getArtifact(pomPath, commitMetadata);
     };
+
     projectBuild.getDeployScript = function(project) {
       return getDeployScript(project);
     };
 
     return projectBuild;
   }
+};
+
+var getArtifact = function(pomPath, commitMetadata) {
+  if (_.isUndefined(commitMetadata) || _.isEmpty(commitMetadata)) {
+    log.error(
+      "",
+      "No commit metadata was passed to Bahmni Apps' getArtifact(..)."
+    );
+    process.exit(1);
+  }
+
+  var artifact = new model.Artifact();
+  artifact.name = "bahmniapps";
+  // Bahmni Apps is not version-managed, we infer its version from either the branch name or commit ID.
+  if (commitMetadata.branchName) {
+    artifact.version = commitMetadata.branchName;
+  } else {
+    artifact.version = commitMetadata.commitId;
+  }
+  artifact.buildPath = "./ui/target";
+  artifact.extension = "zip";
+  artifact.filename = artifact.name + "." + artifact.extension;
+  artifact.destFilename =
+    artifact.name + "-" + artifact.version + "." + artifact.extension;
+
+  // encapsulating the Maven project
+  {
+    var mavenProject = new model.MavenProject();
+    mavenProject.groupId = "net.mekomsolutions";
+    mavenProject.artifactId = artifact.name;
+    mavenProject.version = artifact.version;
+    artifact.mavenProject = mavenProject;
+  }
+
+  return artifact;
 };
 
 var getBuildScript = function() {
@@ -35,9 +74,10 @@ var getBuildScript = function() {
 
 var getDeployScript = function(artifact) {
   var deployScript = new model.Script();
-  if (typeof artifact == "undefined") {
-    console.error(
-      "[ERROR] 'artifact' parameter must be provided in order to construct the 'deploy' script"
+  if (_.isUndefined(artifact)) {
+    log.error(
+      "",
+      "An artifact parameter must be provided to construct the Bahmni Apps deploy script."
     );
     process.exit(1);
   }
@@ -58,39 +98,4 @@ var getDeployScript = function(artifact) {
     "\n";
 
   return deployScript;
-};
-
-var getArtifact = function(pomPath, metadata) {
-  var project = new model.Project();
-  project.name = "bahmniapps";
-  project.groupId = "";
-  project.module = "";
-
-  var artifact = new model.Artifact();
-  artifact.extension = "zip";
-  artifact.path = "./ui/target";
-
-  // Version is not managed through npm or maven project. Using the commit id (or branch if present) instead.
-  if (
-    typeof metadata != "undefined" &&
-    metadata != null &&
-    metadata.commit != ""
-  ) {
-    if (metadata.branch) {
-      project.version = metadata.branch;
-    } else {
-      project.version = metadata.commit;
-    }
-    artifact.filename = project.name + "." + artifact.extension;
-    artifact.destFilename =
-      project.name + "-" + project.version + "." + artifact.extension;
-  } else {
-    project.version = "";
-    artifact.filename = project.name + "." + artifact.extension;
-    artifact.destFilename = artifact.filename;
-  }
-
-  artifact.project = project;
-
-  return artifact;
 };

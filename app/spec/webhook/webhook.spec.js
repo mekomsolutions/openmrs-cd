@@ -1,5 +1,67 @@
 "use strict";
 describe("Test suite for webhook scripts", function() {
+  it("should verify job parameters.", function() {
+    // deps
+    const __rootPath__ = require("app-root-path").path;
+    const fs = require("fs");
+    const path = require("path");
+    const config = require(__dirname + "/../../src/utils/config");
+    const ent = require("ent");
+
+    // replay
+    var jenkinsFile = fs.readFileSync(
+      path.resolve(
+        __rootPath__,
+        "..",
+        "jenkins/jenkins_home/jobs/webhook/config.xml"
+      ),
+      "utf8"
+    );
+    jenkinsFile = ent.decode(jenkinsFile);
+
+    // verif
+    expect(jenkinsFile).toContain("<name>" + config.varPayload() + "</name>");
+    expect(jenkinsFile).toContain(
+      "<name>" + config.varProjectType() + "</name>"
+    );
+    expect(jenkinsFile).toContain(
+      "<name>" + config.varScmService() + "</name>"
+    );
+    expect(jenkinsFile).toContain(
+      "<command>node /opt/app/src/webhook/webhook.js"
+    );
+    expect(jenkinsFile).toContain(
+      "<propertiesFilePath>" +
+        config.getCommitMetadataFileEnvvarsPath() +
+        "</propertiesFilePath>"
+    );
+    expect(jenkinsFile).toContain(
+      "<command>node /opt/app/src/webhook/trigger.js"
+    );
+    expect(jenkinsFile).toContain(
+      "<propertiesFilePath>$WORKSPACE/" +
+        config.getProjectBuildTriggerEnvvarsName() +
+        "</propertiesFilePath>"
+    );
+    expect(jenkinsFile).toContain(
+      "<propertiesFile>" +
+        config.getCommitMetadataFileEnvvarsPath() +
+        "</propertiesFile>"
+    );
+    expect(jenkinsFile).toContain(
+      "<projects>$" + config.varDownstreamJob() + "</projects>"
+    );
+    expect(jenkinsFile).toContain(
+      '<macroTemplate>#${BUILD_NUMBER} - ${ENV,var="' +
+        config.varRepoName() +
+        '"} - ${ENV,var="' +
+        config.varBranchName() +
+        '"} (${ENV,var="' +
+        config.varCommitId() +
+        '"})</macroTemplate>'
+    );
+  });
+
   it("should parse a GitHub HTTP payload", function() {
     // deps
     const fs = require("fs");
@@ -69,7 +131,10 @@ describe("Test suite for webhook scripts", function() {
       fs.readFileSync(mockConfig.getCommitMetadataFilePath(), "utf8")
     ).toEqual(JSON.stringify(expectedMetadata));
     expect(
-      fs.readFileSync(mockConfig.getTempDirPath() + "/commit_metadata.env", "utf8")
+      fs.readFileSync(
+        mockConfig.getTempDirPath() + "/commit_metadata.env",
+        "utf8"
+      )
     ).toEqual(utils.convertToEnvVar(expectedMetadata));
   });
 

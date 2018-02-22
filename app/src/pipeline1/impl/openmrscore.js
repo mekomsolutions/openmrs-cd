@@ -1,38 +1,44 @@
-var model = require("../../models/model");
-var utils = require("../../utils/utils");
-var fs = require("fs");
+"use strict";
+const model = require("../../models/model");
+const utils = require("../../utils/utils");
+const fs = require("fs");
 
 module.exports = {
   getInstance: function() {
     var projectBuild = new model.ProjectBuild();
 
-    // Implement here the ProjectBuild object methods
     projectBuild.getBuildScript = function() {
       return getBuildScript();
     };
+
     projectBuild.getArtifact = function(pomPath) {
       var pom = utils.getPom(pomPath);
-      var project = new model.ProjectBuild();
-      project.version = pom.version;
-      project.name = pom.artifactId;
-      project.module = "webapp";
-      project.groupId = pom.groupId;
 
       var artifact = new model.Artifact();
-
+      artifact.name = pom.artifactId;
+      artifact.version = pom.version;
+      artifact.buildPath = "./omod/target";
       artifact.extension = "omod";
-      artifact.path = "./omod/target";
       artifact.filename =
-        project.name + "-" + project.version + "." + artifact.extension;
+        artifact.name + "-" + artifact.version + "." + artifact.extension;
       artifact.destFilename = artifact.filename;
 
-      artifact.project = project;
+      // encapsulating the Maven project
+      {
+        var mavenProject = new model.MavenProject();
+        mavenProject.groupId = pom.groupId;
+        mavenProject.artifactId = pom.artifactId;
+        mavenProject.version = pom.version;
+        artifact.mavenProject = mavenProject;
+      }
 
       return artifact;
     };
+
     projectBuild.getDeployScript = function() {
       return getDeployScript();
     };
+
     projectBuild.getDeployScript = function() {
       return getDeployScript();
     };

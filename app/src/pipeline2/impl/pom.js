@@ -40,16 +40,17 @@ var replaceVersionNumber = function(properties, pom) {
 };
 
 var convertAsProjectObjects = function(dependencies) {
-  var newDependenciesArray = [];
+  var newDependencies = [];
   for (var i = 0; i < dependencies.length; i++) {
-    var dependency = new model.Project();
-    dependency.groupId = dependencies[i].groupId;
-    dependency.artifactId = dependencies[i].artifactId;
-    dependency.version = dependencies[i].version;
-    newDependenciesArray.push(dependency);
+    newDependencies.push(
+      new model.MavenProject(
+        dependencies[i].groupId,
+        dependencies[i].artifactId,
+        dependencies[i].version
+      )
+    );
   }
-
-  return newDependenciesArray;
+  return newDependencies;
 };
 
 var escapeRegExp = function(str) {

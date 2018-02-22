@@ -1,11 +1,10 @@
 {
-  "project": {
-    "name": "rulesengine",
-    "module": "omod",
+  "mavenProject": {
     "groupId": "org.openmrs.module",
+    "artifactId": "rulesengine",
     "version": "0.89-SNAPSHOT"
   },
-  "path": "",
+  "buildPath": "",
   "extension": "",
   "filename": "",
   "destFilename": ""

@@ -29,9 +29,7 @@ var downstreamJob = {};
 for (var triggerJob in projectTypesByTriggerJob) {
   if (projectTypesByTriggerJob.hasOwnProperty(triggerJob)) {
     if (metadata.projectType.indexOf(projectTypesByTriggerJob[triggerJob])) {
-      downstreamJob = {
-        downstream_job: triggerJob
-      };
+      downstreamJob[config.varDownstreamJob()] = triggerJob; // eg: {"downstream_job" : "pipeline1"}
     }
   }
 }

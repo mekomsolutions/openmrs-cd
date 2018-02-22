@@ -1,9 +1,13 @@
 /**
- * @author Romain Buisson (romain@mekomsolutions.com)
- *
+ * @return build.sh
+ * @return deploy.sh
+ * @return artifact.env
+ * @return artifact.json
  */
+"use strict";
 const fs = require("fs");
 const utils = require("../utils/utils");
+const config = require("../utils/config");
 const log = require("npmlog");
 
 var commitMetadata = {}; // the commit metadata, parsed out from the SCM service commit payload
@@ -35,13 +39,16 @@ var artifact = projectBuild.getArtifact("./", commitMetadata);
 // Retrieve the script to build the projectBuild
 var buildScript = projectBuild.getBuildScriptAsString();
 fs.writeFileSync(process.env.WORKSPACE + "/build.sh", buildScript);
-fs.chmodSync(process.env.WORKSPACE + "/build.sh", 0755);
+fs.chmodSync(process.env.WORKSPACE + "/build.sh", "0755");
 
 // Retrieve the script to deploy the projectBuild
 var deployScript = projectBuild.getDeployScriptAsString(artifact);
 fs.writeFileSync(process.env.WORKSPACE + "/deploy.sh", deployScript);
-fs.chmodSync(process.env.WORKSPACE + "/deploy.sh", 0755);
+fs.chmodSync(process.env.WORKSPACE + "/deploy.sh", "0755");
 
 // Export the artifact info in order for the pipeline and other jobs to use it
-fs.writeFileSync("/tmp/artifact.env", utils.convertToEnvVar(artifact));
+fs.writeFileSync(
+  config.getArtifactEnvvarsPath(),
+  utils.convertToEnvVar(artifact)
+);
 fs.writeFileSync("/tmp/artifact.json", JSON.stringify(artifact, null, 2));

@@ -1,6 +1,80 @@
 "use strict";
-describe("Tests suite for Pipeline1 ", function() {
-  it("should generate build and deploy scripts.", function() {
+describe("Tests suite for pipeline1", function() {
+  it("should verify job parameters.", function() {
+    // deps
+    const __rootPath__ = require("app-root-path").path;
+    const fs = require("fs");
+    const config = require(__dirname + "/../../src/utils/config");
+
+    // replay
+    var jenkinsFile = fs.readFileSync(
+      __rootPath__ + "/../jenkins/jenkins_home/jobs/pipeline1/config.xml",
+      "utf8"
+    );
+
+    // verif
+    expect(jenkinsFile).toContain(
+      "<name>" + config.varProjectType() + "</name>"
+    );
+    expect(jenkinsFile).toContain("<name>" + config.varRepoUrl() + "</name>");
+    expect(jenkinsFile).toContain("<name>" + config.varRepoName() + "</name>");
+    expect(jenkinsFile).toContain(
+      "<name>" + config.varBranchName() + "</name>"
+    );
+    expect(jenkinsFile).toContain("<name>" + config.varCommitId() + "</name>");
+  });
+
+  it("should verify pipeline steps scripts.", function() {
+    // deps
+    const __rootPath__ = require("app-root-path").path;
+    const fs = require("fs");
+    const config = require(__dirname + "/../../src/utils/config");
+
+    // replay
+    var jenkinsFile = fs.readFileSync(
+      __rootPath__ + "/../jobs/pipelines/pipeline1.jenkinsfile",
+      "utf8"
+    );
+
+    // verif 'checkout' stage
+    expect(jenkinsFile).toContain(
+      "git url: " + config.varRepoUrl() + ", branch: " + config.varBranchName()
+    );
+
+    // verif 'build' stage
+    expect(jenkinsFile).toContain(
+      "sh 'node /opt/app/src/$JOB_NAME/" +
+        config.varBuild() +
+        ".js " +
+        config.getCommitMetadataFilePath() +
+        "'"
+    );
+    expect(jenkinsFile).toContain(
+      "sh '$WORKSPACE/" + config.varBuild() + ".sh'"
+    );
+    expect(jenkinsFile).toContain(
+      "sh '. " +
+        config.getArtifactEnvvarsPath() +
+        " ; mv $WORKSPACE/$" +
+        config.varBuildPath() +
+        "/$" +
+        config.varFilename() +
+        " $WORKSPACE/$" +
+        config.varDestFilename() +
+        "'"
+    );
+
+    // verif 'deploy' stage
+    expect(jenkinsFile).toContain(
+      "sh '$WORKSPACE/" +
+        config.varDeploy() +
+        ".sh $JENKINS_HOME/" +
+        config.getArtifactRepoEnvvarsName() +
+        "'"
+    );
+  });
+
+  it("should generate build and deploy scripts", function() {
     // deps
     const proxyquire = require("proxyquire");
     const model = require(__dirname + "/../../src/models/model");
@@ -8,7 +82,7 @@ describe("Tests suite for Pipeline1 ", function() {
     const fs = require("fs");
 
     // setup
-    process.env.projectType = "artifact_type";
+    process.env.projectType = "artifact_type"; // eg. 'openmrsmodule'
     process.env.WORKSPACE = os.tmpdir();
 
     const buildScript = "__build_script__";
@@ -41,7 +115,7 @@ describe("Tests suite for Pipeline1 ", function() {
     ).toEqual(deployScript);
   });
 
-  it("should implement all required functions from model.", function() {
+  it("should implement all required functions from data model.", function() {
     var folderInTest = __dirname + "/../../src/pipeline1/";
 
     const fs = require("fs");
@@ -74,111 +148,135 @@ describe("Tests suite for Pipeline1 ", function() {
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmniapps'.", function() {
-    var projectBuildType = "bahmniapps";
+    const model = require(__dirname + "/../../src/models/model");
+    const projectType = "bahmniapps";
     var folderInTest = __dirname + "/../../src/pipeline1/";
     var projectBuild = require(folderInTest +
       "./impl/" +
-      projectBuildType).getInstance();
+      projectType).getInstance();
 
-    var mockMetadata = {
-      branch: "dev",
-      commit: "12fe45"
+    var mockCommitMetadata = {
+      branchName: "dev",
+      commitId: "12fe45"
     };
 
-    var artifact = projectBuild.getArtifact("./", mockMetadata);
+    var artifact = projectBuild.getArtifact("./", mockCommitMetadata);
 
-    expect(artifact.project.name).toEqual("bahmniapps");
-    expect(artifact.project.version).toEqual("dev");
-    expect(artifact.project.module).toEqual("");
-    expect(artifact.project.groupId).toEqual("");
-
+    // replay with branch specified
+    expect(artifact.name).toEqual("bahmniapps");
+    expect(artifact.version).toEqual("dev");
     expect(artifact.extension).toEqual("zip");
     expect(artifact.filename).toEqual("bahmniapps.zip");
     expect(artifact.destFilename).toEqual("bahmniapps-dev.zip");
-    expect(artifact.path).toEqual("./ui/target");
+    expect(artifact.buildPath).toEqual("./ui/target");
+    expect(artifact.mavenProject).toEqual(
+      new model.MavenProject("net.mekomsolutions", "bahmniapps", "dev")
+    );
 
-    mockMetadata.branch = "";
-    artifact = projectBuild.getArtifact("./", mockMetadata);
+    // replay with no branch specified
+    mockCommitMetadata.branchName = "";
+    artifact = projectBuild.getArtifact("./", mockCommitMetadata);
     expect(artifact.destFilename).toEqual("bahmniapps-12fe45.zip");
+    expect(artifact.mavenProject).toEqual(
+      new model.MavenProject("net.mekomsolutions", "bahmniapps", "12fe45")
+    );
 
+    // verif
     var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
-    expect(true).toBe(buildScript.value.indexOf("/scripts/package.sh\n") > -1);
+    expect(buildScript.value.indexOf("/scripts/package.sh\n") > -1).toBe(true);
 
     var deployScript = projectBuild.getDeployScript(artifact);
     expect(deployScript.type).toEqual("#!/bin/bash");
-    expect(true).toBe(
-      deployScript.value.indexOf("mvn deploy:deploy-file") > -1
+    expect(deployScript.value.indexOf("mvn deploy:deploy-file") > -1).toBe(
+      true
     );
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmniconfig'.", function() {
-    var projectBuildType = "bahmniconfig";
-    var folderInTest = __dirname + "/../../src/pipeline1/";
+    // deps
+    const model = require(__dirname + "/../../src/models/model");
+    const projectType = "bahmniconfig";
+    const folderInTest = __dirname + "/../../src/pipeline1/";
+
+    // replay
     var projectBuild = require(folderInTest +
       "./impl/" +
-      projectBuildType).getInstance();
+      projectType).getInstance();
 
     var artifact = projectBuild.getArtifact(
-      __dirname + "/resources/" + projectBuildType + "/",
+      __dirname + "/resources/" + projectType + "/",
       null
     );
-    expect(artifact.project.name).toEqual("bahmni-config-cambodia");
-    expect(artifact.project.version).toEqual("1.0-SNAPSHOT");
-    expect(artifact.project.module).toEqual("");
-    expect(artifact.project.groupId).toEqual("net.mekomsolutions");
+    var buildScript = projectBuild.getBuildScript();
+    var deployScript = projectBuild.getDeployScript(artifact);
+
+    // verif
+    expect(artifact.name).toEqual("bahmni-config-cambodia");
+    expect(artifact.version).toEqual("1.0-SNAPSHOT");
 
     expect(artifact.extension).toEqual("zip");
     expect(artifact.filename).toEqual(
       "bahmni-config-cambodia-1.0-SNAPSHOT.zip"
     );
-    expect(artifact.destFilename).toEqual(
-      "bahmni-config-cambodia-1.0-SNAPSHOT.zip"
+    expect(artifact.destFilename).toEqual(artifact.filename);
+    expect(artifact.buildPath).toEqual("./target");
+    expect(artifact.mavenProject).toEqual(
+      new model.MavenProject(
+        "net.mekomsolutions",
+        "bahmni-config-cambodia",
+        "1.0-SNAPSHOT"
+      )
     );
-    expect(artifact.path).toEqual("./target");
 
-    var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
     expect(buildScript.value).toEqual("mvn clean install\n");
 
-    var deployScript = projectBuild.getDeployScript(artifact);
     expect(deployScript.type).toEqual("#!/bin/bash");
-    expect(true).toBe(
+    expect(
       deployScript.value.indexOf("mvn clean deploy -DskipTests") > -1
-    );
+    ).toBe(true);
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrsconfig'.", function() {
-    var projectBuildType = "openmrsconfig";
+    // deps
+    const model = require(__dirname + "/../../src/models/model");
+    const projectType = "openmrsconfig";
+
+    // setup
     var folderInTest = __dirname + "/../../src/pipeline1/";
+
+    // replay
     var projectBuild = require(folderInTest +
       "./impl/" +
-      projectBuildType).getInstance();
-
+      projectType).getInstance();
     var artifact = projectBuild.getArtifact(
-      __dirname + "/resources/" + projectBuildType + "/",
+      __dirname + "/resources/" + projectType + "/",
       null
     );
+    var buildScript = projectBuild.getBuildScript();
+    var deployScript = projectBuild.getDeployScript(artifact);
 
-    expect(artifact.project.name).toEqual("openmrs-config-cambodia");
-    expect(artifact.project.version).toEqual("1.0-SNAPSHOT");
-    expect(artifact.project.module).toEqual("");
-    expect(artifact.project.groupId).toEqual("net.mekomsolutions");
-
+    // verif
+    expect(artifact.name).toEqual("openmrs-config-cambodia");
+    expect(artifact.version).toEqual("1.0-SNAPSHOT");
     expect(artifact.extension).toEqual("zip");
     expect(artifact.filename).toEqual(
       "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
     );
-    expect(artifact.destFilename).toEqual(
-      "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
+    expect(artifact.destFilename).toEqual(artifact.filename);
+    expect(artifact.buildPath).toEqual("./target");
+    expect(artifact.mavenProject).toEqual(
+      new model.MavenProject(
+        "net.mekomsolutions",
+        "openmrs-config-cambodia",
+        "1.0-SNAPSHOT"
+      )
     );
-    expect(artifact.path).toEqual("./target");
 
-    var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
     expect(buildScript.value).toEqual("mvn clean install\n");
 
-    var deployScript = projectBuild.getDeployScript(artifact);
     expect(deployScript.type).toEqual("#!/bin/bash");
     expect(true).toBe(
       deployScript.value.indexOf("mvn clean deploy -DskipTests") > -1
@@ -186,32 +284,39 @@ describe("Tests suite for Pipeline1 ", function() {
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrscore'.", function() {
-    var projectBuildType = "openmrscore";
+    // deps
+    const model = require(__dirname + "/../../src/models/model");
+    const projectType = "openmrscore";
+
+    // setup
     var folderInTest = __dirname + "/../../src/pipeline1/";
+
+    // replay
     var projectBuild = require(folderInTest +
       "./impl/" +
-      projectBuildType).getInstance();
+      projectType).getInstance();
 
     var artifact = projectBuild.getArtifact(
-      __dirname + "/resources/" + projectBuildType + "/",
+      __dirname + "/resources/" + projectType + "/",
       null
     );
+    var buildScript = projectBuild.getBuildScript();
+    var deployScript = projectBuild.getDeployScript(artifact);
 
-    expect(artifact.project.name).toEqual("openmrs");
-    expect(artifact.project.version).toEqual("2.2.0-SNAPSHOT");
-    expect(artifact.project.module).toEqual("webapp");
-    expect(artifact.project.groupId).toEqual("org.openmrs");
-
+    // verif
+    expect(artifact.name).toEqual("openmrs");
+    expect(artifact.version).toEqual("2.2.0-SNAPSHOT");
     expect(artifact.extension).toEqual("omod");
     expect(artifact.filename).toEqual("openmrs-2.2.0-SNAPSHOT.omod");
-    expect(artifact.destFilename).toEqual("openmrs-2.2.0-SNAPSHOT.omod");
-    expect(artifact.path).toEqual("./omod/target");
+    expect(artifact.destFilename).toEqual(artifact.filename);
+    expect(artifact.buildPath).toEqual("./omod/target");
+    expect(artifact.mavenProject).toEqual(
+      new model.MavenProject("org.openmrs", "openmrs", "2.2.0-SNAPSHOT")
+    );
 
-    var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
     expect(buildScript.value).toEqual("mvn clean install\n");
 
-    var deployScript = projectBuild.getDeployScript(artifact);
     expect(deployScript.type).toEqual("#!/bin/bash");
     expect(true).toBe(
       deployScript.value.indexOf("mvn clean deploy -DskipTests") > -1
@@ -219,32 +324,32 @@ describe("Tests suite for Pipeline1 ", function() {
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrsmodule'.", function() {
-    var projectBuildType = "openmrsmodule";
+    // setup
+    const projectType = "openmrsmodule";
     var folderInTest = __dirname + "/../../src/pipeline1/";
+
+    // replay
     var projectBuild = require(folderInTest +
       "./impl/" +
-      projectBuildType).getInstance();
-
+      projectType).getInstance();
     var artifact = projectBuild.getArtifact(
-      __dirname + "/resources/" + projectBuildType + "/",
+      __dirname + "/resources/" + projectType + "/",
       null
     );
+    var buildScript = projectBuild.getBuildScript();
+    var deployScript = projectBuild.getDeployScript(artifact);
 
-    expect(artifact.project.name).toEqual("exti18n");
-    expect(artifact.project.version).toEqual("1.1.0-SNAPSHOT");
-    expect(artifact.project.module).toEqual("omod");
-    expect(artifact.project.groupId).toEqual("org.openmrs.module");
-
+    // verif
+    expect(artifact.name).toEqual("exti18n");
+    expect(artifact.version).toEqual("1.1.0-SNAPSHOT");
     expect(artifact.extension).toEqual("omod");
     expect(artifact.filename).toEqual("exti18n-1.1.0-SNAPSHOT.omod");
-    expect(artifact.destFilename).toEqual("exti18n-1.1.0-SNAPSHOT.omod");
-    expect(artifact.path).toEqual("./omod/target");
+    expect(artifact.destFilename).toEqual(artifact.filename);
+    expect(artifact.buildPath).toEqual("./omod/target");
 
-    var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
     expect(buildScript.value).toEqual("mvn clean install\n");
 
-    var deployScript = projectBuild.getDeployScript(artifact);
     expect(deployScript.type).toEqual("#!/bin/bash");
     expect(true).toBe(
       deployScript.value.indexOf("mvn clean deploy -DskipTests") > -1

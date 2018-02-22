@@ -1,6 +1,7 @@
 "use strict";
-var utils = require("../utils/utils");
-var constants = require("../constants/constants");
+const utils = require("../utils/utils");
+const config = require("../utils/config");
+const constants = require("../constants/constants");
 
 /**
  * An object that describes the script to build the project
@@ -15,29 +16,36 @@ class Script {
 }
 
 /**
- * An object that describes an artifact
- *
+ * Describes a Maven project
  */
-class Project {
-  constructor(name, module, groupId, version) {
-    this.name = name;
-    this.module = module;
+class MavenProject {
+  constructor(groupId, artifactId, version) {
     this.groupId = groupId;
+    this.artifactId = artifactId;
     this.version = version;
   }
 }
 
 /**
- * An object that describes an artifact and its details as a file
- *
+ * Describes a build artifact.
  */
 class Artifact {
-  constructor(project, path, extension, filename, destFilename) {
-    this.project = project;
-    this.path = path;
+  constructor(
+    mavenProject,
+    name,
+    version,
+    buildPath,
+    filename,
+    extension,
+    destFilename
+  ) {
+    this.mavenProject = mavenProject;
+    this.name = name;
+    this.version = version;
+    this[config.varBuildPath()] = buildPath;
+    this[config.varFilename()] = filename;
     this.extension = extension;
-    this.filename = filename;
-    this.destFilename = destFilename;
+    this[config.varDestFilename()] = destFilename;
   }
 }
 
@@ -51,7 +59,6 @@ class ProjectBuild {
     return constants.ABSTRACT;
   }
   getBuildScriptAsString() {
-    // A default implementation is provided
     return utils.getScriptAsString(this.getBuildScript());
   }
   getArtifact(pomPath, commitMetadata) {
@@ -61,14 +68,12 @@ class ProjectBuild {
     return constants.ABSTRACT;
   }
   getDeployScriptAsString(artifact) {
-    // A default implementation is provided
     return utils.getScriptAsString(this.getDeployScript(artifact));
   }
 }
 
 /**
- * An object that represents an given server (an OpenMRS distro + ref) (such as a pom.xml file).
- *
+ * Represents a server (an OpenMRS distro + ref) (such as a pom.xml file).
  */
 class Descriptor {
   constructor(serverId, rawData) {
@@ -81,8 +86,7 @@ class Descriptor {
 }
 
 /**
- * An object that represents an event to be logged in the history of a server.
- *
+ * Represents an event to be logged in the history of a server.
  */
 class ServerEvent {
   constructor(timestamp, artifact) {
@@ -92,7 +96,7 @@ class ServerEvent {
 
 module.exports = {
   Script: Script,
-  Project: Project,
+  MavenProject: MavenProject,
   Artifact: Artifact,
   ProjectBuild: ProjectBuild,
   Descriptor: Descriptor,

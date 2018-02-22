@@ -1,14 +1,17 @@
 {
   "name": "app",
   "version": "0.0.0",
-  "description": "Resource scripts for the OpenMRS CD",
+  "description": "Node scripts for the OpenMRS CD",
   "dependencies": {
+    "lodash": "^4.17.5",
     "nock": "9.0.0",
     "npmlog": "^4.1.2",
     "pixl-xml": "^1.0.13",
     "request": "^2.83.0"
   },
   "devDependencies": {
+    "app-root-path": "^2.0.1",
+    "ent": "^2.2.0",
     "jasmine": "^2.8.0",
     "karma": "^1.7.1",
     "prettier": "1.10.2",
