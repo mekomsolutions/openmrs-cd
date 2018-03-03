@@ -2,6 +2,79 @@ describe("Tests suite for Pipeline2 ", function() {
   const folderInTest = __dirname + "/../../src/pipeline2/";
   const fs = require("fs");
 
+  it("should verify job parameters.", function() {
+    // deps
+    const __rootPath__ = require("app-root-path").path;
+    const fs = require("fs");
+    const config = require(__dirname + "/../../src/utils/config");
+
+    // replay
+    var jenkinsFile = fs.readFileSync(
+      __rootPath__ +
+        "/../jenkins/jenkins_home/jobs/" +
+        config.getJobNameForPipeline2() +
+        "/config.xml",
+      "utf8"
+    );
+
+    // verif
+    expect(jenkinsFile).toContain(
+      "<upstreamProjects>" +
+        config.getJobNameForPipeline1() +
+        "</upstreamProjects>"
+    );
+    expect(jenkinsFile).toContain(
+      "<scriptPath>jobs/pipelines/" +
+        config.getJobNameForPipeline2() +
+        ".jenkinsfile</scriptPath>"
+    );
+  });
+
+  it("should verify pipeline steps scripts.", function() {
+    // deps
+    const __rootPath__ = require("app-root-path").path;
+    const fs = require("fs");
+    const config = require(__dirname + "/../../src/utils/config");
+
+    // replay
+    var jenkinsFile = fs.readFileSync(
+      __rootPath__ +
+        "/../jobs/pipelines/" +
+        config.getJobNameForPipeline2() +
+        ".jenkinsfile",
+      "utf8"
+    );
+
+    // verif stage 'setup'
+    expect(jenkinsFile).toContain("sh 'cd /opt/app/; npm install'");
+
+    // verif stage 'fetch servers descriptors'
+    expect(jenkinsFile).toContain(
+      "sh 'node /opt/app/src/$JOB_NAME/" +
+        config.getFetchServersDescriptorsJsScriptName() +
+        " $JENKINS_HOME/" +
+        config.getServersConfigPath() +
+        "'"
+    );
+
+    // verif stage 'parse servers descriptors'
+    expect(jenkinsFile).toContain(
+      "sh 'node /opt/app/src/$JOB_NAME/" +
+        config.getParseServersDescriptorsJsScriptName() +
+        "'"
+    );
+
+    // verif stage 'update servers change log'
+    expect(jenkinsFile).toContain(
+      "sh 'node /opt/app/src/$JOB_NAME/" +
+        config.getUpdateServerChangelogJsScriptName() +
+        "'"
+    );
+    expect(jenkinsFile).toContain(
+      "sh 'cat $JENKINS_HOME/" + config.getServersChangelogPath() + "'"
+    );
+  });
+
   it("should implement all required functions from model", function() {
     const model = require(__dirname + "/../../src/models/model");
     const modelTestUtils = require(__dirname + "/../models/modelTestUtils");

@@ -27,7 +27,7 @@ try {
     "The commit metadata file is either missing at the specified path or is malformed (it is usually created by an upstream webhook job.)"
   );
   log.error("", err);
-  process.exit(1);
+  throw new Error();
 }
 
 // The ProjectBuild is loaded based on the project type
@@ -38,17 +38,32 @@ var artifact = projectBuild.getArtifact("./", commitMetadata);
 
 // Retrieve the script to build the projectBuild
 var buildScript = projectBuild.getBuildScriptAsString();
-fs.writeFileSync(process.env.WORKSPACE + "/build.sh", buildScript);
-fs.chmodSync(process.env.WORKSPACE + "/build.sh", "0755");
+fs.writeFileSync(
+  process.env.WORKSPACE + "/" + config.getBuildShellScriptName(),
+  buildScript
+);
+fs.chmodSync(
+  process.env.WORKSPACE + "/" + config.getBuildShellScriptName(),
+  "0755"
+);
 
 // Retrieve the script to deploy the projectBuild
 var deployScript = projectBuild.getDeployScriptAsString(artifact);
-fs.writeFileSync(process.env.WORKSPACE + "/deploy.sh", deployScript);
-fs.chmodSync(process.env.WORKSPACE + "/deploy.sh", "0755");
+fs.writeFileSync(
+  process.env.WORKSPACE + "/" + config.getDeployShellScriptName(),
+  deployScript
+);
+fs.chmodSync(
+  process.env.WORKSPACE + "/" + config.getDeployShellScriptName(),
+  "0755"
+);
 
 // Export the artifact info in order for the pipeline and other jobs to use it
 fs.writeFileSync(
-  config.getArtifactEnvvarsPath(),
+  config.getChangedArtifactEnvvarsPath(),
   utils.convertToEnvVar(artifact)
 );
-fs.writeFileSync("/tmp/artifact.json", JSON.stringify(artifact, null, 2));
+fs.writeFileSync(
+  config.getChangedArtifactJsonPath(),
+  JSON.stringify(artifact, null, 2)
+);

@@ -1,10 +1,13 @@
+"use strict";
+
 /**
  * @author Romain Buisson (romain@mekomsolutions.com)
  *
  */
-"use strict";
+
 const fs = require("fs");
 const utils = require("../utils/utils");
+const config = require("../utils/config");
 const log = require("npmlog");
 
 var descriptorsDir = "/tmp";
@@ -24,4 +27,7 @@ descriptors.forEach(function(item) {
 
 var byArtifact = utils.sortByArtifact(dependenciesByServer);
 log.info("", byArtifact);
-fs.writeFileSync("/tmp/dependencies.json", JSON.stringify(byArtifact, null, 2));
+fs.writeFileSync(
+  config.getServersByArtifactKeysPath(),
+  JSON.stringify(byArtifact, null, 2)
+);

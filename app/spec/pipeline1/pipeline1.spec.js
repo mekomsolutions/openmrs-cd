@@ -8,7 +8,10 @@ describe("Tests suite for pipeline1", function() {
 
     // replay
     var jenkinsFile = fs.readFileSync(
-      __rootPath__ + "/../jenkins/jenkins_home/jobs/pipeline1/config.xml",
+      __rootPath__ +
+        "/../jenkins/jenkins_home/jobs/" +
+        config.getJobNameForPipeline1() +
+        "/config.xml",
       "utf8"
     );
 
@@ -22,6 +25,11 @@ describe("Tests suite for pipeline1", function() {
       "<name>" + config.varBranchName() + "</name>"
     );
     expect(jenkinsFile).toContain("<name>" + config.varCommitId() + "</name>");
+    expect(jenkinsFile).toContain(
+      "<scriptPath>jobs/pipelines/" +
+        config.getJobNameForPipeline1() +
+        ".jenkinsfile</scriptPath>"
+    );
   });
 
   it("should verify pipeline steps scripts.", function() {
@@ -32,7 +40,10 @@ describe("Tests suite for pipeline1", function() {
 
     // replay
     var jenkinsFile = fs.readFileSync(
-      __rootPath__ + "/../jobs/pipelines/pipeline1.jenkinsfile",
+      __rootPath__ +
+        "/../jobs/pipelines/" +
+        config.getJobNameForPipeline1() +
+        ".jenkinsfile",
       "utf8"
     );
 
@@ -44,17 +55,17 @@ describe("Tests suite for pipeline1", function() {
     // verif 'build' stage
     expect(jenkinsFile).toContain(
       "sh 'node /opt/app/src/$JOB_NAME/" +
-        config.varBuild() +
-        ".js " +
+        config.getBuildJsScriptName() +
+        " " +
         config.getCommitMetadataFilePath() +
         "'"
     );
     expect(jenkinsFile).toContain(
-      "sh '$WORKSPACE/" + config.varBuild() + ".sh'"
+      "sh '$WORKSPACE/" + config.getBuildShellScriptName() + "'"
     );
     expect(jenkinsFile).toContain(
       "sh '. " +
-        config.getArtifactEnvvarsPath() +
+        config.getChangedArtifactEnvvarsPath() +
         " ; mv $WORKSPACE/$" +
         config.varBuildPath() +
         "/$" +
@@ -67,8 +78,8 @@ describe("Tests suite for pipeline1", function() {
     // verif 'deploy' stage
     expect(jenkinsFile).toContain(
       "sh '$WORKSPACE/" +
-        config.varDeploy() +
-        ".sh $JENKINS_HOME/" +
+        config.getDeployShellScriptName() +
+        " $JENKINS_HOME/" +
         config.getArtifactRepoEnvvarsName() +
         "'"
     );

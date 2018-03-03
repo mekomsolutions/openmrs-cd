@@ -5,22 +5,22 @@ pipeline {
     nodejs 'NodeJS 8.6.0'
   }
   stages {
-    stage ('Install npm dependencies') {
+    stage ('Pipeline setup') {
       steps {
         sh 'cd /opt/app/; npm install'
       }
     }
-    stage ('Fetch server descriptors') {
+    stage ('Fetch remote servers descriptors') {
       steps {
         sh 'node /opt/app/src/$JOB_NAME/fetch.js $JENKINS_HOME/servers.json'
       }
     }
-    stage ('Parse the descriptors') {
+    stage ('Parse servers descriptors') {
       steps {
         sh 'node /opt/app/src/$JOB_NAME/parse.js'
       }
     }
-    stage ('Identify servers that depends on the given artifact') {
+    stage ('Update servers change log') {
       steps {
         sh 'node /opt/app/src/$JOB_NAME/compare.js'
         sh 'cat $JENKINS_HOME/history.json'

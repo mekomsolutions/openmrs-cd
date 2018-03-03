@@ -1,19 +1,24 @@
+"use strict";
 /**
  * @author Romain Buisson (romain@mekomsolutions.com)
  *
  */
-var fs = require("fs");
-var utils = require("../utils/utils");
-var log = require("npmlog");
+const fs = require("fs");
+const utils = require("../utils/utils");
+const config = require("../utils/config");
+const log = require("npmlog");
+const descriptorService = require(__dirname + "/descriptorService");
 
-var descriptorService = require(__dirname + "/descriptorService");
 var servers = {};
 
 try {
   servers = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
 } catch (err) {
-  log.error("", "No list of existing servers could be fetched.");
-  log.error("", err);
+  log.warn(
+    "",
+    "There is no servers list configuration file on this server, or the file content is corrupt and could not be loaded."
+  );
+  log.warn("", err);
 }
 
 descriptorService.fetchRemoteDistroDescriptors(servers, function(
@@ -23,17 +28,17 @@ descriptorService.fetchRemoteDistroDescriptors(servers, function(
   if (errors.length != 0) {
     log.error(
       "",
-      "Errors have been encountered while downloading descriptors."
+      "There were errors during the fetching of servers descriptors."
     );
     log.error("", "One or more server(s) may have an invalid descriptor URL.");
     console.dir(errors);
-    process.exit(1);
+    throw new Error();
   }
   var descriptors = result;
 
   log.info("", descriptors);
   fs.writeFileSync(
-    "/tmp/descriptors.json",
+    config.getServersDescriptorsPath(),
     JSON.stringify(descriptors, null, 2)
   );
 });

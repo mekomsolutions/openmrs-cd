@@ -1,21 +1,22 @@
+"use strict";
 /**
  * @author Romain Buisson (romain@mekomsolutions.com)
  *
  */
 const fs = require("fs");
 const utils = require("../utils/utils");
+const config = require("../utils/config");
 const model = require("../models/model");
 const log = require("npmlog");
 
-var dependenciesDir = "/tmp";
-var historyDir = "/var/jenkins_home";
 var dependencies = JSON.parse(
-  fs.readFileSync(dependenciesDir + "/dependencies.json")
+  // mapping artifact key => servers list
+  fs.readFileSync(config.getServersByArtifactKeysPath())
 );
 
 try {
   var artifact = JSON.parse(
-    fs.readFileSync(dependenciesDir + "/artifact.json")
+    fs.readFileSync(config.getChangedArtifactJsonPath())
   );
 } catch (err) {
   log.error(
@@ -27,13 +28,16 @@ try {
   process.exit(1);
 }
 
+const changelogFilePath =
+  config.getJenkinsHomePath() + "/" + config.getServersChangelogPath();
+
 var history = {};
 try {
-  history = JSON.parse(fs.readFileSync(historyDir + "/history.json"));
+  history = JSON.parse(fs.readFileSync(changelogFilePath));
 } catch (err) {
   log.warn(
     "",
-    "No history file found or unable to retrieve it. This may not be an error if you are running this for the first time"
+    "Unable to retrieve the servers change log file. This may not be an error if you are running this script for the first time."
   );
   log.warn("", err);
 }
@@ -46,7 +50,4 @@ utils.setMatchingServersAndUpdateHistory(
   new model.ServerEvent(Date.now(), artifact)
 );
 
-fs.writeFileSync(
-  historyDir + "/history.json",
-  JSON.stringify(history, null, 2)
-);
+fs.writeFileSync(changelogFilePath, JSON.stringify(history, null, 2));

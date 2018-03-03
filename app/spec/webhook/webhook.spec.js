@@ -13,7 +13,9 @@ describe("Test suite for webhook scripts", function() {
       path.resolve(
         __rootPath__,
         "..",
-        "jenkins/jenkins_home/jobs/webhook/config.xml"
+        "jenkins/jenkins_home/jobs/" +
+          config.getJobNameForWebhook() +
+          "/config.xml"
       ),
       "utf8"
     );
@@ -28,7 +30,7 @@ describe("Test suite for webhook scripts", function() {
       "<name>" + config.varScmService() + "</name>"
     );
     expect(jenkinsFile).toContain(
-      "<command>node /opt/app/src/webhook/webhook.js"
+      "<command>node /opt/app/src/" + config.getWebhookJsScriptPath()
     );
     expect(jenkinsFile).toContain(
       "<propertiesFilePath>" +
@@ -36,7 +38,7 @@ describe("Test suite for webhook scripts", function() {
         "</propertiesFilePath>"
     );
     expect(jenkinsFile).toContain(
-      "<command>node /opt/app/src/webhook/trigger.js"
+      "<command>node /opt/app/src/" + config.getTriggerJsScriptPath()
     );
     expect(jenkinsFile).toContain(
       "<propertiesFilePath>$WORKSPACE/" +

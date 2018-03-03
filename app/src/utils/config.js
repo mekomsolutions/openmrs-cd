@@ -21,12 +21,6 @@ module.exports = {
   varDownstreamJob: function() {
     return "downstream_job";
   },
-  varBuild: function() {
-    return "build";
-  },
-  varDeploy: function() {
-    return "deploy";
-  },
   varRepoUrl: function() {
     return "repoUrl";
   },
@@ -52,11 +46,28 @@ module.exports = {
   getTempDirPath: function() {
     return "/tmp";
   },
+  getWebhookJsScriptPath: function() {
+    // relative to /app/src
+    return "webhook/webhook.js";
+  },
+  getTriggerJsScriptPath: function() {
+    // relative to /app/src
+    return "webhook/trigger.js";
+  },
   getCommitMetadataFilePath: function() {
     return "/tmp/commit_metadata.json";
   },
   getCommitMetadataFileEnvvarsPath: function() {
     return "/tmp/commit_metadata.env";
+  },
+  getBuildJsScriptName: function() {
+    return "build.js";
+  },
+  getBuildShellScriptName: function() {
+    return "build.sh";
+  },
+  getDeployShellScriptName: function() {
+    return "deploy.sh";
   },
   getProjectBuildTriggerEnvvarsName: function() {
     return "trigger.env";
@@ -64,10 +75,53 @@ module.exports = {
   getWebhookTriggersFilePath: function() {
     return "/usr/share/jenkins/webhook_triggers.json";
   },
-  getArtifactEnvvarsPath: function() {
+  getChangedArtifactEnvvarsPath: function() {
     return "/tmp/artifact.env";
+  },
+  getChangedArtifactJsonPath: function() {
+    return "/tmp/artifact.json";
   },
   getArtifactRepoEnvvarsName: function() {
     return "artifact_repository.env";
+  },
+  getJenkinsHomePath: function() {
+    // $JENKINS_HOME
+    return "/var/jenkins_home";
+  },
+  getServersConfigPath: function() {
+    // relative to Jenkins home
+    return "servers.json";
+  },
+  getBuildJsScriptName: function() {
+    return "build.js";
+  },
+  getFetchServersDescriptorsJsScriptName: function() {
+    return "fetch.js";
+  },
+  getParseServersDescriptorsJsScriptName: function() {
+    return "parse.js";
+  },
+  getServersDescriptorsPath: function() {
+    return "/tmp/descriptors.json";
+  },
+  getUpdateServerChangelogJsScriptName: function() {
+    return "compare.js";
+  },
+  getServersChangelogPath: function() {
+    // relative to Jenkins home
+    return "history.json";
+  },
+  getServersByArtifactKeysPath: function() {
+    return "/tmp/dependencies.json";
+  },
+
+  getJobNameForWebhook: function() {
+    return "webhook";
+  },
+  getJobNameForPipeline1: function() {
+    return "pipeline1";
+  },
+  getJobNameForPipeline2: function() {
+    return "pipeline2";
   }
 };
