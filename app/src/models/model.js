@@ -19,10 +19,11 @@ class Script {
  * Describes a Maven project
  */
 class MavenProject {
-  constructor(groupId, artifactId, version) {
+  constructor(groupId, artifactId, version, packaging) {
     this.groupId = groupId;
     this.artifactId = artifactId;
     this.version = version;
+    this.packaging = packaging;
   }
 }
 

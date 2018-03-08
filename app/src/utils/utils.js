@@ -5,39 +5,50 @@ const fs = require("fs");
 const log = require("npmlog");
 const _ = require("lodash");
 
-/**
- * https://gist.github.com/penguinboy/762197
- */
-var flattenObject = function(ob) {
-  var toReturn = {};
-
-  for (var i in ob) {
-    if (!ob.hasOwnProperty(i)) continue;
-
-    if (typeof ob[i] == "object") {
-      var flatObject = flattenObject(ob[i]);
-      for (var x in flatObject) {
-        if (!flatObject.hasOwnProperty(x)) continue;
-
-        toReturn[i + "_" + x] = flatObject[x];
-      }
-    } else {
-      toReturn[i] = ob[i];
-    }
-  }
-  return toReturn;
-};
-
 module.exports = {
+  escapeForEnvVars: function(str) {
+    return str
+      .replace(/(\s+)/g, "\\$1")
+      .replace(/-/g, "\\-")
+      .replace(/:/g, "\\:");
+  },
+
+  /**
+   * https://gist.github.com/penguinboy/762197
+   */
+  flattenObject: function(ob) {
+    var toReturn = {};
+
+    for (var i in ob) {
+      if (!ob.hasOwnProperty(i)) continue;
+
+      if (typeof ob[i] == "object") {
+        var flatObject = module.exports.flattenObject(ob[i]);
+        for (var x in flatObject) {
+          if (!flatObject.hasOwnProperty(x)) continue;
+
+          toReturn[i + "_" + x] = flatObject[x];
+        }
+      } else {
+        toReturn[i] = ob[i];
+      }
+    }
+    return toReturn;
+  },
+
   /**
    * @return Returns a concatenated string of all the properties of the passed object
    */
   convertToEnvVar: function(object) {
     var envvars = "";
-    var flat = flattenObject(object);
+    var flat = module.exports.flattenObject(object);
     for (var property in flat) {
       if (flat.hasOwnProperty(property)) {
-        envvars = envvars + property + "=" + flat[property] + "\n";
+        envvars +=
+          property +
+          "=" +
+          module.exports.escapeForEnvVars(flat[property]) +
+          "\n";
       }
     }
     return envvars;

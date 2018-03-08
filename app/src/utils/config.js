@@ -42,6 +42,12 @@ module.exports = {
   varFilename: function() {
     return "filename";
   },
+  varBuildName: function() {
+    return "build_name";
+  },
+  varBuildDesc: function() {
+    return "build_desc";
+  },
 
   getTempDirPath: function() {
     return "/tmp";
@@ -71,6 +77,9 @@ module.exports = {
   },
   getProjectBuildTriggerEnvvarsName: function() {
     return "trigger.env";
+  },
+  getJobBuildDetailsEnvvarsName: function() {
+    return "build_details.env";
   },
   getWebhookTriggersFilePath: function() {
     return "/usr/share/jenkins/webhook_triggers.json";
@@ -123,5 +132,15 @@ module.exports = {
   },
   getJobNameForPipeline2: function() {
     return "pipeline2";
+  },
+  getJobNameForPipeline3: function() {
+    return "pipeline3";
+  },
+
+  getInstanceDeploymentTypes: function() {
+    return ["docker"];
+  },
+  getInstanceArtifactsTypes: function() {
+    return ["maven"];
   }
 };
