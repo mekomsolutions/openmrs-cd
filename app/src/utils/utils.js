@@ -195,5 +195,56 @@ module.exports = {
     });
 
     return matchedServers;
+  },
+
+  /**
+   * Sets a status to an object, with basic audit information alongside it.
+   *
+   * @param {Object} objWithStatus, the object that should be set a status
+   * @param {Object} status, the status object to set (could be a simple String of course)
+   *
+   */
+  setObjectStatus: function(objWithStatus, status) {
+    if (!_.isObject(objWithStatus)) {
+      return;
+    }
+
+    if (!_.isEmpty(status)) {
+      objWithStatus.status = status;
+    }
+
+    objWithStatus.updated = new Date();
+    if (!objWithStatus.created) {
+      objWithStatus.created = objWithStatus.updated;
+    }
+  },
+
+  /**
+   * Finds an instance definition in provided list of instances definitions based on the UUID or name.
+   *
+   * @param {String} uuid, the UUID to match
+   * @param {String} name, the name to match
+   *
+   * @return {Object} The matched instance definition.
+   */
+  findInstanceInList: function(uuid, name, instances) {
+    var filteredInstances = _.filter(instances, function(o) {
+      return o.name === name || o.uuid === uuid;
+    });
+
+    var matchedInstance = {};
+    if (filteredInstances.length > 1) {
+      throw new Error(
+        "Multiple matches were found for the following instance: uuid='" +
+          uuid +
+          "', name='" +
+          name +
+          "'."
+      );
+    }
+    if (filteredInstances.length == 1) {
+      matchedInstance = filteredInstances[0];
+    }
+    return matchedInstance;
   }
 };

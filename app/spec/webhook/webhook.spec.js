@@ -1,11 +1,13 @@
 "use strict";
 describe("Test suite for webhook scripts", function() {
+  const path = require("path");
+  const tests = require(path.resolve("spec", "utils", "testUtils"));
+  const fs = require("fs");
+
   it("should verify job parameters.", function() {
     // deps
     const __rootPath__ = require("app-root-path").path;
-    const fs = require("fs");
-    const path = require("path");
-    const config = require(__dirname + "/../../src/utils/config");
+    const config = require(path.resolve("src/utils/config"));
     const ent = require("ent");
 
     // replay
@@ -65,9 +67,6 @@ describe("Test suite for webhook scripts", function() {
   });
 
   it("should parse a GitHub HTTP payload", function() {
-    // deps
-    const fs = require("fs");
-
     // setup
     var folderInTest = __dirname + "/../../src/webhook/";
 
@@ -90,14 +89,12 @@ describe("Test suite for webhook scripts", function() {
   it("should pass the commit metadata as both envvars and temp JSON file.", function() {
     // deps
     const proxyquire = require("proxyquire");
-    const os = require("os");
-    const fs = require("fs");
 
     // setup
     var folderInTest = __dirname + "/../../src/webhook";
     var fileInTest = folderInTest + "/webhook";
 
-    process.env.scmService = "gotlub";
+    process.env.scmService = "gitlab";
     process.env.projectType = "openmrsmodule";
     var expectedMetadata = {
       projectType: process.env.type,
@@ -107,16 +104,7 @@ describe("Test suite for webhook scripts", function() {
       commitId: "c71670e"
     };
 
-    var mockConfig = {};
-    mockConfig.getTempDirPath = function() {
-      return os.tmpdir();
-    };
-    mockConfig.getCommitMetadataFilePath = function() {
-      return __dirname + "/test_commit_metadata.json";
-    };
-    var stubs = {
-      "../utils/config": mockConfig
-    };
+    var stubs = {};
     stubs["./impl/" + process.env.scmService] = {
       parsePayload: function(payload) {
         return expectedMetadata;
@@ -125,50 +113,41 @@ describe("Test suite for webhook scripts", function() {
     };
 
     // replay
-    proxyquire(fileInTest, stubs);
+    proxyquire(fileInTest, tests.stubs(stubs, {}));
 
     // verif
     const utils = require(folderInTest + "../../utils/utils");
     expect(
-      fs.readFileSync(mockConfig.getCommitMetadataFilePath(), "utf8")
+      fs.readFileSync(tests.config().getCommitMetadataFilePath(), "utf8")
     ).toEqual(JSON.stringify(expectedMetadata));
     expect(
       fs.readFileSync(
-        mockConfig.getTempDirPath() + "/commit_metadata.env",
+        tests.config().getTempDirPath() + "/commit_metadata.env",
         "utf8"
       )
     ).toEqual(utils.convertToEnvVar(expectedMetadata));
+
+    // after
+    tests.cleanup();
   });
 
   it("should save the downstream jobs as a key-value properties file", function() {
     // deps
     const proxyquire = require("proxyquire");
-    const os = require("os");
-    const fs = require("fs");
 
     // setup
     var folderInTest = __dirname + "/../../src/webhook";
     var fileInTest = folderInTest + "/trigger";
 
-    var mockConfig = {};
-    mockConfig.getCommitMetadataFilePath = function() {
-      return __dirname + "/test_commit_metadata.json";
-    };
-    mockConfig.getWebhookTriggersFilePath = function() {
-      return __dirname + "/test_webhook_triggers.json";
-    };
-    var stubs = {
-      "../utils/config": mockConfig
-    };
-
-    process.env.WORKSPACE = os.tmpdir();
-
     // replay
-    proxyquire(fileInTest, stubs);
+    proxyquire(fileInTest, tests.stubs());
 
     // verif
     expect(
       fs.readFileSync(process.env.WORKSPACE + "/trigger.env", "utf8")
     ).toEqual("downstream_job=pipeline1\n");
+
+    // after
+    tests.cleanup();
   });
 });

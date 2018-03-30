@@ -1,0 +1,62 @@
+[
+  {
+    "uuid": "cacb5448-46b0-4808-980d-5521775671c0",
+    "status": "Instance running.",
+    "updated": "2017-03-30T14:36:45.466Z",
+    "created": "2017-03-30T14:36:45.466Z",
+    "name": "cambodia-dev-1",
+    "description": "Dev server for agile development on the ODC.",
+    "type": "dev",
+    "artifacts": {
+      "type": "maven",
+      "value": {
+        "groupId": "net.mekomsolutions",
+        "artifactId": "openmrs-distro-cambodia",
+        "version": "1.0.0-SNAPSHOT",
+        "packaging": "zip"
+      }
+    },
+    "deployment": {
+      "type": "docker",
+      "value": {
+        "version": "1.0",
+        "image": "mekomsolutions/bahmni",
+        "tag": "cambodia-release-0.90"
+      },
+      "host": {
+        "uuid": "51629692-95A9-498E-A370-49F61B02EF89",
+        "artifactsLocation": "/var/docker-volumes/{{uuid}}"
+      }
+    }
+  },
+  {
+    "uuid": "50b6cf72-0e80-457d-8141-a0c8c85d4dae",
+    "status": "Instance running.",
+    "updated": "2018-03-30T14:36:45.466Z",
+    "created": "2018-03-30T14:36:45.466Z",
+    "name": "cambodia-staging-1",
+    "description": "Dev server for agile development on the ODC.",
+    "type": "staging",
+    "artifacts": {
+      "type": "maven",
+      "value": {
+        "groupId": "net.mekomsolutions",
+        "artifactId": "openmrs-distro-cambodia",
+        "version": "1.0.0",
+        "packaging": "zip"
+      }
+    },
+    "deployment": {
+      "type": "docker",
+      "value": {
+        "version": "1.0",
+        "image": "mekomsolutions/bahmni",
+        "tag": "cambodia-release-0.90"
+      },
+      "host": {
+        "uuid": "51629692-95A9-498E-A370-49F61B02EF89",
+        "artifactsLocation": "/var/docker-volumes/{{uuid}}"
+      }
+    }
+  }
+]

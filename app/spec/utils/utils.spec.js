@@ -1,5 +1,5 @@
 "use strict";
-describe("Tests suite for Utils", function() {
+describe("Utils", function() {
   const folderInTest = __dirname + "/../../src/utils/";
   const fs = require("fs");
   const utils = require(folderInTest + "utils");
@@ -139,5 +139,125 @@ describe("Tests suite for Utils", function() {
     );
     expect(history.id1.serverEvents.length).toEqual(3);
     expect(history.id253.serverEvents.length).toEqual(3);
+  });
+
+  it("should match instance in instances list.", function() {
+    // setup
+    var instancesList = [
+      { uuid: "xyz", name: "bar" },
+      { uuid: "abc", name: "baz" },
+      { uuid: "cAcb5448", name: "foo" }
+    ];
+
+    {
+      // replay
+      var instance = utils.findInstanceInList("cAcb5448", "foo", instancesList);
+
+      // verif
+      expect(instance).toEqual({ uuid: "cAcb5448", name: "foo" });
+    }
+    {
+      // replay
+      var instance = utils.findInstanceInList(undefined, "foo", instancesList);
+
+      // verif
+      expect(instance).toEqual({ uuid: "cAcb5448", name: "foo" });
+    }
+    {
+      // replay
+      var instance = utils.findInstanceInList(
+        "cAcb5448",
+        undefined,
+        instancesList
+      );
+
+      // verif
+      expect(instance).toEqual({ uuid: "cAcb5448", name: "foo" });
+    }
+    {
+      // replay / verif
+      expect(function() {
+        utils.findInstanceInList("xyz", "baz", instancesList);
+      }).toThrow();
+    }
+
+    // setup
+    instancesList.push({ uuid: "cAcb5448", name: "foo" });
+
+    {
+      // replay / verif
+      expect(function() {
+        utils.findInstanceInList("cAcb5448", undefined, instancesList);
+      }).toThrow();
+    }
+    {
+      // replay / verif
+      expect(function() {
+        utils.findInstanceInList("cAcb5448", "foo", instancesList);
+      }).toThrow();
+    }
+    {
+      // replay / verif
+      expect(function() {
+        utils.findInstanceInList(undefined, "foo", instancesList);
+      }).toThrow();
+    }
+  });
+
+  it("should set status and basic audit info to objects.", function() {
+    const MockDate = require("mockdate");
+
+    MockDate.set("2015-03-30T13:09:53.867Z");
+
+    // setup
+    var obj = {};
+
+    // replay
+    utils.setObjectStatus(obj, "created");
+
+    // verif
+    expect(obj.status).toEqual("created");
+    expect(obj.created).toEqual(obj.updated);
+    expect(obj.updated instanceof Date).toBe(true);
+
+    MockDate.set("2015-03-30T13:09:53.868Z");
+
+    // replay
+    utils.setObjectStatus(obj, "updated");
+
+    // verif
+    expect(obj.status).toEqual("updated");
+    expect(obj.updated).toBeGreaterThan(obj.created);
+
+    MockDate.reset();
+
+    // setup
+    var obj = { status: "foobar" };
+
+    // replay
+    utils.setObjectStatus(obj);
+
+    // verif
+    expect(obj.status).toEqual("foobar");
+    expect(obj.created).toEqual(obj.updated);
+    expect(obj.updated instanceof Date).toBe(true);
+
+    // setup
+    var obj = null;
+
+    // replay
+    utils.setObjectStatus(obj, "created");
+
+    // verif: null remains null
+    expect(obj).toEqual(null);
+
+    // setup
+    var obj = undefined;
+
+    // replay
+    utils.setObjectStatus(obj, "created");
+
+    // verif: undefined remains undefined
+    expect(obj).toEqual(undefined);
   });
 });

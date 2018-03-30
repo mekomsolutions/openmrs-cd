@@ -16,6 +16,16 @@ class Script {
 }
 
 /**
+ * Describes a Docker deployment
+ */
+class DockerDeployment {
+  constructor(version) {
+    this.version = version;
+    // TODO: Align this implementation to what we settled on in our test resources.
+  }
+}
+
+/**
  * Describes a Maven project
  */
 class MavenProject {
@@ -98,6 +108,7 @@ class ServerEvent {
 module.exports = {
   Script: Script,
   MavenProject: MavenProject,
+  DockerDeployment: DockerDeployment,
   Artifact: Artifact,
   ProjectBuild: ProjectBuild,
   Descriptor: Descriptor,

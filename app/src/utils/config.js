@@ -1,5 +1,8 @@
 "use strict";
 
+const path = require("path");
+const _ = require("lodash");
+
 /**
  * Configuration API, typically to specify files or dirs locations.
  */
@@ -20,6 +23,18 @@ module.exports = {
   },
   varDownstreamJob: function() {
     return "downstream_job";
+  },
+  varInstanceUuid: function() {
+    return "instance_uuid";
+  },
+  varArtifactsChanges: function() {
+    return "artifacts_changes";
+  },
+  varDeploymentChanges: function() {
+    return "deployment_changes";
+  },
+  varDataChanges: function() {
+    return "data_changes";
   },
   varRepoUrl: function() {
     return "repoUrl";
@@ -49,6 +64,23 @@ module.exports = {
     return "build_desc";
   },
 
+  getGlobalConfigDirPath: function() {
+    return process.env.GLOBAL_CONFIG_DIR_PATH;
+  },
+  getBuildDirPath: function() {
+    // https://stackoverflow.com/a/48712627/321797
+    if (_.isEmpty(process.env.CURRENT_BUILD_PATH)) {
+      return path.resolve(
+        process.env.JENKINS_HOME,
+        "jobs",
+        process.env.JOB_NAME,
+        "builds",
+        process.env.BUILD_NUMBER
+      );
+    } else {
+      return process.env.CURRENT_BUILD_PATH;
+    }
+  },
   getTempDirPath: function() {
     return "/tmp";
   },
@@ -101,6 +133,15 @@ module.exports = {
     // relative to Jenkins home
     return "servers.json";
   },
+  getInstancesConfigFileName: function() {
+    return "instances.json";
+  },
+  getInstancesConfigPath: function() {
+    return path.resolve(
+      module.exports.getGlobalConfigDirPath(),
+      module.exports.getInstancesConfigFileName()
+    );
+  },
   getBuildJsScriptName: function() {
     return "build.js";
   },
@@ -137,6 +178,9 @@ module.exports = {
     return "pipeline3";
   },
 
+  getInstanceTypes: function() {
+    return ["debug", "dev", "staging", "prod"];
+  },
   getInstanceDeploymentTypes: function() {
     return ["docker"];
   },
