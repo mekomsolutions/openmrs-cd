@@ -68,10 +68,8 @@ describe("Test suite for webhook scripts", function() {
 
   it("should parse a GitHub HTTP payload", function() {
     // setup
-    var folderInTest = __dirname + "/../../src/webhook/";
-
     var type = "github";
-    var payloadParser = new require(folderInTest + "impl/" + type);
+    var payloadParser = new require(path.resolve("src/webhook/impl/" + type));
 
     // replay
     var metadata = payloadParser.parsePayload(
@@ -91,9 +89,6 @@ describe("Test suite for webhook scripts", function() {
     const proxyquire = require("proxyquire");
 
     // setup
-    var folderInTest = __dirname + "/../../src/webhook";
-    var fileInTest = folderInTest + "/webhook";
-
     process.env.scmService = "gitlab";
     process.env.projectType = "openmrsmodule";
     var expectedMetadata = {
@@ -113,10 +108,10 @@ describe("Test suite for webhook scripts", function() {
     };
 
     // replay
-    proxyquire(fileInTest, tests.stubs(stubs, {}));
+    proxyquire(path.resolve("src/webhook/webhook"), tests.stubs(stubs, {}));
 
     // verif
-    const utils = require(folderInTest + "../../utils/utils");
+    const utils = require(path.resolve("src/utils/utils"));
     expect(
       fs.readFileSync(tests.config().getCommitMetadataFilePath(), "utf8")
     ).toEqual(JSON.stringify(expectedMetadata));
@@ -135,12 +130,8 @@ describe("Test suite for webhook scripts", function() {
     // deps
     const proxyquire = require("proxyquire");
 
-    // setup
-    var folderInTest = __dirname + "/../../src/webhook";
-    var fileInTest = folderInTest + "/trigger";
-
     // replay
-    proxyquire(fileInTest, tests.stubs());
+    proxyquire(path.resolve("src/webhook/trigger"), tests.stubs());
 
     // verif
     expect(
