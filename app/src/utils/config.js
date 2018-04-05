@@ -9,8 +9,8 @@ const _ = require("lodash");
 
 module.exports = {
   //
-  // The 'var's below are used to define model fields members names that
-  // are explictly referenced in Jenkins jobs files (.jenkinsfile and config.xml)
+  // The vars below are used to define model fields members names that
+  // are explictly referenced in Jenkins jobs files (eg. in .jenkinsfile and config.xml)
   //
   varPayload: function() {
     return "payload";
@@ -64,8 +64,12 @@ module.exports = {
     return "build_desc";
   },
 
-  getGlobalConfigDirPath: function() {
-    return process.env.GLOBAL_CONFIG_DIR_PATH;
+  /**
+   * The app data dir is where persistent data should be kept.
+   * Whether it is actual data or configuration files.
+   */
+  getAppDataDirPath: function() {
+    return process.env.APP_DATA_DIR_PATH; // this must be exist as a global property within Jenkins
   },
   getBuildDirPath: function() {
     // https://stackoverflow.com/a/48712627/321797
@@ -93,10 +97,13 @@ module.exports = {
     return "webhook/trigger.js";
   },
   getCommitMetadataFilePath: function() {
-    return "/tmp/commit_metadata.json";
+    return path.resolve(
+      module.exports.getTempDirPath(),
+      "commit_metadata.json"
+    );
   },
   getCommitMetadataFileEnvvarsPath: function() {
-    return "/tmp/commit_metadata.env";
+    return path.resolve(module.exports.getTempDirPath(), "commit_metadata.env");
   },
   getBuildJsScriptName: function() {
     return "build.js";
@@ -106,6 +113,9 @@ module.exports = {
   },
   getDeployShellScriptName: function() {
     return "deploy.sh";
+  },
+  getPrehostPrepareScriptName: function() {
+    return "prehost-prepare.sh";
   },
   getProjectBuildTriggerEnvvarsName: function() {
     return "trigger.env";
@@ -117,10 +127,10 @@ module.exports = {
     return "/usr/share/jenkins/webhook_triggers.json";
   },
   getChangedArtifactEnvvarsPath: function() {
-    return "/tmp/artifact.env";
+    return path.resolve(module.exports.getTempDirPath(), "artifact.env");
   },
   getChangedArtifactJsonPath: function() {
-    return "/tmp/artifact.json";
+    return path.resolve(module.exports.getTempDirPath(), "artifact.json");
   },
   getArtifactRepoEnvvarsName: function() {
     return "artifact_repository.env";
@@ -138,7 +148,7 @@ module.exports = {
   },
   getInstancesConfigPath: function() {
     return path.resolve(
-      module.exports.getGlobalConfigDirPath(),
+      module.exports.getAppDataDirPath(),
       module.exports.getInstancesConfigFileName()
     );
   },
@@ -152,7 +162,7 @@ module.exports = {
     return "parse.js";
   },
   getServersDescriptorsPath: function() {
-    return "/tmp/descriptors.json";
+    return path.resolve(module.exports.getTempDirPath(), "descriptors.json");
   },
   getUpdateServerChangelogJsScriptName: function() {
     return "compare.js";
@@ -162,7 +172,14 @@ module.exports = {
     return "history.json";
   },
   getServersByArtifactKeysPath: function() {
-    return "/tmp/dependencies.json";
+    return path.resolve(module.exports.getTempDirPath(), "dependencies.json");
+  },
+  getCDArtifactsDirPath: function(instanceUuid) {
+    return path.resolve(
+      module.exports.getAppDataDirPath(),
+      instanceUuid,
+      "artifacts"
+    );
   },
 
   getJobNameForWebhook: function() {

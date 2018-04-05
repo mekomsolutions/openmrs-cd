@@ -57,6 +57,8 @@ var init = function() {
   process.env.JENKINS_HOME = testDirPath;
   process.env.JOB_NAME = "test-job";
   process.env.BUILD_NUMBER = "3";
+
+  process.env.APP_DATA_DIR_PATH = path.resolve(testDirPath, "app_data");
 };
 
 module.exports = {
@@ -93,10 +95,12 @@ module.exports = {
 
     init();
     mkdirp.sync(config.getBuildDirPath());
+    mkdirp.sync(config.getAppDataDirPath());
 
     setMockConfig(extraConfig);
     var stubs = {
-      "../utils/config": module.exports.config()
+      "../utils/config": module.exports.config(),
+      "../../utils/config": module.exports.config()
     };
 
     Object.assign(stubs, extraStubs);

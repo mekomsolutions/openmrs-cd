@@ -31,16 +31,17 @@ try {
 }
 
 // The ProjectBuild is loaded based on the project type
-var projectBuild = require("./impl/" + process.env.projectType).getInstance();
+var projectBuild = require("./impl/" +
+  process.env[config.varProjectType()]).getInstance();
 
 // Retrieve the details of the artifact that will be built
 var artifact = projectBuild.getArtifact("./", commitMetadata);
 
 // Retrieve the script to build the projectBuild
-var buildScript = projectBuild.getBuildScriptAsString();
+var buildScript = projectBuild.getBuildScript();
 fs.writeFileSync(
   process.env.WORKSPACE + "/" + config.getBuildShellScriptName(),
-  buildScript
+  utils.getScriptAsString(buildScript)
 );
 fs.chmodSync(
   process.env.WORKSPACE + "/" + config.getBuildShellScriptName(),
@@ -48,10 +49,10 @@ fs.chmodSync(
 );
 
 // Retrieve the script to deploy the projectBuild
-var deployScript = projectBuild.getDeployScriptAsString(artifact);
+var deployScript = projectBuild.getDeployScript(artifact);
 fs.writeFileSync(
   process.env.WORKSPACE + "/" + config.getDeployShellScriptName(),
-  deployScript
+  utils.getScriptAsString(deployScript)
 );
 fs.chmodSync(
   process.env.WORKSPACE + "/" + config.getDeployShellScriptName(),

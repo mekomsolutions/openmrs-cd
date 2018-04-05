@@ -1,10 +1,14 @@
 "use strict";
+
 describe("Tests suite for pipeline1", function() {
+  const fs = require("fs");
+  const path = require("path");
+
+  const config = require(path.resolve("src/utils/config"));
+
   it("should verify job parameters.", function() {
     // deps
     const __rootPath__ = require("app-root-path").path;
-    const fs = require("fs");
-    const config = require(__dirname + "/../../src/utils/config");
 
     // replay
     var jenkinsFile = fs.readFileSync(
@@ -35,8 +39,6 @@ describe("Tests suite for pipeline1", function() {
   it("should verify pipeline steps scripts.", function() {
     // deps
     const __rootPath__ = require("app-root-path").path;
-    const fs = require("fs");
-    const config = require(__dirname + "/../../src/utils/config");
 
     // replay
     var jenkinsFile = fs.readFileSync(
@@ -85,59 +87,17 @@ describe("Tests suite for pipeline1", function() {
     );
   });
 
-  it("should generate build and deploy scripts", function() {
-    // deps
-    const proxyquire = require("proxyquire");
-    const model = require(__dirname + "/../../src/models/model");
-    const os = require("os");
-    const fs = require("fs");
-
-    // setup
-    process.env.projectType = "artifact_type"; // eg. 'openmrsmodule'
-    process.env.WORKSPACE = os.tmpdir();
-
-    const buildScript = "__build_script__";
-    const deployScript = "__deploy_script__";
-    var mockBuild = new model.ProjectBuild();
-    mockBuild.getBuildScriptAsString = function() {
-      return buildScript;
-    };
-    mockBuild.getDeployScriptAsString = function(artifact) {
-      return deployScript;
-    };
-
-    var stubs = {};
-    stubs["./impl/" + process.env.projectType] = {
-      getInstance: function() {
-        return mockBuild;
-      },
-      "@noCallThru": true
-    };
-
-    // replay
-    proxyquire(__dirname + "/../../src/pipeline1/build.js", stubs);
-
-    // verif
-    expect(
-      fs.readFileSync(process.env.WORKSPACE + "/build.sh", "utf8")
-    ).toEqual(buildScript);
-    expect(
-      fs.readFileSync(process.env.WORKSPACE + "/deploy.sh", "utf8")
-    ).toEqual(deployScript);
-  });
-
   it("should implement all required functions from data model.", function() {
-    var folderInTest = __dirname + "/../../src/pipeline1/";
+    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
 
-    const fs = require("fs");
-    const model = require(__dirname + "/../../src/models/model");
-    const modelTestUtils = require(__dirname + "/../models/modelTestUtils");
+    const model = require(path.resolve("src/models/model"));
+    const modelTestUtils = require(path.resolve("spec/models/modelTestUtils"));
 
     // Running tests on each file present in the  folderInTest folder and ensure they correctly implement every needed function
-    fs.readdirSync(folderInTest + "impl/").forEach(file => {
+    fs.readdirSync(folderInTest + "/impl/").forEach(file => {
       var type = file.split(".")[0];
       var projectBuild = new require(
-        folderInTest + "impl/" + type
+        folderInTest + "/impl/" + type
       ).getInstance();
 
       modelTestUtils.ensureImplementedFunctions(
@@ -159,11 +119,12 @@ describe("Tests suite for pipeline1", function() {
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmniapps'.", function() {
-    const model = require(__dirname + "/../../src/models/model");
+    const model = require(path.resolve("src/models/model"));
     const projectType = "bahmniapps";
-    var folderInTest = __dirname + "/../../src/pipeline1/";
+    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
+
     var projectBuild = require(folderInTest +
-      "./impl/" +
+      "/impl/" +
       projectType).getInstance();
 
     var mockCommitMetadata = {
@@ -206,13 +167,13 @@ describe("Tests suite for pipeline1", function() {
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmniconfig'.", function() {
     // deps
-    const model = require(__dirname + "/../../src/models/model");
+    const model = require(path.resolve("src/models/model"));
     const projectType = "bahmniconfig";
-    const folderInTest = __dirname + "/../../src/pipeline1/";
+    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
 
     // replay
     var projectBuild = require(folderInTest +
-      "./impl/" +
+      "/impl/" +
       projectType).getInstance();
 
     var artifact = projectBuild.getArtifact(
@@ -251,15 +212,15 @@ describe("Tests suite for pipeline1", function() {
 
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrsconfig'.", function() {
     // deps
-    const model = require(__dirname + "/../../src/models/model");
+    const model = require(path.resolve("src/models/model"));
     const projectType = "openmrsconfig";
 
     // setup
-    var folderInTest = __dirname + "/../../src/pipeline1/";
+    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
 
     // replay
     var projectBuild = require(folderInTest +
-      "./impl/" +
+      "/impl/" +
       projectType).getInstance();
     var artifact = projectBuild.getArtifact(
       __dirname + "/resources/" + projectType + "/",
@@ -296,15 +257,15 @@ describe("Tests suite for pipeline1", function() {
 
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrscore'.", function() {
     // deps
-    const model = require(__dirname + "/../../src/models/model");
+    const model = require(path.resolve("src/models/model"));
     const projectType = "openmrscore";
 
     // setup
-    var folderInTest = __dirname + "/../../src/pipeline1/";
+    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
 
     // replay
     var projectBuild = require(folderInTest +
-      "./impl/" +
+      "/impl/" +
       projectType).getInstance();
 
     var artifact = projectBuild.getArtifact(
@@ -337,11 +298,11 @@ describe("Tests suite for pipeline1", function() {
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrsmodule'.", function() {
     // setup
     const projectType = "openmrsmodule";
-    var folderInTest = __dirname + "/../../src/pipeline1/";
+    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
 
     // replay
     var projectBuild = require(folderInTest +
-      "./impl/" +
+      "/impl/" +
       projectType).getInstance();
     var artifact = projectBuild.getArtifact(
       __dirname + "/resources/" + projectType + "/",

@@ -1,9 +1,12 @@
 "use strict";
 
+const path = require("path");
 const XML = require("pixl-xml");
 const fs = require("fs");
 const log = require("npmlog");
 const _ = require("lodash");
+
+const model = require(path.resolve("src/models/model"));
 
 module.exports = {
   escapeForEnvVars: function(str) {
@@ -83,15 +86,27 @@ module.exports = {
   },
 
   getScriptAsString: function(script) {
-    var string = "";
-    if (script != null) {
-      string = script.type;
-      string = string + "\n\n";
-      string = string + script.comments;
-      string = string + "\n\n";
-      string = string + script.value;
+    if (script instanceof model.Script !== true) {
+      throw new Error("Illegal argument: must be a script object.");
     }
-    return string;
+
+    const LINE_BREAKS = "\n\n";
+
+    var asString = "";
+    if (_.isString(script.type) && script.type !== "") {
+      asString += script.type;
+      asString += LINE_BREAKS;
+    }
+    if (_.isString(script.headComment) && script.headComment !== "") {
+      asString += script.headComment;
+      asString += LINE_BREAKS;
+    }
+    if (_.isString(script.body) && script.body !== "") {
+      asString += script.body;
+    } else {
+      asString = asString.replace(new RegExp(LINE_BREAKS + "$"), "finish"); // https://stackoverflow.com/a/2729681/321797
+    }
+    return asString;
   },
 
   /*

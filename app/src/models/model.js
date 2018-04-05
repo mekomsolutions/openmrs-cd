@@ -1,4 +1,7 @@
 "use strict";
+
+const _ = require("lodash");
+
 const utils = require("../utils/utils");
 const config = require("../utils/config");
 const constants = require("../constants/constants");
@@ -8,10 +11,10 @@ const constants = require("../constants/constants");
  *
  */
 class Script {
-  constructor(type, comments, script) {
+  constructor(type, headComment, body) {
     this.type = type;
-    this.comments = comments;
-    this.value = script;
+    this.headComment = headComment;
+    this.body = body;
   }
 }
 
@@ -69,18 +72,19 @@ class ProjectBuild {
   getBuildScript() {
     return constants.ABSTRACT;
   }
-  getBuildScriptAsString() {
-    return utils.getScriptAsString(this.getBuildScript());
-  }
+  // getBuildScriptAsString() {
+  //   console.log(this.getBuildScript());
+  //   return utils.getScriptAsString(this.getBuildScript());
+  // }
   getArtifact(pomPath, commitMetadata) {
     return constants.ABSTRACT;
   }
   getDeployScript(artifact) {
     return constants.ABSTRACT;
   }
-  getDeployScriptAsString(artifact) {
-    return utils.getScriptAsString(this.getDeployScript(artifact));
-  }
+  // getDeployScriptAsString(artifact) {
+  //   return utils.getScriptAsString(this.getDeployScript(artifact));
+  // }
 }
 
 /**

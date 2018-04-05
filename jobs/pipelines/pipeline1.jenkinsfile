@@ -1,8 +1,8 @@
 pipeline {
   agent any
   tools {
-        maven 'Maven 3.5.0' 
-        nodejs 'NodeJS 8.6.0'
+    maven 'Maven 3.5.0' 
+    nodejs 'NodeJS 8.6.0'
   }
   stages {
     stage ('Project code checkout') {
