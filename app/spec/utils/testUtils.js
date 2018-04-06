@@ -82,12 +82,14 @@ module.exports = {
    *
    **/
   stubs: function(extraStubs, extraConfig) {
-    testDirPath = path.resolve(
-      require("os").tmpdir(),
-      Math.random()
-        .toString(36)
-        .slice(-5)
-    ); // https://stackoverflow.com/a/8084248/321797
+    if (testDirPath === "") {
+      testDirPath = path.resolve(
+        require("os").tmpdir(),
+        Math.random()
+          .toString(36)
+          .slice(-5)
+      ); // https://stackoverflow.com/a/8084248/321797
+    }
 
     // mkdirp.sync(testDirPath);
     if (lastDirPath !== testDirPath) {

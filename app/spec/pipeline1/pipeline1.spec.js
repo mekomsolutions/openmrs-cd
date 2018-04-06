@@ -156,13 +156,11 @@ describe("Tests suite for pipeline1", function() {
     // verif
     var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
-    expect(buildScript.value.indexOf("/scripts/package.sh\n") > -1).toBe(true);
+    expect(buildScript.body.indexOf("/scripts/package.sh\n") > -1).toBe(true);
 
     var deployScript = projectBuild.getDeployScript(artifact);
     expect(deployScript.type).toEqual("#!/bin/bash");
-    expect(deployScript.value.indexOf("mvn deploy:deploy-file") > -1).toBe(
-      true
-    );
+    expect(deployScript.body.indexOf("mvn deploy:deploy-file") > -1).toBe(true);
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmniconfig'.", function() {
@@ -202,12 +200,12 @@ describe("Tests suite for pipeline1", function() {
     );
 
     expect(buildScript.type).toEqual("#!/bin/bash");
-    expect(buildScript.value).toEqual("mvn clean install\n");
+    expect(buildScript.body).toEqual("mvn clean install\n");
 
     expect(deployScript.type).toEqual("#!/bin/bash");
-    expect(
-      deployScript.value.indexOf("mvn clean deploy -DskipTests") > -1
-    ).toBe(true);
+    expect(deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1).toBe(
+      true
+    );
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrsconfig'.", function() {
@@ -247,11 +245,11 @@ describe("Tests suite for pipeline1", function() {
     );
 
     expect(buildScript.type).toEqual("#!/bin/bash");
-    expect(buildScript.value).toEqual("mvn clean install\n");
+    expect(buildScript.body).toEqual("mvn clean install\n");
 
     expect(deployScript.type).toEqual("#!/bin/bash");
     expect(true).toBe(
-      deployScript.value.indexOf("mvn clean deploy -DskipTests") > -1
+      deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1
     );
   });
 
@@ -287,11 +285,11 @@ describe("Tests suite for pipeline1", function() {
     );
 
     expect(buildScript.type).toEqual("#!/bin/bash");
-    expect(buildScript.value).toEqual("mvn clean install\n");
+    expect(buildScript.body).toEqual("mvn clean install\n");
 
     expect(deployScript.type).toEqual("#!/bin/bash");
     expect(true).toBe(
-      deployScript.value.indexOf("mvn clean deploy -DskipTests") > -1
+      deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1
     );
   });
 
@@ -320,11 +318,11 @@ describe("Tests suite for pipeline1", function() {
     expect(artifact.buildPath).toEqual("./omod/target");
 
     expect(buildScript.type).toEqual("#!/bin/bash");
-    expect(buildScript.value).toEqual("mvn clean install\n");
+    expect(buildScript.body).toEqual("mvn clean install\n");
 
     expect(deployScript.type).toEqual("#!/bin/bash");
     expect(true).toBe(
-      deployScript.value.indexOf("mvn clean deploy -DskipTests") > -1
+      deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1
     );
   });
 });

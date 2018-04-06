@@ -35,7 +35,10 @@ describe("Project build script", function() {
     };
 
     // replay
-    proxyquire(path.resolve("src/pipeline1/build.js"), tests.stubs(stubs));
+    proxyquire(
+      path.resolve("src/" + config.getJobNameForPipeline1() + "/build.js"),
+      tests.stubs(stubs)
+    );
 
     // verif
     expect(

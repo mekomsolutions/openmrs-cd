@@ -4,13 +4,21 @@
  * @return artifact.env
  * @return artifact.json
  */
+
 "use strict";
+
 const fs = require("fs");
-const utils = require("../utils/utils");
-const config = require("../utils/config");
+const path = require("path");
 const log = require("npmlog");
 
-var commitMetadata = {}; // the commit metadata, parsed out from the SCM service commit payload
+const utils = require(path.resolve("src/utils/utils"));
+const cst = require(path.resolve("src/const"));
+const config = require(cst.CONFIGPATH);
+
+//
+// the commit metadata, parsed out from the SCM service commit payload
+//
+var commitMetadata = {};
 try {
   if (process.argv[2] !== undefined) {
     commitMetadata = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
@@ -30,7 +38,9 @@ try {
   throw new Error();
 }
 
+//
 // The ProjectBuild is loaded based on the project type
+//
 var projectBuild = require("./impl/" +
   process.env[config.varProjectType()]).getInstance();
 
@@ -48,7 +58,9 @@ fs.chmodSync(
   "0755"
 );
 
+//
 // Retrieve the script to deploy the projectBuild
+//
 var deployScript = projectBuild.getDeployScript(artifact);
 fs.writeFileSync(
   process.env.WORKSPACE + "/" + config.getDeployShellScriptName(),
@@ -59,7 +71,9 @@ fs.chmodSync(
   "0755"
 );
 
+//
 // Export the artifact info in order for the pipeline and other jobs to use it
+//
 fs.writeFileSync(
   config.getChangedArtifactEnvvarsPath(),
   utils.convertToEnvVar(artifact)
