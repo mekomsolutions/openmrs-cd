@@ -3,11 +3,13 @@
 const __rootPath__ = require("app-root-path").path;
 
 const path = require("path");
+const proxyquire = require("proxyquire");
 const fsx = require("fs-extra");
 const mkdirp = require("mkdirp");
 const log = require("npmlog");
 
-const config = require(path.resolve("src/utils/config"));
+const cst = require(path.resolve("src/const"));
+const config = require(cst.CONFIGPATH);
 
 var testDirPath = "";
 var lastDirPath = "";
@@ -63,8 +65,8 @@ var init = function() {
 
 module.exports = {
   cleanup: function() {
-    // fsx.removeSync(testDirPath);
-    // testDirPath = "";
+    fsx.removeSync(testDirPath);
+    testDirPath = "";
   },
 
   config: function() {
@@ -98,12 +100,11 @@ module.exports = {
     mkdirp.sync(config.getAppDataDirPath());
 
     setMockConfig(extraConfig);
-    var stubs = {
-      "../utils/config": module.exports.config(),
-      "../../utils/config": module.exports.config()
-    };
+    var stubs = {};
+    stubs[cst.CONFIGPATH] = module.exports.config();
 
     Object.assign(stubs, extraStubs);
+    stubs[cst.DBPATH] = proxyquire(path.resolve("src/utils/db"), stubs); // to hande second level stubbing, https://stackoverflow.com/a/42673500/321797
     return stubs;
   }
 };

@@ -1,9 +1,5 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const config = require("../../utils/config");
-
 module.exports = {
   getFetchArtifactsScript: function(artifacts, artifactsPath) {
     var script = "";

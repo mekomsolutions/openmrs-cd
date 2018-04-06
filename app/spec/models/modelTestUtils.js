@@ -12,15 +12,17 @@
 * Any method in the prototype that retuns that string is considered as a method to be implemented.
 * 
 */
-var constants = require(__dirname + "/../../src/constants/constants");
-var log = require("npmlog");
+const log = require("npmlog");
+const path = require("path");
+
+const cst = require(path.resolve("src/const"));
 
 var ensureImplementedFunctions = function(instance, objectClass) {
   var properties = Object.getOwnPropertyNames(objectClass.prototype);
   var object = new objectClass();
   for (var property of properties) {
     if (property != "constructor") {
-      if (object[property]().startsWith(constants.ABSTRACT)) {
+      if (object[property]().startsWith(cst.ABSTRACT)) {
         var implemented = true;
         if (instance[property].toString() == object[property].toString()) {
           log.error(

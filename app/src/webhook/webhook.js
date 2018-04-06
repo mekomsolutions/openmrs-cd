@@ -9,10 +9,14 @@
  */
 
 "use strict";
+
 const fs = require("fs");
-const utils = require("../utils/utils");
-const config = require("../utils/config");
+const path = require("path");
 const log = require("npmlog");
+
+const cst = require(path.resolve("src/const"));
+const config = require(cst.CONFIGPATH);
+const utils = require(path.resolve("src/utils/utils"));
 
 // The ad-hoc PayloadParser instance is loaded based on the SCM service
 const payloadParser = require("./impl/" + process.env.scmService);

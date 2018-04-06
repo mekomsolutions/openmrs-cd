@@ -1,10 +1,11 @@
 "use strict";
 
 const _ = require("lodash");
+const path = require("path");
 
-const utils = require("../utils/utils");
-const config = require("../utils/config");
-const constants = require("../constants/constants");
+const utils = require(path.resolve("src/utils/utils"));
+const cst = require(path.resolve("src/const"));
+const config = require(cst.CONFIGPATH);
 
 /**
  * An object that describes the script to build the project
@@ -70,21 +71,14 @@ class Artifact {
  */
 class ProjectBuild {
   getBuildScript() {
-    return constants.ABSTRACT;
+    return cst.ABSTRACT;
   }
-  // getBuildScriptAsString() {
-  //   console.log(this.getBuildScript());
-  //   return utils.getScriptAsString(this.getBuildScript());
-  // }
   getArtifact(pomPath, commitMetadata) {
-    return constants.ABSTRACT;
+    return cst.ABSTRACT;
   }
   getDeployScript(artifact) {
-    return constants.ABSTRACT;
+    return cst.ABSTRACT;
   }
-  // getDeployScriptAsString(artifact) {
-  //   return utils.getScriptAsString(this.getDeployScript(artifact));
-  // }
 }
 
 /**
@@ -96,7 +90,7 @@ class Descriptor {
     this.rawData = rawData;
   }
   getDependencies() {
-    return constants.ABSTRACT;
+    return cst.ABSTRACT;
   }
 }
 

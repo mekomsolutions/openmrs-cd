@@ -7,22 +7,22 @@
 
 const fs = require("fs");
 const path = require("path");
+const _ = require("lodash");
 
 const utils = require(path.resolve("src/utils/utils"));
 const model = require(path.resolve("src/models/model"));
-const config = require("../utils/config");
+const cst = require(path.resolve("src/const"));
+const config = require(cst.CONFIGPATH);
+const db = require(cst.DBPATH);
 
 //
 //  Fetching the instance definition based on the provided UUID
 //
-var instances = JSON.parse(
-  fs.readFileSync(config.getInstancesConfigPath(), "utf8")
-);
-var instanceDef = utils.findInstanceInList(
-  process.env[config.varInstanceUuid()],
-  null,
-  instances
-);
+var instanceUuid = process.env[config.varInstanceUuid()];
+var instanceDef = db.getInstanceDefinition(instanceUuid);
+if (_.isEmpty(instanceDef)) {
+  throw new Error("Instance definition not found for UUID: " + instanceUuid);
+}
 
 //
 //  Building the pre-host connecton CD preparation script

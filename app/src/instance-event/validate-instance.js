@@ -9,7 +9,8 @@ const fs = require("fs");
 const path = require("path");
 
 const utils = require(path.resolve("src/utils/utils"));
-const config = require("../utils/config");
+const cst = require(path.resolve("src/const"));
+const config = require(cst.CONFIGPATH);
 
 const validator = require("./validator");
 

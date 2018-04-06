@@ -9,8 +9,10 @@
 
 "use strict";
 const fs = require("fs");
-const utils = require("../utils/utils");
-const config = require("../utils/config");
+const path = require("path");
+const utils = require(path.resolve("src/utils/utils"));
+const cst = require(path.resolve("src/const"));
+const config = require(cst.CONFIGPATH);
 const log = require("npmlog");
 const model = require("./model");
 
