@@ -195,7 +195,8 @@ describe("Tests suite for pipeline1", function() {
       new model.MavenProject(
         "net.mekomsolutions",
         "bahmni-config-cambodia",
-        "1.0-SNAPSHOT"
+        "1.0-SNAPSHOT",
+        "zip"
       )
     );
 
@@ -240,7 +241,8 @@ describe("Tests suite for pipeline1", function() {
       new model.MavenProject(
         "net.mekomsolutions",
         "openmrs-config-cambodia",
-        "1.0-SNAPSHOT"
+        "1.0-SNAPSHOT",
+        "zip"
       )
     );
 
@@ -248,8 +250,8 @@ describe("Tests suite for pipeline1", function() {
     expect(buildScript.body).toEqual("mvn clean install\n");
 
     expect(deployScript.type).toEqual("#!/bin/bash");
-    expect(true).toBe(
-      deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1
+    expect(deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1).toBe(
+      true
     );
   });
 
@@ -276,20 +278,20 @@ describe("Tests suite for pipeline1", function() {
     // verif
     expect(artifact.name).toEqual("openmrs");
     expect(artifact.version).toEqual("2.2.0-SNAPSHOT");
-    expect(artifact.extension).toEqual("omod");
-    expect(artifact.filename).toEqual("openmrs-2.2.0-SNAPSHOT.omod");
+    expect(artifact.extension).toEqual("war");
+    expect(artifact.filename).toEqual("openmrs-2.2.0-SNAPSHOT.war");
     expect(artifact.destFilename).toEqual(artifact.filename);
-    expect(artifact.buildPath).toEqual("./omod/target");
+    expect(artifact.buildPath).toEqual("./webapp/target");
     expect(artifact.mavenProject).toEqual(
-      new model.MavenProject("org.openmrs", "openmrs", "2.2.0-SNAPSHOT")
+      new model.MavenProject("org.openmrs", "openmrs", "2.2.0-SNAPSHOT", "war")
     );
 
     expect(buildScript.type).toEqual("#!/bin/bash");
     expect(buildScript.body).toEqual("mvn clean install\n");
 
     expect(deployScript.type).toEqual("#!/bin/bash");
-    expect(true).toBe(
-      deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1
+    expect(deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1).toBe(
+      true
     );
   });
 
@@ -321,8 +323,43 @@ describe("Tests suite for pipeline1", function() {
     expect(buildScript.body).toEqual("mvn clean install\n");
 
     expect(deployScript.type).toEqual("#!/bin/bash");
-    expect(true).toBe(
-      deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1
+    expect(deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1).toBe(
+      true
+    );
+  });
+
+  it("should getArtifact, getBuildScript and getDeployScript for 'distribution'.", function() {
+    // setup
+    const projectType = "distribution";
+    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
+
+    // replay
+    var projectBuild = require(folderInTest +
+      "/impl/" +
+      projectType).getInstance();
+    var artifact = projectBuild.getArtifact(
+      __dirname + "/resources/" + projectType + "/",
+      null
+    );
+    var buildScript = projectBuild.getBuildScript();
+    var deployScript = projectBuild.getDeployScript(artifact);
+
+    // verif
+    expect(artifact.name).toEqual("openmrs-distro-cambodia");
+    expect(artifact.version).toEqual("1.1.0-SNAPSHOT");
+    expect(artifact.extension).toEqual("zip");
+    expect(artifact.filename).toEqual(
+      "openmrs-distro-cambodia-1.1.0-SNAPSHOT.zip"
+    );
+    expect(artifact.destFilename).toEqual(artifact.filename);
+    expect(artifact.buildPath).toEqual("./target");
+
+    expect(buildScript.type).toEqual("#!/bin/bash");
+    expect(buildScript.body).toEqual("mvn clean install\n");
+
+    expect(deployScript.type).toEqual("#!/bin/bash");
+    expect(deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1).toBe(
+      true
     );
   });
 });

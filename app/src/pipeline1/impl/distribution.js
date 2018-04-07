@@ -8,7 +8,8 @@ const utils = require(path.resolve("src/utils/utils"));
 
 const cmns = require("../commons");
 
-const thisType = "openmrscore";
+const thisType = "distribution";
+const nexusType = "openmrsmodule"; // for now we park distributions artifacts in the same place as OpenMRS modules on Nexus
 
 module.exports = {
   getInstance: function() {
@@ -21,12 +22,12 @@ module.exports = {
     projectBuild.getDeployScript = function(artifact) {
       return cmns.getMavenProjectDeployScript(
         thisType,
-        "ARTIFACT_UPLOAD_URL_" + thisType
+        "ARTIFACT_UPLOAD_URL_" + nexusType
       );
     };
 
     projectBuild.getArtifact = function(pomDirPath, commitMetadata) {
-      return cmns.getMavenProjectArtifact(pomDirPath, "./webapp/target", "war");
+      return cmns.getMavenProjectArtifact(pomDirPath, "./target", "zip");
     };
 
     return projectBuild;
