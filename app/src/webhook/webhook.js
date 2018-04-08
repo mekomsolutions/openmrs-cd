@@ -14,9 +14,9 @@ const fs = require("fs");
 const path = require("path");
 const log = require("npmlog");
 
-const cst = require(path.resolve("src/const"));
+const cst = require("../const");
 const config = require(cst.CONFIGPATH);
-const utils = require(path.resolve("src/utils/utils"));
+const utils = require("../utils/utils");
 
 // The ad-hoc PayloadParser instance is loaded based on the SCM service
 const payloadParser = require("./impl/" + process.env.scmService);

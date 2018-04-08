@@ -9,9 +9,9 @@ const fs = require("fs");
 const path = require("path");
 const _ = require("lodash");
 
-const utils = require(path.resolve("src/utils/utils"));
-const model = require(path.resolve("src/models/model"));
-const cst = require(path.resolve("src/const"));
+const utils = require("../utils/utils");
+const model = require("../models/model");
+const cst = require("../const");
 const config = require(cst.CONFIGPATH);
 const db = require(cst.DBPATH);
 

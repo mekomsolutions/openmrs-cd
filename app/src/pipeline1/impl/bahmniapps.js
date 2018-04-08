@@ -5,8 +5,8 @@ const path = require("path");
 const _ = require("lodash");
 const log = require("npmlog");
 
-const model = require(path.resolve("src/models/model"));
-const utils = require(path.resolve("src/utils/utils"));
+const model = require("../../models/model");
+const utils = require("../../utils/utils");
 
 const thisType = "bahmniapps";
 
@@ -34,7 +34,7 @@ var getArtifact = function(pomDirPath, commitMetadata) {
   if (_.isEmpty(commitMetadata)) {
     log.error(
       "",
-      "No commit metadata was passed to Bahmni Apps' getArtifact(..)."
+      "No commit metadata was passed to '" + thisType + "' getArtifact(..)."
     );
     throw new Error();
   }

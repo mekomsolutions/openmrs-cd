@@ -4,10 +4,11 @@
  * @param {string}
  */
 
-const config = require("../utils/config");
-const model = require("../models/model");
 const log = require("npmlog");
 const _ = require("lodash");
+
+const config = require("../utils/config");
+const model = require("../models/model");
 
 const NEW_FLAG_MISSING_MSG =
   "There is no flag indicating whether the instance definition is new or not.";

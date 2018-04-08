@@ -3,8 +3,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const model = require(path.resolve("src/models/model"));
-const utils = require(path.resolve("src/utils/utils"));
+const model = require("../../models/model");
+const utils = require("../../utils/utils");
 
 const cmns = require("../commons");
 

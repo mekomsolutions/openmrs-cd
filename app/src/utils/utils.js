@@ -1,12 +1,11 @@
 "use strict";
 
 const path = require("path");
-const XML = require("pixl-xml");
 const fs = require("fs");
 const log = require("npmlog");
 const _ = require("lodash");
 
-const model = require(path.resolve("src/models/model"));
+const model = require("../models/model");
 
 module.exports = {
   escapeForEnvVars: function(str) {
@@ -40,7 +39,7 @@ module.exports = {
   },
 
   /**
-   * @return Returns a concatenated string of all the properties of the passed object
+   * @return Returns a concatenated string of all the object's properties.
    */
   convertToEnvVar: function(object) {
     var envvars = "";
@@ -55,12 +54,6 @@ module.exports = {
       }
     }
     return envvars;
-  },
-
-  getPom: function(pomDirPath) {
-    var file = fs.readFileSync(path.resolve(pomDirPath, "pom.xml"), "utf8");
-    var parsedPom = XML.parse(file);
-    return parsedPom;
   },
 
   sortByArtifact: function(dependenciesByServer) {

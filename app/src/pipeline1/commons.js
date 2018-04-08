@@ -4,11 +4,22 @@ const path = require("path");
 const fs = require("fs");
 const log = require("npmlog");
 const _ = require("lodash");
+const XML = require("pixl-xml");
 
-const model = require(path.resolve("src/models/model"));
-const utils = require(path.resolve("src/utils/utils"));
+const model = require("../models/model");
 
 module.exports = {
+  /*
+   * Objectifies a POM XML file.
+   * 
+   * @param {string} pomDirPath - The path to the POM file directory.
+   */
+  getPom: function(pomDirPath) {
+    var file = fs.readFileSync(path.resolve(pomDirPath, "pom.xml"), "utf8");
+    var parsedPom = XML.parse(file);
+    return parsedPom;
+  },
+
   /*
    * Generates the default build script for Maven projects.
    * 
@@ -64,10 +75,9 @@ module.exports = {
    * @param {string} buildPath - The relative build path. Eg. './target'
    * @param {string} artifactExtension - The extension of the build output artifact file. Eg. 'omod', 'zip', 'jar'... etc.
    * 
-   *  'mvn clean deploy'
    */
   getMavenProjectArtifact: function(pomDirPath, buildPath, artifactExtension) {
-    var pom = utils.getPom(pomDirPath);
+    var pom = module.exports.getPom(pomDirPath);
 
     var artifact = new model.Artifact();
     artifact.name = pom.artifactId;

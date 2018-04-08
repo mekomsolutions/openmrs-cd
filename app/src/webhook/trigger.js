@@ -10,10 +10,11 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const utils = require(path.resolve("src/utils/utils"));
-const cst = require(path.resolve("src/const"));
-const config = require(cst.CONFIGPATH);
 const log = require("npmlog");
+
+const utils = require("../utils/utils");
+const cst = require("../const");
+const config = require(cst.CONFIGPATH);
 const model = require("./model");
 
 var metadata = JSON.parse(

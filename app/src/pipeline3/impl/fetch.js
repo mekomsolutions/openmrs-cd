@@ -1,12 +1,18 @@
 "use strict";
 
 module.exports = {
-  getFetchArtifactsScript: function(artifacts, artifactsPath) {
+  /*
+   * Generates a script that fetches an instance's artifacts to save them a specified location.
+   * 
+   * @param {object} artifacts - The 'artifacts' part of the instance definition.
+   * @param {string} destPath - The destination part where to save the fecthed artifacts.
+   */
+  getFetchArtifactsScript: function(artifacts, destPath) {
     var script = "";
 
-    script += "mkdir -p " + artifactsPath;
+    script += "mkdir -p " + destPath;
     script += "\n";
-    script += "rm -rf " + artifactsPath + "/*";
+    script += "rm -rf " + destPath + "/*";
     script += "\n";
 
     if (artifacts.type === "maven") {
@@ -23,7 +29,7 @@ module.exports = {
         artifacts.value.packaging +
         " " +
         "-DoutputDirectory=" +
-        artifactsPath;
+        destPath;
       script += "\n";
     }
 
