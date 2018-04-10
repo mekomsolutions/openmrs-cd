@@ -11,6 +11,7 @@ const path = require("path");
 const utils = require("../utils/utils");
 const cst = require("../const");
 const config = require(cst.CONFIGPATH);
+const db = require(cst.DBPATH);
 
 const validator = require("./validator");
 
@@ -25,13 +26,9 @@ var instanceEvent = {};
 if (process.env.instanceDefinitionEvent) {
   instanceEvent = JSON.parse(process.env.instanceDefinitionEvent);
 }
-var instances = JSON.parse(
-  fs.readFileSync(config.getInstancesConfigPath(), "utf8")
-);
-var existingInstance = utils.findInstanceInList(
+var existingInstance = db.getInstanceDefinition(
   instanceEvent.uuid,
-  instanceEvent.name,
-  instances
+  instanceEvent.name
 );
 var isNewInstance = _.isEmpty(existingInstance);
 
@@ -43,19 +40,7 @@ validator.validateInstanceDefinition(instanceEvent, isNewInstance);
 //
 // adding/merging the instance definition event (in)to the list of managed instances
 //
-instanceEvent.uuid = existingInstance.uuid || uuid();
-utils.setObjectStatus(instanceEvent, "Instance definition validated");
-
-Object.assign(existingInstance, instanceEvent);
-
-instances = _.reject(instances, function(el) {
-  return el.uuid === existingInstance.uuid;
-});
-instances.push(existingInstance);
-fs.writeFileSync(
-  config.getInstancesConfigPath(),
-  JSON.stringify(instances, null, 2)
-);
+db.saveInstanceDefinition(instanceEvent);
 
 //
 // setting the downstream job parameters

@@ -18,10 +18,11 @@ const db = require(cst.DBPATH);
 //
 //  Fetching the instance definition based on the provided UUID
 //
-var instanceUuid = process.env[config.varInstanceUuid()];
-var instanceDef = db.getInstanceDefinition(instanceUuid);
+var instanceDef = db.getInstanceDefinition(
+  process.env[config.varInstanceUuid()]
+);
 if (_.isEmpty(instanceDef)) {
-  throw new Error("Instance definition not found for UUID: " + instanceUuid);
+  throw new Error();
 }
 
 //

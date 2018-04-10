@@ -1,4 +1,5 @@
 "use strict";
+
 describe("Utils", function() {
   const folderInTest = __dirname + "/../../src/utils/";
   const fs = require("fs");

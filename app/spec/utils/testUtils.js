@@ -9,7 +9,6 @@ const mkdirp = require("mkdirp");
 const log = require("npmlog");
 
 const cst = require(path.resolve("src/const"));
-const config = require(cst.CONFIGPATH);
 
 var testDirPath = "";
 var lastDirPath = "";
@@ -35,6 +34,8 @@ var prepareFile = function(filePath) {
 };
 
 var setMockConfig = function(extraConfig) {
+  mockConfig = Object.assign({}, require(path.resolve("src/utils/config")));
+
   mockConfig.getTempDirPath = function() {
     return testDirPath;
   };
@@ -65,7 +66,9 @@ var init = function() {
 
 module.exports = {
   cleanup: function() {
-    fsx.removeSync(testDirPath);
+    if (testDirPath) {
+      fsx.removeSync(testDirPath);
+    }
     testDirPath = "";
   },
 
@@ -91,17 +94,16 @@ module.exports = {
       ); // https://stackoverflow.com/a/8084248/321797
     }
 
-    // mkdirp.sync(testDirPath);
     if (lastDirPath !== testDirPath) {
       log.info("TEST", testDirPath);
       lastDirPath = testDirPath;
     }
 
     init();
-    mkdirp.sync(config.getBuildDirPath());
-    mkdirp.sync(config.getAppDataDirPath());
-
     setMockConfig(extraConfig);
+    mkdirp.sync(module.exports.config().getBuildDirPath());
+    mkdirp.sync(module.exports.config().getAppDataDirPath());
+
     var stubs = {};
     stubs[cst.CONFIGPATH] = module.exports.config();
 

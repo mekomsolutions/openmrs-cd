@@ -1,0 +1,62 @@
+[
+  {
+    "uuid": "50b6cf72-0e80-457d-8141-a0c8c85d4dae",
+    "status": "Instance running.",
+    "updated": "2018-03-30T14:36:45.466Z",
+    "created": "2018-03-30T14:36:45.466Z",
+    "name": "cambodia-staging-1",
+    "description": "Dev server for agile development on the ODC.",
+    "type": "staging",
+    "artifacts": {
+      "type": "maven",
+      "value": {
+        "groupId": "net.mekomsolutions",
+        "artifactId": "openmrs-distro-cambodia",
+        "version": "1.0.0",
+        "packaging": "zip"
+      }
+    },
+    "deployment": {
+      "type": "docker",
+      "value": {
+        "version": "1.0",
+        "image": "mekomsolutions/bahmni",
+        "tag": "cambodia-release-0.90"
+      },
+      "host": {
+        "uuid": "51629692-95A9-498E-A370-49F61B02EF89",
+        "artifactsLocation": "/var/docker-volumes/{{uuid}}"
+      }
+    }
+  },
+  {
+    "name": "walhalla-staging",
+    "description": "Staging server for the Walhalla distro.",
+    "type": "staging",
+    "artifacts": {
+      "type": "maven",
+      "value": {
+        "groupId": "net.mekomsolutions",
+        "artifactId": "openmrs-distro-walhalla",
+        "version": "1.0.0",
+        "packaging": "zip"
+      }
+    },
+    "deployment": {
+      "type": "docker",
+      "value": {
+        "version": "1.0",
+        "image": "mekomsolutions/bahmni",
+        "tag": "cambodia-release-0.90"
+      },
+      "host": {
+        "uuid": "51629692-95a9-498e-a370-49f61b02ef89",
+        "artifactsLocation": "/var/docker-volumes/{{uuid}}"
+      }
+    },
+    "uuid": "760c37f2-7663-43bf-a686-e2f62a3baf23",
+    "status": "status: saving new instance",
+    "updated": "2018-04-10T19:08:52.923Z",
+    "created": "2018-04-10T19:08:52.923Z"
+  }
+]

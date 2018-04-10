@@ -19,7 +19,7 @@
       "tag": "cambodia-release-0.90"
     },
     "host": {
-      "uuid": "51629692-95A9-498E-A370-49F61B02EF89",
+      "uuid": "51629692-95a9-498e-a370-49f61b02ef89",
       "artifactsLocation": "/var/docker-volumes/{{uuid}}"
     }
   }
