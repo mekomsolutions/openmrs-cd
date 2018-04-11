@@ -13,6 +13,9 @@ describe("validate-instance", function() {
 
   const cst = require(path.resolve("src/const"));
 
+  // setup
+  const fileInTest = path.resolve("src/instance-event/validate-instance.js");
+
   it("should process an existing instance definition with artifacts changes.", function() {
     // setup
     const db = require(cst.DBPATH);
@@ -87,66 +90,6 @@ describe("validate-instance", function() {
     delete savedInstance.updated;
     delete savedInstance.status;
     expect(savedInstance).toEqual(instanceEvent);
-
-    // verif that the 'trigger' properties file is correctly generated
-    var triggerParams = {};
-    triggerParams[config.varDownstreamJob()] = config.getJobNameForPipeline3();
-    triggerParams[config.varInstanceUuid()] = uuid;
-    triggerParams[config.varArtifactsChanges()] = JSON.stringify(true);
-    triggerParams[config.varDeploymentChanges()] = JSON.stringify(true);
-    triggerParams[config.varDataChanges()] = JSON.stringify(false);
-
-    expect(
-      fs.readFileSync(
-        path.resolve(
-          config.getBuildDirPath(),
-          config.getProjectBuildTriggerEnvvarsName()
-        ),
-        "utf8"
-      )
-    ).toEqual(utils.convertToEnvVar(triggerParams));
-
-    // after
-    tests.cleanup();
-  });
-
-  // setup
-  const fileInTest = path.resolve("src/instance-event/validate-instance.js");
-
-  it("should process a new instance definition (LEGACY).", function() {
-    // setup
-    process.env.instanceDefinitionEvent = fs.readFileSync(
-      path.resolve(
-        "spec/instance-event/resources/test_instance_definition_2.json"
-      ),
-      "utf8"
-    );
-    var stubs = tests.stubs();
-
-    var beforeInstances = JSON.parse(
-      fs.readFileSync(tests.config().getInstancesConfigPath(), "utf8")
-    );
-
-    // replay
-    proxyquire(fileInTest, stubs);
-
-    // verif that the instances list is updated accordingly
-    var instances = JSON.parse(
-      fs.readFileSync(tests.config().getInstancesConfigPath(), "utf8")
-    );
-    expect(instances.length).toEqual(beforeInstances.length + 1);
-
-    var filtered = _.differenceWith(instances, beforeInstances, _.isEqual);
-    expect(filtered.length).toEqual(1);
-
-    var instance = filtered[0];
-    var expected = JSON.parse(process.env.instanceDefinitionEvent);
-    var uuid = instance.uuid;
-    delete instance.uuid;
-    delete instance.created;
-    delete instance.updated;
-    delete instance.status;
-    expect(instance).toEqual(expected);
 
     // verif that the 'trigger' properties file is correctly generated
     var triggerParams = {};
