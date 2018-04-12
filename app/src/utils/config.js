@@ -48,6 +48,9 @@ module.exports = {
   varCommitId: function() {
     return "commitId";
   },
+  varPomFileContent: function() {
+    return "pomFileContent";
+  },
   varBuildPath: function() {
     return "buildPath";
   },

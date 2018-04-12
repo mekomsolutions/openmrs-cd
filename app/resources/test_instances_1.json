@@ -54,9 +54,9 @@
         "artifactsLocation": "/var/docker-volumes/{{uuid}}"
       }
     },
-    "uuid": "84fec715-f940-4d3b-9209-d4bb078fe612",
+    "uuid": "b4434f3f-dfda-4e78-a65b-73bcf6c3befd",
     "status": "status: saving new instance",
-    "updated": "2018-04-12T09:36:33.610Z",
-    "created": "2018-04-12T09:36:33.610Z"
+    "updated": "2018-04-12T18:22:42.792Z",
+    "created": "2018-04-12T18:22:42.792Z"
   }
 ]
