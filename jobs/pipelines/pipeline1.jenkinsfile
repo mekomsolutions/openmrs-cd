@@ -8,6 +8,9 @@ pipeline {
     stage ('Project code checkout') {
       steps {
         git url: repoUrl, branch: branchName
+        script {
+          env.pomFileContent = readFile('pom.xml')
+        }
       }
     }
     stage ('Project build') {
@@ -22,6 +25,11 @@ pipeline {
       steps {
         sh 'cat $WORKSPACE/deploy.sh'
         sh '$WORKSPACE/deploy.sh $JENKINS_HOME/artifact_repository.env'
+      }
+    }
+    stage ('POM post-processing') {
+      steps {
+        sh 'node /opt/app/src/$JOB_NAME/analyze-pom.js'
       }
     }
   }
