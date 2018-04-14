@@ -17,20 +17,44 @@ var mockConfig = {};
 
 var copiedPaths = {};
 
-/**
- * Wrap the path to a resource file with this function when this file might be edited through the tests.
+/*
+ * Moves a resource file to a temporary test dir that allows safe editions.
+ *
+ * @param {string} whereDir - The subdir where to the file should live during tests. Eg. "app_data".
+ * @param {array} filePath - The original (=out of tests) file path.
+ *
+ * @return The saved dependencies.
  */
-var prepareFile = function(filePath) {
+var prepareFile = function(whereDir, filePath) {
+  setTestDir();
+
   var newFilePath = path.resolve(
     testDirPath,
-    "resources",
+    whereDir,
     path.basename(filePath)
   );
+
   if (!(newFilePath in copiedPaths)) {
     fsx.copySync(filePath, newFilePath);
     copiedPaths[newFilePath] = null;
   }
   return newFilePath;
+};
+
+var setTestDir = function() {
+  if (testDirPath === "") {
+    testDirPath = path.resolve(
+      require("os").tmpdir(),
+      Math.random()
+        .toString(36)
+        .slice(-5)
+    ); // https://stackoverflow.com/a/8084248/321797
+  }
+
+  if (lastDirPath !== testDirPath) {
+    log.info("TEST", testDirPath);
+    lastDirPath = testDirPath;
+  }
 };
 
 var setMockConfig = function(extraConfig) {
@@ -40,21 +64,34 @@ var setMockConfig = function(extraConfig) {
     return testDirPath;
   };
   mockConfig.getCommitMetadataFilePath = function() {
-    return path.resolve("spec/webhook", "test_commit_metadata.json");
+    return prepareFile(
+      "tmp",
+      path.resolve("spec/webhook", "test_commit_metadata.json")
+    );
   };
   mockConfig.getWebhookTriggersFilePath = function() {
-    return path.resolve("spec/webhook", "test_webhook_triggers.json");
+    return prepareFile(
+      "tmp",
+      path.resolve("spec/webhook", "test_webhook_triggers.json")
+    );
   };
   mockConfig.getInstancesConfigPath = function() {
     return prepareFile(
+      "app_data",
       path.resolve("spec/utils/resources", "test_instances_1.json")
+    );
+  };
+  mockConfig.getArtifactDependenciesConfigPath = function() {
+    return prepareFile(
+      "app_data",
+      path.resolve("spec/utils/resources", "test_artifacts_dependencies_1.json")
     );
   };
 
   Object.assign(mockConfig, extraConfig);
 };
 
-var init = function() {
+var setEnvvars = function() {
   process.env.WORKSPACE = testDirPath;
 
   process.env.JENKINS_HOME = testDirPath;
@@ -85,21 +122,10 @@ module.exports = {
    *
    **/
   stubs: function(extraStubs, extraConfig) {
-    if (testDirPath === "") {
-      testDirPath = path.resolve(
-        require("os").tmpdir(),
-        Math.random()
-          .toString(36)
-          .slice(-5)
-      ); // https://stackoverflow.com/a/8084248/321797
-    }
+    setTestDir();
 
-    if (lastDirPath !== testDirPath) {
-      log.info("TEST", testDirPath);
-      lastDirPath = testDirPath;
-    }
+    setEnvvars();
 
-    init();
     setMockConfig(extraConfig);
     mkdirp.sync(module.exports.config().getBuildDirPath());
     mkdirp.sync(module.exports.config().getAppDataDirPath());

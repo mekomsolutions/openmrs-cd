@@ -155,6 +155,15 @@ module.exports = {
       module.exports.getInstancesConfigFileName()
     );
   },
+  getArtifactDependenciesConfigFileName: function() {
+    return "artifacts_dependencies.json";
+  },
+  getArtifactDependenciesConfigPath: function() {
+    return path.resolve(
+      module.exports.getAppDataDirPath(),
+      module.exports.getArtifactDependenciesConfigFileName()
+    );
+  },
   getBuildJsScriptName: function() {
     return "build.js";
   },

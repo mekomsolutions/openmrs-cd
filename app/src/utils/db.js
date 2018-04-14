@@ -110,6 +110,63 @@ module.exports = {
       config.getInstancesConfigPath(),
       JSON.stringify(instances, null, 2)
     );
+  },
+
+  /*
+   * Get the dependencies for a given artifact.
+   *
+   * @param {string} artifactKey - The artifact key of the artifact whose dependencies are being updated (in practice: a distribution artifact.)
+   *
+   * @return Its dependencies as an embedded list of artifact keys.
+   *  Eg.   var deps = db.getArtifactDependencies("net.mekomsolutions|openmrs-distro-cambodia|1.1.0-SNAPSHOT");
+   *        var depsArray = deps["dependencies"];
+   */
+  getArtifactDependencies: function(artifactKey) {
+    log.info("", "Fetching artifacts dependencies for: " + artifactKey);
+
+    var allDeps = getAllArtifactDependencies();
+
+    var deps = allDeps[artifactKey];
+    if (_.isUndefined(deps)) {
+      log.info("", "No artifacts dependencies found for: " + artifactKey);
+      deps = {};
+    }
+
+    return deps;
+  },
+
+  /*
+   * Overwrites an artifact list of dependencies.
+   *
+   * @param {string} artifactKey - The artifact key of the artifact whose dependencies are being updated (in practice: a distribution artifact.)
+   * @param {array} dependenciesToSave - The dependencies as an array of artifact keys.
+   *
+   * @return The saved dependencies.
+   */
+  saveArtifactDependencies: function(artifactKey, dependenciesToSave) {
+    log.info("", "Saving artifacts dependencies for: " + artifactKey);
+
+    var allDeps = getAllArtifactDependencies();
+
+    var deps = module.exports.getArtifactDependencies(artifactKey);
+    if (!_.isEmpty(deps)) {
+      log.info(
+        "",
+        "Existing artifacts dependencies are being overwritten for: " +
+          artifactKey
+      );
+    }
+
+    deps["dependencies"] = dependenciesToSave; // complete override
+    utils.setObjectStatus(deps);
+    allDeps[artifactKey] = deps;
+
+    fs.writeFileSync(
+      config.getArtifactDependenciesConfigPath(),
+      JSON.stringify(allDeps, null, 2)
+    );
+
+    return deps;
   }
 };
 
@@ -121,8 +178,7 @@ module.exports = {
 var getAllInstanceDefinitions = function() {
   log.info("", "Fetching all instance definitions.");
 
-  var instances = {};
-  instances = JSON.parse(
+  var instances = JSON.parse(
     fs.readFileSync(config.getInstancesConfigPath(), "utf8")
   );
 
@@ -131,7 +187,26 @@ var getAllInstanceDefinitions = function() {
       "",
       "There are currently no instance definitions saved in database."
     );
+    instances = {};
   }
 
   return instances;
+};
+
+var getAllArtifactDependencies = function() {
+  log.info("", "Fetching all artifacts dependencies.");
+
+  var allDeps = JSON.parse(
+    fs.readFileSync(config.getArtifactDependenciesConfigPath(), "utf8")
+  );
+
+  if (_.isEmpty(allDeps)) {
+    log.warn(
+      "",
+      "There are currently no artifacts dependencies saved in database."
+    );
+    allDeps = {};
+  }
+
+  return allDeps;
 };

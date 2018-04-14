@@ -39,6 +39,9 @@ class MavenProject {
     this.version = version;
     this.packaging = packaging;
   }
+  asArtifactKey() {
+    return this.groupId + "|" + this.artifactId + "|" + this.version;
+  }
 }
 
 /**
