@@ -1,3 +1,3 @@
 {
-  "pipeline1" : [ "openmrsmodule", "openmrscore", "openmrsconfig", "bahmniconfig", "bahmniapps", "distribution"]
+  "pipeline1" : [ "openmrsmodule", "bahmnicore", "openmrscore", "openmrsconfig", "bahmniconfig", "bahmniapps", "distribution"]
 }

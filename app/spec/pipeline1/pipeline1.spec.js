@@ -328,6 +328,39 @@ describe("Tests suite for pipeline1", function() {
     );
   });
 
+  it("should getArtifact, getBuildScript and getDeployScript for 'bahmnicore'.", function() {
+    // setup
+    const projectType = "bahmnicore";
+    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
+
+    // replay
+    var projectBuild = require(folderInTest +
+      "/impl/" +
+      projectType).getInstance();
+    var artifact = projectBuild.getArtifact(
+      __dirname + "/resources/" + projectType + "/",
+      null
+    );
+    var buildScript = projectBuild.getBuildScript();
+    var deployScript = projectBuild.getDeployScript(artifact);
+
+    // verif
+    expect(artifact.name).toEqual("bahmnicore");
+    expect(artifact.version).toEqual("0.91-SNAPSHOT");
+    expect(artifact.extension).toEqual("omod");
+    expect(artifact.filename).toEqual("bahmnicore-0.91-SNAPSHOT.omod");
+    expect(artifact.destFilename).toEqual(artifact.filename);
+    expect(artifact.buildPath).toEqual("./bahmnicore-omod/target");
+
+    expect(buildScript.type).toEqual("#!/bin/bash");
+    expect(buildScript.body).toEqual("mvn clean install -P IT\n");
+
+    expect(deployScript.type).toEqual("#!/bin/bash");
+    expect(deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1).toBe(
+      true
+    );
+  });
+
   it("should getArtifact, getBuildScript and getDeployScript for 'distribution'.", function() {
     // setup
     const projectType = "distribution";
