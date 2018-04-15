@@ -29,6 +29,10 @@ module.exports = {
       return cmns.getMavenProjectArtifact(pomDirPath, "./omod/target", "omod");
     };
 
+    projectBuild.postBuildActions = function() {
+      cmns.postBuildActions();
+    };
+
     return projectBuild;
   }
 };

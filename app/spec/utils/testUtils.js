@@ -87,6 +87,12 @@ var setMockConfig = function(extraConfig) {
       path.resolve("spec/utils/resources", "test_artifacts_dependencies_1.json")
     );
   };
+  mockConfig.getArtifactsBuildParamsDbPath = function() {
+    return prepareFile(
+      "app_data",
+      path.resolve("spec/utils/resources", "test_artifacts_build_params_1.json")
+    );
+  };
 
   Object.assign(mockConfig, extraConfig);
 };

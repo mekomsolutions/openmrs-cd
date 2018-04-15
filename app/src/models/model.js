@@ -73,14 +73,26 @@ class Artifact {
  *
  */
 class ProjectBuild {
+  /**
+   * @return model.Script()
+   */
   getBuildScript() {
     return cst.ABSTRACT;
   }
+  /**
+   * @return model.Artifact()
+   */
   getArtifact(pomPath, commitMetadata) {
     return cst.ABSTRACT;
   }
+  /**
+   * @return model.Script()
+   */
   getDeployScript(artifact) {
     return cst.ABSTRACT;
+  }
+  postBuildActions() {
+    return "true";
   }
 }
 

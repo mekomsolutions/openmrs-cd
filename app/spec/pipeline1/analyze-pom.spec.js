@@ -17,6 +17,10 @@ describe("POM post-analysis", function() {
     const db = require(cst.DBPATH);
 
     process.env[config.varProjectType()] = "distribution";
+    process.env[config.varRepoUrl()] =
+      "https://github.com/mekomsolutions/openmrs-distro-cambodia";
+    process.env[config.varRepoName()] = "openmrs-distro-cambodia";
+    process.env[config.varBranchName()] = "master";
     process.env[config.varPomFileContent()] = fs.readFileSync(
       path.resolve(
         "spec/" +

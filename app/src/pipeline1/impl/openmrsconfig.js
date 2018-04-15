@@ -29,6 +29,10 @@ module.exports = {
       return cmns.getMavenProjectArtifact(pomDirPath, "./target", "zip");
     };
 
+    projectBuild.postBuildActions = function() {
+      cmns.postBuildActions();
+    };
+
     return projectBuild;
   }
 };

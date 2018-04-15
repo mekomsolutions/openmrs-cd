@@ -1,0 +1,13 @@
+[
+  {
+    "buildParams": {
+      "projectType": "distribution",
+      "repoUrl": "https://github.com/mekomsolutions/openmrs-distro-cambodia",
+      "repoName": "openmrs-distro-cambodia",
+      "branchName": "INFRA-111"
+    },
+    "artifactKey": "net.mekomsolutions|openmrs-distro-cambodia|1.1.0-SNAPSHOT",
+    "updated": "2018-04-14T18:27:12.017Z",
+    "created": "2018-02-14T18:27:12.017Z"
+  }
+]

@@ -29,6 +29,10 @@ module.exports = {
       return cmns.getMavenProjectArtifact(pomDirPath, "./webapp/target", "war");
     };
 
+    projectBuild.postBuildActions = function() {
+      cmns.postBuildActions();
+    };
+
     return projectBuild;
   }
 };

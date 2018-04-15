@@ -227,6 +227,71 @@ module.exports = {
   },
 
   /**
+   * Finds an object in a list based on 'primary key' properties values.
+   *
+   * @param {Object} keyPairs - The key-value map of primary key properties.
+   *    Eg. {"uuid": "9f6abb06-895a-479b-b4d6-fd1111aef011"} or {"uuid": "9f6abb06-895a-479b-b4d6-fd1111aef011", "name": "my-new-object-1"}
+   * @param {Array} objects - The list of objects to search.
+   */
+  findObject: function(keyPairs, objects) {
+    var filteredObjects = _.filter(objects, function(o) {
+      var found = true;
+
+      Object.keys(keyPairs).forEach(function(keyName) {
+        var keyVal = keyPairs[keyName];
+        if (_.isEmpty(keyVal)) {
+          found = false;
+          log.error(
+            "",
+            "An empty search key was provided preventing an object match."
+          );
+        }
+        found &= o[keyName] == keyVal;
+      });
+
+      return found;
+    });
+
+    var matchedObject = {};
+    if (filteredObjects.length > 1) {
+      throw new Error();
+    }
+    if (filteredObjects.length == 1) {
+      matchedObject = filteredObjects[0];
+    }
+    return matchedObject;
+  },
+
+  /**
+   * Deletes an object from a list based on 'primary key' properties values.
+   *
+   * @param {Object} keyPairs - The key-value map of primary key properties.
+   *    Eg. {"uuid": "9f6abb06-895a-479b-b4d6-fd1111aef011"} or {"uuid": "9f6abb06-895a-479b-b4d6-fd1111aef011", "name": "my-new-object-1"}
+   * @param {Array} objects - The list of objects to be amended.
+   */
+  removeObject: function(keyPairs, objects) {
+    objects = _.reject(objects, function(o) {
+      var found = true;
+
+      Object.keys(keyPairs).forEach(function(keyName) {
+        var keyVal = keyPairs[keyName];
+        if (_.isEmpty(keyVal)) {
+          found = false;
+          log.error(
+            "",
+            "An empty search key was provided preventing an object match."
+          );
+        }
+        found &= o[keyName] == keyVal;
+      });
+
+      return found;
+    });
+
+    return objects;
+  },
+
+  /**
    * Finds an instance definition in provided list of instances definitions based on the UUID or name.
    *
    * @param {String} uuid, the UUID to match

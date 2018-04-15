@@ -97,5 +97,7 @@ module.exports = {
     artifact.mavenProject = mavenProject;
 
     return artifact;
-  }
+  },
+
+  postBuildActions: function() {}
 };

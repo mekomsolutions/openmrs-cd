@@ -155,6 +155,15 @@ module.exports = {
       module.exports.getInstancesConfigFileName()
     );
   },
+  getArtifactsBuildParamsDbFileName: function() {
+    return "artifacts_build_params.json";
+  },
+  getArtifactsBuildParamsDbPath: function() {
+    return path.resolve(
+      module.exports.getAppDataDirPath(),
+      module.exports.getArtifactsBuildParamsDbFileName()
+    );
+  },
   getArtifactDependenciesConfigFileName: function() {
     return "artifacts_dependencies.json";
   },

@@ -8,6 +8,8 @@ const log = require("npmlog");
 const model = require("../../models/model");
 const utils = require("../../utils/utils");
 
+const cmns = require("../commons");
+
 const thisType = "bahmniapps";
 
 module.exports = {
@@ -24,6 +26,10 @@ module.exports = {
 
     projectBuild.getArtifact = function(pomDirPath, commitMetadata) {
       return getArtifact(pomDirPath, commitMetadata);
+    };
+
+    projectBuild.postBuildActions = function() {
+      cmns.postBuildActions();
     };
 
     return projectBuild;
