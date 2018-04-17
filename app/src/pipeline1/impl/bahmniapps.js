@@ -29,7 +29,7 @@ module.exports = {
     };
 
     projectBuild.postBuildActions = function(args) {
-      cmns.postBuildActions();
+      // TODO
     };
 
     return projectBuild;
