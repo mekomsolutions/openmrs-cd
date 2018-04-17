@@ -30,9 +30,9 @@ module.exports = {
       );
     };
 
-    projectBuild.getArtifact = function(pomDirPath, commitMetadata) {
+    projectBuild.getArtifact = function(args) {
       var artifact = cmns.getMavenProjectArtifact(
-        pomDirPath,
+        args.pom,
         "./bahmnicore-omod/target",
         "omod"
       );
@@ -45,8 +45,12 @@ module.exports = {
       return artifact;
     };
 
-    projectBuild.postBuildActions = function() {
-      cmns.postBuildActions();
+    projectBuild.postBuildActions = function(args) {
+      cmns.mavenPostBuildActions(
+        args.pom.groupId,
+        args.artifactsIds,
+        args.pom.version
+      );
     };
 
     return projectBuild;

@@ -31,6 +31,7 @@ jenkins_home/fingerprints/
 jenkins_home/config-history/
 jenkins_home/queue.xml
 jenkins_home/org.jenkinsci.plugins.workflow.flow.FlowExecutionList.xml
+jenkins_home/jenkins.install.InstallUtil.lastExecVersion
 
 # Specific to pipeline2
 jenkins_home/history.json

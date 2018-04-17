@@ -6,9 +6,7 @@ describe("validate-instance", function() {
   const path = require("path");
   const _ = require("lodash");
 
-  const config = require(path.resolve("src/utils/config"));
   const utils = require(path.resolve("src/utils/utils"));
-  const tests = require(path.resolve("spec/utils/testUtils"));
   const proxyquire = require("proxyquire");
 
   const cst = require(path.resolve("src/const"));
@@ -18,7 +16,10 @@ describe("validate-instance", function() {
 
   it("should process an existing instance definition with artifacts changes.", function() {
     // setup
-    const db = require(cst.DBPATH);
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    var stubs = tests.stubs();
+    const config = tests.config();
+    const db = proxyquire(cst.DBPATH, stubs);
 
     process.env.instanceDefinitionEvent = fs.readFileSync(
       path.resolve(
@@ -33,7 +34,7 @@ describe("validate-instance", function() {
     expect(beforeInstance).not.toEqual({});
 
     // replay
-    proxyquire(fileInTest, tests.stubs());
+    proxyquire(fileInTest, stubs);
 
     // verif that the instances list is updated accordingly
     var updatedInstance = db.getInstanceDefinition(instanceEvent.uuid);
@@ -64,7 +65,10 @@ describe("validate-instance", function() {
 
   it("should process a new instance definition.", function() {
     // setup
-    const db = require(cst.DBPATH);
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    var stubs = tests.stubs();
+    const config = tests.config();
+    const db = proxyquire(cst.DBPATH, stubs);
 
     process.env.instanceDefinitionEvent = fs.readFileSync(
       path.resolve(
@@ -78,7 +82,7 @@ describe("validate-instance", function() {
     expect(db.getInstanceDefinition(null, instanceEvent.name)).toEqual({});
 
     // replay
-    proxyquire(fileInTest, tests.stubs());
+    proxyquire(fileInTest, stubs);
 
     // verif that the instances list is updated accordingly
     var savedInstance = db.getInstanceDefinition(null, instanceEvent.name);

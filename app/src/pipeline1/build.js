@@ -45,7 +45,10 @@ var projectBuild = require("./impl/" +
   process.env[config.varProjectType()]).getInstance();
 
 // Retrieve the details of the artifact that will be built
-var artifact = projectBuild.getArtifact("./", commitMetadata);
+var artifact = projectBuild.getArtifact({
+  pom: utils.getPom(config.getBuildPomPath()),
+  commitMetadata: commitMetadata
+});
 
 // Retrieve the script to build the projectBuild
 var buildScript = projectBuild.getBuildScript();

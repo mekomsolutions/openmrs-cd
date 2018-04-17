@@ -4,6 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const log = require("npmlog");
 const _ = require("lodash");
+const XML = require("pixl-xml");
 
 const model = require("../models/model");
 
@@ -54,6 +55,20 @@ module.exports = {
       }
     }
     return envvars;
+  },
+
+  getPom: function(pomFilePath) {
+    var pom = {}; // the JSON rep. of the main XML POM
+    try {
+      pom = XML.parse(fs.readFileSync(pomFilePath, "utf-8"));
+    } catch (err) {
+      log.warn(
+        "",
+        "The main POM file could not be parsed, or was not found, is this not a Maven project?"
+      );
+      log.warn("", JSON.stringify(err, null, 2));
+    }
+    return pom;
   },
 
   sortByArtifact: function(dependenciesByServer) {

@@ -6,6 +6,7 @@ USER root
 RUN apt-get update
 RUN apt-get -y install nano
 RUN apt-get -y install openssh-server
+RUN apt-get -y install libxml2-utils # for xmllint
 
 # These packages are needed for Jenkins to build some projects.
 # This is because the Jenkins server is used as its own agent. Build tasks are running directly on it.

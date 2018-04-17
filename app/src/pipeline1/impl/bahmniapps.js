@@ -24,11 +24,11 @@ module.exports = {
       return getDeployScript(artifact);
     };
 
-    projectBuild.getArtifact = function(pomDirPath, commitMetadata) {
-      return getArtifact(pomDirPath, commitMetadata);
+    projectBuild.getArtifact = function(args) {
+      return getArtifact(args.commitMetadata);
     };
 
-    projectBuild.postBuildActions = function() {
+    projectBuild.postBuildActions = function(args) {
       cmns.postBuildActions();
     };
 
@@ -36,15 +36,7 @@ module.exports = {
   }
 };
 
-var getArtifact = function(pomDirPath, commitMetadata) {
-  if (_.isEmpty(commitMetadata)) {
-    log.error(
-      "",
-      "No commit metadata was passed to '" + thisType + "' getArtifact(..)."
-    );
-    throw new Error();
-  }
-
+var getArtifact = function(commitMetadata) {
   var artifact = new model.Artifact();
   artifact.name = "bahmniapps";
   // Bahmni Apps is not version-managed, we infer its version from either the branch name or commit ID.

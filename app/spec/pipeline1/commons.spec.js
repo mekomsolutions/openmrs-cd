@@ -46,15 +46,16 @@ describe("Commons for project builds", function() {
   it("should generate an 'Artifact' for a Maven project.", function() {
     // setup
     const projectType = "openmrsmodule";
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
 
     // replay
-    var artifact = cmns.getMavenProjectArtifact(
-      path.resolve(
-        "spec/" + config.getJobNameForPipeline1() + "/resources/" + projectType
-      ),
-      "./target",
-      "omod"
-    );
+    var artifact = cmns.getMavenProjectArtifact(pom, "./target", "omod");
 
     // verif
     expect(artifact instanceof model.Artifact).toBeTruthy();
@@ -70,5 +71,45 @@ describe("Commons for project builds", function() {
     expect(artifact.mavenProject.artifactId).toEqual(artifact.name);
     expect(artifact.mavenProject.version).toEqual(artifact.version);
     expect(artifact.mavenProject.packaging).toEqual(artifact.extension);
+  });
+
+  it("should save a file with all downstream builds parameters to rebuild impacted artifacts.", function() {
+    // deps
+    const proxyquire = require("proxyquire");
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    const mockCmns = proxyquire(
+      path.resolve("src/" + config.getJobNameForPipeline1() + "/commons"),
+      tests.stubs()
+    );
+
+    // setup
+    const projectType = "bahmnicore";
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
+    var artifactsIds = ["bahmnicore-api", "bahmnicore-omod"];
+
+    // replay
+    mockCmns.mavenPostBuildActions(pom.groupId, artifactsIds, pom.version);
+
+    // verif
+    var buildParams = JSON.parse(
+      fs.readFileSync(config.getDownstreamBuildParamsJsonPath(), "utf-8")
+    );
+    expect(buildParams.length).toEqual(1);
+    var params = buildParams[0];
+    expect(params.projectType).toEqual("distribution");
+    expect(params.repoUrl).toEqual(
+      "https://github.com/mekomsolutions/openmrs-distro-cambodia"
+    );
+    expect(params.repoName).toEqual("openmrs-distro-cambodia");
+    expect(params.branchName).toEqual("INFRA-111");
+
+    // after
+    tests.cleanup();
   });
 });

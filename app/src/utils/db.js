@@ -78,6 +78,15 @@ module.exports = {
   },
 
   /*
+   * Get the list of all dependencies artifact per artifact.
+   *
+   * @return The dependencies of each artifact as a succession of embedded lists of artifact keys.
+   */
+  getAllArtifactDependencies: function() {
+    return getAllObjects(DM_DEPS, config.getArtifactDependenciesConfigPath());
+  },
+
+  /*
    * Get the dependencies for a given artifact.
    *
    * @param {string} artifactKey - The artifact key of the artifact whose dependencies are being updated (in practice: a distribution artifact.)
@@ -140,6 +149,22 @@ module.exports = {
       keyPairs,
       true,
       ""
+    );
+  },
+
+  /*
+   * Get the last used build parameters for an artifact.
+   *
+   * @param {string} artifactKey - The artifact key of the artifact whose last build params are being fetched (in practice: a distribution artifact.)
+   *
+   * @return The build parameters.
+   */
+  getArtifactBuildParams: function(artifactKey) {
+    var keyPairs = { artifactKey: artifactKey };
+    return getObject(
+      DM_BUILDPARAMS,
+      config.getArtifactsBuildParamsDbPath(),
+      keyPairs
     );
   }
 };

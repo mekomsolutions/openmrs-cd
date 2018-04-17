@@ -31,32 +31,27 @@ module.exports = {
       );
     };
 
-    projectBuild.getArtifact = function(pomDirPath, commitMetadata) {
-      return cmns.getMavenProjectArtifact(pomDirPath, "./target", "zip");
+    projectBuild.getArtifact = function(args) {
+      return cmns.getMavenProjectArtifact(args.pom, "./target", "zip");
     };
 
-    projectBuild.postBuildActions = function() {
-      postBuildActions();
+    projectBuild.postBuildActions = function(args) {
+      postBuildActions(args.pom);
     };
 
     return projectBuild;
   }
 };
 
-var postBuildActions = function() {
-  //
-  // Default POM parsing.
-  //
-  var parsedPom = XML.parse(process.env[config.varPomFileContent()]);
-
+var postBuildActions = function(pom) {
   //
   //  Building the list of dependencies (as artifact keys).
   //
   var deps = [];
-  parsedPom.dependencies.dependency.forEach(function(dep) {
+  pom.dependencies.dependency.forEach(function(dep) {
     var propKey = dep.version.substring(2).slice(0, -1); // "${foo.version}" -> "foo.version"
 
-    var propVal = parsedPom.properties[propKey];
+    var propVal = pom.properties[propKey];
     if (!_.isUndefined(propVal)) {
       // substituting the version alias, if any
       dep.version = propVal;
@@ -74,9 +69,9 @@ var postBuildActions = function() {
   //  Saving/updating the list of dependencies in database.
   //
   var project = new model.MavenProject(
-    parsedPom.groupId,
-    parsedPom.artifactId,
-    parsedPom.version
+    pom.groupId,
+    pom.artifactId,
+    pom.version
   );
   db.saveArtifactDependencies(project.asArtifactKey(), deps);
 

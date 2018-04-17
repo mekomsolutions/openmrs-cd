@@ -4,7 +4,10 @@ describe("Tests suite for pipeline1", function() {
   const fs = require("fs");
   const path = require("path");
 
+  const utils = require(path.resolve("src/utils/utils"));
   const config = require(path.resolve("src/utils/config"));
+
+  const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
 
   it("should verify job parameters.", function() {
     // deps
@@ -88,8 +91,7 @@ describe("Tests suite for pipeline1", function() {
   });
 
   it("should implement all required functions from data model.", function() {
-    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
-
+    // deps
     const model = require(path.resolve("src/models/model"));
     const modelTestUtils = require(path.resolve("spec/models/modelTestUtils"));
 
@@ -105,34 +107,38 @@ describe("Tests suite for pipeline1", function() {
         model.ProjectBuild
       );
 
-      var metadata = {
-        commit: 123456
+      var commitMetadata = {
+        branchName: "master"
+      };
+      var pom = {
+        artifactId: "foo"
       };
 
-      var artifact = projectBuild.getArtifact(
-        __dirname + "/resources/" + type + "/",
-        metadata
-      );
+      var artifact = projectBuild.getArtifact({
+        pom: pom,
+        commitMetadata: commitMetadata
+      });
 
       modelTestUtils.ensureImplementedFunctions(artifact, model.Artifact);
     });
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmniapps'.", function() {
+    // deps
     const model = require(path.resolve("src/models/model"));
-    const projectType = "bahmniapps";
-    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
 
+    // setup
+    const projectType = "bahmniapps";
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
 
-    var mockCommitMetadata = {
+    var commitMetadata = {
       branchName: "dev",
       commitId: "12fe45"
     };
 
-    var artifact = projectBuild.getArtifact("./", mockCommitMetadata);
+    var artifact = projectBuild.getArtifact({ commitMetadata: commitMetadata });
 
     // replay with branch specified
     expect(artifact.name).toEqual("bahmniapps");
@@ -146,8 +152,8 @@ describe("Tests suite for pipeline1", function() {
     );
 
     // replay with no branch specified
-    mockCommitMetadata.branchName = "";
-    artifact = projectBuild.getArtifact("./", mockCommitMetadata);
+    commitMetadata.branchName = "";
+    artifact = projectBuild.getArtifact({ commitMetadata: commitMetadata });
     expect(artifact.destFilename).toEqual("bahmniapps-12fe45.zip");
     expect(artifact.mavenProject).toEqual(
       new model.MavenProject("net.mekomsolutions", "bahmniapps", "12fe45")
@@ -167,17 +173,22 @@ describe("Tests suite for pipeline1", function() {
     // deps
     const model = require(path.resolve("src/models/model"));
     const projectType = "bahmniconfig";
-    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
+
+    // setup
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
 
     // replay
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
 
-    var artifact = projectBuild.getArtifact(
-      __dirname + "/resources/" + projectType + "/",
-      null
-    );
+    var artifact = projectBuild.getArtifact({ pom: pom });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -215,16 +226,19 @@ describe("Tests suite for pipeline1", function() {
     const projectType = "openmrsconfig";
 
     // setup
-    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
 
     // replay
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
-    var artifact = projectBuild.getArtifact(
-      __dirname + "/resources/" + projectType + "/",
-      null
-    );
+    var artifact = projectBuild.getArtifact({ pom: pom });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -261,17 +275,20 @@ describe("Tests suite for pipeline1", function() {
     const projectType = "openmrscore";
 
     // setup
-    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
 
     // replay
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
 
-    var artifact = projectBuild.getArtifact(
-      __dirname + "/resources/" + projectType + "/",
-      null
-    );
+    var artifact = projectBuild.getArtifact({ pom: pom });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -298,16 +315,19 @@ describe("Tests suite for pipeline1", function() {
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrsmodule'.", function() {
     // setup
     const projectType = "openmrsmodule";
-    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
 
     // replay
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
-    var artifact = projectBuild.getArtifact(
-      __dirname + "/resources/" + projectType + "/",
-      null
-    );
+    var artifact = projectBuild.getArtifact({ pom: pom });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -331,16 +351,19 @@ describe("Tests suite for pipeline1", function() {
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmnicore'.", function() {
     // setup
     const projectType = "bahmnicore";
-    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
 
     // replay
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
-    var artifact = projectBuild.getArtifact(
-      __dirname + "/resources/" + projectType + "/",
-      null
-    );
+    var artifact = projectBuild.getArtifact({ pom: pom });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -364,16 +387,19 @@ describe("Tests suite for pipeline1", function() {
   it("should getArtifact, getBuildScript and getDeployScript for 'distribution'.", function() {
     // setup
     const projectType = "distribution";
-    const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
 
     // replay
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
-    var artifact = projectBuild.getArtifact(
-      __dirname + "/resources/" + projectType + "/",
-      null
-    );
+    var artifact = projectBuild.getArtifact({ pom: pom });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 

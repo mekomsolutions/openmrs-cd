@@ -21,11 +21,12 @@ describe("db", function() {
 
   const utils = require(path.resolve("src/utils/utils"));
   const cst = require(path.resolve("src/const"));
-  const tests = require(path.resolve("spec/utils/testUtils"));
 
   it("should overwrite artifact build params.", function() {
     // setup
-    const db = require(cst.DBPATH);
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    var stubs = tests.stubs();
+    const db = proxyquire(cst.DBPATH, stubs);
     const config = tests.config();
 
     var artifactKey =
@@ -67,7 +68,9 @@ describe("db", function() {
 
   it("should save new artifact build params.", function() {
     // setup
-    const db = require(cst.DBPATH);
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    var stubs = tests.stubs();
+    const db = proxyquire(cst.DBPATH, stubs);
     const config = tests.config();
 
     var artifactKey =
@@ -115,7 +118,9 @@ describe("db", function() {
 
   it("should delete artifact build params.", function() {
     // setup
-    const db = require(cst.DBPATH);
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    var stubs = tests.stubs();
+    const db = proxyquire(cst.DBPATH, stubs);
     const config = tests.config();
 
     var artifactKey =
@@ -148,7 +153,9 @@ describe("db", function() {
 
   it("should save a new instance definition.", function() {
     // setup
-    const db = require(cst.DBPATH);
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    var stubs = tests.stubs();
+    const db = proxyquire(cst.DBPATH, stubs);
     const config = tests.config();
 
     var instances = {};
@@ -191,7 +198,9 @@ describe("db", function() {
 
   it("should update an instance definition.", function() {
     // setup
-    const db = require(cst.DBPATH);
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    var stubs = tests.stubs();
+    const db = proxyquire(cst.DBPATH, stubs);
     const config = tests.config();
 
     var instances = {};
@@ -237,7 +246,9 @@ describe("db", function() {
 
   it("should delete an instance definition.", function() {
     // setup
-    const db = require(cst.DBPATH);
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    var stubs = tests.stubs();
+    const db = proxyquire(cst.DBPATH, stubs);
     const config = tests.config();
 
     var instances = {};

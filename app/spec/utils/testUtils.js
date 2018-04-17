@@ -7,6 +7,7 @@ const proxyquire = require("proxyquire");
 const fsx = require("fs-extra");
 const mkdirp = require("mkdirp");
 const log = require("npmlog");
+const _ = require("lodash");
 
 const cst = require(path.resolve("src/const"));
 
@@ -21,7 +22,7 @@ var copiedPaths = {};
  * Moves a resource file to a temporary test dir that allows safe editions.
  *
  * @param {string} whereDir - The subdir where to the file should live during tests. Eg. "app_data".
- * @param {array} filePath - The original (=out of tests) file path.
+ * @param {array} filePath - The original (= outside of tests) file path.
  *
  * @return The saved dependencies.
  */
@@ -58,7 +59,8 @@ var setTestDir = function() {
 };
 
 var setMockConfig = function(extraConfig) {
-  mockConfig = Object.assign({}, require(path.resolve("src/utils/config")));
+  var realConfig = require(path.resolve("src/utils/config"));
+  mockConfig = Object.assign({}, realConfig);
 
   mockConfig.getTempDirPath = function() {
     return testDirPath;
@@ -91,6 +93,12 @@ var setMockConfig = function(extraConfig) {
     return prepareFile(
       "app_data",
       path.resolve("spec/utils/resources", "test_artifacts_build_params_1.json")
+    );
+  };
+  mockConfig.getArtifactIdListFilePath = function() {
+    return prepareFile(
+      realConfig.getRelativeBuildDirPath(),
+      path.resolve("spec/pipeline1/resources", "test_artifacts_ids1.txt")
     );
   };
 
@@ -127,7 +135,7 @@ module.exports = {
    * @param {Object} extraConfig - To add to or override default mock for the config object.
    *
    **/
-  stubs: function(extraStubs, extraConfig) {
+  stubs: function(extraStubs, extraConfig, nestedRequires) {
     setTestDir();
 
     setEnvvars();
@@ -140,7 +148,14 @@ module.exports = {
     stubs[cst.CONFIGPATH] = module.exports.config();
 
     Object.assign(stubs, extraStubs);
-    stubs[cst.DBPATH] = proxyquire(path.resolve("src/utils/db"), stubs); // to hande second level stubbing, https://stackoverflow.com/a/42673500/321797
+
+    // Further stubbing for nexted requires, see https://stackoverflow.com/a/42673500/321797
+    stubs[cst.DBPATH] = proxyquire(path.resolve("src/utils/db"), stubs);
+    if (!_.isEmpty(nestedRequires)) {
+      Object.keys(nestedRequires).forEach(function(requirePath) {
+        stubs[requirePath] = proxyquire(nestedRequires[requirePath], stubs);
+      });
+    }
     return stubs;
   }
 };

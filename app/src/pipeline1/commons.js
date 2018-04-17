@@ -7,19 +7,11 @@ const _ = require("lodash");
 const XML = require("pixl-xml");
 
 const model = require("../models/model");
+const cst = require("../const");
+const config = require(cst.CONFIGPATH);
+const db = require(cst.DBPATH);
 
 module.exports = {
-  /*
-   * Objectifies a POM XML file.
-   * 
-   * @param {string} pomDirPath - The path to the POM file directory.
-   */
-  getPom: function(pomDirPath) {
-    var file = fs.readFileSync(path.resolve(pomDirPath, "pom.xml"), "utf8");
-    var parsedPom = XML.parse(file);
-    return parsedPom;
-  },
-
   /*
    * Generates the default build script for Maven projects.
    * 
@@ -71,14 +63,12 @@ module.exports = {
    * Generates a default 'Artifact' object for a Maven project.
    *  The ouput encapsulates the 'MavenProject' object.
    *
-   * @param {string} pomDirPath - The path to the POM file's directory.
-   * @param {string} buildPath - The relative build path. Eg. './target'
-   * @param {string} artifactExtension - The extension of the build output artifact file. Eg. 'omod', 'zip', 'jar'... etc.
+   * @param {Object} pom - A JSON representation of the POM XML.
+   * @param {String} buildPath - The relative build path. Eg. './target'
+   * @param {String} artifactExtension - The extension of the build output artifact file. Eg. 'omod', 'zip', 'jar'... etc.
    * 
    */
-  getMavenProjectArtifact: function(pomDirPath, buildPath, artifactExtension) {
-    var pom = module.exports.getPom(pomDirPath);
-
+  getMavenProjectArtifact: function(pom, buildPath, artifactExtension) {
     var artifact = new model.Artifact();
     artifact.name = pom.artifactId;
     artifact.version = pom.version;
@@ -99,5 +89,38 @@ module.exports = {
     return artifact;
   },
 
-  postBuildActions: function() {}
+  /*
+   * Looks for projects (distributions) impacted by a change in the currently built artifact.
+   * Then saves the build parameters of the impacted projects to rebuild them as downstream jobs.
+   *
+   * @param {String} groupId - The Maven group ID of the currently built project.
+   * @param {Array} artifactsIds - All the artifacts IDs (itself and submodules) that belong to the currently built project.
+   * @param {String} artifactExtension - The Maven version of the currently built project.
+   * 
+   */
+  mavenPostBuildActions: function(groupId, artifactsIds, version) {
+    var allDeps = db.getAllArtifactDependencies();
+    var impactedArtifacts = [];
+
+    artifactsIds.forEach(function(artifactId) {
+      var project = new model.MavenProject(groupId, artifactId, version, "zzz");
+      allDeps.forEach(function(deps) {
+        if (deps.dependencies.indexOf(project.asArtifactKey()) > -1) {
+          impactedArtifacts.push(deps.artifactKey);
+        }
+      });
+    });
+    impactedArtifacts = _.uniq(impactedArtifacts);
+
+    var params = [];
+    impactedArtifacts.forEach(function(artifactKey) {
+      var buildParams = db.getArtifactBuildParams(artifactKey);
+      params.push(buildParams["buildParams"]);
+    });
+
+    fs.writeFileSync(
+      config.getDownstreamBuildParamsJsonPath(),
+      JSON.stringify(params)
+    );
+  }
 };

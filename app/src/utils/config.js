@@ -48,9 +48,6 @@ module.exports = {
   varCommitId: function() {
     return "commitId";
   },
-  varPomFileContent: function() {
-    return "pomFileContent";
-  },
   varBuildPath: function() {
     return "buildPath";
   },
@@ -74,19 +71,39 @@ module.exports = {
   getAppDataDirPath: function() {
     return process.env.APP_DATA_DIR_PATH; // this must be exist as a global property within Jenkins
   },
+  getArtifactIdListFileName: function() {
+    return "artifacts_ids.txt";
+  },
+  getArtifactIdListFilePath: function() {
+    return path.resolve(
+      module.exports.getBuildDirPath(),
+      module.exports.getArtifactIdListFileName()
+    );
+  },
+  getRelativeBuildDirPath: function() {
+    return (
+      "jobs" +
+      "/" +
+      process.env.JOB_NAME +
+      "/" +
+      "builds" +
+      "/" +
+      process.env.BUILD_NUMBER
+    );
+  },
   getBuildDirPath: function() {
     // https://stackoverflow.com/a/48712627/321797
-    if (_.isEmpty(process.env.CURRENT_BUILD_PATH)) {
+    if (_.isEmpty(process.env.BUILD_PATH)) {
       return path.resolve(
         process.env.JENKINS_HOME,
-        "jobs",
-        process.env.JOB_NAME,
-        "builds",
-        process.env.BUILD_NUMBER
+        module.exports.getRelativeBuildDirPath()
       );
     } else {
-      return process.env.CURRENT_BUILD_PATH;
+      return process.env.BUILD_PATH;
     }
+  },
+  getBuildPomPath: function() {
+    return path.resolve(process.env.WORKSPACE, "pom.xml");
   },
   getTempDirPath: function() {
     return "/tmp";
@@ -134,6 +151,15 @@ module.exports = {
   },
   getChangedArtifactJsonPath: function() {
     return path.resolve(module.exports.getTempDirPath(), "artifact.json");
+  },
+  getDownstreamBuildParamsJsonName: function() {
+    return "builds_params.json";
+  },
+  getDownstreamBuildParamsJsonPath: function() {
+    return path.resolve(
+      module.exports.getBuildDirPath(),
+      module.exports.getDownstreamBuildParamsJsonName()
+    );
   },
   getArtifactRepoEnvvarsName: function() {
     return "artifact_repository.env";

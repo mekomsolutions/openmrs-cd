@@ -20,7 +20,7 @@ Typically some JSON data containing all the information about a code commit.</de
           <name>projectType</name>
           <description>The type of the code project that is emitting the payload.
 
-Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;, &apos;distribution&apos;.</description>
+Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmnicore&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;, &apos;distribution&apos;.</description>
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>

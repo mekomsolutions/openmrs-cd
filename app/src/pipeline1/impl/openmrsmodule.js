@@ -25,12 +25,20 @@ module.exports = {
       );
     };
 
-    projectBuild.getArtifact = function(pomDirPath, commitMetadata) {
-      return cmns.getMavenProjectArtifact(pomDirPath, "./omod/target", "omod");
+    projectBuild.getArtifact = function(args) {
+      return cmns.getMavenProjectArtifact(args.pom, "./omod/target", "omod");
     };
 
-    projectBuild.postBuildActions = function() {
+    projectBuild.postBuildActions = function(args) {
       cmns.postBuildActions();
+    };
+
+    projectBuild.postBuildActions = function(args) {
+      cmns.mavenPostBuildActions(
+        args.pom.groupId,
+        args.artifactsIds,
+        args.pom.version
+      );
     };
 
     return projectBuild;

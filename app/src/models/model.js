@@ -2,6 +2,7 @@
 
 const _ = require("lodash");
 const path = require("path");
+const log = require("npmlog");
 
 const utils = require("../utils/utils");
 const cst = require("../const");
@@ -80,9 +81,12 @@ class ProjectBuild {
     return cst.ABSTRACT;
   }
   /**
+   * @param {Object} args - Eg. getArtifact({ pom: ..., commitMetadata: ...})
+   *  'grep' for invocations the code base to identify possible properties for args.
+   *
    * @return model.Artifact()
    */
-  getArtifact(pomPath, commitMetadata) {
+  getArtifact(args) {
     return cst.ABSTRACT;
   }
   /**
@@ -91,7 +95,11 @@ class ProjectBuild {
   getDeployScript(artifact) {
     return cst.ABSTRACT;
   }
-  postBuildActions() {
+  /**
+   * @param {Object} args - Eg. postBuildActions({ pom: ..., artifactIds: ...})
+   *  'grep' for invocations in the code base to identify possible properties for args.
+   */
+  postBuildActions(args) {
     return "true";
   }
 }
