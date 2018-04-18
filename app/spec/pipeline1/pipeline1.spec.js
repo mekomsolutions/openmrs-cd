@@ -56,6 +56,13 @@ describe("Tests suite for pipeline1", function() {
     expect(jenkinsFile).toContain(
       "git url: " + config.varRepoUrl() + ", branch: " + config.varBranchName()
     );
+    expect(jenkinsFile).toContain(
+      "sh 'find . -mindepth 1 -maxdepth 2 -name pom.xml -exec xmllint --xpath \"//*[local-name()=\\'project\\']/*[local-name()=\\'artifactId\\']/text()\" {} \\\\; -exec echo \\\\; > $" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getArtifactIdListFileName() +
+        "'"
+    );
 
     // verif 'build' stage
     expect(jenkinsFile).toContain(
@@ -87,6 +94,54 @@ describe("Tests suite for pipeline1", function() {
         " $JENKINS_HOME/" +
         config.getArtifactRepoEnvvarsName() +
         "'"
+    );
+
+    // verif 'post-build' stage
+    expect(jenkinsFile).toContain(
+      "sh 'node /opt/app/src/$JOB_NAME/" +
+        config.getPostBuildJsScriptName() +
+        "'"
+    );
+    expect(jenkinsFile).toContain(
+      'def buildParamsPath = "${env.' +
+        config.varEnvvarBuildPath() +
+        "}/" +
+        config.getDownstreamBuildParamsJsonName() +
+        '"'
+    );
+    expect(jenkinsFile).toContain(
+      "def params = readJSON file: buildParamsPath"
+    );
+    expect(jenkinsFile).toContain(
+      "build job: '" + config.getJobNameForPipeline1() + "', wait: false"
+    );
+    expect(jenkinsFile).toContain(
+      "string(name: '" +
+        config.varProjectType() +
+        "', value: params[i]['" +
+        config.varProjectType() +
+        "'])"
+    );
+    expect(jenkinsFile).toContain(
+      "string(name: '" +
+        config.varBranchName() +
+        "', value: params[i]['" +
+        config.varBranchName() +
+        "'])"
+    );
+    expect(jenkinsFile).toContain(
+      "string(name: '" +
+        config.varRepoUrl() +
+        "', value: params[i]['" +
+        config.varRepoUrl() +
+        "'])"
+    );
+    expect(jenkinsFile).toContain(
+      "string(name: '" +
+        config.varRepoName() +
+        "', value: params[i]['" +
+        config.varRepoName() +
+        "'])"
     );
   });
 

@@ -63,6 +63,9 @@ module.exports = {
   varBuildDesc: function() {
     return "build_desc";
   },
+  varEnvvarBuildPath: function() {
+    return "BUILD_PATH";
+  },
 
   /**
    * The app data dir is where persistent data should be kept.
@@ -93,13 +96,13 @@ module.exports = {
   },
   getBuildDirPath: function() {
     // https://stackoverflow.com/a/48712627/321797
-    if (_.isEmpty(process.env.BUILD_PATH)) {
+    if (_.isEmpty(process.env[module.exports.varEnvvarBuildPath()])) {
       return path.resolve(
         process.env.JENKINS_HOME,
         module.exports.getRelativeBuildDirPath()
       );
     } else {
-      return process.env.BUILD_PATH;
+      return process.env[module.exports.varEnvvarBuildPath()];
     }
   },
   getBuildPomPath: function() {
@@ -127,6 +130,9 @@ module.exports = {
   },
   getBuildJsScriptName: function() {
     return "build.js";
+  },
+  getPostBuildJsScriptName: function() {
+    return "post-build.js";
   },
   getBuildShellScriptName: function() {
     return "build.sh";

@@ -22,6 +22,38 @@ describe("db", function() {
   const utils = require(path.resolve("src/utils/utils"));
   const cst = require(path.resolve("src/const"));
 
+  it("should ensure that db files are ready to be read from/written to.", function() {
+    // deps
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    const fsx = require("fs-extra");
+
+    // setup
+    var rndDirPath = path.resolve(
+      require("os").tmpdir(),
+      Math.random()
+        .toString(36)
+        .slice(-5)
+    );
+    var extraConfig = {};
+    extraConfig.getArtifactDependenciesConfigPath = function() {
+      return path.resolve(rndDirPath, "foo.json");
+    };
+    var stubs = tests.stubs(null, extraConfig);
+    const db = proxyquire(cst.DBPATH, stubs);
+
+    // replay
+    db.getAllArtifactDependencies();
+
+    // verif
+    expect(
+      fs.existsSync(extraConfig.getArtifactDependenciesConfigPath())
+    ).toBeTruthy();
+
+    // after
+    tests.cleanup();
+    fsx.removeSync(rndDirPath);
+  });
+
   it("should overwrite artifact build params.", function() {
     // setup
     const tests = require(path.resolve("spec/utils/testUtils"));

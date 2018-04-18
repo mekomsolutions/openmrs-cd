@@ -44,8 +44,8 @@
             <comparator class="hudson.util.CaseInsensitiveComparator"/>
           </default>
           <int>2</int>
-          <string></string>
-          <string></string>
+          <string>APP_DATA_DIR_PATH</string>
+          <string>$JENKINS_HOME/app_data</string>
           <string>BUILD_PATH</string>
           <string>$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER</string>
         </tree-map>

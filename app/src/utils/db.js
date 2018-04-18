@@ -1,6 +1,7 @@
 "use strict";
 
 const fs = require("fs");
+const mkdirp = require("mkdirp");
 const path = require("path");
 const log = require("npmlog");
 const _ = require("lodash");
@@ -183,6 +184,14 @@ var getAllObjects = function(domainName, dbFilePath) {
     "Fetching all objects in the data domain '" + domainName + "'..."
   );
 
+  // ensures the db file and its parent dir exist
+  if (!fs.existsSync(path.dirname(dbFilePath))) {
+    mkdirp.sync(path.dirname(dbFilePath));
+  }
+  if (!fs.existsSync(dbFilePath)) {
+    fs.writeFileSync(dbFilePath, JSON.stringify([]));
+  }
+
   var objects = JSON.parse(fs.readFileSync(dbFilePath, "utf8"));
 
   if (_.isEmpty(objects)) {
@@ -288,22 +297,4 @@ var saveObject = function(
   fs.writeFileSync(dbFilePath, JSON.stringify(objects, null, 2));
 
   return object;
-};
-
-var getAllArtifactDependencies = function() {
-  log.info("", "Fetching all artifacts dependencies.");
-
-  var allDeps = JSON.parse(
-    fs.readFileSync(config.getArtifactDependenciesConfigPath(), "utf8")
-  );
-
-  if (_.isEmpty(allDeps)) {
-    log.warn(
-      "",
-      "There are currently no artifacts dependencies saved in database."
-    );
-    allDeps = {};
-  }
-
-  return allDeps;
 };

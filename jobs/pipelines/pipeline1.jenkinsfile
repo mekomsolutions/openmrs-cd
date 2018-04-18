@@ -29,15 +29,18 @@ pipeline {
       steps {
         sh 'node /opt/app/src/$JOB_NAME/post-build.js'
         script {
-          params = readJSON file: 'env.BUILD_PATH/builds_params.json'
-          for (i = 0; i < params.size(); i++) {
-            build job: 'pipeline1', wait: false, parameters: \
+          def buildParamsPath = "${env.BUILD_PATH}/builds_params.json"
+          if (fileExists(buildParamsPath)) {
+            def params = readJSON file: buildParamsPath
+            for (i = 0; i < params.size(); i++) {
+              build job: 'pipeline1', wait: false, parameters: \
               [ \
                 string(name: 'projectType', value: params[i]['projectType']), \
                 string(name: 'repoUrl', value: params[i]['repoUrl']), \
                 string(name: 'repoName', value: params[i]['repoName']), \
                 string(name: 'branchName', value: params[i]['branchName']) \
               ]
+            }
           }
         }
       }
