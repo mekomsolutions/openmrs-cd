@@ -7,7 +7,7 @@ pipeline {
   stages {
     stage ('Project code checkout') {
       steps {
-        git url: repoUrl, branch: branchName
+        checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: repoUrl]], branches: [[name: branchName]]], poll: false
         sh 'find . -mindepth 1 -maxdepth 2 -name pom.xml -exec xmllint --xpath "//*[local-name()=\'project\']/*[local-name()=\'artifactId\']/text()" {} \\; -exec echo \\; > $BUILD_PATH/artifacts_ids.txt'
       }
     }

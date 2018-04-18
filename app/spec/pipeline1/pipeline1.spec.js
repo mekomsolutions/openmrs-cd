@@ -54,7 +54,11 @@ describe("Tests suite for pipeline1", function() {
 
     // verif 'checkout' stage
     expect(jenkinsFile).toContain(
-      "git url: " + config.varRepoUrl() + ", branch: " + config.varBranchName()
+      "checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: " +
+        config.varRepoUrl() +
+        "]], branches: [[name: " +
+        config.varBranchName() +
+        "]]], poll: false"
     );
     expect(jenkinsFile).toContain(
       "sh 'find . -mindepth 1 -maxdepth 2 -name pom.xml -exec xmllint --xpath \"//*[local-name()=\\'project\\']/*[local-name()=\\'artifactId\\']/text()\" {} \\\\; -exec echo \\\\; > $" +
