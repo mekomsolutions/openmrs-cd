@@ -71,6 +71,12 @@ var setMockConfig = function(extraConfig) {
       path.resolve("spec/webhook", "test_commit_metadata.json")
     );
   };
+  mockConfig.getBuildArtifactJsonPath = function() {
+    return prepareFile(
+      realConfig.getRelativeBuildDirPath(),
+      path.resolve("spec/utils/resources", "test_artifact_1.json")
+    );
+  };
   mockConfig.getWebhookTriggersFilePath = function() {
     return prepareFile(
       "tmp",
@@ -81,6 +87,12 @@ var setMockConfig = function(extraConfig) {
     return prepareFile(
       "app_data",
       path.resolve("spec/utils/resources", "test_instances_1.json")
+    );
+  };
+  mockConfig.getInstancesEventsDbPath = function() {
+    return prepareFile(
+      "app_data",
+      path.resolve("spec/utils/resources", "test_instances_events_1.json")
     );
   };
   mockConfig.getArtifactDependenciesConfigPath = function() {
@@ -98,7 +110,7 @@ var setMockConfig = function(extraConfig) {
   mockConfig.getArtifactIdListFilePath = function() {
     return prepareFile(
       realConfig.getRelativeBuildDirPath(),
-      path.resolve("spec/pipeline1/resources", "test_artifacts_ids1.txt")
+      path.resolve("spec/pipeline1/resources", "test_artifacts_ids_1.txt")
     );
   };
 

@@ -1,0 +1,20 @@
+[
+  {
+    "uuid": "8e640adc-03ab-43cb-850f-d4835d0a8320",
+    "name": "westeros-staging-2",
+    "type": "staging",
+    "artifacts": [
+      {
+        "type": "maven",
+        "value": {
+          "groupId": "net.mekomsolutions",
+          "artifactId": "openmrs-distro-westeros",
+          "version": "2.1.0",
+          "packaging": "zip"
+        }
+      }
+    ],
+    "updated": "2018-04-20T17:41:01.584Z",
+    "created": "2018-03-20T17:41:01.584Z"
+  }
+]

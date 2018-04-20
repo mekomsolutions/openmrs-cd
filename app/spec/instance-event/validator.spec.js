@@ -85,7 +85,7 @@ describe("The instances config validator", function() {
     }).not.toThrow();
   });
 
-  it("should validate instances artifacts section.", function() {
+  it("should validate an instances artifacts section.", function() {
     // deps
     const model = require(path.resolve("src/models/model"));
 
@@ -93,56 +93,30 @@ describe("The instances config validator", function() {
     var _script_ = require(fileInTest);
 
     // verif
+    expect(_script_.validateArtifactSection(null)).toBeTruthy();
+    expect(_script_.validateArtifactSection(undefined)).toBeTruthy();
+    expect(_script_.validateArtifactSection({})).toBeTruthy();
+
     expect(function() {
-      _script_.validateArtifactsConfig(null, false);
-    }).not.toThrow();
-    expect(function() {
-      _script_.validateArtifactsConfig(null, true);
+      _script_.validateArtifactSection({
+        type: ""
+      });
     }).toThrow();
     expect(function() {
-      _script_.validateArtifactsConfig(undefined, false);
-    }).not.toThrow();
-    expect(function() {
-      _script_.validateArtifactsConfig(undefined, true);
+      _script_.validateArtifactSection({
+        type: "foobar"
+      });
     }).toThrow();
     expect(function() {
-      _script_.validateArtifactsConfig({}, false);
-    }).not.toThrow();
-    expect(function() {
-      _script_.validateArtifactsConfig({}, true);
+      _script_.validateArtifactSection({
+        type: "maven"
+      });
     }).toThrow();
     expect(function() {
-      _script_.validateArtifactsConfig(
-        {
-          type: ""
-        },
-        true
-      );
-    }).toThrow();
-    expect(function() {
-      _script_.validateArtifactsConfig(
-        {
-          type: "foobar"
-        },
-        true
-      );
-    }).toThrow();
-    expect(function() {
-      _script_.validateArtifactsConfig(
-        {
-          type: "maven"
-        },
-        true
-      );
-    }).toThrow();
-    expect(function() {
-      _script_.validateArtifactsConfig(
-        {
-          type: "maven",
-          value: new model.MavenProject()
-        },
-        true
-      );
+      _script_.validateArtifactSection({
+        type: "maven",
+        value: new model.MavenProject()
+      });
     }).not.toThrow();
   });
 });

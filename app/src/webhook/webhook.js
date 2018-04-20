@@ -22,17 +22,19 @@ const utils = require("../utils/utils");
 const payloadParser = require("./impl/" + process.env.scmService);
 
 var commitMetadata = payloadParser.parsePayload(process.env.payload);
-commitMetadata.projectType = process.env.projectType;
+commitMetadata[config.varProjectType()] = process.env[config.varProjectType()];
 
-// For downstream reuse:
+// For downstream trigger reuse:
 fs.writeFileSync(
-  config.getTempDirPath() + "/commit_metadata.env",
+  // as envvars
+  config.getCommitMetadataFileEnvvarsPath(),
   utils.convertToEnvVar(commitMetadata)
-); // as envvars
+);
 fs.writeFileSync(
+  // and ALSO as a JSON file
   config.getCommitMetadataFilePath(),
   JSON.stringify(commitMetadata)
-); // and ALSO as a JSON file
+);
 
 log.info(
   "",

@@ -249,9 +249,8 @@ describe("db", function() {
     instances = JSON.parse(
       fs.readFileSync(config.getInstancesConfigPath(), "utf8")
     );
-    var beforeInstance = utils.findInstanceInList(
-      instance.uuid,
-      instance.name,
+    var beforeInstance = utils.findObject(
+      { uuid: instance.uuid, name: instance.name },
       instances
     );
     expect(beforeInstance).not.toEqual({});
@@ -297,9 +296,8 @@ describe("db", function() {
     instances = JSON.parse(
       fs.readFileSync(config.getInstancesConfigPath(), "utf8")
     );
-    var instance = utils.findInstanceInList(
-      instance.uuid,
-      instance.name,
+    var instance = utils.findObject(
+      { uuid: instance.uuid, name: instance.name },
       instances
     );
     expect(instance).not.toEqual({});

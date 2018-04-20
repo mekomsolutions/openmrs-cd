@@ -1,16 +1,22 @@
 "use strict";
 
-describe("Post build", function() {
+describe("Script triggering downstream builds", function() {
   const fs = require("fs");
   const path = require("path");
   const proxyquire = require("proxyquire");
 
   const cst = require(path.resolve("src/const"));
 
-  it("should analyze and process distributions POM files.", function() {
+  it("should save a distribution build parameters.", function() {
+    //
+    // deps
+    //
     const tests = require(path.resolve("spec/utils/testUtils"));
+    const utils = require(path.resolve("src/utils/utils"));
 
+    //
     // setup
+    //
     var extraConfig = {};
     extraConfig.getBuildPomPath = function() {
       return path.resolve(
@@ -36,13 +42,34 @@ describe("Post build", function() {
     process.env[config.varRepoName()] = "openmrs-distro-cambodia";
     process.env[config.varBranchName()] = "master";
 
+    // fitting the Maven project information to the current project type
+    var pom = utils.getPom(config.getBuildPomPath());
+    var artifact = {
+      mavenProject: {
+        groupId: pom.artifactId,
+        artifactId: pom.groupId,
+        version: pom.version
+      }
+    };
+    fs.writeFileSync(
+      config.getBuildArtifactJsonPath(),
+      JSON.stringify(artifact, null, 2)
+    );
+    fs.writeFileSync(config.getArtifactIdListFilePath(), []);
+
+    //
     // replay
+    //
     proxyquire(
-      path.resolve("src/" + config.getJobNameForPipeline1() + "/post-build.js"),
+      path.resolve(
+        "src/" + config.getJobNameForPipeline1() + "/downstream-builds.js"
+      ),
       stubs
     );
 
+    //
     // verif
+    //
     var deps = db.getArtifactDependencies(
       "net.mekomsolutions|openmrs-distro-cambodia|1.1.0-SNAPSHOT"
     );
@@ -76,15 +103,22 @@ describe("Post build", function() {
     expect(params[config.varRepoName()]).toEqual("openmrs-distro-cambodia");
     expect(params[config.varBranchName()]).toEqual("master");
 
+    //
     // after
+    //
     tests.cleanup();
   });
 
-  it("should analyze and process non-distributions POM files.", function() {
+  it("should identify dependent artifacts and save their build parameters for further pipeline steps.", function() {
+    //
     // deps
+    //
     const tests = require(path.resolve("spec/utils/testUtils"));
+    const utils = require(path.resolve("src/utils/utils"));
 
+    //
     // setup
+    //
     var extraConfig = {};
     extraConfig.getBuildPomPath = function() {
       return path.resolve(
@@ -112,13 +146,33 @@ describe("Post build", function() {
     process.env[config.varRepoName()] = "bahmni-core";
     process.env[config.varBranchName()] = "master";
 
+    // fitting the Maven project information to the current project type
+    var pom = utils.getPom(config.getBuildPomPath());
+    var artifact = {
+      mavenProject: {
+        groupId: pom.artifactId,
+        artifactId: pom.groupId,
+        version: pom.version
+      }
+    };
+    fs.writeFileSync(
+      config.getBuildArtifactJsonPath(),
+      JSON.stringify(artifact, null, 2)
+    );
+
+    //
     // replay
+    //
     proxyquire(
-      path.resolve("src/" + config.getJobNameForPipeline1() + "/post-build.js"),
+      path.resolve(
+        "src/" + config.getJobNameForPipeline1() + "/downstream-builds.js"
+      ),
       stubs
     );
 
+    //
     // verif
+    //
     var buildParams = JSON.parse(
       fs.readFileSync(config.getDownstreamBuildParamsJsonPath(), "utf-8")
     );
@@ -132,7 +186,9 @@ describe("Post build", function() {
     expect(params.repoName).toEqual("openmrs-distro-cambodia");
     expect(params.branchName).toEqual("INFRA-111");
 
+    //
     // after
+    //
     tests.cleanup();
   });
 

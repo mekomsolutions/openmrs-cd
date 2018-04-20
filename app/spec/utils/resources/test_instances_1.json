@@ -7,15 +7,26 @@
     "name": "cambodia-dev-1",
     "description": "Dev server for agile development on the ODC.",
     "type": "dev",
-    "artifacts": {
-      "type": "maven",
-      "value": {
-        "groupId": "net.mekomsolutions",
-        "artifactId": "openmrs-distro-cambodia",
-        "version": "1.0.0-SNAPSHOT",
-        "packaging": "zip"
+    "artifacts": [
+      {
+        "type": "maven",
+        "value": {
+          "groupId": "net.mekomsolutions",
+          "artifactId": "openmrs-distro-cambodia",
+          "version": "1.1.0-SNAPSHOT",
+          "packaging": "zip"
+        }
+      },
+      {
+        "type": "maven",
+        "value": {
+          "groupId": "net.mekomsolutions",
+          "artifactId": "foo-bar-arty",
+          "version": "2.0.0-SNAPSHOT",
+          "packaging": "jar"
+        }
       }
-    },
+    ],
     "deployment": {
       "type": "docker",
       "value": {
@@ -37,15 +48,17 @@
     "name": "cambodia-staging-1",
     "description": "Dev server for agile development on the ODC.",
     "type": "staging",
-    "artifacts": {
-      "type": "maven",
-      "value": {
-        "groupId": "net.mekomsolutions",
-        "artifactId": "openmrs-distro-cambodia",
-        "version": "1.0.0",
-        "packaging": "zip"
+    "artifacts": [
+      {
+        "type": "maven",
+        "value": {
+          "groupId": "net.mekomsolutions",
+          "artifactId": "openmrs-distro-cambodia",
+          "version": "1.0.0",
+          "packaging": "zip"
+        }
       }
-    },
+    ],
     "deployment": {
       "type": "docker",
       "value": {

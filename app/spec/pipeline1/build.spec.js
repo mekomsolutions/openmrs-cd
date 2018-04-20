@@ -41,12 +41,12 @@ describe("Project build script", function() {
     );
 
     // verif
-    expect(
-      fs.readFileSync(process.env.WORKSPACE + "/build.sh", "utf8")
-    ).toEqual("__build_script__");
-    expect(
-      fs.readFileSync(process.env.WORKSPACE + "/deploy.sh", "utf8")
-    ).toEqual("__deploy_script__");
+    expect(fs.readFileSync(config.getBuildShellScriptPath(), "utf8")).toEqual(
+      "__build_script__"
+    );
+    expect(fs.readFileSync(config.getDeployShellScriptPath(), "utf8")).toEqual(
+      "__deploy_script__"
+    );
 
     // after
     tests.cleanup();

@@ -12,16 +12,49 @@ const config = require(cst.CONFIGPATH);
 const utils = require("../utils/utils");
 
 // Covered data domains names/desc listed here (those are used for logging only)
-const DM_INSTANCES = "Instances Definitions";
+const DM_INSTDEFS = "Instances Definitions";
+const DM_INSEVENTS = "Instances Events";
 const DM_DEPS = "Artifacts Dependencies";
 const DM_BUILDPARAMS = "Artifacts Builds Params";
 
 module.exports = {
   /*
+   * Saves an instance event to the database.
+   *
+   * @param {Object} instanceEvent - The instance event to save.
+   *    This is typically part of an instance definition.
+   *
+   * @return The updated version of the instance event.
+   */
+  saveInstanceEvent: function(instanceEvent) {
+    var keyPairs = {
+      name: instanceEvent.name,
+      uuid: instanceEvent.uuid
+    };
+    return saveObject(
+      DM_INSEVENTS,
+      config.getInstancesEventsDbPath(),
+      instanceEvent,
+      keyPairs,
+      false,
+      null
+    );
+  },
+
+  /*
+   * Gets all instances definitions from database.
+   *
+   * @return [] if no instances definitions are found.
+   */
+  getAllInstancesDefinitions: function() {
+    return getAllObjects(DM_INSTDEFS, config.getInstancesConfigPath());
+  },
+
+  /*
    * Gets an instance definition from database.
    *
-   * @param {string} uuid - The instance definition UUID.
-   * @param {string} name - The instance definition name.
+   * @param {String} uuid - The instance definition UUID.
+   * @param {String} name - The instance definition name.
    * 
    * @return {} if instance definition is not found.
    */
@@ -33,16 +66,16 @@ module.exports = {
     if (!_.isEmpty(name)) {
       keyPairs["name"] = name;
     }
-    return getObject(DM_INSTANCES, config.getInstancesConfigPath(), keyPairs);
+    return getObject(DM_INSTDEFS, config.getInstancesConfigPath(), keyPairs);
   },
 
   /*
    * Saves an instance definition to the database.
    *
-   * @param {object} instance - The instance definition to save.
+   * @param {Object} instance - The instance definition to save.
    *    This could be an partial/incomplete instance definition (eg. and 'instance event').
    *    If applicable the instance UUID will be set.
-   * @param {string} status - The new instance status (for auditing).
+   * @param {String} status - The new instance status (for auditing).
    *
    * @return The complete updated version of the instance definition.
    */
@@ -52,7 +85,7 @@ module.exports = {
       uuid: instanceToSave.uuid || uuid()
     };
     return saveObject(
-      DM_INSTANCES,
+      DM_INSTDEFS,
       config.getInstancesConfigPath(),
       instanceToSave,
       keyPairs,
@@ -64,12 +97,12 @@ module.exports = {
   /*
    * Remove an instance definition from the database.
    *
-   * @param {string} uuid - The instance definition UUID.
+   * @param {String} uuid - The instance definition UUID.
    */
   deleteInstanceDefinition: function(uuid) {
     var keyPairs = { uuid: uuid };
     saveObject(
-      DM_INSTANCES,
+      DM_INSTDEFS,
       config.getInstancesConfigPath(),
       null,
       keyPairs,
@@ -90,7 +123,7 @@ module.exports = {
   /*
    * Get the dependencies for a given artifact.
    *
-   * @param {string} artifactKey - The artifact key of the artifact whose dependencies are being updated (in practice: a distribution artifact.)
+   * @param {String} artifactKey - The artifact key of the artifact whose dependencies are being updated (in practice: a distribution artifact.)
    *
    * @return Its dependencies as an embedded list of artifact keys.
    *  Eg.   var deps = db.getArtifactDependencies("net.mekomsolutions|openmrs-distro-cambodia|1.1.0-SNAPSHOT");
@@ -108,8 +141,8 @@ module.exports = {
   /*
    * Overwrites an artifact list of dependencies.
    *
-   * @param {string} artifactKey - The artifact key of the artifact whose dependencies are being updated (in practice: a distribution artifact.)
-   * @param {array} dependenciesToSave - The dependencies as an array of artifact keys.
+   * @param {String} artifactKey - The artifact key of the artifact whose dependencies are being updated (in practice: a distribution artifact.)
+   * @param {Array} dependenciesToSave - The dependencies as an array of artifact keys.
    *
    * @return The saved dependencies.
    */
@@ -132,8 +165,8 @@ module.exports = {
   /*
    * Overwrites the last used build parameters for an artifact.
    *
-   * @param {string} artifactKey - The artifact key of the artifact whose last build params are being updated (in practice: a distribution artifact.)
-   * @param {array} buildParams - The build parameters.
+   * @param {String} artifactKey - The artifact key of the artifact whose last build params are being updated (in practice: a distribution artifact.)
+   * @param {Array} buildParams - The build parameters.
    *
    * @return The saved build parameters.
    */
@@ -156,7 +189,7 @@ module.exports = {
   /*
    * Get the last used build parameters for an artifact.
    *
-   * @param {string} artifactKey - The artifact key of the artifact whose last build params are being fetched (in practice: a distribution artifact.)
+   * @param {String} artifactKey - The artifact key of the artifact whose last build params are being fetched (in practice: a distribution artifact.)
    *
    * @return The build parameters.
    */
@@ -173,8 +206,8 @@ module.exports = {
 /*
  * Fetches all objects for a data domain.
  *
- * @param {string} domainName - A description string for the data domain. Eg. "Instance Definitions", "Artifact Build Params", ... etc.
- * @param {string} dbFilePath - The path to the DB-file for the data domain.
+ * @param {String} domainName - A description string for the data domain. Eg. "Instance Definitions", "Artifact Build Params", ... etc.
+ * @param {String} dbFilePath - The path to the DB-file for the data domain.
  *
  * @return An array of all objects saved for the data domain.
  */
@@ -201,7 +234,7 @@ var getAllObjects = function(domainName, dbFilePath) {
         domainName +
         "' saved in database."
     );
-    objects = {};
+    objects = [];
   }
 
   return objects;
@@ -210,9 +243,9 @@ var getAllObjects = function(domainName, dbFilePath) {
 /*
  * Fetches an object based on primary keys in a data domain.
  *
- * @param {string} domainName - A description string for the data domain. Eg. "Instance Definitions", "Artifact Build Params", ... etc.
- * @param {string} dbFilePath - The path to the DB-file for the data domain.
- * @param {object} keyPairs - A key-value map primary key name <-> primary key value to identify the object to fetch.
+ * @param {String} domainName - A description string for the data domain. Eg. "Instance Definitions", "Artifact Build Params", ... etc.
+ * @param {String} dbFilePath - The path to the DB-file for the data domain.
+ * @param {Object} keyPairs - A key-value map primary key name <-> primary key value to identify the object to fetch.
  *    Eg. {"uuid": "9f6abb06-895a-479b-b4d6-fd1111aef011"}
  *
  * @return The matched object in the data domain.
@@ -240,14 +273,14 @@ var getObject = function(domainName, dbFilePath, keyPairs) {
 /*
  * Saves an object in a data domain.
  *
- * @param {string} domainName - A description string for the data domain. Eg. "Instance Definitions", "Artifact Build Params", ... etc.
- * @param {string} dbFilePath - The path to the DB-file for the data domain.
- * @param {object} object - A new object to save or update, null to delete an object.
+ * @param {String} domainName - A description string for the data domain. Eg. "Instance Definitions", "Artifact Build Params", ... etc.
+ * @param {String} dbFilePath - The path to the DB-file for the data domain.
+ * @param {Object} object - A new object to save or update, null to delete an object.
  *  IMPORTANT: provide a 'null' object to delete an object identified by the key pairs.
- * @param {object} keyPairs - A key-value map primary key name <-> primary key value to identify the object to fetch.
+ * @param {Object} keyPairs - A key-value map primary key name <-> primary key value to identify the object to fetch.
  *    Eg. {"uuid": "9f6abb06-895a-479b-b4d6-fd1111aef011"} or {"uuid": "9f6abb06-895a-479b-b4d6-fd1111aef011", "name": "my-new-object-1"}
- * @param {boolean} override - Set to true to override existing objects, false to updated exisiting objects.
- * @param {string} status - An audit status. Eg. "Created".
+ * @param {boolean} override - Set to true to override existing objects, false to update exisiting objects.
+ * @param {String} status - An audit status. Eg. "Created".
  *
  * @return The saved/updated object in the data domain.
  */

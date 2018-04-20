@@ -2,15 +2,17 @@
   "name": "walhalla-staging",
   "description": "Staging server for the Walhalla distro.",
   "type": "staging",
-  "artifacts": {
-    "type": "maven",
-    "value": {
-      "groupId": "net.mekomsolutions",
-      "artifactId": "openmrs-distro-walhalla",
-      "version": "1.0.0",
-      "packaging": "zip"
+  "artifacts": [
+    {
+      "type": "maven",
+      "value": {
+        "groupId": "net.mekomsolutions",
+        "artifactId": "openmrs-distro-walhalla",
+        "version": "1.0.0",
+        "packaging": "zip"
+      }
     }
-  },
+  ],
   "deployment": {
     "type": "docker",
     "value": {

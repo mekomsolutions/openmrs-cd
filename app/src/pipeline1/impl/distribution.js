@@ -57,23 +57,19 @@ var postBuildActions = function(pom) {
       dep.version = propVal;
     }
 
-    var mavenProject = new model.MavenProject(
-      dep.groupId,
-      dep.artifactId,
-      dep.version
-    );
-    deps.push(mavenProject.asArtifactKey());
+    deps.push(utils.toArtifactKey(dep.groupId, dep.artifactId, dep.version));
   });
 
-  //
-  //  Saving/updating the list of dependencies in database.
-  //
-  var project = new model.MavenProject(
+  var artifactKey = utils.toArtifactKey(
     pom.groupId,
     pom.artifactId,
     pom.version
   );
-  db.saveArtifactDependencies(project.asArtifactKey(), deps);
+
+  //
+  //  Saving/updating the list of dependencies in database.
+  //
+  db.saveArtifactDependencies(artifactKey, deps);
 
   //
   //  Keeping track of the params of the latest built job (the current one).
@@ -84,5 +80,5 @@ var postBuildActions = function(pom) {
     config.varRepoName(),
     config.varBranchName()
   ]);
-  db.saveArtifactBuildParams(project.asArtifactKey(), buildJobParams);
+  db.saveArtifactBuildParams(artifactKey, buildJobParams);
 };

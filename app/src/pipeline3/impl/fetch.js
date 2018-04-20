@@ -4,10 +4,10 @@ module.exports = {
   /*
    * Generates a script that fetches an instance's artifacts to save them a specified location.
    * 
-   * @param {object} artifacts - The 'artifacts' part of the instance definition.
-   * @param {string} destPath - The destination part where to save the fecthed artifacts.
+   * @param {object} artifact - An 'artifact' section of the artifacts part of the instance definition.
+   * @param {string} destPath - The destination part where to save the fecthed artifact.
    */
-  getFetchArtifactsScript: function(artifacts, destPath) {
+  getFetchArtifactScript: function(artifact, destPath) {
     var script = "";
 
     script += "mkdir -p " + destPath;
@@ -15,18 +15,18 @@ module.exports = {
     script += "rm -rf " + destPath + "/*";
     script += "\n";
 
-    if (artifacts.type === "maven") {
+    if (artifact.type === "maven") {
       script +=
         "mvn dependency:unpack" +
         " " +
         "-Dartifact=" +
-        artifacts.value.groupId +
+        artifact.value.groupId +
         ":" +
-        artifacts.value.artifactId +
+        artifact.value.artifactId +
         ":" +
-        artifacts.value.version +
+        artifact.value.version +
         ":" +
-        artifacts.value.packaging +
+        artifact.value.packaging +
         " " +
         "-DoutputDirectory=" +
         destPath;

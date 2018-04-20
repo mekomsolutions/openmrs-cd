@@ -7,6 +7,7 @@ const _ = require("lodash");
 const XML = require("pixl-xml");
 
 const model = require("../models/model");
+const utils = require("../utils/utils");
 const cst = require("../const");
 const config = require(cst.CONFIGPATH);
 const db = require(cst.DBPATH);
@@ -99,28 +100,51 @@ module.exports = {
    * 
    */
   mavenPostBuildActions: function(groupId, artifactsIds, version) {
-    var allDeps = db.getAllArtifactDependencies();
     var impactedArtifacts = [];
 
+    // Looking for all artifacts that depend on those of the current project
+    var allDeps = db.getAllArtifactDependencies();
     artifactsIds.forEach(function(artifactId) {
-      var project = new model.MavenProject(groupId, artifactId, version, "zzz");
+      var artifactKey = utils.toArtifactKey(groupId, artifactId, version);
       allDeps.forEach(function(deps) {
-        if (deps.dependencies.indexOf(project.asArtifactKey()) > -1) {
+        if (deps.dependencies.indexOf(artifactKey) > -1) {
           impactedArtifacts.push(deps.artifactKey);
         }
       });
     });
     impactedArtifacts = _.uniq(impactedArtifacts);
 
+    // Fetching the build parameters of the impacted artifacts
     var params = [];
     impactedArtifacts.forEach(function(artifactKey) {
       var buildParams = db.getArtifactBuildParams(artifactKey);
       params.push(buildParams["buildParams"]);
     });
-
     fs.writeFileSync(
+      // saving them to a file specific to the current build
       config.getDownstreamBuildParamsJsonPath(),
       JSON.stringify(params)
     );
+  },
+
+  getMavenArtifactIds: function(artifactsIdsFilePath) {
+    var artifactsIds = [];
+    try {
+      // artifacts IDs of all the Maven (sub)modules found, so one per POM found
+      // there won't be anything gathered here for POM-less projects (eg. Bahmni Apps... etc)
+      artifactsIds = fs
+        .readFileSync(artifactsIdsFilePath, "utf-8")
+        .toString()
+        .split("\n");
+
+      artifactsIds = artifactsIds.filter(Boolean);
+    } catch (err) {
+      log.warn(
+        "",
+        "No artifacts IDs were extracted out of the POM files, is this not a Maven project?"
+      );
+      log.warn("", JSON.stringify(err, null, 2));
+    }
+    return artifactsIds;
   }
 };

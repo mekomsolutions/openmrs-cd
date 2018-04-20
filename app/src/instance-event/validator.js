@@ -16,8 +16,29 @@ const NEW_FLAG_MISSING_MSG =
 module.exports = {
   validateInstanceDefinition: function(instanceDef, isNew) {
     module.exports.validateBaseConfig(instanceDef, isNew);
+
     module.exports.validateDeploymentConfig(instanceDef.deployment, isNew);
-    module.exports.validateArtifactsConfig(instanceDef.artifacts, isNew);
+
+    if (
+      isNew &&
+      _.isEmpty(instanceDef.artifacts || !_.isArray(instanceDef.artifacts))
+    ) {
+      throw new Error(
+        "The artifacts section did not contain enough information to proceed further with the instance, aborting."
+      );
+    }
+    var allArtifactsEmpty = true;
+    instanceDef.artifacts.forEach(function(artifact) {
+      allArtifactsEmpty &= module.exports.validateArtifactSection(
+        artifact,
+        isNew
+      );
+    });
+    if (isNew && allArtifactsEmpty) {
+      throw new Error(
+        "No artifacts were provided preventing to proceed further with the instance, aborting."
+      );
+    }
   },
 
   validateBaseConfig: function(instanceDef, isNew) {
@@ -80,37 +101,29 @@ module.exports = {
     }
   },
 
-  validateArtifactsConfig: function(artifacts, isNew) {
-    if (_.isUndefined(isNew)) {
-      throw new Error(NEW_FLAG_MISSING_MSG);
+  validateArtifactSection: function(artifact) {
+    if (_.isEmpty(artifact)) {
+      return true;
+    }
+    if (!artifact.type || _.isEmpty(artifact.value)) {
+      log.error("", "Illegal argument: the artifact section is malformed.");
+      throw new Error();
     }
 
-    var empty =
-      _.isEmpty(artifacts) || !artifacts.type || _.isEmpty(artifacts.value);
-    if (isNew && empty) {
+    if (config.getInstanceArtifactsTypes().indexOf(artifact.type) < 0) {
       throw new Error(
-        "The artifacts section did not contain enough information to proceed further with the instance, aborting."
-      );
-    }
-
-    if (
-      !empty &&
-      config.getInstanceArtifactsTypes().indexOf(artifacts.type) < 0
-    ) {
-      throw new Error(
-        "The instance artifacts type is either not recognized or not supported: '" +
-          artifacts.type +
+        "The artifact type is either not recognized or not supported: '" +
+          artifact.type +
           "'"
       );
     }
 
-    if (!empty) {
-      // validating the actual config based on its type
-      module.exports.getConfigValidatorsMap()[artifacts.type](artifacts.value);
-    }
+    module.exports.getConfigValidatorsMap()[artifact.type](artifact.value);
+
+    return false;
   },
 
-  validateMavenArtifactsConfigValue: function(value) {
+  validateMavenArtifactConfigValue: function(value) {
     if (
       JSON.stringify(Object.keys(value).sort()) !==
       JSON.stringify(Object.keys(new model.MavenProject()).sort())
@@ -130,7 +143,7 @@ module.exports = {
 
   getConfigValidatorsMap: function() {
     return {
-      maven: module.exports.validateMavenArtifactsConfigValue,
+      maven: module.exports.validateMavenArtifactConfigValue,
       docker: module.exports.validateDockerDeploymentConfigValue
     };
   }

@@ -53,35 +53,29 @@ var artifact = projectBuild.getArtifact({
 // Retrieve the script to build the projectBuild
 var buildScript = projectBuild.getBuildScript();
 fs.writeFileSync(
-  process.env.WORKSPACE + "/" + config.getBuildShellScriptName(),
+  config.getBuildShellScriptPath(),
   utils.getScriptAsString(buildScript)
 );
-fs.chmodSync(
-  process.env.WORKSPACE + "/" + config.getBuildShellScriptName(),
-  "0755"
-);
+fs.chmodSync(config.getBuildShellScriptPath(), "0755");
 
 //
 // Retrieve the script to deploy the projectBuild
 //
 var deployScript = projectBuild.getDeployScript(artifact);
 fs.writeFileSync(
-  process.env.WORKSPACE + "/" + config.getDeployShellScriptName(),
+  config.getDeployShellScriptPath(),
   utils.getScriptAsString(deployScript)
 );
-fs.chmodSync(
-  process.env.WORKSPACE + "/" + config.getDeployShellScriptName(),
-  "0755"
-);
+fs.chmodSync(config.getDeployShellScriptPath(), "0755");
 
 //
-// Export the artifact info in order for the pipeline and other jobs to use it
+// Export the whole artifact for further steps & stages
 //
 fs.writeFileSync(
-  config.getChangedArtifactEnvvarsPath(),
+  config.getBuildArtifactEnvvarsPath(),
   utils.convertToEnvVar(artifact)
 );
 fs.writeFileSync(
-  config.getChangedArtifactJsonPath(),
+  config.getBuildArtifactJsonPath(),
   JSON.stringify(artifact, null, 2)
 );

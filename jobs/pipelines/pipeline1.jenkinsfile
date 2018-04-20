@@ -5,29 +5,29 @@ pipeline {
     nodejs 'NodeJS 8.6.0'
   }
   stages {
-    stage ('Project code checkout') {
+    stage ('Checkout the code and identify all Maven artifacts') {
       steps {
         checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: repoUrl]], branches: [[name: branchName]]], poll: false
         sh 'find . -mindepth 1 -maxdepth 2 -name pom.xml -exec xmllint --xpath "//*[local-name()=\'project\']/*[local-name()=\'artifactId\']/text()" {} \\; -exec echo \\; > $BUILD_PATH/artifacts_ids.txt'
       }
     }
-    stage ('Project build') {
+    stage ('Build the project') {
       steps {
         sh 'node /opt/app/src/$JOB_NAME/build.js /tmp/commit_metadata.json'
-        sh 'cat $WORKSPACE/build.sh'
-        sh '$WORKSPACE/build.sh'
-        sh '. /tmp/artifact.env ; mv $WORKSPACE/$buildPath/$filename $WORKSPACE/$destFilename'
+        sh 'cat $BUILD_PATH/build.sh'
+        sh '$BUILD_PATH/build.sh'
+        sh '. $BUILD_PATH/artifact.env ; mv $WORKSPACE/$buildPath/$filename $WORKSPACE/$destFilename'
       }
     }
-    stage ('Artifact deployment') {
+    stage ('Deploy the built artifacts to their repository') {
       steps {
-        sh 'cat $WORKSPACE/deploy.sh'
-        sh '$WORKSPACE/deploy.sh $JENKINS_HOME/artifact_repository.env'
+        sh 'cat $BUILD_PATH/deploy.sh'
+        sh '$BUILD_PATH/deploy.sh $JENKINS_HOME/artifact_repository.env'
       }
     }
-    stage ('Post-processing') {
+    stage ('Trigger possible downstream builds and/or save the current build parameters') {
       steps {
-        sh 'node /opt/app/src/$JOB_NAME/post-build.js'
+        sh 'node /opt/app/src/$JOB_NAME/downstream-builds.js'
         script {
           def buildParamsPath = "${env.BUILD_PATH}/builds_params.json"
           if (fileExists(buildParamsPath)) {
@@ -43,6 +43,11 @@ pipeline {
             }
           }
         }
+      }
+    }
+    stage ('Identify impacted instances and append instances events log') {
+      steps {
+        sh 'node /opt/app/src/$JOB_NAME/identify-instances.js'
       }
     }
   }

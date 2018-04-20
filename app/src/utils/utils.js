@@ -9,6 +9,36 @@ const XML = require("pixl-xml");
 const model = require("../models/model");
 
 module.exports = {
+  /**
+   * Based on the Maven model where an artifact belongs to a group and is given a version,
+   * this method builds a unique 'artifact key'.
+   * Examples:  "org.openmrs.module|uicommons-omod|2.3.0"
+   *            "net.mekomsolutions|openmrs-distro-cambodia|1.1.0-SNAPSHOT"
+   *            "net.mekomsolutions|bahmniapps|a63f511"
+   */
+  toArtifactKey: function(groupId, artifactId, version) {
+    return groupId + "|" + artifactId + "|" + version;
+  },
+
+  /**
+   * Reverses toArtifactKey, see above.
+   */
+  fromArtifactKey: function(artifactKey) {
+    if (_.isEmpty(artifactKey)) {
+      throw new Error("Illegal argument: empty artifact key.");
+    }
+    var parts = artifactKey.split("|");
+    if (parts.length !== 3) {
+      throw new Error("Illegal argument: malformed artifact key.");
+    }
+    var pom = {
+      groupId: parts[0],
+      artifactId: parts[1],
+      version: parts[2]
+    };
+    return pom;
+  },
+
   escapeForEnvVars: function(str) {
     return str
       .replace(/(\s+)/g, "\\$1")
@@ -71,27 +101,6 @@ module.exports = {
     return pom;
   },
 
-  sortByArtifact: function(dependenciesByServer) {
-    var dependenciesByArtifact = {};
-
-    for (var property in dependenciesByServer) {
-      if (dependenciesByServer.hasOwnProperty(property)) {
-        var dependenciesForAServer =
-          dependenciesByServer[property].dependencies;
-        for (var i = 0; i < dependenciesForAServer.length; i++) {
-          var dep = dependenciesForAServer[i];
-          var key = dep.groupId + "." + dep.artifactId + "_" + dep.version;
-          if (dependenciesByArtifact.hasOwnProperty(key)) {
-            dependenciesByArtifact[key].push(property);
-          } else {
-            dependenciesByArtifact[key] = [property];
-          }
-        }
-      }
-    }
-    return dependenciesByArtifact;
-  },
-
   getScriptAsString: function(script) {
     if (script instanceof model.Script !== true) {
       throw new Error("Illegal argument: must be a script object.");
@@ -114,109 +123,6 @@ module.exports = {
       asString = asString.replace(new RegExp(LINE_BREAKS + "$"), "finish"); // https://stackoverflow.com/a/2729681/321797
     }
     return asString;
-  },
-
-  /*
-   * identifies the servers that have a dependency on the 'artifact' and updates the 'history' 
-   */
-  setMatchingServersAndUpdateHistory: function(
-    dependencies,
-    history,
-    serverEvent
-  ) {
-    var artifact = serverEvent.artifact;
-    var suffix = artifact.mavenProject.module
-      ? "-" + artifact.mavenProject.module
-      : "";
-    var key =
-      artifact.mavenProject.groupId +
-      "." +
-      artifact.mavenProject.artifactId +
-      suffix +
-      "_" +
-      artifact.mavenProject.version;
-
-    var servers = module.exports.getServersByArtifactKey(dependencies, key);
-
-    if (servers) {
-      for (var server of servers) {
-        if (history[server]) {
-          history[server].serverEvents.push(serverEvent);
-        } else {
-          history[server] = {
-            serverEvents: []
-          };
-          history[server].serverEvents.push(serverEvent);
-        }
-      }
-    } else {
-      log.warn(
-        "",
-        "No server was found that matches the provided artifact: " + key
-      );
-      console.dir(serverEvent);
-    }
-  },
-
-  /**
-   * Artifact keys are strings such as 'org.openmrs.module.mksreports_1.1.1-SNAPSHOT', 'org.openmrs.module.metadatasharing-omod_1.2.2', ...
-   * So a concatenation of group ID + artifact ID + version.
-   *
-   * @param {String} serversByArtifactKeys, a map with keys=artifact keys and values=servers running affected by those artifact keys
-   * @param {String} artifactKey, an artifact key to match
-   *
-   * @return {String Array} An array of the servers affected by the input artifact key
-   */
-  getServersByArtifactKey: function(serversByArtifactKeys, artifactKey) {
-    var res = artifactKey.split("_");
-    if (!_.isArray(res) || res.length != 2) {
-      log.error(
-        "",
-        "Could not extract the artifact information from " + artifactKey
-      );
-      log.error(
-        "",
-        "This is an example of a valid artifact key: " +
-          "org.openmrs.module.mksreports_1.1.1-SNAPSHOT"
-      );
-      throw new Error();
-    }
-    var artifact = res[0]; // that's the group id + artifact id concatenated
-    var artifactVersion = res[1];
-
-    var matchedServers = [];
-
-    _.forOwn(serversByArtifactKeys, function(servers, serversArtifactKey) {
-      var res = serversArtifactKey.split("_");
-      if (!_.isArray(res) || res.length != 2) {
-        log.error(
-          "",
-          "Could not extract the artifact information from " +
-            serversArtifactKey
-        );
-        log.error(
-          "",
-          "This is an example of a valid artifact key: " +
-            "org.openmrs.module.mksreports_1.1.1-SNAPSHOT"
-        );
-        throw new Error();
-      }
-      var serversArtifact = res[0];
-      var serversArtifactVersion = res[1];
-
-      if (
-        serversArtifact.startsWith(artifact) &&
-        serversArtifactVersion == artifactVersion
-      ) {
-        log.info(
-          "",
-          artifactKey + " was found to affect server(s): " + servers
-        );
-        matchedServers = _.merge(matchedServers, servers);
-      }
-    });
-
-    return matchedServers;
   },
 
   /**
@@ -304,34 +210,5 @@ module.exports = {
     });
 
     return objects;
-  },
-
-  /**
-   * Finds an instance definition in provided list of instances definitions based on the UUID or name.
-   *
-   * @param {String} uuid, the UUID to match
-   * @param {String} name, the name to match
-   *
-   * @return {Object} The matched instance definition.
-   */
-  findInstanceInList: function(uuid, name, instances) {
-    var filteredInstances = _.filter(instances, function(o) {
-      return o.name === name || o.uuid === uuid;
-    });
-
-    var matchedInstance = {};
-    if (filteredInstances.length > 1) {
-      throw new Error(
-        "Multiple matches were found for the following instance: uuid='" +
-          uuid +
-          "', name='" +
-          name +
-          "'."
-      );
-    }
-    if (filteredInstances.length == 1) {
-      matchedInstance = filteredInstances[0];
-    }
-    return matchedInstance;
   }
 };

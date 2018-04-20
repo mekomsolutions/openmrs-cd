@@ -77,11 +77,17 @@ describe("Tests suite for pipeline1", function() {
         "'"
     );
     expect(jenkinsFile).toContain(
-      "sh '$WORKSPACE/" + config.getBuildShellScriptName() + "'"
+      "sh '$" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getBuildShellScriptName() +
+        "'"
     );
     expect(jenkinsFile).toContain(
-      "sh '. " +
-        config.getChangedArtifactEnvvarsPath() +
+      "sh '. $" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getBuildArtifactEnvvarsName() +
         " ; mv $WORKSPACE/$" +
         config.varBuildPath() +
         "/$" +
@@ -93,7 +99,9 @@ describe("Tests suite for pipeline1", function() {
 
     // verif 'deploy' stage
     expect(jenkinsFile).toContain(
-      "sh '$WORKSPACE/" +
+      "sh '$" +
+        config.varEnvvarBuildPath() +
+        "/" +
         config.getDeployShellScriptName() +
         " $JENKINS_HOME/" +
         config.getArtifactRepoEnvvarsName() +
@@ -146,6 +154,13 @@ describe("Tests suite for pipeline1", function() {
         "', value: params[i]['" +
         config.varRepoName() +
         "'])"
+    );
+
+    // verif 'impacted instances' stage
+    expect(jenkinsFile).toContain(
+      "sh 'node /opt/app/src/$JOB_NAME/" +
+        config.getIdentifyInstancesJsScriptName() +
+        "'"
     );
   });
 

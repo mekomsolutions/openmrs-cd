@@ -30,10 +30,6 @@ module.exports = {
     };
 
     projectBuild.postBuildActions = function(args) {
-      cmns.postBuildActions();
-    };
-
-    projectBuild.postBuildActions = function(args) {
       cmns.mavenPostBuildActions(
         args.pom.groupId,
         args.artifactsIds,

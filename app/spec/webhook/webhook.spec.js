@@ -116,10 +116,7 @@ describe("Test suite for webhook scripts", function() {
       fs.readFileSync(tests.config().getCommitMetadataFilePath(), "utf8")
     ).toEqual(JSON.stringify(expectedMetadata));
     expect(
-      fs.readFileSync(
-        tests.config().getTempDirPath() + "/commit_metadata.env",
-        "utf8"
-      )
+      fs.readFileSync(tests.config().getCommitMetadataFileEnvvarsPath(), "utf8")
     ).toEqual(utils.convertToEnvVar(expectedMetadata));
 
     // after

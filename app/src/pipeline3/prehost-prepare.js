@@ -35,10 +35,12 @@ script.headComment =
 script.body = "";
 
 if (process.env[config.varArtifactsChanges()] === "true") {
-  script.body += require("./impl/fetch").getFetchArtifactsScript(
-    instanceDef.artifacts,
-    config.getCDArtifactsDirPath(instanceDef.uuid)
-  );
+  instanceDef.artifacts.forEach(function(artifact) {
+    script.body += require("./impl/fetch").getFetchArtifactScript(
+      artifact,
+      config.getCDArtifactsDirPath(instanceDef.uuid)
+    );
+  });
 }
 if (process.env[config.varDataChanges()] === "true") {
   // TODO

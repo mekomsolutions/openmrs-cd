@@ -132,13 +132,28 @@ module.exports = {
     return "build.js";
   },
   getPostBuildJsScriptName: function() {
-    return "post-build.js";
+    return "downstream-builds.js";
+  },
+  getIdentifyInstancesJsScriptName: function() {
+    return "identify-instances.js";
   },
   getBuildShellScriptName: function() {
     return "build.sh";
   },
+  getBuildShellScriptPath: function() {
+    return path.resolve(
+      module.exports.getBuildDirPath(),
+      module.exports.getBuildShellScriptName()
+    );
+  },
   getDeployShellScriptName: function() {
     return "deploy.sh";
+  },
+  getDeployShellScriptPath: function() {
+    return path.resolve(
+      module.exports.getBuildDirPath(),
+      module.exports.getDeployShellScriptName()
+    );
   },
   getPrehostPrepareScriptName: function() {
     return "prehost-prepare.sh";
@@ -152,11 +167,17 @@ module.exports = {
   getWebhookTriggersFilePath: function() {
     return "/usr/share/jenkins/webhook_triggers.json";
   },
-  getChangedArtifactEnvvarsPath: function() {
-    return path.resolve(module.exports.getTempDirPath(), "artifact.env");
+  getBuildArtifactEnvvarsName: function() {
+    return "artifact.env";
   },
-  getChangedArtifactJsonPath: function() {
-    return path.resolve(module.exports.getTempDirPath(), "artifact.json");
+  getBuildArtifactEnvvarsPath: function() {
+    return path.resolve(
+      module.exports.getBuildDirPath(),
+      module.exports.getBuildArtifactEnvvarsName()
+    );
+  },
+  getBuildArtifactJsonPath: function() {
+    return path.resolve(module.exports.getBuildDirPath(), "artifact.json");
   },
   getDownstreamBuildParamsJsonName: function() {
     return "builds_params.json";
@@ -174,10 +195,6 @@ module.exports = {
     // $JENKINS_HOME
     return "/var/jenkins_home";
   },
-  getServersConfigPath: function() {
-    // relative to Jenkins home
-    return "servers.json";
-  },
   getInstancesConfigFileName: function() {
     return "instances.json";
   },
@@ -185,6 +202,12 @@ module.exports = {
     return path.resolve(
       module.exports.getAppDataDirPath(),
       module.exports.getInstancesConfigFileName()
+    );
+  },
+  getInstancesEventsDbPath: function() {
+    return path.resolve(
+      module.exports.getAppDataDirPath(),
+      "instances_events.json"
     );
   },
   getArtifactsBuildParamsDbFileName: function() {
@@ -208,25 +231,6 @@ module.exports = {
   getBuildJsScriptName: function() {
     return "build.js";
   },
-  getFetchServersDescriptorsJsScriptName: function() {
-    return "fetch.js";
-  },
-  getParseServersDescriptorsJsScriptName: function() {
-    return "parse.js";
-  },
-  getServersDescriptorsPath: function() {
-    return path.resolve(module.exports.getTempDirPath(), "descriptors.json");
-  },
-  getUpdateServerChangelogJsScriptName: function() {
-    return "compare.js";
-  },
-  getServersChangelogPath: function() {
-    // relative to Jenkins home
-    return "history.json";
-  },
-  getServersByArtifactKeysPath: function() {
-    return path.resolve(module.exports.getTempDirPath(), "dependencies.json");
-  },
   getCDArtifactsDirPath: function(instanceUuid) {
     return path.resolve(
       module.exports.getAppDataDirPath(),
@@ -241,9 +245,6 @@ module.exports = {
   getJobNameForPipeline1: function() {
     return "pipeline1";
   },
-  getJobNameForPipeline2: function() {
-    return "pipeline2";
-  },
   getJobNameForPipeline3: function() {
     return "pipeline3";
   },
@@ -256,5 +257,9 @@ module.exports = {
   },
   getInstanceArtifactsTypes: function() {
     return ["maven"];
+  },
+
+  getInstanceEventsProperties: function() {
+    return ["uuid", "name", "type", "artifacts"];
   }
 };
