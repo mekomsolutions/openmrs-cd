@@ -7,6 +7,7 @@
     "name": "cambodia-dev-1",
     "description": "Dev server for agile development on the ODC.",
     "type": "dev",
+    "version": "1.0.0",
     "artifacts": [
       {
         "type": "maven",
@@ -28,15 +29,20 @@
       }
     ],
     "deployment": {
+      "hostDir": "/var/docker-volumes/{{uuid}}",
       "type": "docker",
+      "version": "1.0.0",
       "value": {
-        "version": "1.0",
         "image": "mekomsolutions/bahmni",
         "tag": "cambodia-release-0.90"
       },
       "host": {
-        "uuid": "51629692-95A9-498E-A370-49F61B02EF89",
-        "artifactsLocation": "/var/docker-volumes/{{uuid}}"
+        "type": "ssh",
+        "value": {
+          "ip": "54.154.133.95",
+          "user": "ec2-user",
+          "port": "22"
+        }
       }
     }
   },
@@ -48,6 +54,7 @@
     "name": "cambodia-staging-1",
     "description": "Dev server for agile development on the ODC.",
     "type": "staging",
+    "version": "1.0.0",
     "artifacts": [
       {
         "type": "maven",
@@ -60,15 +67,20 @@
       }
     ],
     "deployment": {
+      "hostDir": "/var/docker-volumes/{{uuid}}",
       "type": "docker",
+      "version": "1.0.0",
       "value": {
-        "version": "1.0",
         "image": "mekomsolutions/bahmni",
         "tag": "cambodia-release-0.90"
       },
       "host": {
-        "uuid": "51629692-95A9-498E-A370-49F61B02EF89",
-        "artifactsLocation": "/var/docker-volumes/{{uuid}}"
+        "type": "ssh",
+        "value": {
+          "ip": "10.99.0.34",
+          "user": "cdagent",
+          "port": "22"
+        }
       }
     }
   }

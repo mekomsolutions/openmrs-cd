@@ -47,6 +47,6 @@ log.info("", utils.convertToEnvVar(downstreamJob));
 
 // Export the downstream job as an env. variable
 fs.writeFileSync(
-  process.env.WORKSPACE + "/trigger.env",
+  config.getProjectBuildTriggerEnvvarsPath(),
   utils.convertToEnvVar(downstreamJob)
 );

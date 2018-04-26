@@ -53,7 +53,7 @@ var setTestDir = function() {
   }
 
   if (lastDirPath !== testDirPath) {
-    log.info("TEST", testDirPath);
+    log.info("Test dir:", testDirPath);
     lastDirPath = testDirPath;
   }
 };
@@ -118,11 +118,15 @@ var setMockConfig = function(extraConfig) {
 };
 
 var setEnvvars = function() {
-  process.env.WORKSPACE = testDirPath;
-
   process.env.JENKINS_HOME = testDirPath;
   process.env.JOB_NAME = "test-job";
   process.env.BUILD_NUMBER = "3";
+
+  process.env.WORKSPACE = path.resolve(
+    testDirPath,
+    process.env.JOB_NAME,
+    "workspace"
+  );
 
   process.env.APP_DATA_DIR_PATH = path.resolve(testDirPath, "app_data");
 };

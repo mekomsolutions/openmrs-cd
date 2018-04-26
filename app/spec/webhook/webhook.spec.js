@@ -1,7 +1,6 @@
 "use strict";
 describe("Test suite for webhook scripts", function() {
   const path = require("path");
-  const tests = require(path.resolve("spec", "utils", "testUtils"));
   const fs = require("fs");
 
   it("should verify job parameters.", function() {
@@ -43,7 +42,7 @@ describe("Test suite for webhook scripts", function() {
       "<command>node /opt/app/src/" + config.getTriggerJsScriptPath()
     );
     expect(jenkinsFile).toContain(
-      "<propertiesFilePath>$WORKSPACE/" +
+      "<propertiesFilePath>$BUILD_PATH/" +
         config.getProjectBuildTriggerEnvvarsName() +
         "</propertiesFilePath>"
     );
@@ -86,6 +85,7 @@ describe("Test suite for webhook scripts", function() {
 
   it("should pass the commit metadata as both envvars and temp JSON file.", function() {
     // deps
+    const tests = require(path.resolve("spec", "utils", "testUtils"));
     const proxyquire = require("proxyquire");
 
     // setup
@@ -125,6 +125,8 @@ describe("Test suite for webhook scripts", function() {
 
   it("should save the downstream jobs as a key-value properties file", function() {
     // deps
+    const tests = require(path.resolve("spec", "utils", "testUtils"));
+    const config = tests.config();
     const proxyquire = require("proxyquire");
 
     // replay
@@ -132,8 +134,8 @@ describe("Test suite for webhook scripts", function() {
 
     // verif
     expect(
-      fs.readFileSync(process.env.WORKSPACE + "/trigger.env", "utf8")
-    ).toEqual("downstream_job=pipeline1\n");
+      fs.readFileSync(config.getProjectBuildTriggerEnvvarsPath(), "utf8")
+    ).toEqual("downstream_job=" + config.getJobNameForPipeline1() + "\n");
 
     // after
     tests.cleanup();

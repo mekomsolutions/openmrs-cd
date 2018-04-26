@@ -22,7 +22,7 @@ describe("Pre-host preparation scripts", function() {
     // replay
     proxyquire(
       path.resolve(
-        "src/" + config.getJobNameForPipeline3() + "/prehost-prepare.js"
+        "src/" + config.getJobNameForPipeline3() + "/prehost-preparation.js"
       ),
       tests.stubs()
     );

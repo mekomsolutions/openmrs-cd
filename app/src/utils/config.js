@@ -158,8 +158,17 @@ module.exports = {
   getPrehostPrepareScriptName: function() {
     return "prehost-prepare.sh";
   },
+  getHostPrepareScriptName: function() {
+    return "host-prepare.sh";
+  },
   getProjectBuildTriggerEnvvarsName: function() {
     return "trigger.env";
+  },
+  getProjectBuildTriggerEnvvarsPath: function() {
+    return path.resolve(
+      module.exports.getBuildDirPath(),
+      module.exports.getProjectBuildTriggerEnvvarsName()
+    );
   },
   getJobBuildDetailsEnvvarsName: function() {
     return "build_details.env";
@@ -231,12 +240,11 @@ module.exports = {
   getBuildJsScriptName: function() {
     return "build.js";
   },
+  /**
+   * The path whereto artifacts of an instance are fetched on the CD server.
+   */
   getCDArtifactsDirPath: function(instanceUuid) {
-    return path.resolve(
-      module.exports.getAppDataDirPath(),
-      instanceUuid,
-      "artifacts"
-    );
+    return path.resolve(process.env.WORKSPACE, instanceUuid, "artifacts");
   },
 
   getJobNameForWebhook: function() {

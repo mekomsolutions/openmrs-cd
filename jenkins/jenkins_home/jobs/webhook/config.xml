@@ -59,7 +59,7 @@ Supported values: &apos;github&apos;.</description>
     </hudson.tasks.Shell>
     <EnvInjectBuilder plugin="envinject@2.1.5">
       <info>
-        <propertiesFilePath>$WORKSPACE/trigger.env</propertiesFilePath>
+        <propertiesFilePath>$BUILD_PATH/trigger.env</propertiesFilePath>
       </info>
     </EnvInjectBuilder>
     <org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.3.6">
