@@ -14,6 +14,54 @@ describe("validate-instance", function() {
   // setup
   const fileInTest = path.resolve("src/instance-event/validate-instance.js");
 
+  it("should verify job parameters.", function() {
+    // deps
+    const __rootPath__ = require("app-root-path").path;
+    const config = require(path.resolve("src/utils/config"));
+    const ent = require("ent");
+
+    // replay
+    var jenkinsFile = fs.readFileSync(
+      path.resolve(
+        __rootPath__,
+        "..",
+        "jenkins/jenkins_home/jobs/" +
+          config.getJobNameForInstanceEvent() +
+          "/config.xml"
+      ),
+      "utf8"
+    );
+    jenkinsFile = ent.decode(jenkinsFile);
+
+    // verif
+    expect(jenkinsFile).toContain(
+      "<name>" + config.varInstanceEvent() + "</name>"
+    );
+    expect(jenkinsFile).toContain(
+      "<command>node /opt/app/src/" +
+        config.getJobNameForInstanceEvent() +
+        "/" +
+        config.getInstanceEventJsScriptName()
+    );
+    expect(jenkinsFile).toContain(
+      "<propertiesFile>$" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getProjectBuildTriggerEnvvarsName() +
+        "</propertiesFile>"
+    );
+    expect(jenkinsFile).toContain(
+      "<projects>$" + config.varDownstreamJob() + "</projects>"
+    );
+    expect(jenkinsFile).toContain(
+      '<macroTemplate>#${BUILD_NUMBER} - ${ENV,var="' +
+        config.varInstanceName() +
+        '"} (${ENV,var="' +
+        config.varInstanceUuid() +
+        '"})</macroTemplate>'
+    );
+  });
+
   it("should process an existing instance definition with artifacts changes.", function() {
     // setup
     const tests = require(path.resolve("spec/utils/testUtils"));
@@ -21,7 +69,7 @@ describe("validate-instance", function() {
     const config = tests.config();
     const db = proxyquire(cst.DBPATH, stubs);
 
-    process.env.instanceDefinitionEvent = fs.readFileSync(
+    process.env[config.varInstanceEvent()] = fs.readFileSync(
       path.resolve(
         "spec/instance-event/resources/test_instance_definition_1.json"
       ),
@@ -29,7 +77,7 @@ describe("validate-instance", function() {
     );
 
     // pre-verif
-    var instanceEvent = JSON.parse(process.env.instanceDefinitionEvent);
+    var instanceEvent = JSON.parse(process.env[config.varInstanceEvent()]);
     var beforeInstance = db.getInstanceDefinition(instanceEvent.uuid);
     expect(beforeInstance).not.toEqual({});
 
@@ -45,6 +93,7 @@ describe("validate-instance", function() {
     var triggerParams = {};
     triggerParams[config.varDownstreamJob()] = config.getJobNameForPipeline3();
     triggerParams[config.varInstanceUuid()] = instanceEvent.uuid;
+    triggerParams[config.varInstanceName()] = "cambodia-dev-1";
     triggerParams[config.varArtifactsChanges()] = JSON.stringify(true);
     triggerParams[config.varDeploymentChanges()] = JSON.stringify(false);
     triggerParams[config.varDataChanges()] = JSON.stringify(false);
@@ -70,7 +119,7 @@ describe("validate-instance", function() {
     const config = tests.config();
     const db = proxyquire(cst.DBPATH, stubs);
 
-    process.env.instanceDefinitionEvent = fs.readFileSync(
+    process.env[config.varInstanceEvent()] = fs.readFileSync(
       path.resolve(
         "spec/instance-event/resources/test_instance_definition_2.json"
       ),
@@ -78,7 +127,7 @@ describe("validate-instance", function() {
     );
 
     // pre-verif
-    var instanceEvent = JSON.parse(process.env.instanceDefinitionEvent);
+    var instanceEvent = JSON.parse(process.env[config.varInstanceEvent()]);
     expect(db.getInstanceDefinition(null, instanceEvent.name)).toEqual({});
 
     // replay
@@ -99,6 +148,7 @@ describe("validate-instance", function() {
     var triggerParams = {};
     triggerParams[config.varDownstreamJob()] = config.getJobNameForPipeline3();
     triggerParams[config.varInstanceUuid()] = uuid;
+    triggerParams[config.varInstanceName()] = "walhalla-staging";
     triggerParams[config.varArtifactsChanges()] = JSON.stringify(true);
     triggerParams[config.varDeploymentChanges()] = JSON.stringify(true);
     triggerParams[config.varDataChanges()] = JSON.stringify(false);

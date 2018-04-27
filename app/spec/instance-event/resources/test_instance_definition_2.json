@@ -14,16 +14,20 @@
     }
   ],
   "deployment": {
+    "hostDir": "/var/docker-volumes/{{uuid}}",
     "type": "docker",
-    "hostDir": "/tmp",
+    "version": "1.0.0",
     "value": {
-      "version": "1.0",
       "image": "mekomsolutions/bahmni",
       "tag": "cambodia-release-0.90"
     },
     "host": {
-      "uuid": "51629692-95a9-498e-a370-49f61b02ef89",
-      "artifactsLocation": "/var/docker-volumes/{{uuid}}"
+      "type": "ssh",
+      "value": {
+        "ip": "54.154.133.95",
+        "user": "ec2-user",
+        "port": "22"
+      }
     }
   }
 }

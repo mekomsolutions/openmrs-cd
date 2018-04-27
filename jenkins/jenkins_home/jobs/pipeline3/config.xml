@@ -8,51 +8,35 @@
       <parameters/>
     </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
   </actions>
-  <description>Job that is able to fetch and build the code of any project to then retrieve its built artifacts.&#xd;
-Those built artifacts are then deployed on the configured artifact repository (typically Nexus.)&#xd;
-&#xd;
-It takes as an input a bunch of &apos;commit metadata&apos;, i.e. all the information about a specific code commit that is triggering the current build.</description>
-  <displayName>Project Build</displayName>
+  <description>This job processes an instance definition and its main sections: &apos;data&apos;, &apos;artifacts&apos; and &apos;deployment&apos;.&#xd;
+Depending on the context and the instance definition it can setup and run a new instance or setup and restart an existing instance.</description>
+  <displayName>Run Instance</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
-          <name>projectType</name>
-          <description>The type of the code project
-
-Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmnicore&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;, &apos;distribution&apos;</description>
+          <name>instanceUuid</name>
+          <description>The UUID of the instance definition to process.</description>
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>repoUrl</name>
-          <description>The code project&apos;s repository URL
-
-Eg. &quot;https://github.com/openmrs/openmrs-core&quot;</description>
-          <defaultValue></defaultValue>
+          <name>artifactsChanges</name>
+          <description>Tells whether there has been artifacts changes and hence whether the artifacts section should be (re)processed.</description>
+          <defaultValue>false</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>repoName</name>
-          <description>The code project&apos;s repository name
-
-Eg. &quot;openmrs-core&quot;, &quot;bahmni-config-cambodia&quot;, &quot;openmrs-module-webservices.rest&quot;, ...</description>
-          <defaultValue></defaultValue>
+          <name>deploymentChanges</name>
+          <description>Tells whether there has been deployment changes and hence whether the deployment section should be (re)processed.</description>
+          <defaultValue>false</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>branchName</name>
-          <description>The branch that should be built.</description>
-          <defaultValue></defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>commitId</name>
-          <description>The commit that should be built.
-
-Certain projects require to pinpoint to an exact commit rather than using the tip of a branch.</description>
-          <defaultValue></defaultValue>
+          <name>dataChanges</name>
+          <description>Tells whether there has been data changes and hence whether the data section should be (re)processed.</description>
+          <defaultValue>false</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
@@ -75,7 +59,7 @@ Certain projects require to pinpoint to an exact commit rather than using the ti
       <submoduleCfg class="list"/>
       <extensions/>
     </scm>
-    <scriptPath>jobs/pipelines/pipeline1.jenkinsfile</scriptPath>
+    <scriptPath>jobs/pipelines/pipeline3.jenkinsfile</scriptPath>
     <lightweight>true</lightweight>
   </definition>
   <triggers/>

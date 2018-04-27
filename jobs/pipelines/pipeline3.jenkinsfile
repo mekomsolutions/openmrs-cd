@@ -1,0 +1,53 @@
+pipeline {
+  agent any
+  tools {
+    maven 'Maven 3.5.0' 
+    nodejs 'NodeJS 8.6.0'
+  }
+  stages {
+    stage ('Pre-host connection preparation') {
+      steps {
+        sh 'node /opt/app/src/$JOB_NAME/prehost-preparation.js'
+        sh 'cat $BUILD_PATH/prehost-prepare.sh'
+        sh '$BUILD_PATH/prehost-prepare.sh'
+      }
+    }
+    stage ('Host preparation') {
+      steps {
+        sh 'node /opt/app/src/$JOB_NAME/host-preparation.js'
+        sh 'cat $BUILD_PATH/host-prepare.sh'
+        sh '$BUILD_PATH/host-prepare.sh'
+      }
+    }
+    stage ('Maintenance mode: ON') {
+      steps {
+        sh 'echo "Stage/steps awaiting implementation... Skipping."'
+      }
+    }
+    stage ('Production host preparation') {
+      steps {
+        sh 'echo "Stage/steps awaiting implementation... Skipping."'
+      }
+    }
+    stage ('Start or restart the instance') {
+      steps {
+        sh 'echo "Stage/steps awaiting implementation... Skipping."'
+      }
+    }
+    stage ('Instance startup status monitoring') {
+      steps {
+        sh 'echo "Stage/steps awaiting implementation... Skipping."'
+      }
+    }
+    stage ('Maintenance mode: OFF') {
+      steps {
+        sh 'echo "Stage/steps awaiting implementation... Skipping."'
+      }
+    }
+    stage ('Post startup actions') {
+      steps {
+        sh 'echo "Stage/steps awaiting implementation... Skipping."'
+      }
+    }
+  }
+}

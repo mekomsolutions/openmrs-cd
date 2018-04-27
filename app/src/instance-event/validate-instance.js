@@ -23,8 +23,8 @@ const uuid = require("uuid/v4");
 // finding the existing instance definition
 //
 var instanceEvent = {};
-if (process.env.instanceDefinitionEvent) {
-  instanceEvent = JSON.parse(process.env.instanceDefinitionEvent);
+if (process.env[config.varInstanceEvent()]) {
+  instanceEvent = JSON.parse(process.env[config.varInstanceEvent()]);
 }
 var existingInstance = db.getInstanceDefinition(
   instanceEvent.uuid,
@@ -50,6 +50,8 @@ downstreamJobParams[
   config.varDownstreamJob()
 ] = config.getJobNameForPipeline3();
 downstreamJobParams[config.varInstanceUuid()] = instanceEvent.uuid;
+var displayName = instanceEvent.name ? instanceEvent.name : "no-name-set";
+downstreamJobParams[config.varInstanceName()] = displayName;
 downstreamJobParams[config.varArtifactsChanges()] = JSON.stringify(
   !_.isEmpty(instanceEvent.artifacts)
 );
@@ -64,9 +66,6 @@ downstreamJobParams[config.varDataChanges()] = JSON.stringify(
 // Export the downstream job parameters as a 'trigger' properties file
 //
 fs.writeFileSync(
-  path.resolve(
-    config.getBuildDirPath(),
-    config.getProjectBuildTriggerEnvvarsName()
-  ),
+  config.getProjectBuildTriggerEnvvarsPath(),
   utils.convertToEnvVar(downstreamJobParams)
 );

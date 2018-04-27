@@ -25,16 +25,19 @@ module.exports = {
     return "downstream_job";
   },
   varInstanceUuid: function() {
-    return "instance_uuid";
+    return "instanceUuid";
+  },
+  varInstanceName: function() {
+    return "instanceName";
   },
   varArtifactsChanges: function() {
-    return "artifacts_changes";
+    return "artifactsChanges";
   },
   varDeploymentChanges: function() {
-    return "deployment_changes";
+    return "deploymentChanges";
   },
   varDataChanges: function() {
-    return "data_changes";
+    return "dataChanges";
   },
   varRepoUrl: function() {
     return "repoUrl";
@@ -47,6 +50,9 @@ module.exports = {
   },
   varCommitId: function() {
     return "commitId";
+  },
+  varInstanceEvent: function() {
+    return "instanceEvent";
   },
   varBuildPath: function() {
     return "buildPath";
@@ -137,6 +143,9 @@ module.exports = {
   getIdentifyInstancesJsScriptName: function() {
     return "identify-instances.js";
   },
+  getInstanceEventJsScriptName: function() {
+    return "validate-instance.js";
+  },
   getBuildShellScriptName: function() {
     return "build.sh";
   },
@@ -155,8 +164,14 @@ module.exports = {
       module.exports.getDeployShellScriptName()
     );
   },
+  getPrehostPrepareJsScriptName: function() {
+    return "prehost-preparation.js";
+  },
   getPrehostPrepareScriptName: function() {
     return "prehost-prepare.sh";
+  },
+  getHostPrepareJsScriptName: function() {
+    return "host-preparation.js";
   },
   getHostPrepareScriptName: function() {
     return "host-prepare.sh";
@@ -249,6 +264,9 @@ module.exports = {
 
   getJobNameForWebhook: function() {
     return "webhook";
+  },
+  getJobNameForInstanceEvent: function() {
+    return "instance-event";
   },
   getJobNameForPipeline1: function() {
     return "pipeline1";
