@@ -10,11 +10,15 @@ const utils = require("../utils/utils");
 
 const fs = require("fs");
 const path = require("path");
+const _ = require("lodash");
 const log = require("npmlog");
 
 var projectBuild = require("./impl/" +
   process.env[config.varProjectType()]).getInstance();
 
+//
+//  Reading the list of artifact IDs extracted from the POMs in Groovy (see .jenkinsfile)
+//
 var artifactsIds = [];
 try {
   // artifacts IDs of all the Maven (sub)modules found, so one per POM found
@@ -29,8 +33,27 @@ try {
   );
   log.warn("", JSON.stringify(err, null, 2));
 }
+artifactsIds = artifactsIds.filter(function(el) {
+  return el.trim() !== "";
+});
 
+//
+//  Plan B since there is no POM and this is not a Maven project.
+//  Getting the 'pseudo' Maven info that was attached to the built artifact during the build stage.
+//
+var pseudoPom = {};
+if (_.isEmpty(artifactsIds)) {
+  var arty = JSON.parse(
+    fs.readFileSync(config.getBuildArtifactJsonPath(), "utf-8")
+  );
+  pseudoPom = _.pick(arty.mavenProject, ["groupId", "artifactId", "version"]);
+}
+
+//
+//  Running the post build actions.
+//
 projectBuild.postBuildActions({
   pom: utils.getPom(config.getBuildPomPath()),
-  artifactsIds: artifactsIds
+  artifactsIds: artifactsIds,
+  pseudoPom: pseudoPom
 });

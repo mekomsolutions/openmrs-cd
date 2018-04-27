@@ -29,7 +29,13 @@ module.exports = {
     };
 
     projectBuild.postBuildActions = function(args) {
-      // TODO
+      var artifactsIds = [];
+      artifactsIds.push(args.pseudoPom.artifactId);
+      cmns.mavenPostBuildActions(
+        args.pseudoPom.groupId,
+        artifactsIds,
+        args.pseudoPom.version
+      );
     };
 
     return projectBuild;

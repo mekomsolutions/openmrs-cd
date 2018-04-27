@@ -15,6 +15,7 @@
   ],
   "deployment": {
     "type": "docker",
+    "hostDir": "/tmp",
     "value": {
       "version": "1.0",
       "image": "mekomsolutions/bahmni",

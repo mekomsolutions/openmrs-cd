@@ -110,7 +110,7 @@ var setMockConfig = function(extraConfig) {
   mockConfig.getArtifactIdListFilePath = function() {
     return prepareFile(
       realConfig.getRelativeBuildDirPath(),
-      path.resolve("spec/pipeline1/resources", "test_artifacts_ids_1.txt")
+      path.resolve("spec/pipeline1/resources", "test_empty_artifacts_ids.txt")
     );
   };
 

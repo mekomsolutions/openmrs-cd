@@ -1,0 +1,13 @@
+admin
+bahmni-emr-api
+bahmni-mapping
+bahmni-test-commons
+bahmnicore-api
+bahmnicore-omod
+bahmnicore-ui
+jss-old-data
+obs-relationship
+openelis-atomfeed-client-omod
+bahmni
+reference-data
+vagrant-deploy

@@ -127,6 +127,12 @@ describe("Script triggering downstream builds", function() {
           "/resources/bahmnicore/pom.xml"
       );
     };
+    extraConfig.getArtifactIdListFilePath = function() {
+      return path.resolve(
+        "spec/pipeline1/resources",
+        "bahmnicore/test_artifacts_ids_1.txt"
+      );
+    };
     var config = require(path.resolve("src/utils/config"));
 
     const stubs = tests.stubs(null, extraConfig, {

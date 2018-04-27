@@ -78,6 +78,27 @@ describe("The instances config validator", function() {
       _script_.validateDeploymentConfig(
         {
           type: "docker",
+          hostDir: "",
+          value: new model.DockerDeployment()
+        },
+        true
+      );
+    }).toThrow();
+    expect(function() {
+      _script_.validateDeploymentConfig(
+        {
+          type: "docker",
+          hostDir: { not_a: "dir path" },
+          value: new model.DockerDeployment()
+        },
+        true
+      );
+    }).toThrow();
+    expect(function() {
+      _script_.validateDeploymentConfig(
+        {
+          type: "docker",
+          hostDir: "/tmp/{{uuid}}",
           value: new model.DockerDeployment()
         },
         true

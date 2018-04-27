@@ -22,15 +22,18 @@ describe("Post build", function() {
 
     var config = require(path.resolve("src/utils/config"));
 
+    process.env[config.varProjectType()] = "distribution";
     const stubs = tests.stubs(null, extraConfig, {
       "./impl/distribution": path.resolve(
-        "src/" + config.getJobNameForPipeline1() + "/impl/distribution"
+        "src/" +
+          config.getJobNameForPipeline1() +
+          "/impl/" +
+          process.env[config.varProjectType()]
       )
     });
     config = tests.config();
     const db = proxyquire(cst.DBPATH, stubs);
 
-    process.env[config.varProjectType()] = "distribution";
     process.env[config.varRepoUrl()] =
       "https://github.com/mekomsolutions/openmrs-distro-cambodia";
     process.env[config.varRepoName()] = "openmrs-distro-cambodia";
@@ -80,7 +83,7 @@ describe("Post build", function() {
     tests.cleanup();
   });
 
-  it("should analyze and process non-distributions POM files.", function() {
+  it("should analyze and process Bahmni Core POM files.", function() {
     // deps
     const tests = require(path.resolve("spec/utils/testUtils"));
 
@@ -93,20 +96,29 @@ describe("Post build", function() {
           "/resources/bahmnicore/pom.xml"
       );
     };
+    extraConfig.getArtifactIdListFilePath = function() {
+      return path.resolve(
+        "spec/pipeline1/resources",
+        "bahmnicore/test_artifacts_ids_1.txt"
+      );
+    };
     var config = require(path.resolve("src/utils/config"));
 
+    process.env[config.varProjectType()] = "bahmnicore";
     const stubs = tests.stubs(null, extraConfig, {
       "../commons": path.resolve(
         "src/" + config.getJobNameForPipeline1() + "/commons"
       ),
       "./impl/bahmnicore": path.resolve(
-        "src/" + config.getJobNameForPipeline1() + "/impl/bahmnicore"
+        "src/" +
+          config.getJobNameForPipeline1() +
+          "/impl/" +
+          process.env[config.varProjectType()]
       )
     });
     config = tests.config();
     const db = proxyquire(cst.DBPATH, stubs);
 
-    process.env[config.varProjectType()] = "bahmnicore";
     process.env[config.varRepoUrl()] =
       "https://github.com/mekomsolutions/bahmni-core";
     process.env[config.varRepoName()] = "bahmni-core";
@@ -137,6 +149,61 @@ describe("Post build", function() {
   });
 
   it("should analyze and process Bahmni Apps.", function() {
-    // TODO
+    // deps
+    const tests = require(path.resolve("spec/utils/testUtils"));
+
+    // setup
+    var extraConfig = {};
+    extraConfig.getBuildArtifactJsonPath = function() {
+      return path.resolve(
+        "spec/" + config.getJobNameForPipeline1() + "/resources",
+        "bahmniapps/test_artifact_bahmniapps.json"
+      );
+    };
+    var config = require(path.resolve("src/utils/config"));
+
+    process.env[config.varProjectType()] = "bahmniapps";
+    const stubs = tests.stubs(null, extraConfig, {
+      "../commons": path.resolve(
+        "src/" + config.getJobNameForPipeline1() + "/commons"
+      ),
+      "./impl/bahmniapps": path.resolve(
+        "src/" +
+          config.getJobNameForPipeline1() +
+          "/impl/" +
+          process.env[config.varProjectType()]
+      )
+    });
+    config = tests.config();
+    const db = proxyquire(cst.DBPATH, stubs);
+
+    process.env[config.varProjectType()] = "bahmniapps";
+    process.env[config.varRepoUrl()] =
+      "https://github.com/mekomsolutions/openmrs-module-bahmniapps";
+    process.env[config.varRepoName()] = "openmrs-module-bahmniapps";
+    process.env[config.varBranchName()] = "master";
+
+    // replay
+    proxyquire(
+      path.resolve("src/" + config.getJobNameForPipeline1() + "/post-build.js"),
+      stubs
+    );
+
+    // verif
+    var buildParams = JSON.parse(
+      fs.readFileSync(config.getDownstreamBuildParamsJsonPath(), "utf-8")
+    );
+
+    expect(buildParams.length).toEqual(1);
+    var params = buildParams[0];
+    expect(params.projectType).toEqual("distribution");
+    expect(params.repoUrl).toEqual(
+      "https://github.com/mekomsolutions/openmrs-distro-cambodia"
+    );
+    expect(params.repoName).toEqual("openmrs-distro-cambodia");
+    expect(params.branchName).toEqual("INFRA-111");
+
+    // after
+    tests.cleanup();
   });
 });
