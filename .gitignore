@@ -3,6 +3,7 @@
 /**/build/
 target
 **/.DS_Store
+README.html
 
 # Ignore Gradle GUI config
 gradle-app.setting

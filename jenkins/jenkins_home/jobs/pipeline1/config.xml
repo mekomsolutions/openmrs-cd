@@ -75,7 +75,7 @@ Certain projects require to pinpoint to an exact commit rather than using the ti
       <submoduleCfg class="list"/>
       <extensions/>
     </scm>
-    <scriptPath>jobs/pipelines/pipeline1.jenkinsfile</scriptPath>
+    <scriptPath>jenkins/pipelines/pipeline1.jenkinsfile</scriptPath>
     <lightweight>true</lightweight>
   </definition>
   <triggers/>

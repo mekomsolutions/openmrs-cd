@@ -59,7 +59,7 @@ Depending on the context and the instance definition it can setup and run a new 
       <submoduleCfg class="list"/>
       <extensions/>
     </scm>
-    <scriptPath>jobs/pipelines/pipeline3.jenkinsfile</scriptPath>
+    <scriptPath>jenkins/pipelines/pipeline3.jenkinsfile</scriptPath>
     <lightweight>true</lightweight>
   </definition>
   <triggers/>
