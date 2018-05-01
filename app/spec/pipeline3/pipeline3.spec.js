@@ -34,6 +34,11 @@ describe("Tests suite for pipeline3", function() {
     expect(jenkinsFile).toContain(
       "<name>" + config.varDataChanges() + "</name>"
     );
+    expect(jenkinsFile).toContain(
+      "<scriptPath>jenkins/pipelines/" +
+        config.getJobNameForPipeline3() +
+        ".jenkinsfile</scriptPath>"
+    );
   });
 
   it("should verify pipeline steps scripts.", function() {
@@ -43,7 +48,7 @@ describe("Tests suite for pipeline3", function() {
     // replay
     var jenkinsFile = fs.readFileSync(
       __rootPath__ +
-        "/../jobs/pipelines/" +
+        "/../jenkins/pipelines/" +
         config.getJobNameForPipeline3() +
         ".jenkinsfile",
       "utf8"

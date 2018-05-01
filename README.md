@@ -1,7 +1,7 @@
 # OpenMRS CD
 > A dockerized [Jenkins](https://jenkins.io/) server ready to manage [OpenMRS](https://openmrs.org/) and [Bahmni](https://www.bahmni.org/) instances.
 
-## User guide
+## User Guide
 
 To start a new OpenMRS CD server
 
@@ -33,17 +33,36 @@ And answer the prompted questions.
 
 **Note:** _If you do not want to enter the artifacts repository URLs and authentication details by hand (through the CLI) you can just edit **usr/share/jenkins/artifact_repo_default.json** (see the default one [here](docker/config/artifact_repo_default.json) as an example) with your own repo URLs and ID and then run the script again. It will detect the file and ask you to use it with the values provided in it._
 
-## Developer guide
+## Developer Guide
 
-Gradle is used to build all the artifacts that make the OpenMRS CD.
+>OpenMRS CD is a Dockerized Jenkins with preconfigured jobs. Those jobs run Node JS scripts or Node-generated Bash scripts.
 
-### The parent project (root folder)
+This explains the structure and content of the root folder of the project:
 
-In order to build all components of the OpenMRS CD run the following command from the root folder:
 ```
-gradle build
+.
+├── app
+├── docker
+└── jenkins
 ```
-Each subproject's 'build' tasks will run.
+**app** is the Node JS area, **docker** holds the Dockerfile (and other resources needed to configure the container) and **jenkins** contains the parts of Jenkins home that are preconfigured, as well as the pipelines Jenkinsfiles.
+
+Gradle is used to run all build tasks and package all artifacts that make the OpenMRS CD.
+
+### The 'app' component
+Developing on the OpenMRS CD means working in here most of the time.
+That is because the bulk of the logic of what the OpenMRS CD does lives here. Almost all Jenkins jobs are built on the following pattern:
+>Jenkins jobs run Node scripts that generate Bash scripts that in turn perform the core CD tasks.
+
+This is how one would build the underlying Node JS app:
+```
+cd app/
+npm run all
+```
+And this must be done before submitting code commits.
+However note that the code base is not really built into anything since the container links directly to **/app**, but this formats the code and runs the test suite.
+
+The app developer guide can be found [here](app/README.md).
 
 ### The 'docker' component
 ```
@@ -55,31 +74,24 @@ This task builds the Docker image used as a base for the OpenMRS CD. See the [Do
 ```
 gradle deploy
 ```
-This deploys the Docker image on the Mekom Solutions Docker Hub repository. This is not run by default when running the `gradle build` of the parent Gradle project
+This deploys the Docker image on the Mekom Solutions Docker Hub repository. This is not run by default or by the parent build, see below.
 
-### The 'jenkins_home' component
+### The 'jenkins' component
 
-OpenMRS CD not only needs a Docker image for its binaries but also requires a Jenkins Home folder providing the base Jenkins configuration.
+OpenMRS CD not only needs a Docker image for its binaries but also requires a 'Jenkins home' folder that provides the Jenkins preconfiguration.
 
 ```
-cd jenkins_home/
+cd jenkins/
 gradle build
 ```
-This will package a zip archive of the jenkins_home folder.
+This will package a zip archive of the jenkins folder.
 
-**Note:** _Developing with the Jenkins_home component requires to use `git clean -Xdf`. Please read the [note for developpers](jenkins/README.md) first._
+**Note:** _Developing with the jenkins component may require to use `git clean -Xdf` from time to time. Please read the [note for developpers](jenkins/README.md) first._
 
-### The 'jobs' component
+### The parent project (root folder)
 
-This folder holds the Pipelines that the Jenkins server will fetch directly from GitHub. They do not need to be packaged and deployed. That is why, unlike the other components, 'jobs' does not implement any build task. 
-
-### The 'app' component
-
-The 'app' folder provides scripts and resources run by the Jenkins pipelines and jobs.
+Finally it is possible to build everything at once from the root level:
 ```
-cd app/
 gradle build
 ```
-This will run tests tasks configured for this build and generate a zip packaged file of all scripts and resources if successful.
-
-The zip package is located at the default Gradle location for build artifacts: **./app/build/distributions/**
+This will cascade down to all child builds and run them.

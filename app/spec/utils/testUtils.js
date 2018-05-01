@@ -145,10 +145,15 @@ module.exports = {
 
   /**
    * Generate the test context with a number of preloaded variables and stubbed objects.
-   * Typical use: 'proxiquire("file-to-load", tests.stubs())'
+   * Typical use: 'proxyquire("file-to-load", tests.stubs())'
    *
    * @param {Object} extraStubs - To add to or override default stubs for proxyquire.
    * @param {Object} extraConfig - To add to or override default mock for the config object.
+   * @param {Object} nestedRequires - A map additional {relative path ➔ path to require with stubs}.
+   *    Eg:
+   *      {
+   *        "../commons": path.resolve("src/pipeline1/commons")
+   *      }
    *
    **/
   stubs: function(extraStubs, extraConfig, nestedRequires) {
@@ -165,7 +170,7 @@ module.exports = {
 
     Object.assign(stubs, extraStubs);
 
-    // Further stubbing for nexted requires, see https://stackoverflow.com/a/42673500/321797
+    // Further stubbing for nested requires, see https://stackoverflow.com/a/42673500/321797
     stubs[cst.DBPATH] = proxyquire(path.resolve("src/utils/db"), stubs);
     if (!_.isEmpty(nestedRequires)) {
       Object.keys(nestedRequires).forEach(function(requirePath) {

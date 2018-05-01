@@ -101,6 +101,13 @@ module.exports = {
     return pom;
   },
 
+  /*
+   * Saves an instance event to the database.
+   *
+   * @param {Object/model.Script} script - The script object.
+   *
+   * @return A stringified version of the script ready to be written to file.
+   */
   getScriptAsString: function(script) {
     if (script instanceof model.Script !== true) {
       throw new Error("Illegal argument: must be a script object.");

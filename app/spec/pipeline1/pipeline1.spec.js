@@ -33,7 +33,7 @@ describe("Tests suite for pipeline1", function() {
     );
     expect(jenkinsFile).toContain("<name>" + config.varCommitId() + "</name>");
     expect(jenkinsFile).toContain(
-      "<scriptPath>jobs/pipelines/" +
+      "<scriptPath>jenkins/pipelines/" +
         config.getJobNameForPipeline1() +
         ".jenkinsfile</scriptPath>"
     );
@@ -46,7 +46,7 @@ describe("Tests suite for pipeline1", function() {
     // replay
     var jenkinsFile = fs.readFileSync(
       __rootPath__ +
-        "/../jobs/pipelines/" +
+        "/../jenkins/pipelines/" +
         config.getJobNameForPipeline1() +
         ".jenkinsfile",
       "utf8"
