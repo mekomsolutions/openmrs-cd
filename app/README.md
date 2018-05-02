@@ -40,7 +40,7 @@ app/src
     └── webhook.js
 ```
 Set aside const.js which, as the name suggests, is the location of global constants, there are two types of subfolders that should be distinguished when looking from the root level:
-1. **models** and **utils** that contain broad purpose libraries needed across the app.
+1. **utils** that contain broad purpose libraries needed across the app.
 2. Jenkins jobs scripts implementations: **webhook**, **pipeline1**, **instance-event** and **pipeline3**.
 
 **Convention:** We are adopting the rule that the Node folder name is the exact name of the job within Jenkins, so as it is stated in the config.xml of the ad-hoc job.
@@ -111,6 +111,9 @@ The generic tool to **fetch** an object of a domain, please follow the JavaScrip
 ##### utils.js
 
 Reusable and testable functions that are constantly needed. `findObject` and `removeObject` are particularly critical to db.js for instance, see [here](https://github.com/mekomsolutions/openmrs-cd/blob/d89776b66749179e36ca8abdebe8d0dac3f12e9e/app/src/utils/utils.js#L157-L221).
+
+##### model.js
+Classes definitions that might be reusable across the entire app.
 
 ### Conventions and Patterns
 

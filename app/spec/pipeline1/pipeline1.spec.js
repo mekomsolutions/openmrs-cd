@@ -115,14 +115,14 @@ describe("Tests suite for pipeline1", function() {
         "'"
     );
     expect(jenkinsFile).toContain(
-      'def buildParamsPath = "${env.' +
+      'def buildsParamsPath = "${env.' +
         config.varEnvvarBuildPath() +
         "}/" +
         config.getDownstreamBuildParamsJsonName() +
         '"'
     );
     expect(jenkinsFile).toContain(
-      "def params = readJSON file: buildParamsPath"
+      "def params = readJSON file: buildsParamsPath"
     );
     expect(jenkinsFile).toContain(
       "build job: '" + config.getJobNameForPipeline1() + "', wait: false"
@@ -166,7 +166,7 @@ describe("Tests suite for pipeline1", function() {
 
   it("should implement all required functions from data model.", function() {
     // deps
-    const model = require(path.resolve("src/models/model"));
+    const model = require(path.resolve("src/utils/model"));
     const modelTestUtils = require(path.resolve("spec/models/modelTestUtils"));
 
     // Running tests on each file present in the  folderInTest folder and ensure they correctly implement every needed function
@@ -199,7 +199,7 @@ describe("Tests suite for pipeline1", function() {
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmniapps'.", function() {
     // deps
-    const model = require(path.resolve("src/models/model"));
+    const model = require(path.resolve("src/utils/model"));
 
     // setup
     const projectType = "bahmniapps";
@@ -245,7 +245,7 @@ describe("Tests suite for pipeline1", function() {
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmniconfig'.", function() {
     // deps
-    const model = require(path.resolve("src/models/model"));
+    const model = require(path.resolve("src/utils/model"));
     const projectType = "bahmniconfig";
 
     // setup
@@ -296,7 +296,7 @@ describe("Tests suite for pipeline1", function() {
 
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrsconfig'.", function() {
     // deps
-    const model = require(path.resolve("src/models/model"));
+    const model = require(path.resolve("src/utils/model"));
     const projectType = "openmrsconfig";
 
     // setup
@@ -345,7 +345,7 @@ describe("Tests suite for pipeline1", function() {
 
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrscore'.", function() {
     // deps
-    const model = require(path.resolve("src/models/model"));
+    const model = require(path.resolve("src/utils/model"));
     const projectType = "openmrscore";
 
     // setup

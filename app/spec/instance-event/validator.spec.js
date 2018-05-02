@@ -34,7 +34,7 @@ describe("The instances config validator", function() {
 
   it("should validate instances deployment section.", function() {
     // deps
-    const model = require(path.resolve("src/models/model"));
+    const model = require(path.resolve("src/utils/model"));
 
     // setup
     var _script_ = require(fileInTest);
@@ -108,7 +108,7 @@ describe("The instances config validator", function() {
 
   it("should validate an instances artifacts section.", function() {
     // deps
-    const model = require(path.resolve("src/models/model"));
+    const model = require(path.resolve("src/utils/model"));
 
     // setup
     var _script_ = require(fileInTest);

@@ -4,7 +4,7 @@ describe("Utils", function() {
   const folderInTest = __dirname + "/../../src/utils/";
   const fs = require("fs");
   const utils = require(folderInTest + "utils");
-  const model = require(folderInTest + "../models/model");
+  const model = require(folderInTest + "model");
 
   it("should extract POM-like information out of an artifact key.", function() {
     // replay

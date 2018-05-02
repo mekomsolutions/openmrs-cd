@@ -29,9 +29,9 @@ pipeline {
       steps {
         sh 'node /opt/app/src/$JOB_NAME/downstream-builds.js'
         script {
-          def buildParamsPath = "${env.BUILD_PATH}/builds_params.json"
-          if (fileExists(buildParamsPath)) {
-            def params = readJSON file: buildParamsPath
+          def buildsParamsPath = "${env.BUILD_PATH}/builds_params.json"
+          if (fileExists(buildsParamsPath)) {
+            def params = readJSON file: buildsParamsPath
             for (i = 0; i < params.size(); i++) {
               build job: 'pipeline1', wait: false, parameters: \
               [ \

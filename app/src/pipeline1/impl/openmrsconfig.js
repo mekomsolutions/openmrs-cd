@@ -3,7 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const model = require("../../models/model");
+const model = require("../../utils/model");
 const utils = require("../../utils/utils");
 
 const cmns = require("../commons");

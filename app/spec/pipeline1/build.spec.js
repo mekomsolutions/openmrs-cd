@@ -8,7 +8,7 @@ describe("Project build script", function() {
     // deps
     const tests = require(path.resolve("spec/utils/testUtils"));
     const proxyquire = require("proxyquire");
-    const model = require(path.resolve("src/models/model"));
+    const model = require(path.resolve("src/utils/model"));
     const config = require(path.resolve("src/utils/config"));
 
     // setup

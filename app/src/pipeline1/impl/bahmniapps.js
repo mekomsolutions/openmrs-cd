@@ -5,7 +5,7 @@ const path = require("path");
 const _ = require("lodash");
 const log = require("npmlog");
 
-const model = require("../../models/model");
+const model = require("../../utils/model");
 const utils = require("../../utils/utils");
 
 const cmns = require("../commons");

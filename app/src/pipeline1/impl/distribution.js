@@ -6,7 +6,7 @@ const log = require("npmlog");
 const XML = require("pixl-xml");
 const _ = require("lodash");
 
-const model = require("../../models/model");
+const model = require("../../utils/model");
 const utils = require("../../utils/utils");
 const cst = require("../../const");
 const config = require(cst.CONFIGPATH);

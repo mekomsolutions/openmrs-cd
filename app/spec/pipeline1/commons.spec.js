@@ -6,7 +6,7 @@ describe("Commons for project builds", function() {
 
   const utils = require(path.resolve("src/utils/utils"));
   const config = require(path.resolve("src/utils/config"));
-  const model = require(path.resolve("src/models/model"));
+  const model = require(path.resolve("src/utils/model"));
 
   const cmns = require(path.resolve(
     "src/" + config.getJobNameForPipeline1() + "/commons"

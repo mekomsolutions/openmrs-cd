@@ -13,7 +13,7 @@ const utils = require("../utils/utils");
 
 // Covered data domains names/desc listed here (those are used for logging only)
 const DM_INSTDEFS = "Instances Definitions";
-const DM_INSEVENTS = "Instances Events";
+const DM_INSTEVENTS = "Instances Events";
 const DM_DEPS = "Artifacts Dependencies";
 const DM_BUILDPARAMS = "Artifacts Builds Params";
 
@@ -32,7 +32,7 @@ module.exports = {
       uuid: instanceEvent.uuid
     };
     return saveObject(
-      DM_INSEVENTS,
+      DM_INSTEVENTS,
       config.getInstancesEventsDbPath(),
       instanceEvent,
       keyPairs,

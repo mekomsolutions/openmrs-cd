@@ -13,7 +13,7 @@ const path = require("path");
 const _ = require("lodash");
 
 const utils = require("../utils/utils");
-const model = require("../models/model");
+const model = require("../utils/model");
 const cst = require("../const");
 const config = require(cst.CONFIGPATH);
 const db = require(cst.DBPATH);
