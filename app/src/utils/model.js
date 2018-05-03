@@ -24,9 +24,9 @@ class Script {
  * Describes a Docker deployment
  */
 class DockerDeployment {
-  constructor(version) {
-    this.version = version;
-    // TODO: Align this implementation to what we settled on in our test resources.
+  constructor(image, tag) {
+    this.image = image;
+    this.tag = tag;
   }
 }
 

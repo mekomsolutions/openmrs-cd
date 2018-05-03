@@ -275,6 +275,9 @@ module.exports = {
     return "pipeline3";
   },
 
+  getInstanceVersions: function() {
+    return ["1.0.0"];
+  },
   getInstanceTypes: function() {
     return ["debug", "dev", "staging", "prod"];
   },

@@ -2,6 +2,7 @@
   "name": "walhalla-staging",
   "description": "Staging server for the Walhalla distro.",
   "type": "staging",
+  "version": "1.0.0",
   "artifacts": [
     {
       "type": "maven",
@@ -16,7 +17,6 @@
   "deployment": {
     "hostDir": "/var/docker-volumes/{{uuid}}",
     "type": "docker",
-    "version": "1.0.0",
     "value": {
       "image": "mekomsolutions/bahmni",
       "tag": "cambodia-release-0.90"

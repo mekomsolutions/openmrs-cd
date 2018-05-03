@@ -46,6 +46,14 @@ module.exports = {
       throw new Error(NEW_FLAG_MISSING_MSG);
     }
 
+    if (
+      isNew &&
+      config.getInstanceVersions().indexOf(instanceDef.version) < 0
+    ) {
+      throw new Error(
+        "A new instance definition must point to a supported implementation version."
+      );
+    }
     if (isNew && instanceDef.uuid) {
       throw new Error(
         "A new instance definition cannot be provided with an UUID."
@@ -61,7 +69,7 @@ module.exports = {
         "At least a name or a UUID is required to identify an instance."
       );
     }
-    if (config.getInstanceTypes().indexOf(instanceDef.type) < 0) {
+    if (isNew && config.getInstanceTypes().indexOf(instanceDef.type) < 0) {
       throw new Error(
         "The instance type is either not recognized or not supported: '" +
           instanceDef.type +
@@ -147,10 +155,14 @@ module.exports = {
   },
 
   validateDockerDeploymentConfigValue: function(value) {
-    log.warn(
-      "",
-      "The Docker config deployment value validator is not yet implemented."
-    );
+    if (
+      JSON.stringify(Object.keys(value).sort()) !==
+      JSON.stringify(Object.keys(new model.DockerDeployment()).sort())
+    ) {
+      throw new Error(
+        "The Docker deployment value should be provided as an instance of 'DockerDeployment'."
+      );
+    }
   },
 
   getConfigValidatorsMap: function() {

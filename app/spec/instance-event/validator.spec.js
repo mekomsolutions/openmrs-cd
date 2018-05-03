@@ -25,10 +25,19 @@ describe("The instances config validator", function() {
       );
     }).not.toThrow();
     expect(function() {
+      _script_.validateBaseConfig(
+        { name: "foo-instance", type: "dev", version: "1.0.0" },
+        true
+      );
+    }).not.toThrow();
+    expect(function() {
       _script_.validateBaseConfig({ uuid: "cAcb5448" }, true);
     }).toThrow();
     expect(function() {
       _script_.validateBaseConfig({ type: "dev" }, true);
+    }).toThrow();
+    expect(function() {
+      _script_.validateBaseConfig({ version: "_0.9999.abs_" }, true);
     }).toThrow();
   });
 

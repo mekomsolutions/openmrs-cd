@@ -31,7 +31,6 @@
     "deployment": {
       "hostDir": "/var/docker-volumes/{{uuid}}",
       "type": "docker",
-      "version": "1.0.0",
       "value": {
         "image": "mekomsolutions/bahmni",
         "tag": "cambodia-release-0.90"
@@ -69,7 +68,6 @@
     "deployment": {
       "hostDir": "/var/docker-volumes/{{uuid}}",
       "type": "docker",
-      "version": "1.0.0",
       "value": {
         "image": "mekomsolutions/bahmni",
         "tag": "cambodia-release-0.90"
