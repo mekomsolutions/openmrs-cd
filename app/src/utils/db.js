@@ -6,6 +6,7 @@ const path = require("path");
 const log = require("npmlog");
 const _ = require("lodash");
 const uuid = require("uuid/v4");
+const S = require("string");
 
 const cst = require("../const");
 const config = require(cst.CONFIGPATH);
@@ -80,9 +81,18 @@ module.exports = {
    * @return The complete updated version of the instance definition.
    */
   saveInstanceDefinition: function(instanceToSave, status) {
+    if (_.isEmpty(instanceToSave.uuid)) {
+      instanceToSave.uuid = uuid();
+    }
+    // substitute aliases that may be present in the instance definition
+    var aliasesMap = config.getInstanceDefinitionAliasesMap(instanceToSave);
+    instanceToSave = JSON.parse(
+      S(JSON.stringify(instanceToSave)).template(aliasesMap).s
+    );
+
     var keyPairs = {
       name: instanceToSave.name,
-      uuid: instanceToSave.uuid || uuid()
+      uuid: instanceToSave.uuid
     };
     return saveObject(
       DM_INSTDEFS,

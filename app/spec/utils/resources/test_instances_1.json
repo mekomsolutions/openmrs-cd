@@ -29,7 +29,7 @@
       }
     ],
     "deployment": {
-      "hostDir": "/var/docker-volumes/{{uuid}}",
+      "hostDir": "/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0",
       "type": "docker",
       "value": {
         "image": "mekomsolutions/bahmni",
@@ -66,7 +66,7 @@
       }
     ],
     "deployment": {
-      "hostDir": "/var/docker-volumes/{{uuid}}",
+      "hostDir": "/var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae",
       "type": "docker",
       "value": {
         "image": "mekomsolutions/bahmni",

@@ -31,10 +31,7 @@ if (_.isEmpty(instanceDef)) {
 //  Host metadata
 //
 var ssh = instanceDef.deployment.host.value; // TODO this should be extracted based on the host type
-var hostDir = instanceDef.deployment.hostDir.replace(
-  "{{uuid}}",
-  instanceDef.uuid
-);
+var hostDir = instanceDef.deployment.hostDir;
 
 //
 //  Building the script
