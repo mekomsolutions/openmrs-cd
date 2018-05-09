@@ -3,7 +3,7 @@
 const _ = require("lodash");
 const uuid = require("uuid/v4");
 
-var heredoc = uuid();
+var heredoc = "heredoc_delimiter_7e228d99";
 
 module.exports = {
   /*
