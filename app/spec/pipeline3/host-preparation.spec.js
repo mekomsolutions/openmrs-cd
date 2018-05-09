@@ -39,9 +39,7 @@ describe("Host preparation scripts", function() {
       path.resolve(config.getBuildDirPath(), config.getHostPrepareScriptName()),
       "utf8"
     );
-    var hostArtifactsDir =
-      instanceDef.deployment.hostDir.replace("{{uuid}}", instanceUuid) +
-      "/artifacts";
+    var hostArtifactsDir = instanceDef.deployment.hostDir + "/artifacts";
 
     expect(script).toContain("mkdir -p " + hostArtifactsDir);
     expect(script).toContain("rm -rf " + hostArtifactsDir + "/*");

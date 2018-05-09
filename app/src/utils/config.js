@@ -287,6 +287,14 @@ module.exports = {
   getInstanceArtifactsTypes: function() {
     return ["maven"];
   },
+  /**
+   * Possible aliases to use in an instance definition, and their mapped value
+   */
+  getInstanceDefinitionAliasesMap: function(instanceDef) {
+    return {
+      uuid: instanceDef.uuid
+    };
+  },
 
   getInstanceEventsProperties: function() {
     return ["uuid", "name", "type", "artifacts"];
