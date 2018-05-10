@@ -59,9 +59,6 @@ describe("Host preparation scripts", function() {
     expect(script).toContain("rm -rf " + hostArtifactsDir + "/*");
     var srcDir = process.env.WORKSPACE + "/" + instanceUuid + "/artifacts/";
 
-    expectedRsyncCommandAndArgs = "rsync -avz -e 'ssh -p 22' ";
-    expectedRsyncRemoteHostConnectionStr = "ec2-user@54.154.133.95:";
-
     expect(script).toContain(
       expectedRsyncCommandAndArgs +
         srcDir +
