@@ -68,6 +68,22 @@ if (process.env[config.varDeploymentChanges()] === "true") {
   }
 }
 
+// 'data'
+
+if (process.env[config.varDataChanges()] === "true") {
+  for (var index in instanceDef.data) {
+    var instanceDataDir = hostDir + "/data";
+    var data = instanceDef.data[index];
+    if (data.type === "instance") {
+      // Retrieve the data directory of the source instance
+      var sourceInstanceDataDir =
+        db.getInstanceDefinition(data.value.uuid).deployment.hostDir + "/data";
+      Object.assign(ssh, { remoteDst: true, remoteSrc: true });
+      script.body += scripts.rsync(ssh, sourceInstanceDataDir, instanceDataDir);
+    }
+  }
+}
+
 //
 //  Saving the script in the current build dir.
 //
