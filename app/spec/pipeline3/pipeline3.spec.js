@@ -81,5 +81,19 @@ describe("Tests suite for pipeline3", function() {
         config.getHostPrepareScriptName() +
         "'"
     );
+
+    // verif 'start instance' stage
+    expect(jenkinsFile).toContain(
+      "sh 'node /opt/app/src/$JOB_NAME/" +
+        config.getStartInstanceJsScriptName() +
+        "'"
+    );
+    expect(jenkinsFile).toContain(
+      "sh '$" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getStartInstanceScriptName() +
+        "'"
+    );
   });
 });
