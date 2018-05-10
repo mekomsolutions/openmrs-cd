@@ -176,6 +176,12 @@ module.exports = {
   getHostPrepareScriptName: function() {
     return "host-prepare.sh";
   },
+  getStartInstanceJsScriptName: function() {
+    return "start-instance.js";
+  },
+  getStartInstanceScriptName: function() {
+    return "start-instance.sh";
+  },
   getProjectBuildTriggerEnvvarsName: function() {
     return "trigger.env";
   },
