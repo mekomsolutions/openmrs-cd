@@ -72,15 +72,14 @@ if (process.env[config.varDeploymentChanges()] === "true") {
 
 if (process.env[config.varDataChanges()] === "true") {
   for (var index in instanceDef.data) {
-    var hostDataDir = hostDir + "/data";
+    var instanceDataDir = hostDir + "/data";
     var data = instanceDef.data[index];
     if (data.type === "instance") {
-      // Retrieve the data directory of the other instance
-      var hostSourceDataDir =
+      // Retrieve the data directory of the source instance
+      var sourceInstanceDataDir =
         db.getInstanceDefinition(data.value.uuid).deployment.hostDir + "/data";
-      // Source and destination are both on the remote host
       Object.assign(ssh, { remoteDst: true, remoteSrc: true });
-      script.body += scripts.rsync(ssh, hostSourceDataDir, hostDataDir);
+      script.body += scripts.rsync(ssh, sourceInstanceDataDir, instanceDataDir);
     }
   }
 }
