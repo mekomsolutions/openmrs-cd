@@ -1,25 +1,26 @@
-FROM jenkins/jenkins:2.104
+FROM jenkins/jenkins:2.121
 MAINTAINER Mekom Solutions <support@mekomsolutions.com> 
 
 USER root
 
-RUN apt-get update
-RUN apt-get -y install nano
-RUN apt-get -y install openssh-server
-RUN apt-get -y install rsync
-RUN apt-get -y install libxml2-utils # for xmllint
+RUN apt update
+RUN apt -y install nano
+RUN apt -y install openssh-server
+RUN apt -y install rsync
+RUN apt -y install libxml2-utils # for xmllint
 
 # These packages are needed for Jenkins to build some projects.
 # This is because the Jenkins server is used as its own agent. Build tasks are running directly on it.
-RUN apt-get -y install ruby-full
-RUN apt-get -y install ruby-compass
-RUN apt-get -y install xvfb
-RUN apt-get -y install firefox-esr
-RUN apt-get -y install sudo
+RUN apt -y install ruby-full
+RUN apt -y install ruby-compass
+RUN apt -y install xvfb
+RUN apt -y install firefox-esr
+RUN apt -y install sudo
+RUN apt -y install rsync
 
 # Installing Node.js
 RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-RUN sudo apt-get install -y nodejs
+RUN sudo apt install -y nodejs
 
 # Jenkins needs to be a sudo to execute some build tasks (particularly Bahmni Apps)
 RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
