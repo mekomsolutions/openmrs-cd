@@ -120,7 +120,6 @@ module.exports = {
     if (!script.endsWith("\n")) {
       script += "\n";
     }
-
     var remoteScript = "";
 
     remoteScript +=
@@ -141,11 +140,13 @@ module.exports = {
     return script;
   },
 
-  initFolder: function(folderPath) {
+  initFolder: function(folderPath, user) {
+    var group = user;
     var script = "";
 
-    script += "mkdir -p " + folderPath;
+    script += "sudo mkdir -p " + folderPath;
     script += "\n";
+    script += "sudo chown -R " + user + ":" + group + " " + folderPath + "\n";
     script += "rm -rf " + folderPath + "/*";
     script += "\n";
 

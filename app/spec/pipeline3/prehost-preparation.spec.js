@@ -37,12 +37,23 @@ describe("Pre-host preparation scripts", function() {
     );
     var artifactsPath = config.getCDArtifactsDirPath(instanceUuid);
 
-    expect(script).toContain("mkdir -p " + artifactsPath);
-    expect(script).toContain("rm -rf " + artifactsPath + "/*");
-    expect(script).toContain(
-      "mvn dependency:unpack -Dartifact=net.mekomsolutions:openmrs-distro-cambodia:1.1.0-SNAPSHOT:zip -DoutputDirectory=" +
-        artifactsPath
-    );
+    var expectedScript =
+      "set -xe\n" +
+      "sudo mkdir -p " +
+      artifactsPath +
+      "\n" +
+      "sudo chown -R jenkins:jenkins " +
+      artifactsPath +
+      "\n" +
+      "rm -rf " +
+      artifactsPath +
+      "/*\n" +
+      "mvn dependency:unpack -Dartifact=net.mekomsolutions:openmrs-distro-cambodia:1.1.0-SNAPSHOT:zip " +
+      "-DoutputDirectory=" +
+      artifactsPath +
+      "\n";
+
+    expect(script).toContain(expectedScript);
 
     // after
     tests.cleanup();
