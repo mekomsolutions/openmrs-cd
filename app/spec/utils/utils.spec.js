@@ -134,10 +134,10 @@ describe("Utils", function() {
 
   it("should find object based on keyMap.", function() {
     var expectedError1 = new Error(
-      "Illegal state: provided search keys were partially matched on the target objects"
+      "Illegal state: search keys were only partially matched when searching collection"
     );
     var expectedError2 = new Error(
-      "Illegal state: multiple objects matching the search keys"
+      "Illegal state: search keys were matched multiple times when searching collection"
     );
 
     var objects = [

@@ -163,7 +163,6 @@ module.exports = {
    */
   findObject: function(keyPairs, objects) {
     var filteredObjects = _.filter(objects, function(o) {
-      var found = false;
       var results = [];
       Object.keys(keyPairs).forEach(function(keyName) {
         var keyVal = keyPairs[keyName];
@@ -175,22 +174,21 @@ module.exports = {
           );
         }
         results.push(o[keyName] == keyVal);
-      })
-      results.forEach(function(item) {
-        if (results[0] != item) {
-          throw new Error(
-            "Illegal state: provided search keys were partially matched on the target objects"
-          );
-        }
-        found = item;
       });
+
+      var found = results[0];
+      if (!results.every(val => val === found)) {
+        throw new Error(
+          "Illegal state: search keys were only partially matched when searching collection"
+        );
+      }
       return found;
     });
 
     var matchedObject = {};
     if (filteredObjects.length > 1) {
       throw new Error(
-        "Illegal state: multiple objects matching the search keys"
+        "Illegal state: search keys were matched multiple times when searching collection"
       );
     }
     if (filteredObjects.length == 1) {
