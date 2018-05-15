@@ -42,7 +42,7 @@ describe("Test suite for webhook scripts", function() {
       "<command>node /opt/app/src/" + config.getTriggerJsScriptPath()
     );
     expect(jenkinsFile).toContain(
-      "<propertiesFilePath>$BUILD_PATH/" +
+      "<propertiesFilePath>$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/" +
         config.getProjectBuildTriggerEnvvarsName() +
         "</propertiesFilePath>"
     );

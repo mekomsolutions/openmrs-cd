@@ -45,9 +45,8 @@ describe("validate-instance", function() {
         config.getInstanceEventJsScriptName()
     );
     expect(jenkinsFile).toContain(
-      "<propertiesFile>$" +
-        config.varEnvvarBuildPath() +
-        "/" +
+      "<propertiesFile>" +
+        "$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/" +
         config.getProjectBuildTriggerEnvvarsName() +
         "</propertiesFile>"
     );
