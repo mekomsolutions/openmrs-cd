@@ -163,26 +163,33 @@ module.exports = {
    */
   findObject: function(keyPairs, objects) {
     var filteredObjects = _.filter(objects, function(o) {
-      var found = true;
-
+      var results = [];
       Object.keys(keyPairs).forEach(function(keyName) {
         var keyVal = keyPairs[keyName];
         if (_.isEmpty(keyVal)) {
-          found = false;
+          results.push(false);
           log.error(
             "",
             "An empty search key was provided preventing an object match."
           );
         }
-        found &= o[keyName] == keyVal;
+        results.push(o[keyName] == keyVal);
       });
 
+      var found = results[0];
+      if (!results.every(val => val === found)) {
+        throw new Error(
+          "Illegal state: search keys were only partially matched when searching collection"
+        );
+      }
       return found;
     });
 
     var matchedObject = {};
     if (filteredObjects.length > 1) {
-      throw new Error();
+      throw new Error(
+        "Illegal state: search keys were matched multiple times when searching collection"
+      );
     }
     if (filteredObjects.length == 1) {
       matchedObject = filteredObjects[0];

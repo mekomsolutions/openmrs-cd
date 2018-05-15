@@ -261,13 +261,7 @@ var getAllObjects = function(domainName, dbFilePath) {
  * @return The matched object in the data domain.
  */
 var getObject = function(domainName, dbFilePath, keyPairs) {
-  log.info(
-    "",
-    log.info(
-      "",
-      "Fetching an object in the data domain '" + domainName + "'..."
-    )
-  );
+  log.info("", "Fetching an object in the data domain '" + domainName + "'...");
   log.info("", JSON.stringify(keyPairs, null, 2));
 
   var objects = getAllObjects(domainName, dbFilePath);

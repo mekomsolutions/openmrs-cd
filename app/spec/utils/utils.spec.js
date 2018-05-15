@@ -3,6 +3,8 @@
 describe("Utils", function() {
   const folderInTest = __dirname + "/../../src/utils/";
   const fs = require("fs");
+  const _ = require("lodash");
+
   const utils = require(folderInTest + "utils");
   const model = require(folderInTest + "model");
 
@@ -128,5 +130,72 @@ describe("Utils", function() {
 
     // verif: undefined remains undefined
     expect(obj).toEqual(undefined);
+  });
+
+  it("should find object based on keyMap.", function() {
+    var expectedError1 = new Error(
+      "Illegal state: search keys were only partially matched when searching collection"
+    );
+    var expectedError2 = new Error(
+      "Illegal state: search keys were matched multiple times when searching collection"
+    );
+
+    var objects = [
+      {
+        uuid: "uuid-A",
+        name: "staging-cambodia"
+      },
+      {
+        uuid: "uuid-B",
+        name: "staging-cambodia"
+      },
+      {
+        uuid: "uuid-B",
+        name: "dev-cambodia"
+      },
+      {
+        uuid: "uuid-D",
+        name: "prod-cambodia"
+      }
+    ];
+
+    var keyPairs = {
+      uuid: "uuid-A"
+    };
+    expect(utils.findObject(keyPairs, objects).uuid).toEqual("uuid-A");
+
+    var keyPairs = {
+      uuid: "uuid-D",
+      name: "prod-cambodia"
+    };
+    expect(utils.findObject(keyPairs, objects).uuid).toEqual("uuid-D");
+
+    keyPairs = {
+      uuid: "uuid-B",
+      name: "staging-cambodia"
+    };
+    expect(function() {
+      utils.findObject(keyPairs, objects);
+    }).toThrow(expectedError1);
+
+    keyPairs = {
+      uuid: ""
+    };
+    expect(_.isEmpty(utils.findObject(keyPairs, objects))).toEqual(true);
+
+    var keyPairs = {
+      uuid: "uuid-D",
+      name: "dev-cambodia"
+    };
+    expect(function() {
+      utils.findObject(keyPairs, objects);
+    }).toThrow(expectedError1);
+
+    keyPairs = {
+      name: "staging-cambodia"
+    };
+    expect(function() {
+      utils.findObject(keyPairs, objects);
+    }).toThrow(expectedError2);
   });
 });
