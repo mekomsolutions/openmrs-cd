@@ -158,7 +158,7 @@ describe("validate-instance", function() {
     triggerParams[config.varInstanceName()] = "walhalla-staging";
     triggerParams[config.varArtifactsChanges()] = JSON.stringify(true);
     triggerParams[config.varDeploymentChanges()] = JSON.stringify(true);
-    triggerParams[config.varDataChanges()] = JSON.stringify(false);
+    triggerParams[config.varDataChanges()] = JSON.stringify(true);
 
     expect(
       fs.readFileSync(
