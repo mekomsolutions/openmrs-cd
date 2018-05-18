@@ -4,11 +4,13 @@
  * @param {string}
  */
 
-const log = require("npmlog");
+const path = require("path");
 const _ = require("lodash");
+const log = require("npmlog");
 
-const config = require("../utils/config");
 const model = require("../utils/model");
+const cst = require("../const");
+const config = require(cst.CONFIGPATH);
 
 const NEW_FLAG_MISSING_MSG =
   "There is no flag indicating whether the instance definition is new or not.";
@@ -39,6 +41,7 @@ module.exports = {
         "No artifacts were provided preventing to proceed further with the instance, aborting."
       );
     }
+    module.exports.validateDataSection(instanceDef.data, isNew);
   },
 
   validateBaseConfig: function(instanceDef, isNew) {
@@ -163,6 +166,35 @@ module.exports = {
         "The Docker deployment value should be provided as an instance of 'DockerDeployment'."
       );
     }
+  },
+
+  validateDataSection: function(data) {
+    if (_.isEmpty(data)) {
+      return true;
+    }
+    data.forEach(function(element) {
+      if (element.type === "instance") {
+        var empty = _.isEmpty(element.value) || _.isEmpty(element.value.uuid);
+        if (empty) {
+          throw new Error(
+            "The data.type 'instance' section did not contain enough information to proceed further with the instance, aborting."
+          );
+        }
+        return true;
+      }
+      if (element.type === "sql") {
+        var empty =
+          _.isEmpty(element.value) ||
+          _.isEmpty(element.value.engine) ||
+          _.isEmpty(element.value.database) ||
+          _.isEmpty(element.value.sourceFile);
+        if (empty) {
+          throw new Error(
+            "The data.type 'sql' section did not contain enough information to proceed further with the instance, aborting."
+          );
+        }
+      }
+    });
   },
 
   getConfigValidatorsMap: function() {

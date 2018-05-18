@@ -29,5 +29,21 @@
         "port": "22"
       }
     }
-  }
+  },
+  "data": [
+    {
+      "type": "instance",
+      "value": {
+        "uuid": "50b6cf72-0e80-457d-8141-a0c8c85d4dae"
+      }
+    },
+    {
+      "type": "sql",
+      "value": {
+        "engine": "mysql",
+        "database": "openmrs",
+        "sourceFile": "/var/reference-data/demo-data.sql"
+      }
+    }
+  ]
 }
