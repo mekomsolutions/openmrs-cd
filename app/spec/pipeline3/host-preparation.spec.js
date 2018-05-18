@@ -119,4 +119,32 @@ describe("Host preparation scripts", function() {
         hostDataDir
     );
   });
+  it("should fail when instance to copy is non-existing.", function() {
+    process.env[config.varInstanceUuid()] = instanceUuid;
+    process.env[config.varDataChanges()] = "true";
+    var instanceDef = db.getInstanceDefinition(instanceUuid);
+
+    // replay
+    proxyquire(
+      path.resolve(
+        "src/" + config.getJobNameForPipeline3() + "/host-preparation.js"
+      ),
+      tests.stubs()
+    );
+
+    instanceDef.data[0].value.uuid = "non-exsiting-instance-uuid";
+    db.saveInstanceDefinition(instanceDef, instanceUuid);
+
+    // Expect an error to be thrown...
+    expect(function() {
+      proxyquire(
+        path.resolve(
+          "src/" + config.getJobNameForPipeline3() + "/host-preparation.js"
+        ),
+        tests.stubs()
+      );
+    }).toThrow(
+      new Error("Illegal argument: empty or unexisting instance definition.")
+    );
+  });
 });

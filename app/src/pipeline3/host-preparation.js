@@ -8,6 +8,7 @@
 const fs = require("fs");
 const path = require("path");
 const _ = require("lodash");
+const log = require("npmlog");
 
 const utils = require("../utils/utils");
 const model = require("../utils/model");
@@ -79,9 +80,18 @@ if (process.env[config.varDataChanges()] === "true") {
     var instanceDataDir = hostDir + "/data";
     var data = instanceDef.data[index];
     if (data.type === "instance") {
-      // Retrieve the data directory of the source instance
-      var sourceInstanceDataDir =
-        db.getInstanceDefinition(data.value.uuid).deployment.hostDir + "/data";
+      // Retrieve the source instance
+      var sourceInstance = db.getInstanceDefinition(data.value.uuid);
+      if (_.isEmpty(sourceInstance)) {
+        log.error(
+          "",
+          "Source instance definition could not be found. Instance can not use data of non-existing instance."
+        );
+        throw new Error(
+          "Illegal argument: empty or unexisting instance definition."
+        );
+      }
+      var sourceInstanceDataDir = sourceInstance.deployment.hostDir + "/data";
       Object.assign(ssh, { remoteDst: true, remoteSrc: true });
       script.body += scripts.rsync(ssh, sourceInstanceDataDir, instanceDataDir);
     }
