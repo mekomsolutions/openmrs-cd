@@ -15,5 +15,6 @@ module.exports = {
   CONFIGPATH: path.resolve(__root, "src/utils/config"),
   DBPATH: path.resolve(__root, "src/utils/db"),
 
-  ABSTRACT: "__abstract__"
+  ABSTRACT: "__abstract__",
+  HEREDOC: "heredoc_delimiter_7e228d99"
 };
