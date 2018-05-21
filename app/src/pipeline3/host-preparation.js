@@ -92,7 +92,7 @@ if (process.env[config.varDataChanges()] === "true") {
           "Illegal argument: empty or unexisting instance definition."
         );
       }
-      var sourceInstanceDataDir = sourceInstance.deployment.hostDir + "/data";
+      var sourceInstanceDataDir = sourceInstance.deployment.hostDir + "/data/";
       script.body += scripts.remote(
         ssh,
         scripts.rsync("", sourceInstanceDataDir, instanceDataDir)

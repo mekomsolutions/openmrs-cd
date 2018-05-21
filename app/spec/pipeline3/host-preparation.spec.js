@@ -120,7 +120,7 @@ describe("Host preparation scripts", function() {
         heredocDelimiter +
         "\n" +
         rsyncCommand +
-        " /var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae/data " +
+        " /var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae/data/ " +
         hostDataDir
     );
   });
