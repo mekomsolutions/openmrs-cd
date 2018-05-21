@@ -31,7 +31,9 @@ pipeline {
     }
     stage ('Start or restart the instance') {
       steps {
-        sh 'echo "Stage/steps awaiting implementation... Skipping."'
+        sh 'node /opt/app/src/$JOB_NAME/start-instance.js'
+        sh 'cat $BUILD_PATH/start-instance.sh'
+        sh '$BUILD_PATH/start-instance.sh'
       }
     }
     stage ('Instance startup status monitoring') {

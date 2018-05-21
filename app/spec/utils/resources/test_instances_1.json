@@ -7,6 +7,7 @@
     "name": "cambodia-dev-1",
     "description": "Dev server for agile development on the ODC.",
     "type": "dev",
+    "group": "tlc",
     "version": "1.0.0",
     "artifacts": [
       {
@@ -33,7 +34,11 @@
       "type": "docker",
       "value": {
         "image": "mekomsolutions/bahmni",
-        "tag": "cambodia-release-0.90"
+        "tag": "cambodia-release-0.90",
+        "ports": {
+          "443": "8733",
+          "80": "8180"
+        }
       },
       "host": {
         "type": "ssh",
