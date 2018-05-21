@@ -5,12 +5,14 @@ describe("Host preparation scripts", function() {
   const fs = require("fs");
   const path = require("path");
   const _ = require("lodash");
-
   const proxyquire = require("proxyquire");
 
+  const cst = require(path.resolve("src/const"));
+
+  const heredocDelimiter = cst.HEREDOC;
   var tests, stubs, config, scripts, db;
   var instanceUuid;
-  var expectedRsyncCommandAndArgs, expectedRsyncRemoteHostConnectionStr;
+  var remoteHostConnectionStr, rsyncCommand, remoteRsyncCommand, sshCommand;
 
   beforeEach(function() {
     tests = require(path.resolve("spec/utils/testUtils"));
@@ -27,8 +29,10 @@ describe("Host preparation scripts", function() {
     process.env[config.varDataChanges()] = "false";
 
     instanceUuid = "cacb5448-46b0-4808-980d-5521775671c0";
-    expectedRsyncCommandAndArgs = "rsync -avz -e 'ssh -p 22' ";
-    expectedRsyncRemoteHostConnectionStr = "ec2-user@54.154.133.95:";
+    remoteHostConnectionStr = "ec2-user@54.154.133.95";
+    sshCommand = "ssh -T " + remoteHostConnectionStr + " -p 22 <<";
+    rsyncCommand = "rsync -avz";
+    remoteRsyncCommand = rsyncCommand + " -e 'ssh -p 22' ";
   });
 
   afterEach(function() {
@@ -60,10 +64,11 @@ describe("Host preparation scripts", function() {
     var srcDir = process.env.WORKSPACE + "/" + instanceUuid + "/artifacts/";
 
     expect(script).toContain(
-      expectedRsyncCommandAndArgs +
+      remoteRsyncCommand +
         srcDir +
         " " +
-        expectedRsyncRemoteHostConnectionStr +
+        remoteHostConnectionStr +
+        ":" +
         hostArtifactsDir
     );
   });
@@ -111,11 +116,11 @@ describe("Host preparation scripts", function() {
     );
     var hostDataDir = instanceDef.deployment.hostDir + "/data";
     expect(script).toContain(
-      expectedRsyncCommandAndArgs +
-        expectedRsyncRemoteHostConnectionStr +
-        "/var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae" +
-        "/data " +
-        expectedRsyncRemoteHostConnectionStr +
+      sshCommand +
+        heredocDelimiter +
+        "\n" +
+        rsyncCommand +
+        " /var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae/data " +
         hostDataDir
     );
   });
