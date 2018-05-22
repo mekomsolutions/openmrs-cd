@@ -10,6 +10,7 @@ pipeline {
         sh 'node /opt/app/src/$JOB_NAME/prehost-preparation.js'
         sh 'cat $BUILD_PATH/prehost-prepare.sh'
         sh '$BUILD_PATH/prehost-prepare.sh'
+        sh 'export status=1; node /opt/app/src/$JOB_NAME/update-status.js'
       }
     }
     stage ('Host preparation') {
@@ -17,6 +18,7 @@ pipeline {
         sh 'node /opt/app/src/$JOB_NAME/host-preparation.js'
         sh 'cat $BUILD_PATH/host-prepare.sh'
         sh '$BUILD_PATH/host-prepare.sh'
+        sh 'export status=2; node /opt/app/src/$JOB_NAME/update-status.js'
       }
     }
     stage ('Maintenance mode: ON') {
@@ -34,6 +36,7 @@ pipeline {
         sh 'node /opt/app/src/$JOB_NAME/start-instance.js'
         sh 'cat $BUILD_PATH/start-instance.sh'
         sh '$BUILD_PATH/start-instance.sh'
+        sh 'export status=5; node /opt/app/src/$JOB_NAME/update-status.js'
       }
     }
     stage ('Instance startup status monitoring') {
