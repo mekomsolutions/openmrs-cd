@@ -67,6 +67,13 @@ describe("Tests suite for pipeline3", function() {
         config.getPrehostPrepareScriptName() +
         "'"
     );
+    expect(jenkinsFile).toContain(
+      "sh 'export status=" +
+        config.getPrehostPrepareStatusCode() +
+        "; node /opt/app/src/$JOB_NAME/" +
+        config.getUpdateStatusJsScriptName() +
+        "'"
+    );
 
     // verif 'host prepare' stage
     expect(jenkinsFile).toContain(
@@ -81,6 +88,13 @@ describe("Tests suite for pipeline3", function() {
         config.getHostPrepareScriptName() +
         "'"
     );
+    expect(jenkinsFile).toContain(
+      "sh 'export status=" +
+        config.getHostPrepareStatusCode() +
+        "; node /opt/app/src/$JOB_NAME/" +
+        config.getUpdateStatusJsScriptName() +
+        "'"
+    );
 
     // verif 'start instance' stage
     expect(jenkinsFile).toContain(
@@ -93,6 +107,13 @@ describe("Tests suite for pipeline3", function() {
         config.varEnvvarBuildPath() +
         "/" +
         config.getStartInstanceScriptName() +
+        "'"
+    );
+    expect(jenkinsFile).toContain(
+      "sh 'export status=" +
+        config.getStartInstanceStatusCode() +
+        "; node /opt/app/src/$JOB_NAME/" +
+        config.getUpdateStatusJsScriptName() +
         "'"
     );
   });

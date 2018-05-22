@@ -72,6 +72,9 @@ module.exports = {
   varEnvvarBuildPath: function() {
     return "BUILD_PATH";
   },
+  varStatus: function() {
+    return "status";
+  },
 
   /**
    * The app data dir is where persistent data should be kept.
@@ -170,17 +173,29 @@ module.exports = {
   getPrehostPrepareScriptName: function() {
     return "prehost-prepare.sh";
   },
+  getPrehostPrepareStatusCode: function() {
+    return "1";
+  },
   getHostPrepareJsScriptName: function() {
     return "host-preparation.js";
   },
   getHostPrepareScriptName: function() {
     return "host-prepare.sh";
   },
+  getHostPrepareStatusCode: function() {
+    return "2";
+  },
   getStartInstanceJsScriptName: function() {
     return "start-instance.js";
   },
   getStartInstanceScriptName: function() {
     return "start-instance.sh";
+  },
+  getStartInstanceStatusCode: function() {
+    return "5";
+  },
+  getUpdateStatusJsScriptName: function() {
+    return "update-status.js";
   },
   getProjectBuildTriggerEnvvarsName: function() {
     return "trigger.env";
