@@ -183,5 +183,105 @@ module.exports = {
     }
 
     return script;
+  },
+
+  /*
+   * Script utils to manipulate Docker containers.
+   *
+   */
+  container: {
+    /*
+     * Util function that wraps the passed commands so each is applied either if the container exists or if it does not.
+     * 
+     * @param {String} containerName - The name of the container.
+     * @param {String} ifExistsCommand - The command that should run if the container exists.
+     * @param {String} elseCommand - The command that will run if the container does *not* exist.
+     *
+     * @return {String} The script as a string.
+     */
+    ifExists: function(containerName, ifExistsCommand, elseCommand) {
+      var cmd = "";
+      cmd +=
+        "container=\\$(docker ps -a --filter name=" +
+        containerName +
+        " --format {{.Names}})\n";
+      cmd += 'if [ "\\$container" == "' + containerName + '" ]\n';
+      cmd += "then ";
+      cmd += !_.isEmpty(ifExistsCommand) ? ifExistsCommand : "echo\n";
+      cmd += "else ";
+      cmd += !_.isEmpty(elseCommand) ? elseCommand : "echo\n";
+      cmd += "fi\n";
+
+      return cmd;
+    },
+
+    /*
+     * Generates a script that restarts the passed container.
+     * 
+     * @param {String} containerName - The name of the container to restart.
+     *
+     * @return {String} The script as a string.
+     */
+    restart: function(containerName) {
+      var cmd = "";
+      cmd += "docker restart " + containerName + "\n";
+      return module.exports.container.ifExists(containerName, cmd);
+    },
+
+    /*
+     * Generates a script to remove the passed container.
+     * 
+     * @param {String} containerName - The name of the container to restart.
+     *
+     * @return {String} The script as a string.
+     */
+    remove: function(containerName) {
+      var cmd = "";
+      cmd += "docker stop " + containerName + "\n";
+      cmd += "docker rm -v " + containerName + "\n";
+      return module.exports.container.ifExists(containerName, cmd);
+    },
+
+    run: function(containerName, instanceDef) {
+      var hostDir = instanceDef.deployment.hostDir;
+      var docker = instanceDef.deployment.value;
+
+      var cmd = "";
+      var cmdArgs = [];
+      cmdArgs.push("docker run -dit");
+      cmdArgs.push("--restart unless-stopped");
+
+      Object.keys(docker.ports).forEach(function(key) {
+        cmdArgs.push("--publish " + docker.ports[key] + ":" + key);
+      });
+
+      var labels = {
+        type: instanceDef.type,
+        group: instanceDef.group
+      };
+      Object.keys(labels).forEach(function(key) {
+        cmdArgs.push("--label " + key + "=" + labels[key]);
+      });
+
+      cmdArgs.push("--name " + containerName);
+      cmdArgs.push("--hostname bahmni");
+
+      var mounts = {
+        "/mnt": hostDir
+      };
+      Object.keys(mounts).forEach(function(key) {
+        cmdArgs.push(
+          "--mount type=bind,source=" + mounts[key] + ",target=" + key
+        );
+      });
+
+      cmdArgs.push(docker.image + ":" + docker.tag);
+
+      cmdArgs.forEach(function(arg, index) {
+        cmd += arg;
+        cmd += !cmdArgs[index + 1] ? "" : " ";
+      });
+      return cmd + "\n";
+    }
   }
 };
