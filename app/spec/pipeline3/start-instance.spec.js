@@ -35,6 +35,34 @@ describe("Start instance scripts", function() {
     tests.cleanup();
   });
 
+  it("should generate bash script upon artifact changes.", function() {
+    process.env[config.varInstanceUuid()] = instanceUuid;
+    process.env[config.varArtifactsChanges()] = "true";
+    var instanceDef = db.getInstanceDefinition(instanceUuid);
+
+    // replay
+    proxyquire(
+      path.resolve(
+        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
+      ),
+      tests.stubs()
+    );
+
+    // verif
+    var script = fs.readFileSync(
+      path.resolve(
+        config.getBuildDirPath(),
+        config.getStartInstanceScriptName()
+      ),
+      "utf8"
+    );
+    var ssh = instanceDef.deployment.host.value;
+
+    expect(script).toContain(
+      scripts.remote(ssh, scripts.container.restart(instanceUuid))
+    );
+  });
+
   it("should generate bash script upon deployment changes.", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
     process.env[config.varDeploymentChanges()] = "true";
@@ -56,11 +84,13 @@ describe("Start instance scripts", function() {
       ),
       "utf8"
     );
+
+    var ssh = instanceDef.deployment.host.value;
+    var docker = scripts.container;
+
     expect(script).toContain(
-      "set -e\n" +
-        "ssh -T ec2-user@54.154.133.95 -p 22 <<heredoc_delimiter_7e228d99\n" +
-        "docker run -dit --restart unless-stopped --publish 8180:80 --publish 8733:443 --label type=dev --label group=tlc --name cacb5448-46b0-4808-980d-5521775671c0 --hostname bahmni --mount type=bind,source=/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0,target=/mnt mekomsolutions/bahmni:cambodia-release-0.90\n" +
-        "heredoc_delimiter_7e228d99"
+      scripts.remote(ssh, docker.remove(instanceUuid)) +
+        scripts.remote(ssh, docker.run(instanceUuid, instanceDef))
     );
   });
 });
