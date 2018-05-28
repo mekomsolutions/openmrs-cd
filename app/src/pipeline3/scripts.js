@@ -1,9 +1,12 @@
 "use strict";
 
+const path = require("path");
 const _ = require("lodash");
 const uuid = require("uuid/v4");
 
-var heredoc = "heredoc_delimiter_7e228d99";
+const cst = require("../const");
+const heredoc = cst.HEREDOC;
+const heredoc_2 = cst.HEREDOC_2;
 
 module.exports = {
   /*
@@ -140,14 +143,14 @@ module.exports = {
     return script;
   },
 
-  initFolder: function(folderPath, user) {
+  initFolder: function(folderPath, user, wipe) {
     var group = user;
     var script = "";
 
     script += "sudo mkdir -p " + folderPath;
     script += "\n";
     script += "sudo chown -R " + user + ":" + group + " " + folderPath + "\n";
-    script += "rm -rf " + folderPath + "/*";
+    script += wipe == true ? "rm -rf " + folderPath + "/*" : "";
     script += "\n";
 
     return script;
@@ -200,19 +203,20 @@ module.exports = {
      * @return {String} The script as a string.
      */
     ifExists: function(containerName, ifExistsCommand, elseCommand) {
-      var cmd = "";
-      cmd +=
+      var script = "";
+      script += "set -xe\n";
+      script +=
         "container=\\$(docker ps -a --filter name=" +
         containerName +
         " --format {{.Names}})\n";
-      cmd += 'if [ "\\$container" == "' + containerName + '" ]\n';
-      cmd += "then ";
-      cmd += !_.isEmpty(ifExistsCommand) ? ifExistsCommand : "echo\n";
-      cmd += "else ";
-      cmd += !_.isEmpty(elseCommand) ? elseCommand : "echo\n";
-      cmd += "fi\n";
+      script += 'if [ "\\$container" == "' + containerName + '" ]\n';
+      script += "then ";
+      script += !_.isEmpty(ifExistsCommand) ? ifExistsCommand : "echo\n";
+      script += "else ";
+      script += !_.isEmpty(elseCommand) ? elseCommand : "echo\n";
+      script += "fi\n";
 
-      return cmd;
+      return script;
     },
 
     /*
@@ -223,9 +227,10 @@ module.exports = {
      * @return {String} The script as a string.
      */
     restart: function(containerName) {
-      var cmd = "";
-      cmd += "docker restart " + containerName + "\n";
-      return module.exports.container.ifExists(containerName, cmd);
+      var script = "";
+      script += "set -xe\n";
+      script += "docker restart " + containerName + "\n";
+      return module.exports.container.ifExists(containerName, script);
     },
 
     /*
@@ -236,23 +241,34 @@ module.exports = {
      * @return {String} The script as a string.
      */
     remove: function(containerName) {
-      var cmd = "";
-      cmd += "docker stop " + containerName + "\n";
-      cmd += "docker rm -v " + containerName + "\n";
-      return module.exports.container.ifExists(containerName, cmd);
+      var script = "";
+      script += "set -xe\n";
+      script += "docker stop " + containerName + "\n";
+      script += "docker rm -v " + containerName + "\n";
+      return module.exports.container.ifExists(containerName, script);
     },
 
+    /*
+     * Run a new container with the appropriate options.
+     * 
+     * @param {String} containerName - The name of the container to restart.
+     * @param {Object} instanceDef - The instance definition of the instance to start.
+     *
+     * @return {String} The script as a string.
+     */
     run: function(containerName, instanceDef) {
       var hostDir = instanceDef.deployment.hostDir;
       var docker = instanceDef.deployment.value;
 
-      var cmd = "";
-      var cmdArgs = [];
-      cmdArgs.push("docker run -dit");
-      cmdArgs.push("--restart unless-stopped");
+      var script = "";
+      script += "set -xe\n";
+
+      var scriptArgs = [];
+      scriptArgs.push("docker run -dit");
+      scriptArgs.push("--restart unless-stopped");
 
       Object.keys(docker.ports).forEach(function(key) {
-        cmdArgs.push("--publish " + docker.ports[key] + ":" + key);
+        scriptArgs.push("--publish " + docker.ports[key] + ":" + key);
       });
 
       var labels = {
@@ -260,28 +276,72 @@ module.exports = {
         group: instanceDef.group
       };
       Object.keys(labels).forEach(function(key) {
-        cmdArgs.push("--label " + key + "=" + labels[key]);
+        scriptArgs.push("--label " + key + "=" + labels[key]);
       });
 
-      cmdArgs.push("--name " + containerName);
-      cmdArgs.push("--hostname bahmni");
+      scriptArgs.push("--name " + containerName);
+      scriptArgs.push("--hostname bahmni");
 
       var mounts = {
         "/mnt": hostDir
       };
       Object.keys(mounts).forEach(function(key) {
-        cmdArgs.push(
+        scriptArgs.push(
           "--mount type=bind,source=" + mounts[key] + ",target=" + key
         );
       });
 
-      cmdArgs.push(docker.image + ":" + docker.tag);
+      scriptArgs.push(docker.image + ":" + docker.tag);
 
-      cmdArgs.forEach(function(arg, index) {
-        cmd += arg;
-        cmd += !cmdArgs[index + 1] ? "" : " ";
+      scriptArgs.forEach(function(arg, index) {
+        script += arg;
+        script += !scriptArgs[index + 1] ? "" : " ";
       });
-      return cmd + "\n";
+      return script + "\n";
+    },
+
+    /*
+     * Executes the passed shell command into the container.
+     * 
+     * @param {String} containerName - The name of the container on which to execute the command.
+     * @param {String} command - The command to execute.
+     *
+     * @return {String} The script as a string.
+     */
+    exec: function(containerName, command) {
+      var script = "";
+      script += "set -xe\n";
+      script +=
+        "docker exec -i " +
+        containerName +
+        " /bin/bash -s <<" +
+        heredoc_2 +
+        "\n";
+      script += "set -xe\n";
+      script += command + "\n";
+      script += heredoc_2;
+
+      return script + "\n";
+    },
+
+    /*
+     * Copy 'source' located on the host to the container's 'destination'.
+     * 
+     * @param {String} containerName - The name of the container onto which to copy the data.
+     * @param {String} source - The source file to be copied on the container.
+     * @param {String} destination - The destination location for this file.
+    *
+     * @return {String} The script as a string.
+     */
+    copy: function(containerName, source, destination) {
+      var script = "";
+      script += module.exports.container.exec(
+        containerName,
+        "mkdir -p " + destination
+      );
+      script += "docker cp " + source + " " + containerName + ":" + destination;
+
+      return script + "\n";
     }
   }
 };

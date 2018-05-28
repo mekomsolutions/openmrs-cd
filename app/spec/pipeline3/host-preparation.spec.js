@@ -60,7 +60,6 @@ describe("Host preparation scripts", function() {
     var hostArtifactsDir = instanceDef.deployment.hostDir + "/artifacts";
 
     expect(script).toContain("mkdir -p " + hostArtifactsDir);
-    expect(script).toContain("rm -rf " + hostArtifactsDir + "/*");
     var srcDir = process.env.WORKSPACE + "/" + instanceUuid + "/artifacts/";
 
     expect(script).toContain(

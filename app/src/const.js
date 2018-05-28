@@ -16,5 +16,6 @@ module.exports = {
   DBPATH: path.resolve(__root, "src/utils/db"),
 
   ABSTRACT: "__abstract__",
-  HEREDOC: "heredoc_delimiter_7e228d99"
+  HEREDOC: "heredoc_delimiter_7e228d99",
+  HEREDOC_2: "heredoc_delimiter_ec8cd90e"
 };
