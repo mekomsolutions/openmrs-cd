@@ -58,10 +58,20 @@
       },
       {
         "type": "sql",
+        "executionStage": "5",
         "value": {
           "engine": "mysql",
           "database": "openmrs",
           "sourceFile": "/var/reference-data/demo-data.sql"
+        }
+      },
+      {
+        "type": "sql",
+        "executionStage": "6",
+        "value": {
+          "engine": "mysql",
+          "database": "openmrs",
+          "sourceFile": "/var/reference-data/copyConcepts.sql"
         }
       }
     ]

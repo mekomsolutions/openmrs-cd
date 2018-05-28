@@ -2,6 +2,7 @@
 
 const path = require("path");
 const _ = require("lodash");
+const uuid = require("uuid/v4");
 
 /**
  * Configuration API, typically to specify files or dirs locations.
@@ -319,5 +320,8 @@ module.exports = {
 
   getInstanceEventsProperties: function() {
     return ["uuid", "name", "type", "artifacts"];
+  },
+  getUuid: function() {
+    return uuid();
   }
 };

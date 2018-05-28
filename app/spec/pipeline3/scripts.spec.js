@@ -6,6 +6,8 @@ describe("Scripts", function() {
   const path = require("path");
 
   const config = require(path.resolve("src/utils/config"));
+  const cst = require(path.resolve("src/const"));
+  const heredoc_2 = cst.HEREDOC_2;
 
   const scripts = require(path.resolve(
     "src/" + config.getJobNameForPipeline3() + "/scripts"
@@ -87,7 +89,8 @@ describe("Scripts", function() {
     };
 
     expect(docker.run("cambodia1", instanceDef)).toEqual(
-      "docker run -dit --restart unless-stopped " +
+      "set -xe\n" +
+        "docker run -dit --restart unless-stopped " +
         "--publish 8180:80 --publish 8733:443 --label type=dev --label group=tlc " +
         "--name cambodia1 --hostname bahmni " +
         "--mount type=bind,source=/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0,target=/mnt " +
@@ -98,14 +101,16 @@ describe("Scripts", function() {
   it("should generate ifExists wrapper", function() {
     var docker = scripts.container;
     expect(docker.ifExists("cambodia1", "cmd1\n", "cmd2\n")).toEqual(
-      "container=\\$(docker ps -a --filter name=cambodia1 --format {{.Names}})\n" +
+      "set -xe\n" +
+        "container=\\$(docker ps -a --filter name=cambodia1 --format {{.Names}})\n" +
         'if [ "\\$container" == "cambodia1" ]\n' +
         "then cmd1\n" +
         "else cmd2\n" +
         "fi\n"
     );
     expect(docker.ifExists("cambodia1")).toEqual(
-      "container=\\$(docker ps -a --filter name=cambodia1 --format {{.Names}})\n" +
+      "set -xe\n" +
+        "container=\\$(docker ps -a --filter name=cambodia1 --format {{.Names}})\n" +
         'if [ "\\$container" == "cambodia1" ]\n' +
         "then echo\n" +
         "else echo\n" +
@@ -116,7 +121,7 @@ describe("Scripts", function() {
   it("should generate Docker restart command", function() {
     var docker = scripts.container;
     expect(docker.restart("cambodia1")).toEqual(
-      docker.ifExists("cambodia1", "docker restart cambodia1\n")
+      docker.ifExists("cambodia1", "set -xe\n" + "docker restart cambodia1\n")
     );
   });
 
@@ -125,8 +130,30 @@ describe("Scripts", function() {
     expect(docker.remove("cambodia1")).toEqual(
       docker.ifExists(
         "cambodia1",
-        "docker stop cambodia1\ndocker rm -v cambodia1\n"
+        "set -xe\ndocker stop cambodia1\ndocker rm -v cambodia1\n"
       )
+    );
+  });
+
+  it("should generate Docker exec command", function() {
+    var docker = scripts.container;
+    expect(docker.exec("cambodia1", "echo 'test'")).toEqual(
+      "set -xe\n" +
+        "docker exec -i cambodia1 /bin/bash -s <<" +
+        heredoc_2 +
+        "\n" +
+        "set -xe\n" +
+        "echo 'test'\n" +
+        heredoc_2 +
+        "\n"
+    );
+  });
+
+  it("should generate Docker copy command", function() {
+    var docker = scripts.container;
+    expect(docker.copy("cambodia1", "/tmp/test1", "/tmp/test2")).toEqual(
+      docker.exec("cambodia1", "mkdir -p /tmp/test2") +
+        "docker cp /tmp/test1 cambodia1:/tmp/test2\n"
     );
   });
 });
