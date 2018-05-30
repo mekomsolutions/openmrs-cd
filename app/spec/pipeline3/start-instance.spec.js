@@ -7,16 +7,11 @@ describe("Start instance scripts", function() {
   const _ = require("lodash");
 
   const proxyquire = require("proxyquire");
-
-  var tests, stubs, config, scripts, db;
-  var instanceUuid;
-
-  var uuid = "1234";
-  var getUuid = function() {
-    return uuid;
-  };
+  var tests, stubs, utils, config, scripts, db;
+  var instanceUuid, testRandomString;
 
   beforeEach(function() {
+    utils = require(path.resolve("src/utils/utils"));
     tests = require(path.resolve("spec/utils/testUtils"));
     stubs = tests.stubs();
 
@@ -31,6 +26,7 @@ describe("Start instance scripts", function() {
     process.env[config.varDataChanges()] = "false";
 
     instanceUuid = "cacb5448-46b0-4808-980d-5521775671c0";
+    testRandomString = "0.7p3z2u8fbvi76n32bg"
   });
 
   afterEach(function() {
@@ -101,12 +97,17 @@ describe("Start instance scripts", function() {
     process.env[config.varDataChanges()] = "true";
     var instanceDef = db.getInstanceDefinition(instanceUuid);
 
+    var mockUtils = Object.assign({}, utils);
+    mockUtils.random = function() {
+        return testRandomString;
+    }  
+
     // replay
     proxyquire(
       path.resolve(
         "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
       ),
-      tests.stubs(null, { getUuid: getUuid })
+      tests.stubs({"../utils/utils": mockUtils})
     );
 
     // verif
@@ -133,7 +134,7 @@ describe("Start instance scripts", function() {
     );
 
     var sqlCmd =
-      "cat /tmp/1234/demo-data.sql | mysql -uroot -ppassword openmrs";
+      "cat /tmp/n32bg/demo-data.sql | mysql -uroot -ppassword openmrs";
     expect(script).toContain(
       scripts.remote(ssh, docker.exec(instanceUuid, sqlCmd))
     );
@@ -147,7 +148,7 @@ describe("Start instance scripts", function() {
       path.resolve(
         "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
       ),
-      tests.stubs(null, { getUuid: getUuid })
+      tests.stubs({"../utils/utils": mockUtils})
     );
 
     // verif
@@ -160,7 +161,7 @@ describe("Start instance scripts", function() {
     );
 
     sqlCmd =
-      "zcat /tmp/1234/demo-data.sql.gz | mysql -uroot -ppassword openmrs";
+      "zcat /tmp/" + testRandomString.slice(-5) + "/demo-data.sql.gz | mysql -uroot -ppassword openmrs";
     expect(script).toContain(
       scripts.remote(ssh, docker.exec(instanceUuid, sqlCmd))
     );
@@ -175,12 +176,17 @@ describe("Start instance scripts", function() {
       instanceDef.data[1].value.sourceFile + ".gz";
     db.saveInstanceDefinition(instanceDef, instanceUuid);
 
+    var mockUtils = Object.assign({}, utils);
+    mockUtils.random = function() {
+        return testRandomString;
+    }  
+
     // replay
     proxyquire(
       path.resolve(
         "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
       ),
-      tests.stubs(null, { getUuid: getUuid })
+      tests.stubs({"../utils/utils": mockUtils})
     );
 
     // verif
@@ -194,13 +200,11 @@ describe("Start instance scripts", function() {
 
     var ssh = instanceDef.deployment.host.value;
     var docker = scripts.container;
-
     var sqlCmd =
-      "zcat /tmp/1234/demo-data.sql.gz | mysql -uroot -ppassword openmrs";
+      "zcat /tmp/" + testRandomString.slice(-5) + "/demo-data.sql.gz | mysql -uroot -ppassword openmrs";
     expect(script).toContain(
       scripts.remote(ssh, docker.exec(instanceUuid, sqlCmd))
     );
   });
 
-  it("should handle execution stage.", function() {});
 });
