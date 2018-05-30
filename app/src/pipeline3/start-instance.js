@@ -98,7 +98,10 @@ if (process.env[config.varDataChanges()] === "true") {
       (data.executionStage === currentStage || _.isEmpty(data.executionStage))
     ) {
       var sql = data.value;
-      var randomFolderName = config.getUuid().substring(0, 7);
+      var randomFolderName = utils
+        .random()
+        .toString(36)
+        .slice(-5);
       var destFolder = "/tmp/" + randomFolderName + "/";
       Object.assign(ssh, { remoteDst: false, remoteSrc: false });
       script.body += scripts.remote(

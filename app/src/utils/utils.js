@@ -224,5 +224,11 @@ module.exports = {
     });
 
     return objects;
+  },
+  /**
+   * Returns a random number in [0,1[ interval using Math.random() function
+   */
+  random: function() {
+    return Math.random();
   }
 };
