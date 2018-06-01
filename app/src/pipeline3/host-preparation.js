@@ -95,7 +95,15 @@ if (process.env[config.varDataChanges()] === "true") {
       var sourceInstanceDataDir = sourceInstance.deployment.hostDir + "/data/";
       script.body += scripts.remote(
         ssh,
-        scripts.rsync("", sourceInstanceDataDir, instanceDataDir)
+        scripts.rsync(
+          "",
+          sourceInstanceDataDir,
+          instanceDataDir,
+          null,
+          null,
+          null,
+          true
+        )
       );
     }
   });
