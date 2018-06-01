@@ -77,7 +77,7 @@ module.exports = {
    *
    * @return {String} The remote version of the script
    */
-  rsync: function(ssh, srcPath, dstPath, slashSrc, slashDst, args) {
+  rsync: function(ssh, srcPath, dstPath, slashSrc, slashDst, args, sudo) {
     srcPath = module.exports.trailSlash(srcPath, slashSrc);
     dstPath = module.exports.trailSlash(dstPath, slashDst);
 
@@ -98,7 +98,9 @@ module.exports = {
     }
 
     var script = "";
-
+    if (sudo) {
+      script += "sudo ";
+    }
     script += "rsync " + args + sshPort + " " + srcPath + " " + dstPath;
     script += "\n";
 
@@ -236,7 +238,7 @@ module.exports = {
     /*
      * Generates a script to remove the passed container.
      * 
-     * @param {String} containerName - The name of the container to restart.
+     * @param {String} containerName - The name of the container to remove.
      *
      * @return {String} The script as a string.
      */
@@ -251,7 +253,7 @@ module.exports = {
     /*
      * Run a new container with the appropriate options.
      * 
-     * @param {String} containerName - The name of the container to restart.
+     * @param {String} containerName - The name of the container to run.
      * @param {Object} instanceDef - The instance definition of the instance to start.
      *
      * @return {String} The script as a string.
