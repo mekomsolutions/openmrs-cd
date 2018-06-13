@@ -38,7 +38,8 @@
     {
       "type": "instance",
       "value": {
-        "uuid": "50b6cf72-0e80-457d-8141-a0c8c85d4dae"
+        "uuid": "50b6cf72-0e80-457d-8141-a0c8c85d4dae",
+        "dataDir": null
       }
     },
     {
