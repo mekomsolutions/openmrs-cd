@@ -34,6 +34,7 @@ describe("Tests suite for pipeline3", function() {
     expect(jenkinsFile).toContain(
       "<name>" + config.varDataChanges() + "</name>"
     );
+    expect(jenkinsFile).toContain("<name>" + config.varCreation() + "</name>");
     expect(jenkinsFile).toContain(
       "<scriptPath>jenkins/pipelines/" +
         config.getJobNameForPipeline3() +

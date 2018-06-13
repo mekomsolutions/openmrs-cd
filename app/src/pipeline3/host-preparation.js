@@ -80,24 +80,30 @@ if (process.env[config.varDeploymentChanges()] === "true") {
 if (process.env[config.varDataChanges()] === "true") {
   instanceDef.data.forEach(function(data) {
     var instanceDataDir = hostDir + "/data";
+    var sourceDataDir;
     if (data.type === "instance") {
-      // Retrieve the source instance
-      var sourceInstance = db.getInstanceDefinition(data.value.uuid);
-      if (_.isEmpty(sourceInstance)) {
-        log.error(
-          "",
-          "Source instance definition could not be found. Instance can not use data of non-existing instance."
-        );
-        throw new Error(
-          "Illegal argument: empty or unexisting instance definition."
-        );
+      if (!_.isEmpty(data.value.uuid)) {
+        // Retrieve the source instance
+        var sourceInstance = db.getInstanceDefinition(data.value.uuid);
+        if (_.isEmpty(sourceInstance)) {
+          log.error(
+            "",
+            "Source instance definition could not be found. Instance can not use data of non-existing instance."
+          );
+          throw new Error(
+            "Illegal argument: empty or unexisting instance definition."
+          );
+        }
+        sourceDataDir = sourceInstance.deployment.hostDir + "/data/";
       }
-      var sourceInstanceDataDir = sourceInstance.deployment.hostDir + "/data/";
+      if (!_.isEmpty(data.value.dataDir)) {
+        sourceDataDir = data.value.dataDir;
+      }
       script.body += scripts.remote(
         ssh,
         scripts.rsync(
           "",
-          sourceInstanceDataDir,
+          sourceDataDir,
           instanceDataDir,
           null,
           null,

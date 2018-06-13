@@ -47,7 +47,64 @@
           "user": "ec2-user",
           "port": "22"
         }
-      }
+      },
+      "links": [
+        {
+          "type": "artifact",
+          "component": "openmrsmodule",
+          "source": "/mnt/artifacts/openmrs_modules",
+          "target": "/opt/openmrs/modules"
+        },
+        {
+          "type": "artifact",
+          "component": "openmrscore",
+          "source": "/mnt/artifacts/openmrs_core/*.war",
+          "target": "/opt/openmrs/openmrs.war"
+        },
+        {
+          "type": "artifact",
+          "component": "bahmniconfig",
+          "source": "/mnt/artifacts/bahmni_config",
+          "target": "/opt/bahmni-web/etc/bahmni_config"
+        },
+        {
+          "type": "artifact",
+          "component": "openmrsconfig",
+          "source": "/mnt/artifacts/openmrs_config",
+          "target": "/opt/openmrs/configuration"
+        },
+        {
+          "type": "artifact",
+          "component": "bahmniapps",
+          "source": "/mnt/artifacts/bahmni_emr/bahmniapps",
+          "target": "/opt/bahmni-web/etc/bahmniapps"
+        },
+        {
+          "type": "artifact",
+          "component": "bahmniconnect",
+          "source":
+            "/mnt/artifacts/bahmni_emr/bahmniconnect/bahmni-connect-apps",
+          "target": "/opt/bahmni-offline/bahmni-connect-apps"
+        },
+        {
+          "type": "data",
+          "component": "db_dumps",
+          "source": "/mnt/data/db_dumps",
+          "target": "/data"
+        },
+        {
+          "type": "data",
+          "component": "bahmni_home",
+          "source": "/mnt/data/bahmni_home",
+          "target": "/home/bahmni"
+        },
+        {
+          "type": "data",
+          "component": "configuration_checksums",
+          "source": "/mnt/data/configuration_checksums",
+          "target": "/opt/openmrs/configuration_checksums"
+        }
+      ]
     },
     "data": [
       {

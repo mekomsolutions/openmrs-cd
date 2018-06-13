@@ -48,10 +48,17 @@ describe("Pre-host preparation scripts", function() {
       "rm -rf " +
       artifactsPath +
       "/*\n" +
-      "mvn dependency:unpack -Dartifact=net.mekomsolutions:openmrs-distro-cambodia:1.1.0-SNAPSHOT:zip " +
+      "mvn dependency:copy -Dartifact=net.mekomsolutions:openmrs-distro-cambodia:1.1.0-SNAPSHOT:zip " +
       "-DoutputDirectory=" +
       artifactsPath +
-      "\n";
+      "\n" +
+      "unzip " +
+      artifactsPath +
+      "/" +
+      "openmrs-distro-cambodia-1.1.0-SNAPSHOT.zip" +
+      " -d " +
+      artifactsPath +
+      "/";
 
     expect(script).toContain(expectedScript);
 

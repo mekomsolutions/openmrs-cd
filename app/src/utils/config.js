@@ -39,6 +39,9 @@ module.exports = {
   varDataChanges: function() {
     return "dataChanges";
   },
+  varCreation: function() {
+    return "creation";
+  },
   varRepoUrl: function() {
     return "repoUrl";
   },

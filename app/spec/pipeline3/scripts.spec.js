@@ -4,8 +4,10 @@ describe("Scripts", function() {
   // deps
   const fs = require("fs");
   const path = require("path");
+  const proxyquire = require("proxyquire");
 
   const config = require(path.resolve("src/utils/config"));
+  const utils = require(path.resolve("src/utils/utils"));
   const cst = require(path.resolve("src/const"));
   const heredoc_2 = cst.HEREDOC_2;
 
@@ -155,5 +157,82 @@ describe("Scripts", function() {
       docker.exec("cambodia1", "mkdir -p /tmp/test2") +
         "docker cp /tmp/test1 cambodia1:/tmp/test2\n"
     );
+  });
+
+  it("should linkFolder", function() {
+    var mockUtils = Object.assign({}, utils);
+    mockUtils.random = function() {
+      return "0.123456789";
+    };
+
+    var scripts_ = proxyquire(
+      path.resolve("src/" + config.getJobNameForPipeline3() + "/scripts.js"),
+      { "../utils/utils": mockUtils }
+    );
+
+    expect(scripts_.linkFolder("source123", "target123", true)).toEqual(
+      "if [ -e target123 ]; then\n" +
+        "echo \"'target123' exists. Backing it up...\"\n" +
+        "rsync -avz target123 target123_56789.backup\n" +
+        "rm -rf target123\n" +
+        "fi\n" +
+        'echo "MountPoint: source123, Target: target123"\n' +
+        "ln -s source123 target123\n" +
+        "chown -R bahmni:bahmni source123\n"
+    );
+  });
+
+  it("should linkComponents", function() {
+    var mockUtils = Object.assign({}, utils);
+    mockUtils.random = function() {
+      return "0.123456789";
+    };
+
+    var scripts_ = proxyquire(
+      path.resolve("src/" + config.getJobNameForPipeline3() + "/scripts.js"),
+      { "../utils/utils": mockUtils }
+    );
+
+    var componentsToLink = ["artifacts"];
+    var links = [
+      {
+        type: "artifact",
+        component: "bahmniconnect",
+        source: "/mnt/artifacts/bahmni_emr/bahmniconnect/bahmni-connect-apps",
+        target: "/opt/bahmni-offline/bahmni-connect-apps"
+      },
+      {
+        type: "data",
+        component: "db_dumps",
+        source: "/mnt/data/db_dumps",
+        target: "/data"
+      }
+    ];
+
+    var expectedScript = "";
+
+    links.forEach(function(item) {
+      if (item.type === "artifact") {
+        expectedScript += "# '" + item.component + "' component:\n";
+        expectedScript += scripts_.linkFolder(item.source, item.target, true);
+        expectedScript += "\n";
+      }
+    });
+
+    var actualScript = "";
+    actualScript = scripts_.linkComponents(componentsToLink, links);
+
+    expect(actualScript).toContain(expectedScript);
+    componentsToLink.push("data");
+    actualScript = scripts_.linkComponents(componentsToLink, links);
+
+    links.forEach(function(item) {
+      if (item.type === "data") {
+        expectedScript += "# '" + item.component + "' component:\n";
+        expectedScript += scripts_.linkFolder(item.source, item.target, true);
+        expectedScript += "\n";
+      }
+    });
+    expect(actualScript).toContain(expectedScript);
   });
 });
