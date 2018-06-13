@@ -7,6 +7,7 @@ const uuid = require("uuid/v4");
 const cst = require("../const");
 const heredoc = cst.HEREDOC;
 const heredoc_2 = cst.HEREDOC_2;
+const utils = require("../utils/utils");
 
 module.exports = {
   /*
@@ -171,7 +172,7 @@ module.exports = {
 
     if (artifact.type === "maven") {
       script +=
-        "mvn dependency:unpack" +
+        "mvn dependency:copy" +
         " " +
         "-Dartifact=" +
         artifact.value.groupId +
@@ -183,10 +184,81 @@ module.exports = {
         artifact.value.packaging +
         " " +
         "-DoutputDirectory=" +
-        destPath;
+        destPath +
+        "\n";
+
+      var fileName =
+        artifact.value.artifactId +
+        "-" +
+        artifact.value.version +
+        "." +
+        artifact.value.packaging;
+
+      script += "unzip " + destPath + "/" + fileName + " -d " + destPath + "/";
+
       script += "\n";
     }
 
+    return script;
+  },
+  /*
+  * Symlinks a source to a target.
+  *
+  * @param {String} source - The source path to be linked.
+   * @param {String} target - The target to which to link the source.
+   * @param {Boolean} removeIfExists - Will remove the 'target' if it exists already.
+   */
+  linkFolder: function(source, target, removeIfExists) {
+    var script = "";
+    if (removeIfExists) {
+      script += "if [ -e " + target + " ]; then\n";
+      script += "echo \"'" + target + "' exists. Backing it up...\"\n";
+      script += module.exports.rsync(
+        {},
+        target,
+        target +
+          "_" +
+          utils
+            .random()
+            .toString(36)
+            .slice(-5) +
+          ".backup"
+      );
+      script += "rm -rf " + target + "\n";
+      script += "fi\n";
+    }
+
+    script += 'echo "MountPoint: ' + source + ", Target: " + target + '"\n';
+    script += "ln -s " + source + " " + target + "\n";
+    script += "chown -R bahmni:bahmni " + source + "\n";
+
+    return script;
+  },
+  linkComponents: function(componentsToLink, links) {
+    var script = "";
+    if (!_.isEmpty(componentsToLink)) {
+      script += "# Link mounted folder...\n\n";
+    }
+    componentsToLink.forEach(function(componentToLink) {
+      if (componentToLink === "artifacts") {
+        links.forEach(function(item) {
+          if (item.type === "artifact") {
+            script += "# '" + item.component + "' component:\n";
+            script += module.exports.linkFolder(item.source, item.target, true);
+            script += "\n";
+          }
+        });
+      }
+      if (componentToLink === "data") {
+        links.forEach(function(item) {
+          if (item.type === "data") {
+            script += "# '" + item.component + "' component:\n";
+            script += module.exports.linkFolder(item.source, item.target, true);
+            script += "\n";
+          }
+        });
+      }
+    });
     return script;
   },
 

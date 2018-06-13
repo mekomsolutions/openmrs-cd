@@ -97,6 +97,7 @@ describe("validate-instance", function() {
     triggerParams[config.varArtifactsChanges()] = JSON.stringify(true);
     triggerParams[config.varDeploymentChanges()] = JSON.stringify(false);
     triggerParams[config.varDataChanges()] = JSON.stringify(false);
+    triggerParams[config.varCreation()] = JSON.stringify(false);
 
     expect(
       fs.readFileSync(
@@ -159,6 +160,7 @@ describe("validate-instance", function() {
     triggerParams[config.varArtifactsChanges()] = JSON.stringify(true);
     triggerParams[config.varDeploymentChanges()] = JSON.stringify(true);
     triggerParams[config.varDataChanges()] = JSON.stringify(true);
+    triggerParams[config.varCreation()] = JSON.stringify(true);
 
     expect(
       fs.readFileSync(

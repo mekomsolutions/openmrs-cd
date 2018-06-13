@@ -7,6 +7,7 @@ describe("Start instance scripts", function() {
   const _ = require("lodash");
 
   const proxyquire = require("proxyquire");
+  const cst = require(path.resolve("src/const"));
   var tests, stubs, utils, config, scripts, db;
   var instanceUuid, testRandomString;
 
@@ -24,9 +25,10 @@ describe("Start instance scripts", function() {
     process.env[config.varArtifactsChanges()] = "false";
     process.env[config.varDeploymentChanges()] = "false";
     process.env[config.varDataChanges()] = "false";
+    process.env[config.varCreation()] = "false";
 
     instanceUuid = "cacb5448-46b0-4808-980d-5521775671c0";
-    testRandomString = "0.7p3z2u8fbvi76n32bg"
+    testRandomString = "0.7p3z2u8fbvi76n32bg";
   });
 
   afterEach(function() {
@@ -86,10 +88,15 @@ describe("Start instance scripts", function() {
     var ssh = instanceDef.deployment.host.value;
     var docker = scripts.container;
 
-    expect(script).toContain(
-      scripts.remote(ssh, docker.remove(instanceUuid)) +
-        scripts.remote(ssh, docker.run(instanceUuid, instanceDef))
+    var expectedScript = [];
+    expectedScript.push(scripts.remote(ssh, docker.remove(instanceUuid)));
+    expectedScript.push(
+      scripts.remote(ssh, docker.run(instanceUuid, instanceDef))
     );
+
+    expectedScript = expectedScript.join(cst.SCRIPT_SEPARATOR);
+
+    expect(expectedScript).toContain(expectedScript);
   });
 
   it("should generate bash script upon data changes.", function() {
@@ -99,15 +106,15 @@ describe("Start instance scripts", function() {
 
     var mockUtils = Object.assign({}, utils);
     mockUtils.random = function() {
-        return testRandomString;
-    }  
+      return testRandomString;
+    };
 
     // replay
     proxyquire(
       path.resolve(
         "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
       ),
-      tests.stubs({"../utils/utils": mockUtils})
+      tests.stubs({ "../utils/utils": mockUtils })
     );
 
     // verif
@@ -126,42 +133,19 @@ describe("Start instance scripts", function() {
     var moveMysqlFolder =
       "sh -c '/etc/bahmni-installer/move-mysql-datadir.sh /etc/my.cnf /mnt/data/mysql_datadir'\n";
     var chown = "chown -R mysql:mysql /mnt/data/mysql_datadir";
-    expect(script).toContain(
+
+    var expectedScript = [];
+    expectedScript.push(
       scripts.remote(
         ssh,
         docker.exec(instanceUuid, changePerms + moveMysqlFolder + chown)
       )
     );
 
+    expect(script).toContain(expectedScript.join(cst.SCRIPT_SEPARATOR));
+
     var sqlCmd =
       "cat /tmp/n32bg/demo-data.sql | mysql -uroot -ppassword openmrs";
-    expect(script).toContain(
-      scripts.remote(ssh, docker.exec(instanceUuid, sqlCmd))
-    );
-
-    instanceDef.data[1].value.sourceFile =
-      instanceDef.data[1].value.sourceFile + ".gz";
-    db.saveInstanceDefinition(instanceDef, instanceUuid);
-
-    // replay
-    proxyquire(
-      path.resolve(
-        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
-      ),
-      tests.stubs({"../utils/utils": mockUtils})
-    );
-
-    // verif
-    script = fs.readFileSync(
-      path.resolve(
-        config.getBuildDirPath(),
-        config.getStartInstanceScriptName()
-      ),
-      "utf8"
-    );
-
-    sqlCmd =
-      "zcat /tmp/" + testRandomString.slice(-5) + "/demo-data.sql.gz | mysql -uroot -ppassword openmrs";
     expect(script).toContain(
       scripts.remote(ssh, docker.exec(instanceUuid, sqlCmd))
     );
@@ -178,15 +162,15 @@ describe("Start instance scripts", function() {
 
     var mockUtils = Object.assign({}, utils);
     mockUtils.random = function() {
-        return testRandomString;
-    }  
+      return testRandomString;
+    };
 
     // replay
     proxyquire(
       path.resolve(
         "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
       ),
-      tests.stubs({"../utils/utils": mockUtils})
+      tests.stubs({ "../utils/utils": mockUtils })
     );
 
     // verif
@@ -201,10 +185,187 @@ describe("Start instance scripts", function() {
     var ssh = instanceDef.deployment.host.value;
     var docker = scripts.container;
     var sqlCmd =
-      "zcat /tmp/" + testRandomString.slice(-5) + "/demo-data.sql.gz | mysql -uroot -ppassword openmrs";
+      "zcat /tmp/" +
+      testRandomString.slice(-5) +
+      "/demo-data.sql.gz | mysql -uroot -ppassword openmrs";
     expect(script).toContain(
       scripts.remote(ssh, docker.exec(instanceUuid, sqlCmd))
     );
   });
 
+  it("should link mounted folders.", function() {
+    process.env[config.varInstanceUuid()] = instanceUuid;
+    var instanceDef = db.getInstanceDefinition(instanceUuid);
+
+    var mockUtils = Object.assign({}, utils);
+    mockUtils.random = function() {
+      return testRandomString;
+    };
+
+    var stubs = tests.stubs({ "../utils/utils": mockUtils }, null, {
+      "./scripts": path.resolve(
+        "src/" + config.getJobNameForPipeline3() + "/scripts"
+      )
+    });
+    var scripts_ = proxyquire(
+      path.resolve("src/" + config.getJobNameForPipeline3() + "/scripts.js"),
+      stubs
+    );
+
+    process.env[config.varDataChanges()] = "true";
+    process.env[config.varDeploymentChanges()] = "true";
+    process.env[config.varArtifactsChanges()] = "true";
+    process.env[config.varCreation()] = "true";
+
+    // replay
+    proxyquire(
+      path.resolve(
+        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
+      ),
+      stubs
+    );
+
+    // verif
+    var script = fs.readFileSync(
+      path.resolve(
+        config.getBuildDirPath(),
+        config.getStartInstanceScriptName()
+      ),
+      "utf8"
+    );
+
+    var ssh = instanceDef.deployment.host.value;
+    var docker = scripts.container;
+
+    var expectedComponentsToLink = [];
+    expectedComponentsToLink.push("artifacts", "data");
+
+    var expectedScript = scripts.remote(
+      ssh,
+      scripts.container.exec(
+        instanceDef.uuid,
+        scripts_.linkComponents(
+          _.uniq(expectedComponentsToLink),
+          instanceDef.deployment.links
+        )
+      )
+    );
+
+    expect(script).toContain(expectedScript);
+
+    process.env[config.varDataChanges()] = "true";
+    process.env[config.varDeploymentChanges()] = "false";
+    process.env[config.varArtifactsChanges()] = "false";
+    process.env[config.varCreation()] = "true";
+
+    // replay
+    proxyquire(
+      path.resolve(
+        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
+      ),
+      stubs
+    );
+
+    // verif
+    var script = fs.readFileSync(
+      path.resolve(
+        config.getBuildDirPath(),
+        config.getStartInstanceScriptName()
+      ),
+      "utf8"
+    );
+
+    expectedComponentsToLink = [];
+    expectedComponentsToLink.push("data");
+
+    var expectedScript = scripts.remote(
+      ssh,
+      scripts.container.exec(
+        instanceDef.uuid,
+        scripts_.linkComponents(
+          _.uniq(expectedComponentsToLink),
+          instanceDef.deployment.links
+        )
+      )
+    );
+    expect(script).toContain(expectedScript);
+
+    process.env[config.varDataChanges()] = "false";
+    process.env[config.varDeploymentChanges()] = "false";
+    process.env[config.varArtifactsChanges()] = "true";
+    process.env[config.varCreation()] = "true";
+
+    // replay
+    proxyquire(
+      path.resolve(
+        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
+      ),
+      stubs
+    );
+
+    // verif
+    var script = fs.readFileSync(
+      path.resolve(
+        config.getBuildDirPath(),
+        config.getStartInstanceScriptName()
+      ),
+      "utf8"
+    );
+
+    expectedComponentsToLink = [];
+    expectedComponentsToLink.push("artifacts");
+
+    var expectedScript = scripts.remote(
+      ssh,
+      scripts.container.exec(
+        instanceDef.uuid,
+        scripts_.linkComponents(
+          _.uniq(expectedComponentsToLink),
+          instanceDef.deployment.links
+        )
+      )
+    );
+    expect(script).toContain(expectedScript);
+  });
+
+  it("should handle Bahmni Event Log Service properties file.", function() {
+    process.env[config.varInstanceUuid()] = instanceUuid;
+    process.env[config.varDataChanges()] = "true";
+    process.env[config.varCreation()] = "false";
+    var instanceDef = db.getInstanceDefinition(instanceUuid);
+
+    // replay
+    proxyquire(
+      path.resolve(
+        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
+      ),
+      tests.stubs()
+    );
+
+    // verif
+    var script = fs.readFileSync(
+      path.resolve(
+        config.getBuildDirPath(),
+        config.getStartInstanceScriptName()
+      ),
+      "utf8"
+    );
+    var ssh = instanceDef.deployment.host.value;
+    var docker = scripts.container;
+
+    var expectedScript = [];
+    expectedScript.push(
+      scripts.remote(
+        ssh,
+        docker.exec(
+          instanceUuid,
+          "if [ -d /opt/bahmni-event-log-service/ ]; then\n" +
+            "rsync -avz /mnt/data/bahmni-event-log-service/application.properties /opt/bahmni-event-log-service/bahmni-event-log-service/WEB-INF/classes/application.properties\n" +
+            "chown -R bahmni:bahmni /opt/bahmni-event-log-service/bahmni-event-log-service/WEB-INF/classes/application.properties\n" +
+            "fi"
+        )
+      )
+    );
+    expect(script).toContain(expectedScript.join(cst.SCRIPT_SEPARATOR));
+  });
 });
