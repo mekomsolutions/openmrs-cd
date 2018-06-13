@@ -123,30 +123,114 @@ describe("The instances config validator", function() {
     var _script_ = require(fileInTest);
 
     // verif
-    expect(_script_.validateArtifactSection(null)).toBeTruthy();
-    expect(_script_.validateArtifactSection(undefined)).toBeTruthy();
-    expect(_script_.validateArtifactSection({})).toBeTruthy();
+    expect(_script_.validateArtifactsConfig(null)).toBeTruthy();
+    expect(_script_.validateArtifactsConfig(undefined)).toBeTruthy();
+    expect(_script_.validateArtifactsConfig({})).toBeTruthy();
 
     expect(function() {
-      _script_.validateArtifactSection({
+      _script_.validateInstanceDefinition({});
+    }).toThrow();
+
+    expect(function() {
+      _script_.validateArtifactsConfig({
         type: ""
       });
     }).toThrow();
     expect(function() {
-      _script_.validateArtifactSection({
-        type: "foobar"
-      });
+      _script_.validateArtifactsConfig([
+        {
+          type: ""
+        }
+      ]);
     }).toThrow();
     expect(function() {
-      _script_.validateArtifactSection({
-        type: "maven"
-      });
+      _script_.validateArtifactsConfig([
+        {
+          type: "foobar"
+        }
+      ]);
     }).toThrow();
     expect(function() {
-      _script_.validateArtifactSection({
-        type: "maven",
-        value: new model.MavenProject()
-      });
+      _script_.validateArtifactsConfig([
+        {
+          type: "maven"
+        }
+      ]);
+    }).toThrow();
+    expect(function() {
+      _script_.validateArtifactsConfig([
+        {
+          type: "maven",
+          value: new model.MavenProject()
+        }
+      ]);
+    }).not.toThrow();
+  });
+
+  it("should validate an instances data section.", function() {
+    // deps
+    const model = require(path.resolve("src/utils/model"));
+
+    // setup
+    var _script_ = require(fileInTest);
+
+    // verif
+    expect(_script_.validateDataConfig(null)).toBeTruthy();
+    expect(_script_.validateDataConfig(undefined)).toBeTruthy();
+    expect(_script_.validateDataConfig({})).toBeTruthy();
+
+    expect(function() {
+      _script_.validateDataConfig([
+        {
+          type: ""
+        }
+      ]);
+    }).toThrow();
+    expect(function() {
+      _script_.validateDataConfig([
+        {
+          type: "foobar"
+        }
+      ]);
+    }).toThrow();
+    expect(function() {
+      _script_.validateDataConfig([
+        {
+          type: "instance"
+        }
+      ]);
+    }).toThrow();
+    expect(function() {
+      _script_.validateDataConfig([
+        {
+          type: "instance",
+          value: new model.InstanceData(null, "/tmp/123")
+        }
+      ]);
+    }).not.toThrow();
+    expect(function() {
+      _script_.validateDataConfig([
+        {
+          type: "instance",
+          value: new model.InstanceData("1234-6533", null)
+        }
+      ]);
+    }).not.toThrow();
+    expect(function() {
+      _script_.validateDataConfig([
+        {
+          type: "instance",
+          value: new model.InstanceData("1234-6533", "/tmp/123")
+        }
+      ]);
+    }).toThrow();
+    expect(function() {
+      _script_.validateDataConfig([
+        {
+          type: "sql",
+          value: new model.SqlData()
+        }
+      ]);
     }).not.toThrow();
   });
 });

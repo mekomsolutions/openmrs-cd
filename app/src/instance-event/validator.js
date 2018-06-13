@@ -21,27 +21,9 @@ module.exports = {
 
     module.exports.validateDeploymentConfig(instanceDef.deployment, isNew);
 
-    if (
-      isNew &&
-      _.isEmpty(instanceDef.artifacts || !_.isArray(instanceDef.artifacts))
-    ) {
-      throw new Error(
-        "The artifacts section did not contain enough information to proceed further with the instance, aborting."
-      );
-    }
-    var allArtifactsEmpty = true;
-    instanceDef.artifacts.forEach(function(artifact) {
-      allArtifactsEmpty &= module.exports.validateArtifactSection(
-        artifact,
-        isNew
-      );
-    });
-    if (isNew && allArtifactsEmpty) {
-      throw new Error(
-        "No artifacts were provided preventing to proceed further with the instance, aborting."
-      );
-    }
-    module.exports.validateDataSection(instanceDef.data, isNew);
+    module.exports.validateArtifactsConfig(instanceDef.artifacts, isNew);
+
+    module.exports.validateDataConfig(instanceDef.data, isNew);
   },
 
   validateBaseConfig: function(instanceDef, isNew) {
@@ -124,26 +106,49 @@ module.exports = {
     }
   },
 
-  validateArtifactSection: function(artifact) {
-    if (_.isEmpty(artifact)) {
+  validateArtifactsConfig: function(artifacts, isNew) {
+    if (_.isEmpty(artifacts)) {
       return true;
     }
-    if (!artifact.type || _.isEmpty(artifact.value)) {
-      log.error("", "Illegal argument: the artifact section is malformed.");
-      throw new Error();
-    }
 
-    if (config.getInstanceArtifactsTypes().indexOf(artifact.type) < 0) {
+    if (!_.isArray(artifacts)) {
       throw new Error(
-        "The artifact type is either not recognized or not supported: '" +
-          artifact.type +
-          "'"
+        "The artifacts section did not contain enough information to proceed further with the instance, aborting."
       );
     }
 
-    module.exports.getConfigValidatorsMap()[artifact.type](artifact.value);
+    var allArtifactsEmpty = true;
+    artifacts.forEach(function(artifact) {
+      allArtifactsEmpty &= validateArtifactSection(artifact, isNew);
+    });
 
-    return false;
+    if (isNew && allArtifactsEmpty) {
+      throw new Error(
+        "No artifacts were provided preventing to proceed further with the instance, aborting."
+      );
+    }
+
+    function validateArtifactSection(artifact) {
+      if (_.isEmpty(artifact)) {
+        return true;
+      }
+      if (!artifact.type || _.isEmpty(artifact.value)) {
+        log.error("", "Illegal argument: the artifact section is malformed.");
+        throw new Error();
+      }
+
+      if (config.getInstanceArtifactsTypes().indexOf(artifact.type) < 0) {
+        throw new Error(
+          "The artifact type is either not recognized or not supported: '" +
+            artifact.type +
+            "'"
+        );
+      }
+
+      module.exports.getConfigValidatorsMap()[artifact.type](artifact.value);
+
+      return false;
+    }
   },
 
   validateMavenArtifactConfigValue: function(value) {
@@ -168,31 +173,44 @@ module.exports = {
     }
   },
 
-  validateDataSection: function(data) {
+  validateDataConfig: function(data) {
     if (_.isEmpty(data)) {
       return true;
     }
     data.forEach(function(element) {
+      if (_.isEmpty(element)) {
+        log.error("", "Illegal argument: the data section is malformed.");
+        throw new Error();
+      }
       if (element.type === "instance") {
-        var empty = _.isEmpty(element.value) || _.isEmpty(element.value.uuid);
+        var empty =
+          _.isEmpty(element.value) ||
+          (_.isEmpty(element.value.uuid) && _.isEmpty(element.value.dataDir));
         if (empty) {
           throw new Error(
             "The data.type 'instance' section did not contain enough information to proceed further with the instance, aborting."
           );
+          return true;
         }
-        return true;
-      }
-      if (element.type === "sql") {
-        var empty =
-          _.isEmpty(element.value) ||
-          _.isEmpty(element.value.engine) ||
-          _.isEmpty(element.value.database) ||
-          _.isEmpty(element.value.sourceFile);
-        if (empty) {
+        var invalid =
+          !_.isEmpty(element.value.uuid) && !_.isEmpty(element.value.dataDir);
+        if (invalid) {
+          throw new Error(
+            "The data.type 'instance' value section cannot contain both 'uuid' and 'dataDir' fields, aborting."
+          );
+        }
+      } else if (element.type === "sql") {
+        if (
+          JSON.stringify(Object.keys(element.value).sort()) !==
+          JSON.stringify(Object.keys(new model.SqlData()).sort())
+        ) {
           throw new Error(
             "The data.type 'sql' section did not contain enough information to proceed further with the instance, aborting."
           );
         }
+      } else {
+        log.error("", "Illegal argument: the data section is malformed.");
+        throw new Error();
       }
     });
   },

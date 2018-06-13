@@ -32,6 +32,29 @@ class DockerDeployment {
 }
 
 /**
+ * Describes an Instance Data section
+ *
+ * Note: 'instanceUuid' and 'dataDir' should not be both provided. Instance validation would fail.
+ */
+class InstanceData {
+  constructor(instanceUuid, dataDir) {
+    this.uuid = instanceUuid;
+    this.dataDir = dataDir;
+  }
+}
+
+/**
+ * Describes a SQL Data section
+ */
+class SqlData {
+  constructor(engine, database, sourceFile) {
+    this.engine = engine;
+    this.database = database;
+    this.sourceFile = sourceFile;
+  }
+}
+
+/**
  * Describes a Maven project
  */
 class MavenProject {
@@ -127,6 +150,8 @@ class ServerEvent {
 module.exports = {
   Script: Script,
   MavenProject: MavenProject,
+  InstanceData: InstanceData,
+  SqlData: SqlData,
   DockerDeployment: DockerDeployment,
   Artifact: Artifact,
   ProjectBuild: ProjectBuild,

@@ -61,6 +61,7 @@ downstreamJobParams[config.varDeploymentChanges()] = JSON.stringify(
 downstreamJobParams[config.varDataChanges()] = JSON.stringify(
   !_.isEmpty(instanceEvent.data)
 );
+downstreamJobParams[config.varCreation()] = JSON.stringify(isNewInstance);
 
 //
 // Export the downstream job parameters as a 'trigger' properties file
