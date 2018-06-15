@@ -195,7 +195,8 @@ module.exports = {
         artifact.value.packaging;
 
       script += "unzip " + destPath + "/" + fileName + " -d " + destPath + "/";
-
+      script += "\n";
+      script += "rm " + destPath + "/" + fileName;
       script += "\n";
     }
 

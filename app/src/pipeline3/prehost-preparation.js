@@ -20,6 +20,8 @@ const db = require(cst.DBPATH);
 
 const scripts = require("./scripts");
 
+const currentStage = config.getPrehostPrepareStatusCode();
+
 //
 //  Fetching the instance definition based on the provided UUID
 //
@@ -66,4 +68,10 @@ fs.writeFileSync(
 fs.chmodSync(
   path.resolve(config.getBuildDirPath(), config.getPrehostPrepareScriptName()),
   "0755"
+);
+
+// Saving the status
+fs.writeFileSync(
+  path.resolve(config.getBuildDirPath(), config.getStatusFileName()),
+  JSON.stringify({ status: currentStage })
 );

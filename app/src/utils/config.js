@@ -322,5 +322,8 @@ module.exports = {
 
   getInstanceEventsProperties: function() {
     return ["uuid", "name", "type", "artifacts"];
+  },
+  getStatusFileName: function() {
+    return "status.json";
   }
 };
