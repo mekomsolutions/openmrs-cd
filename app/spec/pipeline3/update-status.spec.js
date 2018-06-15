@@ -35,7 +35,11 @@ describe("Update-status", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
     var instanceDef = db.getInstanceDefinition(instanceUuid);
 
-    process.env[config.varStatus()] = "5";
+    // Saving the status
+    fs.writeFileSync(
+      path.resolve(config.getBuildDirPath(), config.getStatusFileName()),
+      JSON.stringify({ status: "5" })
+    );
 
     // replay
     proxyquire(
@@ -49,11 +53,15 @@ describe("Update-status", function() {
     expect(instanceDefStatus).toBe("5");
   });
 
-  it("should save instance with the new status", function() {
+  it("should not save instance with the new status", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
     var instanceDef = db.getInstanceDefinition(instanceUuid);
 
-    process.env[config.varStatus()] = "";
+    // Saving the status
+    fs.writeFileSync(
+      path.resolve(config.getBuildDirPath(), config.getStatusFileName()),
+      JSON.stringify({ status: "" })
+    );
 
     expect(function() {
       // replay

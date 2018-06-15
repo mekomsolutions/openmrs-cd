@@ -69,10 +69,12 @@ describe("Tests suite for pipeline3", function() {
         "'"
     );
     expect(jenkinsFile).toContain(
-      "sh 'export status=" +
-        config.getPrehostPrepareStatusCode() +
-        "; node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/app/src/$JOB_NAME/" +
         config.getUpdateStatusJsScriptName() +
+        " $" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getStatusFileName() +
         "'"
     );
 
@@ -90,10 +92,12 @@ describe("Tests suite for pipeline3", function() {
         "'"
     );
     expect(jenkinsFile).toContain(
-      "sh 'export status=" +
-        config.getHostPrepareStatusCode() +
-        "; node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/app/src/$JOB_NAME/" +
         config.getUpdateStatusJsScriptName() +
+        " $" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getStatusFileName() +
         "'"
     );
 
@@ -111,10 +115,12 @@ describe("Tests suite for pipeline3", function() {
         "'"
     );
     expect(jenkinsFile).toContain(
-      "sh 'export status=" +
-        config.getStartInstanceStatusCode() +
-        "; node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/app/src/$JOB_NAME/" +
         config.getUpdateStatusJsScriptName() +
+        " $" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getStatusFileName() +
         "'"
     );
   });
