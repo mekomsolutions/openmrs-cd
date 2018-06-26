@@ -411,4 +411,42 @@ describe("Start instance scripts", function() {
     );
     expect(script).toContain(expectedScript.join(cst.SCRIPT_SEPARATOR));
   });
+
+  it("should apply Concat Configs command.", function() {
+    process.env[config.varInstanceUuid()] = instanceUuid;
+    process.env[config.varDataChanges()] = "false";
+    process.env[config.varCreation()] = "false";
+    var instanceDef = db.getInstanceDefinition(instanceUuid);
+
+    // replay
+    proxyquire(
+      path.resolve(
+        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
+      ),
+      tests.stubs()
+    );
+
+    // verif
+    var script = fs.readFileSync(
+      path.resolve(
+        config.getBuildDirPath(),
+        config.getStartInstanceScriptName()
+      ),
+      "utf8"
+    );
+    var ssh = instanceDef.deployment.host.value;
+    var docker = scripts.container;
+
+    var expectedScript = [];
+    expectedScript.push(
+      scripts.remote(
+        ssh,
+        scripts.container.exec(
+          instanceDef.uuid,
+          "bahmni -i local.inventory concat-configs\n"
+        )
+      )
+    );
+    expect(script).toContain(expectedScript.join(cst.SCRIPT_SEPARATOR));
+  });
 });

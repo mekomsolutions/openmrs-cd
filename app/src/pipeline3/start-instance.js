@@ -239,6 +239,18 @@ if (process.env[config.varDataChanges()] === "true") {
   finalRestart = true;
 }
 
+// Concat Configs (needed for Bahmni Connect)
+script.body.push(
+  scripts.remote(
+    ssh,
+    scripts.container.exec(
+      instanceDef.uuid,
+      "bahmni -i local.inventory concat-configs\n"
+    )
+  )
+);
+finalRestart = true;
+
 if (finalRestart) {
   script.body.push(
     scripts.remote(ssh, scripts.container.restart(instanceDef.uuid))
