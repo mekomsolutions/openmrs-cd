@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.121
+FROM jenkins/jenkins:2.129
 MAINTAINER Mekom Solutions <support@mekomsolutions.com> 
 
 USER root
