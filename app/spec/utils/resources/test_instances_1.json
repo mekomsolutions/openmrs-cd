@@ -48,6 +48,14 @@
           "port": "22"
         }
       },
+      "tls": {
+        "type": "file",
+        "value": {
+          "privateKeyPath": "/a/path",
+          "publicCertPath": "/b/path",
+          "chainCertsPath": "/c/path"
+        }
+      },
       "links": [
         {
           "type": "artifact",

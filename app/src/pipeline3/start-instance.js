@@ -63,6 +63,73 @@ if (process.env[config.varDeploymentChanges()] === "true") {
     script.body.push(
       scripts.remote(ssh, scripts.container.run(instanceDef.uuid, instanceDef))
     );
+    if (!_.isEmpty(instanceDef.deployment.tls)) {
+      var tls = instanceDef.deployment.tls;
+      if (tls.type === "file") {
+        var publicDestPath = "/etc/ssl/";
+        var privateDestPath = "/etc/ssl/private/";
+        script.body.push(
+          scripts.remote(
+            ssh,
+            scripts.container.copy(
+              instanceDef.uuid,
+              tls.value.publicCertPath,
+              publicDestPath + "mekomsolutions.net.crt"
+            )
+          )
+        );
+        script.body.push(
+          scripts.remote(
+            ssh,
+            scripts.container.copy(
+              instanceDef.uuid,
+              tls.value.chainCertsPath,
+              publicDestPath + "mekomsolutions.net.intermediate.crt"
+            )
+          )
+        );
+        script.body.push(
+          scripts.remote(
+            ssh,
+            scripts.container.exec(
+              instanceDef.uuid,
+              "mkdir -m 700 " + privateDestPath
+            )
+          )
+        );
+        script.body.push(
+          scripts.remote(
+            ssh,
+            scripts.container.copy(
+              instanceDef.uuid,
+              tls.value.privateKeyPath,
+              privateDestPath + "mekomsolutions.net.key",
+              true
+            )
+          )
+        );
+      } else if (tls.type === "vault") {
+        // TODO: Implement fetching TLS certs via Vault
+      } else if (tls.type === "letsEncrypt") {
+        // TODO: Implement setting up TLS certs using Let's Encrypt
+      }
+      script.body.push(
+        scripts.remote(
+          ssh,
+          scripts.container.exec(
+            instanceDef.uuid,
+            "chmod 755 /etc/bahmni-installer/update-apache-config.sh\n" +
+              "/etc/bahmni-installer/update-apache-config.sh /etc/httpd/conf.d/ssl.conf"
+          )
+        )
+      );
+      script.body.push(
+        scripts.remote(
+          ssh,
+          scripts.container.exec(instanceDef.uuid, "service httpd restart")
+        )
+      );
+    }
   }
 }
 

@@ -154,8 +154,7 @@ describe("Scripts", function() {
   it("should generate Docker copy command", function() {
     var docker = scripts.container;
     expect(docker.copy("cambodia1", "/tmp/test1", "/tmp/test2")).toEqual(
-      docker.exec("cambodia1", "mkdir -p /tmp/test2") +
-        "docker cp /tmp/test1 cambodia1:/tmp/test2\n"
+      "docker cp /tmp/test1 cambodia1:/tmp/test2\n"
     );
   });
 

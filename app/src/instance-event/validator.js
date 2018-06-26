@@ -104,6 +104,12 @@ module.exports = {
         .getConfigValidatorsMap()
         [deployment.type](deployment.value);
     }
+    if (!empty) {
+      if (deployment.hasOwnProperty("tls")) {
+        var tls = deployment.tls;
+        module.exports.getConfigValidatorsMap()[tls.type](tls.value);
+      }
+    }
   },
 
   validateArtifactsConfig: function(artifacts, isNew) {
@@ -173,6 +179,28 @@ module.exports = {
     }
   },
 
+  validateFileTLSDeploymentConfigValue: function(value) {
+    if (
+      JSON.stringify(Object.keys(value).sort()) !==
+      JSON.stringify(Object.keys(new model.FileTLSDeployment()).sort())
+    ) {
+      throw new Error(
+        "The File TLS deployment value should be provided as an instance of 'FileTLSDeployment'."
+      );
+    }
+  },
+
+  validateVaultTLSDeploymentConfigValue: function(value) {
+    if (
+      JSON.stringify(Object.keys(value).sort()) !==
+      JSON.stringify(Object.keys(new model.VaultTLSDeployment()).sort())
+    ) {
+      throw new Error(
+        "The Vault TLS deployment value should be provided as an instance of 'VaultTLSDeployment'."
+      );
+    }
+  },
+
   validateDataConfig: function(data) {
     if (_.isEmpty(data)) {
       return true;
@@ -218,7 +246,9 @@ module.exports = {
   getConfigValidatorsMap: function() {
     return {
       maven: module.exports.validateMavenArtifactConfigValue,
-      docker: module.exports.validateDockerDeploymentConfigValue
+      docker: module.exports.validateDockerDeploymentConfigValue,
+      file: module.exports.validateFileTLSDeploymentConfigValue,
+      vault: module.exports.validateVaultTLSDeploymentConfigValue
     };
   }
 };

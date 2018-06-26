@@ -75,6 +75,7 @@ module.exports = {
    * @param {Boolean} slashSrc - Set to true to add a trailing slash to the source path
    * @param {Boolean} slashDst - Set to true to add a trailing slash to the destination path
    * @param {String} args - To override the default args: '-avz'
+   * @param {String} sudo - Apply the command as sudo
    *
    * @return {String} The remote version of the script
    */
@@ -405,15 +406,16 @@ module.exports = {
      * @param {String} containerName - The name of the container onto which to copy the data.
      * @param {String} source - The source file to be copied on the container.
      * @param {String} destination - The destination location for this file.
+     * @param {String} sudo - Apply the command as sudo
     *
      * @return {String} The script as a string.
      */
-    copy: function(containerName, source, destination) {
+    copy: function(containerName, source, destination, sudo) {
       var script = "";
-      script += module.exports.container.exec(
-        containerName,
-        "mkdir -p " + destination
-      );
+
+      if (sudo) {
+        script += "sudo ";
+      }
       script += "docker cp " + source + " " + containerName + ":" + destination;
 
       return script + "\n";

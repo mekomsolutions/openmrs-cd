@@ -113,6 +113,66 @@ describe("The instances config validator", function() {
         true
       );
     }).not.toThrow();
+
+    // Verfiy the File TLS deployment section
+    expect(function() {
+      _script_.validateDeploymentConfig(
+        {
+          type: "docker",
+          hostDir: "/tmp/{{uuid}}",
+          value: new model.DockerDeployment(),
+          tls: {
+            type: "file",
+            value: { "1": "not a valid field" }
+          }
+        },
+        true
+      );
+    }).toThrow();
+    expect(function() {
+      _script_.validateDeploymentConfig(
+        {
+          type: "docker",
+          hostDir: "/tmp/{{uuid}}",
+          value: new model.DockerDeployment(),
+          tls: {
+            type: "file",
+            value: new model.FileTLSDeployment()
+          }
+        },
+        true
+      );
+    }).not.toThrow();
+
+    // Verfiy the Vault TLS deployment section
+    expect(function() {
+      _script_.validateDeploymentConfig(
+        {
+          type: "docker",
+          hostDir: "/tmp/{{uuid}}",
+          value: new model.DockerDeployment(),
+          tls: {
+            type: "vault",
+            value: { "1": "not a valid field" }
+          }
+        },
+        true
+      );
+    }).toThrow();
+    expect(function() {
+      _script_.validateDeploymentConfig(
+        {
+          type: "docker",
+          hostDir: "/tmp/{{uuid}}",
+          value: new model.DockerDeployment(),
+          tls: {
+            type: "vault",
+            value: new model.VaultTLSDeployment()
+          }
+        },
+        true
+      );
+    }).not.toThrow();
   });
 
   it("should validate an instances artifacts section.", function() {

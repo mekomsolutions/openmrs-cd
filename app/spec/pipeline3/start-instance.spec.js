@@ -93,10 +93,53 @@ describe("Start instance scripts", function() {
     expectedScript.push(
       scripts.remote(ssh, docker.run(instanceUuid, instanceDef))
     );
+    var tls = instanceDef.deployment.tls;
+    var publicDestPath = "/etc/ssl/";
+    var privateDestPath = "/etc/ssl/private/";
+
+    expectedScript.push(
+      scripts.remote(
+        ssh,
+        scripts.container.copy(
+          instanceDef.uuid,
+          tls.value.publicCertPath,
+          publicDestPath + "mekomsolutions.net.crt"
+        )
+      )
+    );
+    expectedScript.push(
+      scripts.remote(
+        ssh,
+        scripts.container.copy(
+          instanceDef.uuid,
+          tls.value.chainCertsPath,
+          publicDestPath + "mekomsolutions.net.intermediate.crt"
+        )
+      )
+    );
+    expectedScript.push(
+      scripts.remote(
+        ssh,
+        scripts.container.exec(
+          instanceDef.uuid,
+          "mkdir -m 700 " + privateDestPath
+        )
+      )
+    );
+    expectedScript.push(
+      scripts.remote(
+        ssh,
+        scripts.container.copy(
+          instanceDef.uuid,
+          tls.value.privateKeyPath,
+          privateDestPath + "mekomsolutions.net.key",
+          true
+        )
+      )
+    );
 
     expectedScript = expectedScript.join(cst.SCRIPT_SEPARATOR);
-
-    expect(expectedScript).toContain(expectedScript);
+    expect(script).toContain(expectedScript);
   });
 
   it("should generate bash script upon data changes.", function() {

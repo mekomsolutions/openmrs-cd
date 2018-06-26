@@ -32,6 +32,28 @@ class DockerDeployment {
 }
 
 /**
+ * Describes a File TLS deployment section
+ */
+class FileTLSDeployment {
+  constructor(privateKeyPath, publicCertPath, chainCertsPath) {
+    this.privateKeyPath = privateKeyPath;
+    this.publicCertPath = publicCertPath;
+    this.chainCertsPath = chainCertsPath;
+  }
+}
+
+/**
+ * Describes a Vault TLS deployment section used to fetch TLS certs on a remote Vault server
+ */
+class VaultTLSDeployment {
+  constructor(privateKeyURL, publicCertURL, chainCertsURL) {
+    this.privateKeyURL = privateKeyURL;
+    this.publicCertURL = publicCertURL;
+    this.chainCertsURL = chainCertsURL;
+  }
+}
+
+/**
  * Describes an Instance Data section
  *
  * Note: 'instanceUuid' and 'dataDir' should not be both provided. Instance validation would fail.
@@ -153,6 +175,8 @@ module.exports = {
   InstanceData: InstanceData,
   SqlData: SqlData,
   DockerDeployment: DockerDeployment,
+  FileTLSDeployment: FileTLSDeployment,
+  VaultTLSDeployment: VaultTLSDeployment,
   Artifact: Artifact,
   ProjectBuild: ProjectBuild,
   Descriptor: Descriptor,
