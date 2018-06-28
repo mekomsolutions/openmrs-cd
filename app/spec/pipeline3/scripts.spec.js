@@ -71,7 +71,7 @@ describe("Scripts", function() {
   });
 
   it("should generate Docker run command", function() {
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts("docker");
 
     var instanceDef = {
       type: "dev",
@@ -101,7 +101,7 @@ describe("Scripts", function() {
   });
 
   it("should generate ifExists wrapper", function() {
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts("docker");
     expect(docker.ifExists("cambodia1", "cmd1\n", "cmd2\n")).toEqual(
       "set -xe\n" +
         "container=\\$(docker ps -a --filter name=cambodia1 --format {{.Names}})\n" +
@@ -121,14 +121,14 @@ describe("Scripts", function() {
   });
 
   it("should generate Docker restart command", function() {
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts("docker");
     expect(docker.restart("cambodia1")).toEqual(
       docker.ifExists("cambodia1", "set -xe\n" + "docker restart cambodia1\n")
     );
   });
 
   it("should generate Docker remove command", function() {
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts("docker");
     expect(docker.remove("cambodia1")).toEqual(
       docker.ifExists(
         "cambodia1",
@@ -138,7 +138,7 @@ describe("Scripts", function() {
   });
 
   it("should generate Docker exec command", function() {
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts("docker");
     expect(docker.exec("cambodia1", "echo 'test'")).toEqual(
       "set -xe\n" +
         "docker exec -i cambodia1 /bin/bash -s <<" +
@@ -152,7 +152,7 @@ describe("Scripts", function() {
   });
 
   it("should generate Docker copy command", function() {
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts("docker");
     expect(docker.copy("cambodia1", "/tmp/test1", "/tmp/test2")).toEqual(
       "docker cp /tmp/test1 cambodia1:/tmp/test2\n"
     );
@@ -233,5 +233,104 @@ describe("Scripts", function() {
       }
     });
     expect(actualScript).toContain(expectedScript);
+  });
+
+  it("should compute additional instance's scripts", function() {
+    var instanceDef = {
+      scripts: [
+        {
+          type: "shell",
+          executionStage: "6",
+          conditions: ["data"],
+          value: "/a/script.sh"
+        }
+      ],
+      deployment: {
+        host: {
+          value: "{}"
+        },
+        type: "docker"
+      }
+    };
+    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
+
+    process.env[config.varDataChanges()] = "true";
+    process.env[config.varArtifactsChanges()] = "true";
+    process.env[config.varDeploymentChanges()] = "true";
+
+    var scriptsToRun = [];
+    var script = [];
+    script.push("some commands");
+    var currentStage = "6";
+
+    scriptsToRun = scripts.computeAdditionalScripts(
+      script,
+      instanceDef,
+      currentStage,
+      config,
+      process.env
+    );
+    expect(scriptsToRun).toEqual([
+      "some commands",
+      scripts.remote(
+        instanceDef.deployment.host.value,
+        docker.exec(instanceDef.uuid, instanceDef.scripts[0].value)
+      )
+    ]);
+
+    script = [];
+    script.push("some commands");
+    // Setting a different 'currentStage'
+    currentStage = "7";
+
+    scriptsToRun = scripts.computeAdditionalScripts(
+      script,
+      instanceDef,
+      currentStage,
+      config,
+      process.env
+    );
+    expect(scriptsToRun).toEqual(["some commands"]);
+
+    // Sets 'atStageStart' to true
+    instanceDef.scripts[0].atStageStart = "true";
+    script = [];
+    script.push("some commands");
+    currentStage = "6";
+
+    scriptsToRun = scripts.computeAdditionalScripts(
+      script,
+      instanceDef,
+      currentStage,
+      config,
+      process.env
+    );
+
+    // Expects the 'scriptsToRun' to be placed first in the whole script
+    expect(scriptsToRun).toEqual([
+      scripts.remote(
+        instanceDef.deployment.host.value,
+        docker.exec(instanceDef.uuid, instanceDef.scripts[0].value)
+      ),
+      "some commands"
+    ]);
+
+    // Set a 'false' data changes
+    process.env[config.varDataChanges()] = "false";
+    process.env[config.varArtifactsChanges()] = "true";
+    process.env[config.varDeploymentChanges()] = "true";
+
+    script = [];
+    script.push("some commands");
+    currentStage = "6";
+
+    scriptsToRun = scripts.computeAdditionalScripts(
+      script,
+      instanceDef,
+      currentStage,
+      config,
+      process.env
+    );
+    expect(scriptsToRun).toEqual(["some commands"]);
   });
 });

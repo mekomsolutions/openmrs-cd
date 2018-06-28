@@ -8,6 +8,7 @@ const cst = require("../const");
 const heredoc = cst.HEREDOC;
 const heredoc_2 = cst.HEREDOC_2;
 const utils = require("../utils/utils");
+const model = require("../utils/model");
 
 module.exports = {
   /*
@@ -263,14 +264,30 @@ module.exports = {
     });
     return script;
   },
-
   /*
-   * Script utils to manipulate Docker containers.
+   * Method to return the appropriate implementation of scripts utilities for the given deployment type.
    *
    */
-  container: {
+  getDeploymentScripts: function(type) {
+    if (type === "docker") {
+      var docker = module.exports.docker;
+      return new model.DockerDeploymentScripts(
+        docker.ifExists,
+        docker.restart,
+        docker.remove,
+        docker.run,
+        docker.exec,
+        docker.copy
+      );
+    }
+  },
+  /*
+   * Implementation of script utils to specifically manipulate Docker containers.
+   *
+   */
+  docker: {
     /*
-     * Util function that wraps the passed commands so each is applied either if the container exists or if it does not.
+     * Util function that wraps the passed commands so each is applied either accordingly.
      * 
      * @param {String} containerName - The name of the container.
      * @param {String} ifExistsCommand - The command that should run if the container exists.
@@ -306,7 +323,7 @@ module.exports = {
       var script = "";
       script += "set -xe\n";
       script += "docker restart " + containerName + "\n";
-      return module.exports.container.ifExists(containerName, script);
+      return module.exports.docker.ifExists(containerName, script);
     },
 
     /*
@@ -321,7 +338,7 @@ module.exports = {
       script += "set -xe\n";
       script += "docker stop " + containerName + "\n";
       script += "docker rm -v " + containerName + "\n";
-      return module.exports.container.ifExists(containerName, script);
+      return module.exports.docker.ifExists(containerName, script);
     },
 
     /*
@@ -420,5 +437,72 @@ module.exports = {
 
       return script + "\n";
     }
+  },
+  /**
+   * Determines if a script should be run at a given stage and adds it to the final script
+   *
+   * @param {Array} script - The script to which to add the additional scripts (if any is found).
+   * @param {Object} instanceDef - The instance definition of the instance to start.
+   * @param {String} currentStage - The current stage in which the function is called.
+   * @param {Object} config - The global config object (that informs for 'data', 'artifact', deployment' changes.
+   * @param {Object} processEnv - The environment (usually process.env).
+   *
+   */
+  computeAdditionalScripts(
+    script,
+    instanceDef,
+    currentStage,
+    config,
+    processEnv
+  ) {
+    var changes = [];
+    if (processEnv[config.varArtifactsChanges()] === "true") {
+      changes.push("artifact");
+    }
+    if (processEnv[config.varDeploymentChanges()] === "true") {
+      changes.push("deployment");
+    }
+    if (processEnv[config.varDataChanges()] === "true") {
+      changes.push("data");
+    }
+
+    // find scripts elements that match the corresponding changes
+    var scriptsToRun = _.filter(instanceDef.scripts, function(item) {
+      var matches = false;
+      if (!_.isEmpty(_.intersection(item.conditions, changes))) {
+        // ensure execution stage matches too
+        if (item.executionStage === currentStage) {
+          matches = true;
+        }
+      }
+      return matches;
+    });
+
+    var ssh = instanceDef.deployment.host.value;
+
+    scriptsToRun.forEach(function(item) {
+      var deploymentTypeScripts = module.exports.getDeploymentScripts(
+        instanceDef.deployment.type
+      );
+      var runScript = "";
+      if (item.type === "shell") {
+        runScript += module.exports.remote(
+          ssh,
+          deploymentTypeScripts.exec(instanceDef.uuid, item.value)
+        );
+      } else if (item.type === "python") {
+        // TODO: to be implemented
+      } else if (item.type === "sql") {
+        // TODO: to be implemented
+      }
+
+      if (item.atStageStart === "true") {
+        script.unshift(runScript);
+      } else {
+        script.push(runScript);
+      }
+    });
+
+    return script;
   }
 };

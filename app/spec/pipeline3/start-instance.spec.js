@@ -57,10 +57,9 @@ describe("Start instance scripts", function() {
       "utf8"
     );
     var ssh = instanceDef.deployment.host.value;
+    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
 
-    expect(script).toContain(
-      scripts.remote(ssh, scripts.container.restart(instanceUuid))
-    );
+    expect(script).toContain(scripts.remote(ssh, docker.restart(instanceUuid)));
   });
 
   it("should generate bash script upon deployment changes.", function() {
@@ -86,7 +85,7 @@ describe("Start instance scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
 
     var expectedScript = [];
     expectedScript.push(scripts.remote(ssh, docker.remove(instanceUuid)));
@@ -100,7 +99,7 @@ describe("Start instance scripts", function() {
     expectedScript.push(
       scripts.remote(
         ssh,
-        scripts.container.copy(
+        docker.copy(
           instanceDef.uuid,
           tls.value.publicCertPath,
           publicDestPath + "mekomsolutions.net.crt"
@@ -110,7 +109,7 @@ describe("Start instance scripts", function() {
     expectedScript.push(
       scripts.remote(
         ssh,
-        scripts.container.copy(
+        docker.copy(
           instanceDef.uuid,
           tls.value.chainCertsPath,
           publicDestPath + "mekomsolutions.net.intermediate.crt"
@@ -120,16 +119,13 @@ describe("Start instance scripts", function() {
     expectedScript.push(
       scripts.remote(
         ssh,
-        scripts.container.exec(
-          instanceDef.uuid,
-          "mkdir -m 700 " + privateDestPath
-        )
+        docker.exec(instanceDef.uuid, "mkdir -m 700 " + privateDestPath)
       )
     );
     expectedScript.push(
       scripts.remote(
         ssh,
-        scripts.container.copy(
+        docker.copy(
           instanceDef.uuid,
           tls.value.privateKeyPath,
           privateDestPath + "mekomsolutions.net.key",
@@ -170,7 +166,7 @@ describe("Start instance scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
 
     var changePerms = "chmod 775 /etc/bahmni-installer/move-mysql-datadir.sh\n";
     var moveMysqlFolder =
@@ -226,7 +222,8 @@ describe("Start instance scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
+
     var sqlCmd =
       "zcat /tmp/" +
       testRandomString.slice(-5) +
@@ -278,14 +275,14 @@ describe("Start instance scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
 
     var expectedComponentsToLink = [];
     expectedComponentsToLink.push("artifacts", "data");
 
     var expectedScript = scripts.remote(
       ssh,
-      scripts.container.exec(
+      docker.exec(
         instanceDef.uuid,
         scripts_.linkComponents(
           _.uniq(expectedComponentsToLink),
@@ -323,7 +320,7 @@ describe("Start instance scripts", function() {
 
     var expectedScript = scripts.remote(
       ssh,
-      scripts.container.exec(
+      docker.exec(
         instanceDef.uuid,
         scripts_.linkComponents(
           _.uniq(expectedComponentsToLink),
@@ -360,7 +357,7 @@ describe("Start instance scripts", function() {
 
     var expectedScript = scripts.remote(
       ssh,
-      scripts.container.exec(
+      docker.exec(
         instanceDef.uuid,
         scripts_.linkComponents(
           _.uniq(expectedComponentsToLink),
@@ -394,7 +391,7 @@ describe("Start instance scripts", function() {
       "utf8"
     );
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
 
     var expectedScript = [];
     expectedScript.push(
@@ -412,9 +409,9 @@ describe("Start instance scripts", function() {
     expect(script).toContain(expectedScript.join(cst.SCRIPT_SEPARATOR));
   });
 
-  it("should apply Concat Configs command.", function() {
+  it("should call the computeAdditionalScripts method.", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
-    process.env[config.varDataChanges()] = "false";
+    process.env[config.varDataChanges()] = "true";
     process.env[config.varCreation()] = "false";
     var instanceDef = db.getInstanceDefinition(instanceUuid);
 
@@ -435,15 +432,18 @@ describe("Start instance scripts", function() {
       "utf8"
     );
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.container;
+    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
 
     var expectedScript = [];
     expectedScript.push(
+      scripts.remote(ssh, docker.exec(instanceDef.uuid, "/stage/5/script.sh"))
+    );
+    expectedScript.push(
       scripts.remote(
         ssh,
-        scripts.container.exec(
+        docker.exec(
           instanceDef.uuid,
-          "bahmni -i local.inventory concat-configs\n"
+          "/usr/bin/bahmni -i local.inventory concat-configs"
         )
       )
     );

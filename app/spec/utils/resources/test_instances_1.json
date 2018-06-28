@@ -139,6 +139,20 @@
           "sourceFile": "/var/reference-data/copyConcepts.sql"
         }
       }
+    ],
+    "scripts": [
+      {
+        "type": "shell",
+        "executionStage": "5",
+        "conditions": ["data"],
+        "value": "/stage/5/script.sh"
+      },
+      {
+        "type": "shell",
+        "executionStage": "5",
+        "conditions": ["data", "artifacts"],
+        "value": "/usr/bin/bahmni -i local.inventory concat-configs"
+      }
     ]
   },
   {

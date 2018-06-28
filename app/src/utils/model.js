@@ -169,6 +169,20 @@ class ServerEvent {
   }
 }
 
+/**
+ * Docker deployment scripts
+ */
+class DockerDeploymentScripts {
+  constructor(ifExists, restart, remove, run, exec, copy) {
+    this.ifExists = ifExists;
+    this.restart = restart;
+    this.remove = remove;
+    this.run = run;
+    this.exec = exec;
+    this.copy = copy;
+  }
+}
+
 module.exports = {
   Script: Script,
   MavenProject: MavenProject,
@@ -180,5 +194,6 @@ module.exports = {
   Artifact: Artifact,
   ProjectBuild: ProjectBuild,
   Descriptor: Descriptor,
-  ServerEvent: ServerEvent
+  ServerEvent: ServerEvent,
+  DockerDeploymentScripts: DockerDeploymentScripts
 };

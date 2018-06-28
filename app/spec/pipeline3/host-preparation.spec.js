@@ -58,7 +58,6 @@ describe("Host preparation scripts", function() {
       "utf8"
     );
     var hostArtifactsDir = instanceDef.deployment.hostDir + "/artifacts";
-
     expect(script).toContain("mkdir -p " + hostArtifactsDir);
     var srcDir = process.env.WORKSPACE + "/" + instanceUuid + "/artifacts/";
 
