@@ -137,13 +137,18 @@ describe("Tests suite for pipeline3", function() {
         config.getPostStartScriptName() +
         "'"
     );
+
+    // verif 'startup monitoring' stage
     expect(jenkinsFile).toContain(
       "sh 'node /opt/app/src/$JOB_NAME/" +
-        config.getUpdateStatusJsScriptName() +
-        " $" +
+        config.getStartupMonitoringJsScriptName() +
+        "'"
+    );
+    expect(jenkinsFile).toContain(
+      "sh '$" +
         config.varEnvvarBuildPath() +
         "/" +
-        config.getStatusFileName() +
+        config.getStartupMonitoringScriptName() +
         "'"
     );
   });

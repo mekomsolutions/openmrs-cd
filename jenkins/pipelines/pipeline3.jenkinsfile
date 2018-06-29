@@ -53,20 +53,20 @@ pipeline {
         sh 'node /opt/app/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json'
       }
     }
-    stage ('Maintenance mode: OFF') {
-      when {
-        expression { return false }
-      }
-      steps {
-        sh 'echo "Stage/steps awaiting implementation... Skipping."'
-      }
-    }
     stage ('Post startup actions') {
       steps {
         sh 'node /opt/app/src/$JOB_NAME/post-start.js'
         sh 'cat $BUILD_PATH/post-start.sh'
         sh '$BUILD_PATH/post-start.sh'
         sh 'node /opt/app/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json'
+      }
+    }
+    stage ('Maintenance mode: OFF') {
+      when {
+        expression { return false }
+      }
+      steps {
+        sh 'echo "Stage/steps awaiting implementation... Skipping."'
       }
     }
   }

@@ -204,7 +204,7 @@ module.exports = {
     return "post-start.sh";
   },
   getPostStartStatusCode: function() {
-    return "8";
+    return "7";
   },
   getStartupMonitoringJsScriptName: function() {
     return "startup-monitoring.js";
@@ -213,7 +213,7 @@ module.exports = {
     return "startup-monitoring.sh";
   },
   getStartupMonitoringStatusCode: function() {
-    return "7";
+    return "8";
   },
   getUpdateStatusJsScriptName: function() {
     return "update-status.js";
