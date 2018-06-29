@@ -123,5 +123,28 @@ describe("Tests suite for pipeline3", function() {
         config.getStatusFileName() +
         "'"
     );
+
+    // verif 'post start' stage
+    expect(jenkinsFile).toContain(
+      "sh 'node /opt/app/src/$JOB_NAME/" +
+        config.getPostStartJsScriptName() +
+        "'"
+    );
+    expect(jenkinsFile).toContain(
+      "sh '$" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getPostStartScriptName() +
+        "'"
+    );
+    expect(jenkinsFile).toContain(
+      "sh 'node /opt/app/src/$JOB_NAME/" +
+        config.getUpdateStatusJsScriptName() +
+        " $" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getStatusFileName() +
+        "'"
+    );
   });
 });

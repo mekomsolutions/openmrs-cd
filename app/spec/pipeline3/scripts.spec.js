@@ -237,6 +237,7 @@ describe("Scripts", function() {
 
   it("should compute additional instance's scripts", function() {
     var instanceDef = {
+      uuid: "1-22-333",
       scripts: [
         {
           type: "shell",
@@ -247,7 +248,12 @@ describe("Scripts", function() {
       ],
       deployment: {
         host: {
-          value: "{}"
+          type: "ssh",
+          value: {
+            ip: "54.154.133.95",
+            user: "ec2-user",
+            port: "22"
+          }
         },
         type: "docker"
       }
@@ -270,7 +276,7 @@ describe("Scripts", function() {
       config,
       process.env
     );
-    expect(scriptsToRun).toEqual([
+    expect(scriptsToRun.script).toEqual([
       "some commands",
       scripts.remote(
         instanceDef.deployment.host.value,
@@ -290,7 +296,7 @@ describe("Scripts", function() {
       config,
       process.env
     );
-    expect(scriptsToRun).toEqual(["some commands"]);
+    expect(scriptsToRun.script).toEqual(["some commands"]);
 
     // Sets 'atStageStart' to true
     instanceDef.scripts[0].atStageStart = "true";
@@ -307,7 +313,7 @@ describe("Scripts", function() {
     );
 
     // Expects the 'scriptsToRun' to be placed first in the whole script
-    expect(scriptsToRun).toEqual([
+    expect(scriptsToRun.script).toEqual([
       scripts.remote(
         instanceDef.deployment.host.value,
         docker.exec(instanceDef.uuid, instanceDef.scripts[0].value)
@@ -331,6 +337,33 @@ describe("Scripts", function() {
       config,
       process.env
     );
-    expect(scriptsToRun).toEqual(["some commands"]);
+    expect(scriptsToRun.script).toEqual(["some commands"]);
+
+    script = [];
+    script.push("some commands");
+    instanceDef.scripts.push({
+      type: "shell",
+      executionStage: "6",
+      conditions: ["artifacts"],
+      restart: "true",
+      value: "/b/script.sh"
+    });
+
+    scriptsToRun = scripts.computeAdditionalScripts(
+      script,
+      instanceDef,
+      currentStage,
+      config,
+      process.env
+    );
+
+    expect(scriptsToRun.script).toEqual([
+      "some commands",
+      scripts.remote(
+        instanceDef.deployment.host.value,
+        docker.exec(instanceDef.uuid, "/b/script.sh")
+      )
+    ]);
+    expect(scriptsToRun.restartNeeded).toBeTruthy();
   });
 });

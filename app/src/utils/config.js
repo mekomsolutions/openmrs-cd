@@ -197,6 +197,24 @@ module.exports = {
   getStartInstanceStatusCode: function() {
     return "5";
   },
+  getPostStartJsScriptName: function() {
+    return "post-start.js";
+  },
+  getPostStartScriptName: function() {
+    return "post-start.sh";
+  },
+  getPostStartStatusCode: function() {
+    return "8";
+  },
+  getStartupMonitoringJsScriptName: function() {
+    return "startup-monitoring.js";
+  },
+  getStartupMonitoringScriptName: function() {
+    return "startup-monitoring.sh";
+  },
+  getStartupMonitoringStatusCode: function() {
+    return "7";
+  },
   getUpdateStatusJsScriptName: function() {
     return "update-status.js";
   },

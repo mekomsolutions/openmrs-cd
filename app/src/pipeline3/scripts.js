@@ -447,6 +447,7 @@ module.exports = {
    * @param {Object} config - The global config object (that informs for 'data', 'artifact', deployment' changes.
    * @param {Object} processEnv - The environment (usually process.env).
    *
+   * @return {Object} computedScript - Returns an object that contains the initial passed script, appended with the scripts to apply at the current stage and if a final restart is required
    */
   computeAdditionalScripts(
     script,
@@ -457,7 +458,7 @@ module.exports = {
   ) {
     var changes = [];
     if (processEnv[config.varArtifactsChanges()] === "true") {
-      changes.push("artifact");
+      changes.push("artifacts");
     }
     if (processEnv[config.varDeploymentChanges()] === "true") {
       changes.push("deployment");
@@ -479,6 +480,7 @@ module.exports = {
     });
 
     var ssh = instanceDef.deployment.host.value;
+    var restartNeeded = false;
 
     scriptsToRun.forEach(function(item) {
       var deploymentTypeScripts = module.exports.getDeploymentScripts(
@@ -501,8 +503,16 @@ module.exports = {
       } else {
         script.push(runScript);
       }
+
+      if (item.restart === "true") {
+        restartNeeded += true;
+      }
     });
 
-    return script;
+    var computedScript = {
+      script: script,
+      restartNeeded: restartNeeded
+    };
+    return computedScript;
   }
 };

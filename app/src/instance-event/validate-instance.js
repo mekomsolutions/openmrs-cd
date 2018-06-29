@@ -32,6 +32,7 @@ var existingInstance = db.getInstanceDefinition(
 );
 var isNewInstance = _.isEmpty(existingInstance);
 
+log.info("", "Instance Event being processed:\n" + instanceEvent);
 //
 // in-depth validation
 //

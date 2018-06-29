@@ -206,6 +206,7 @@ script.body.push(
   )
 );
 
+// TODO: Remove this block to provide it an 'additionalScript' in the instance definition
 // Copy the Bahmni Event Log Service properties file
 if (process.env[config.varDataChanges()] === "true") {
   var appPropsFilePath =
@@ -229,19 +230,16 @@ if (process.env[config.varDataChanges()] === "true") {
   );
   finalRestart = true;
 }
-
-script.body = _.merge(
+var computedScript = scripts.computeAdditionalScripts(
   script.body,
-  scripts.computeAdditionalScripts(
-    script.body,
-    instanceDef,
-    currentStage,
-    config,
-    process.env
-  )
+  instanceDef,
+  currentStage,
+  config,
+  process.env
 );
+script.body = computedScript.script;
 
-finalRestart = true;
+finalRestart += computedScript.restartNeeded;
 
 if (finalRestart) {
   script.body.push(scripts.remote(ssh, container.restart(instanceDef.uuid)));

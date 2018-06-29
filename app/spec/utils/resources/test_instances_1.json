@@ -152,6 +152,26 @@
         "executionStage": "5",
         "conditions": ["data", "artifacts"],
         "value": "/usr/bin/bahmni -i local.inventory concat-configs"
+      },
+      {
+        "type": "shell",
+        "executionStage": "8",
+        "conditions": ["data", "deployment"],
+        "restart": "false",
+        "value": "/some/script.sh"
+      },
+      {
+        "type": "shell",
+        "executionStage": "8",
+        "conditions": ["data", "deployment"],
+        "restart": "true",
+        "value": "/some/script.sh"
+      },
+      {
+        "type": "shell",
+        "executionStage": "7",
+        "conditions": ["data", "deployment"],
+        "value": "/another/script.sh"
       }
     ]
   },

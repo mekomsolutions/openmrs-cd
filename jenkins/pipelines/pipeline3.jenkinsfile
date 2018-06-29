@@ -22,11 +22,17 @@ pipeline {
       }
     }
     stage ('Maintenance mode: ON') {
+      when {
+        expression { return false }
+      }
       steps {
         sh 'echo "Stage/steps awaiting implementation... Skipping."'
       }
     }
     stage ('Production host preparation') {
+      when {
+        expression { return false }
+      }
       steps {
         sh 'echo "Stage/steps awaiting implementation... Skipping."'
       }
@@ -41,17 +47,26 @@ pipeline {
     }
     stage ('Instance startup status monitoring') {
       steps {
-        sh 'echo "Stage/steps awaiting implementation... Skipping."'
+        sh 'node /opt/app/src/$JOB_NAME/startup-monitoring.js'
+        sh 'cat $BUILD_PATH/startup-monitoring.sh'
+        sh '$BUILD_PATH/startup-monitoring.sh'
+        sh 'node /opt/app/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json'
       }
     }
     stage ('Maintenance mode: OFF') {
+      when {
+        expression { return false }
+      }
       steps {
         sh 'echo "Stage/steps awaiting implementation... Skipping."'
       }
     }
     stage ('Post startup actions') {
       steps {
-        sh 'echo "Stage/steps awaiting implementation... Skipping."'
+        sh 'node /opt/app/src/$JOB_NAME/post-start.js'
+        sh 'cat $BUILD_PATH/post-start.sh'
+        sh '$BUILD_PATH/post-start.sh'
+        sh 'node /opt/app/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json'
       }
     }
   }

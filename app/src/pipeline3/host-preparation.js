@@ -117,16 +117,13 @@ if (process.env[config.varDataChanges()] === "true") {
   });
 }
 
-script.body = _.merge(
+script.body = scripts.computeAdditionalScripts(
   script.body,
-  scripts.computeAdditionalScripts(
-    script.body,
-    instanceDef,
-    currentStage,
-    config,
-    process.env
-  )
-);
+  instanceDef,
+  currentStage,
+  config,
+  process.env
+).script;
 
 script.body = script.body.join(cst.SCRIPT_SEPARATOR);
 
