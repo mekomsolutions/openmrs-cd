@@ -63,4 +63,40 @@ describe("Post start scripts", function() {
     expect(script).toContain("/some/script.sh");
     expect(script).toContain(docker.restart(instanceUuid));
   });
+
+  it("should clear the search index.", function() {
+    process.env[config.varInstanceUuid()] = instanceUuid;
+    process.env[config.varDeploymentChanges()] = "true";
+    var instanceDef = db.getInstanceDefinition(instanceUuid);
+    var container = scripts.getDeploymentScripts(instanceDef.deployment.type);
+
+    // replay
+    proxyquire(
+      path.resolve(
+        "src/" +
+          config.getJobNameForPipeline3() +
+          "/" +
+          config.getPostStartJsScriptName()
+      ),
+      tests.stubs()
+    );
+
+    // verif
+    var script = fs.readFileSync(
+      path.resolve(config.getBuildDirPath(), config.getPostStartScriptName()),
+      "utf8"
+    );
+
+    var ssh = instanceDef.deployment.host.value;
+
+    var clearIndexSql =
+      "\"UPDATE global_property SET global_property.property_value = '' WHERE global_property.property = 'search.indexVersion';\"";
+
+    var clearIndexCmd =
+      "echo " + clearIndexSql + " | " + "mysql -uroot -ppassword openmrs";
+
+    expect(script).toContain(
+      scripts.remote(ssh, container.exec(instanceDef.uuid, clearIndexCmd))
+    );
+  });
 });

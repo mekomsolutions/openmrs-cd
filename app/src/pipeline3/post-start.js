@@ -58,6 +58,18 @@ script.body = computedScript.script;
 
 finalRestart += computedScript.restartNeeded;
 
+// Clear the index version to trigger index rebuild
+// https://talk.openmrs.org/t/rebuild-search-index-from-mysql-or-maven/4446/11?u=mksrom
+var clearIndexSql =
+  "\"UPDATE global_property SET global_property.property_value = '' WHERE global_property.property = 'search.indexVersion';\"";
+var clearIndexCmd =
+  "echo " + clearIndexSql + " | " + "mysql -uroot -ppassword openmrs";
+
+script.body.push(
+  scripts.remote(ssh, container.exec(instanceDef.uuid, clearIndexCmd))
+);
+finalRestart = true;
+
 if (finalRestart) {
   script.body.push(scripts.remote(ssh, container.restart(instanceDef.uuid)));
 }
