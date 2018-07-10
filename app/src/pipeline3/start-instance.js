@@ -165,7 +165,9 @@ if (process.env[config.varDataChanges()] === "true") {
       script.body.push(
         scripts.remote(
           ssh,
-          container.copy(instanceDef.uuid, sql.sourceFile, destFolder)
+          container.exec(instanceDef.uuid, "mkdir -p " + destFolder) +
+            "\n" +
+            container.copy(instanceDef.uuid, sql.sourceFile, destFolder)
         )
       );
 
