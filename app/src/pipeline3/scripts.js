@@ -210,8 +210,9 @@ module.exports = {
   * @param {String} source - The source path to be linked.
    * @param {String} target - The target to which to link the source.
    * @param {Boolean} removeIfExists - Will remove the 'target' if it exists already.
+   * @param {Boolean} create - Will create the 'target' (as a directory) if it is not already present.
    */
-  linkFolder: function(source, target, removeIfExists) {
+  linkFolder: function(source, target, removeIfExists, create) {
     var script = "";
     if (removeIfExists) {
       script += "if [ -e " + target + " ]; then\n";
@@ -228,6 +229,11 @@ module.exports = {
           ".backup"
       );
       script += "rm -rf " + target + "\n";
+      script += "fi\n";
+    }
+    if (create) {
+      script += "if [ ! -e " + target + " ]; then\n";
+      script += "mkdir -p " + target + "\n";
       script += "fi\n";
     }
 
@@ -247,7 +253,12 @@ module.exports = {
         links.forEach(function(item) {
           if (item.type === "artifact") {
             script += "# '" + item.component + "' component:\n";
-            script += module.exports.linkFolder(item.source, item.target, true);
+            script += module.exports.linkFolder(
+              item.source,
+              item.target,
+              true,
+              false
+            );
             script += "\n";
           }
         });
@@ -256,7 +267,12 @@ module.exports = {
         links.forEach(function(item) {
           if (item.type === "data") {
             script += "# '" + item.component + "' component:\n";
-            script += module.exports.linkFolder(item.source, item.target, true);
+            script += module.exports.linkFolder(
+              item.source,
+              item.target,
+              true,
+              true
+            );
             script += "\n";
           }
         });

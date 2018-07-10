@@ -213,7 +213,12 @@ describe("Scripts", function() {
     links.forEach(function(item) {
       if (item.type === "artifact") {
         expectedScript += "# '" + item.component + "' component:\n";
-        expectedScript += scripts_.linkFolder(item.source, item.target, true);
+        expectedScript += scripts_.linkFolder(
+          item.source,
+          item.target,
+          true,
+          false
+        );
         expectedScript += "\n";
       }
     });
@@ -228,7 +233,12 @@ describe("Scripts", function() {
     links.forEach(function(item) {
       if (item.type === "data") {
         expectedScript += "# '" + item.component + "' component:\n";
-        expectedScript += scripts_.linkFolder(item.source, item.target, true);
+        expectedScript += scripts_.linkFolder(
+          item.source,
+          item.target,
+          true,
+          true
+        );
         expectedScript += "\n";
       }
     });
