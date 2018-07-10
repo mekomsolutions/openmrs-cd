@@ -232,8 +232,8 @@ module.exports = {
       script += "fi\n";
     }
     if (create) {
-      script += "if [ ! -e " + target + " ]; then\n";
-      script += "mkdir -p " + target + "\n";
+      script += "if [ ! -e " + source + " ]; then\n";
+      script += "mkdir -p " + source + "\n";
       script += "fi\n";
     }
 
