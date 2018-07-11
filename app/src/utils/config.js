@@ -213,7 +213,7 @@ module.exports = {
     return "startup-monitoring.sh";
   },
   getStartupMonitoringStatusCode: function() {
-    return "8";
+    return "6";
   },
   getUpdateStatusJsScriptName: function() {
     return "update-status.js";

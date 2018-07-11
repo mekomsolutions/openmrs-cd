@@ -169,7 +169,7 @@
       },
       {
         "type": "shell",
-        "executionStage": "8",
+        "executionStage": "6",
         "conditions": ["data", "deployment"],
         "value": "/another/script.sh"
       }
