@@ -91,7 +91,7 @@ module.exports = {
   },
 
   /*
-   * Looks for projects (distributions) impacted by a change in the currently built artifact.
+   * Looks for projects (typically distributions) impacted by a change in the currently built artifact.
    * Then saves the build parameters of the impacted projects to rebuild them as downstream jobs.
    *
    * @param {String} groupId - The Maven group ID of the currently built project.
@@ -114,7 +114,7 @@ module.exports = {
     });
     impactedArtifacts = _.uniq(impactedArtifacts);
 
-    // Fetching the build parameters of the impacted artifacts
+    // Fetching the build parameters of the impacted artifacts (typically distributions)
     var params = [];
     impactedArtifacts.forEach(function(artifactKey) {
       var buildParams = db.getArtifactBuildParams(artifactKey);

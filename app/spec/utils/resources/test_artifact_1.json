@@ -4,8 +4,8 @@
     "artifactId": "rulesengine",
     "version": "0.89-SNAPSHOT"
   },
-  "buildPath": "",
-  "extension": "",
-  "filename": "",
-  "destFilename": ""
+  "buildPath": "$BUILD_PATH",
+  "extension": "omod",
+  "filename": "rulesengine-0.89-SNAPSHOT.omod",
+  "destFilename": "rulesengine-0.89-SNAPSHOT.omod"
 }

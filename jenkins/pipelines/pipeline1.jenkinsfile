@@ -13,7 +13,7 @@ pipeline {
     }
     stage ('Build the project') {
       steps {
-        sh 'node /opt/app/src/$JOB_NAME/build.js /tmp/commit_metadata.json'
+        sh 'node /opt/app/src/$JOB_NAME/build.js'
         sh 'cat $BUILD_PATH/build.sh'
         sh '$BUILD_PATH/build.sh'
         sh '. $BUILD_PATH/artifact.env ; mv $WORKSPACE/$buildPath/$filename $WORKSPACE/$destFilename'
@@ -37,7 +37,6 @@ pipeline {
               [ \
                 string(name: 'projectType', value: params[i]['projectType']), \
                 string(name: 'repoUrl', value: params[i]['repoUrl']), \
-                string(name: 'repoName', value: params[i]['repoName']), \
                 string(name: 'branchName', value: params[i]['branchName']) \
               ]
             }

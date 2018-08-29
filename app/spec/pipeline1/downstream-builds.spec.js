@@ -7,13 +7,18 @@ describe("Script triggering downstream builds", function() {
 
   const cst = require(path.resolve("src/const"));
 
-  it("should save a distribution build parameters.", function() {
-    //
-    // deps
-    //
-    const tests = require(path.resolve("spec/utils/testUtils"));
-    const utils = require(path.resolve("src/utils/utils"));
+  var tests, utils;
 
+  beforeEach(function() {
+    tests = require(path.resolve("spec/utils/testUtils"));
+    utils = require(path.resolve("src/utils/utils"));
+  });
+
+  afterEach(function() {
+    tests.cleanup();
+  });
+
+  it("should save a distribution build parameters.", function() {
     //
     // setup
     //
@@ -39,7 +44,6 @@ describe("Script triggering downstream builds", function() {
     process.env[config.varProjectType()] = "distribution";
     process.env[config.varRepoUrl()] =
       "https://github.com/mekomsolutions/openmrs-distro-cambodia";
-    process.env[config.varRepoName()] = "openmrs-distro-cambodia";
     process.env[config.varBranchName()] = "master";
 
     // fitting the Maven project information to the current project type
@@ -100,22 +104,10 @@ describe("Script triggering downstream builds", function() {
     expect(params[config.varRepoUrl()]).toEqual(
       "https://github.com/mekomsolutions/openmrs-distro-cambodia"
     );
-    expect(params[config.varRepoName()]).toEqual("openmrs-distro-cambodia");
     expect(params[config.varBranchName()]).toEqual("master");
-
-    //
-    // after
-    //
-    tests.cleanup();
   });
 
   it("should identify dependent artifacts and save their build parameters for further pipeline steps.", function() {
-    //
-    // deps
-    //
-    const tests = require(path.resolve("spec/utils/testUtils"));
-    const utils = require(path.resolve("src/utils/utils"));
-
     //
     // setup
     //
@@ -149,7 +141,6 @@ describe("Script triggering downstream builds", function() {
     process.env[config.varProjectType()] = "bahmnicore";
     process.env[config.varRepoUrl()] =
       "https://github.com/mekomsolutions/bahmni-core";
-    process.env[config.varRepoName()] = "bahmni-core";
     process.env[config.varBranchName()] = "master";
 
     // fitting the Maven project information to the current project type
@@ -189,13 +180,7 @@ describe("Script triggering downstream builds", function() {
     expect(params.repoUrl).toEqual(
       "https://github.com/mekomsolutions/openmrs-distro-cambodia"
     );
-    expect(params.repoName).toEqual("openmrs-distro-cambodia");
     expect(params.branchName).toEqual("INFRA-111");
-
-    //
-    // after
-    //
-    tests.cleanup();
   });
 
   it("should analyze and process Bahmni Apps.", function() {

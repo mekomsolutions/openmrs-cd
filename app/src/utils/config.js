@@ -45,9 +45,6 @@ module.exports = {
   varRepoUrl: function() {
     return "repoUrl";
   },
-  varRepoName: function() {
-    return "repoName";
-  },
   varBranchName: function() {
     return "branchName";
   },
@@ -304,8 +301,8 @@ module.exports = {
     return path.resolve(process.env.WORKSPACE, instanceUuid, "artifacts");
   },
 
-  getJobNameForWebhook: function() {
-    return "webhook";
+  getJobNameForGitHubWebhook: function() {
+    return "github-webhook";
   },
   getJobNameForInstanceEvent: function() {
     return "instance-event";

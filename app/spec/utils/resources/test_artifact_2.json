@@ -4,8 +4,8 @@
     "artifactId": "openmrs-config-cambodia",
     "version": "1.0-SNAPSHOT"
   },
-  "buildPath": "",
-  "extension": "",
-  "filename": "",
-  "destFilename": ""
+  "buildPath": "$BUILD_PATH",
+  "extension": "zip",
+  "filename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip",
+  "destFilename": "openmrs-config-cambodia-1.0-SNAPSHOT.zip"
 }

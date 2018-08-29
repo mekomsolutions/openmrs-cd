@@ -9,6 +9,18 @@ const cst = require("../const");
 const config = require(cst.CONFIGPATH);
 
 /**
+ * The commit metadata as passed along from webhook jobs.
+ */
+class CommitMetadata {
+  constructor(projectType, repoUrl, branchName, commitId) {
+    this[config.varProjectType()] = projectType;
+    this[config.varRepoUrl()] = repoUrl;
+    this[config.varBranchName()] = branchName;
+    this[config.varCommitId()] = commitId;
+  }
+}
+
+/**
  * An object that describes the script to build the project
  *
  */
@@ -184,6 +196,7 @@ class DockerDeploymentScripts {
 }
 
 module.exports = {
+  CommitMetadata: CommitMetadata,
   Script: Script,
   MavenProject: MavenProject,
   InstanceData: InstanceData,

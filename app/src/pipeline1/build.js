@@ -12,37 +12,25 @@ const path = require("path");
 const log = require("npmlog");
 
 const utils = require("../utils/utils");
+const model = require("../utils/model");
 const cst = require("../const");
 const config = require(cst.CONFIGPATH);
 
 //
-// the commit metadata, parsed out from the SCM service commit payload
+// The commit metadata whose parts are passed as the build params
 //
-var commitMetadata = {};
-try {
-  if (process.argv[2] !== undefined) {
-    commitMetadata = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
-  } else {
-    log.info(
-      "",
-      "The build process is continuing with no commit metadata provided."
-    );
-    log.info("", "There was no optional argument passed to " + __filename);
-  }
-} catch (err) {
-  log.error(
-    "",
-    "The commit metadata file is either missing at the specified path or is malformed (it is usually created by an upstream webhook job.)"
-  );
-  log.error("", err);
-  throw new Error();
-}
+const projectType = process.env[config.varProjectType()];
+const commitMetadata = new model.CommitMetadata(
+  projectType,
+  process.env[config.varRepoUrl()],
+  process.env[config.varBranchName()],
+  process.env[config.varCommitId()]
+);
 
 //
 // The ProjectBuild is loaded based on the project type
 //
-var projectBuild = require("./impl/" +
-  process.env[config.varProjectType()]).getInstance();
+var projectBuild = require("./impl/" + projectType).getInstance();
 
 // Retrieve the details of the artifact that will be built
 var artifact = projectBuild.getArtifact({

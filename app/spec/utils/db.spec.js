@@ -22,9 +22,21 @@ describe("db", function() {
   const utils = require(path.resolve("src/utils/utils"));
   const cst = require(path.resolve("src/const"));
 
+  var tests, stubs, db, config;
+
+  beforeEach(function() {
+    tests = require(path.resolve("spec/utils/testUtils"));
+    stubs = tests.stubs();
+    db = proxyquire(cst.DBPATH, stubs);
+    config = tests.config();
+  });
+
+  afterEach(function() {
+    tests.cleanup();
+  });
+
   it("should ensure that db files are ready to be read from/written to.", function() {
     // deps
-    const tests = require(path.resolve("spec/utils/testUtils"));
     const fsx = require("fs-extra");
 
     // setup
@@ -50,23 +62,16 @@ describe("db", function() {
     ).toBeTruthy();
 
     // after
-    tests.cleanup();
     fsx.removeSync(rndDirPath);
   });
 
   it("should overwrite artifact build params.", function() {
     // setup
-    const tests = require(path.resolve("spec/utils/testUtils"));
-    var stubs = tests.stubs();
-    const db = proxyquire(cst.DBPATH, stubs);
-    const config = tests.config();
-
     var artifactKey =
       "net.mekomsolutions|openmrs-distro-cambodia|1.1.0-SNAPSHOT";
     var buildParams = {
       projectType: "distribution",
       repoUrl: "https://github.com/mekomsolutions/openmrs-distro-cambodia",
-      repoName: "openmrs-distro-cambodia",
       branchName: "master"
     };
 
@@ -93,24 +98,15 @@ describe("db", function() {
     expect(existingParams["buildParams"]["branchName"]).toEqual("INFRA-111");
     expect(updatedParams["buildParams"]["branchName"]).toEqual("master");
     expect(updatedParams.updated).toBeGreaterThan(existingParams.updated);
-
-    // after
-    tests.cleanup();
   });
 
   it("should save new artifact build params.", function() {
     // setup
-    const tests = require(path.resolve("spec/utils/testUtils"));
-    var stubs = tests.stubs();
-    const db = proxyquire(cst.DBPATH, stubs);
-    const config = tests.config();
-
     var artifactKey =
       "org.globalhealthcoalition|openmrs-distro-haiti|1.0.0-SNAPSHOT";
     var buildParams = {
       projectType: "distribution",
       repoUrl: "https://github.com/globalhealthcoalition/openmrs-distro-haiti",
-      repoName: "openmrs-distro-haiti",
       branchName: "master"
     };
 
@@ -140,21 +136,10 @@ describe("db", function() {
     expect(createdParams["buildParams"]["repoUrl"]).toEqual(
       "https://github.com/globalhealthcoalition/openmrs-distro-haiti"
     );
-    expect(createdParams["buildParams"]["repoName"]).toEqual(
-      "openmrs-distro-haiti"
-    );
-
-    // after
-    tests.cleanup();
   });
 
   it("should delete artifact build params.", function() {
     // setup
-    const tests = require(path.resolve("spec/utils/testUtils"));
-    var stubs = tests.stubs();
-    const db = proxyquire(cst.DBPATH, stubs);
-    const config = tests.config();
-
     var artifactKey =
       "net.mekomsolutions|openmrs-distro-cambodia|1.1.0-SNAPSHOT";
 
@@ -178,18 +163,10 @@ describe("db", function() {
     expect(utils.findObject({ artifactKey: artifactKey }, allParams)).toEqual(
       {}
     );
-
-    // after
-    tests.cleanup();
   });
 
   it("should save a new instance definition.", function() {
     // setup
-    const tests = require(path.resolve("spec/utils/testUtils"));
-    var stubs = tests.stubs();
-    const db = proxyquire(cst.DBPATH, stubs);
-    const config = tests.config();
-
     var instances = {};
     var instance = JSON.parse(
       fs.readFileSync(
@@ -223,18 +200,10 @@ describe("db", function() {
     );
 
     expect(actualInstance).toEqual(instance);
-
-    // after
-    tests.cleanup();
   });
 
   it("should update an instance definition.", function() {
     // setup
-    const tests = require(path.resolve("spec/utils/testUtils"));
-    var stubs = tests.stubs();
-    const db = proxyquire(cst.DBPATH, stubs);
-    const config = tests.config();
-
     var instances = {};
     var instance = JSON.parse(
       fs.readFileSync(
@@ -270,18 +239,10 @@ describe("db", function() {
     expect(actualInstance).toEqual(
       fixObjectDates(Object.assign(beforeInstance, instance))
     );
-
-    // after
-    tests.cleanup();
   });
 
   it("should delete an instance definition.", function() {
     // setup
-    const tests = require(path.resolve("spec/utils/testUtils"));
-    var stubs = tests.stubs();
-    const db = proxyquire(cst.DBPATH, stubs);
-    const config = tests.config();
-
     var instances = {};
     var instance = JSON.parse(
       fs.readFileSync(
@@ -312,8 +273,5 @@ describe("db", function() {
     expect(
       utils.findObject({ uuid: instance.uuid, name: instance.name }, instances)
     ).toEqual({});
-
-    // after
-    tests.cleanup();
   });
 });

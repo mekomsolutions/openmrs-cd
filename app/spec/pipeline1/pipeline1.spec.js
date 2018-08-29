@@ -27,7 +27,6 @@ describe("Tests suite for pipeline1", function() {
       "<name>" + config.varProjectType() + "</name>"
     );
     expect(jenkinsFile).toContain("<name>" + config.varRepoUrl() + "</name>");
-    expect(jenkinsFile).toContain("<name>" + config.varRepoName() + "</name>");
     expect(jenkinsFile).toContain(
       "<name>" + config.varBranchName() + "</name>"
     );
@@ -70,11 +69,7 @@ describe("Tests suite for pipeline1", function() {
 
     // verif 'build' stage
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" +
-        config.getBuildJsScriptName() +
-        " " +
-        config.getCommitMetadataFilePath() +
-        "'"
+      "sh 'node /opt/app/src/$JOB_NAME/" + config.getBuildJsScriptName() + "'"
     );
     expect(jenkinsFile).toContain(
       "sh '$" +
@@ -146,13 +141,6 @@ describe("Tests suite for pipeline1", function() {
         config.varRepoUrl() +
         "', value: params[i]['" +
         config.varRepoUrl() +
-        "'])"
-    );
-    expect(jenkinsFile).toContain(
-      "string(name: '" +
-        config.varRepoName() +
-        "', value: params[i]['" +
-        config.varRepoName() +
         "'])"
     );
 

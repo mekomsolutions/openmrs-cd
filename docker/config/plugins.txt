@@ -7,3 +7,4 @@ parameterized-trigger:2.35.2
 build-name-setter:1.6.9
 pipeline-build-step:2.7
 blueocean:1.6.1
+generic-webhook-trigger:1.43

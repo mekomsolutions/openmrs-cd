@@ -106,7 +106,6 @@ describe("Commons for project builds", function() {
     expect(params.repoUrl).toEqual(
       "https://github.com/mekomsolutions/openmrs-distro-cambodia"
     );
-    expect(params.repoName).toEqual("openmrs-distro-cambodia");
     expect(params.branchName).toEqual("INFRA-111");
 
     // after

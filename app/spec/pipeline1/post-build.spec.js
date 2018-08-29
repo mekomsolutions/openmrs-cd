@@ -7,9 +7,17 @@ describe("Post build", function() {
 
   const cst = require(path.resolve("src/const"));
 
-  it("should analyze and process distributions POM files.", function() {
-    const tests = require(path.resolve("spec/utils/testUtils"));
+  var tests;
 
+  beforeEach(function() {
+    tests = require(path.resolve("spec/utils/testUtils"));
+  });
+
+  afterEach(function() {
+    tests.cleanup();
+  });
+
+  it("should analyze and process distributions POM files.", function() {
     // setup
     var extraConfig = {};
     extraConfig.getBuildPomPath = function() {
@@ -36,7 +44,6 @@ describe("Post build", function() {
 
     process.env[config.varRepoUrl()] =
       "https://github.com/mekomsolutions/openmrs-distro-cambodia";
-    process.env[config.varRepoName()] = "openmrs-distro-cambodia";
     process.env[config.varBranchName()] = "master";
 
     // replay
@@ -76,17 +83,10 @@ describe("Post build", function() {
     expect(params[config.varRepoUrl()]).toEqual(
       "https://github.com/mekomsolutions/openmrs-distro-cambodia"
     );
-    expect(params[config.varRepoName()]).toEqual("openmrs-distro-cambodia");
     expect(params[config.varBranchName()]).toEqual("master");
-
-    // after
-    tests.cleanup();
   });
 
   it("should analyze and process Bahmni Core POM files.", function() {
-    // deps
-    const tests = require(path.resolve("spec/utils/testUtils"));
-
     // setup
     var extraConfig = {};
     extraConfig.getBuildPomPath = function() {
@@ -121,7 +121,6 @@ describe("Post build", function() {
 
     process.env[config.varRepoUrl()] =
       "https://github.com/mekomsolutions/bahmni-core";
-    process.env[config.varRepoName()] = "bahmni-core";
     process.env[config.varBranchName()] = "master";
 
     // replay
@@ -141,17 +140,10 @@ describe("Post build", function() {
     expect(params.repoUrl).toEqual(
       "https://github.com/mekomsolutions/openmrs-distro-cambodia"
     );
-    expect(params.repoName).toEqual("openmrs-distro-cambodia");
     expect(params.branchName).toEqual("INFRA-111");
-
-    // after
-    tests.cleanup();
   });
 
   it("should analyze and process Bahmni Apps.", function() {
-    // deps
-    const tests = require(path.resolve("spec/utils/testUtils"));
-
     // setup
     var extraConfig = {};
     extraConfig.getBuildArtifactJsonPath = function() {
@@ -180,7 +172,6 @@ describe("Post build", function() {
     process.env[config.varProjectType()] = "bahmniapps";
     process.env[config.varRepoUrl()] =
       "https://github.com/mekomsolutions/openmrs-module-bahmniapps";
-    process.env[config.varRepoName()] = "openmrs-module-bahmniapps";
     process.env[config.varBranchName()] = "master";
 
     // replay
@@ -200,10 +191,6 @@ describe("Post build", function() {
     expect(params.repoUrl).toEqual(
       "https://github.com/mekomsolutions/openmrs-distro-cambodia"
     );
-    expect(params.repoName).toEqual("openmrs-distro-cambodia");
     expect(params.branchName).toEqual("INFRA-111");
-
-    // after
-    tests.cleanup();
   });
 });

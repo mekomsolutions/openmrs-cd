@@ -72,12 +72,11 @@ var postBuildActions = function(pom) {
   db.saveArtifactDependencies(artifactKey, deps);
 
   //
-  //  Keeping track of the params of the latest built job (the current one).
+  //  Keeping track of the params of the latest built job (so, the current one).
   //
   var buildJobParams = _.pick(process.env, [
     config.varProjectType(),
     config.varRepoUrl(),
-    config.varRepoName(),
     config.varBranchName()
   ]);
   db.saveArtifactBuildParams(artifactKey, buildJobParams);

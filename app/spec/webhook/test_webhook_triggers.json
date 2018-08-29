@@ -1,9 +1,0 @@
-{
-  "pipeline1": [
-    "openmrsmodule",
-    "openmrscore",
-    "openmrsconfig",
-    "bahmniconfig",
-    "bahmniapps"
-  ]
-}

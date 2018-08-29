@@ -8,13 +8,18 @@ describe("Instances identification", function() {
 
   const cst = require(path.resolve("src/const"));
 
-  it("should spot instances affected by a 'distribution' artifacts change.", function() {
-    //
-    // deps
-    //
-    const tests = require(path.resolve("spec/utils/testUtils"));
-    const utils = require(path.resolve("src/utils/utils"));
+  var tests, utils;
 
+  beforeEach(function() {
+    tests = require(path.resolve("spec/utils/testUtils"));
+    utils = require(path.resolve("src/utils/utils"));
+  });
+
+  afterEach(function() {
+    tests.cleanup();
+  });
+
+  it("should spot instances affected by a 'distribution' artifacts change.", function() {
     //
     // setup
     //
@@ -106,10 +111,5 @@ describe("Instances identification", function() {
         "version"
       ])
     ).toEqual(arty2);
-
-    //
-    // after
-    //
-    tests.cleanup();
   });
 });

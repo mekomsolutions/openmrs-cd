@@ -59,6 +59,7 @@ allInstances.forEach(function(instance) {
 
       var matched = artifactKeys.indexOf(instanceArtifactKey) > -1;
       if (matched) {
+        // this is where each instance event put together
         var instanceEvent = _.pick(
           instance,
           config.getInstanceEventsProperties()
