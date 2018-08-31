@@ -40,14 +40,14 @@ For example by appending the expected parameters to a configurable URL, such as 
         </org.jenkinsci.plugins.gwt.GenericVariable>
         <org.jenkinsci.plugins.gwt.GenericVariable>
           <expressionType>JSONPath</expressionType>
-          <key>$repoName</key>
+          <key>repoName</key>
           <value>$.repository.name</value>
           <regexpFilter></regexpFilter>
           <defaultValue></defaultValue>
         </org.jenkinsci.plugins.gwt.GenericVariable>
       </genericVariables>
-      <regexpFilterText></regexpFilterText>
-      <regexpFilterExpression></regexpFilterExpression>
+      <regexpFilterText>$repoUrl</regexpFilterText>
+      <regexpFilterExpression>^https?:\/\/([a-zA-Z\d-]+\.){0,}github\.com</regexpFilterExpression>
       <genericRequestVariables>
         <org.jenkinsci.plugins.gwt.GenericRequestVariable>
           <key>projectType</key>
@@ -57,7 +57,7 @@ For example by appending the expected parameters to a configurable URL, such as 
       <printPostContent>false</printPostContent>
       <printContributedVariables>false</printContributedVariables>
       <causeString>$repoName - $ref ($commitId)</causeString>
-      <token></token>
+      <token>669b165b0c061c78f1d6e7c23f93f263</token>
     </org.jenkinsci.plugins.gwt.GenericTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
@@ -77,8 +77,7 @@ projectType=$projectType
 repoUrl=$repoUrl
 branchName=$branchName
 commitId=$commitId
-77051b05-4abb-4915-9177-10b0a5b7bca5
-</command>
+77051b05-4abb-4915-9177-10b0a5b7bca5</command>
     </hudson.tasks.Shell>
     <org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater plugin="build-name-setter@1.6.9">
       <buildName>version.txt</buildName>
