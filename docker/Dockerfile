@@ -42,4 +42,3 @@ COPY ./config/artifact_repo_default.json /usr/share/jenkins/artifact_repo_defaul
 COPY ./resources/package.json /usr/share/jenkins/package.json
 COPY ./resources/m2_settings.xml.template /usr/share/jenkins/m2_settings.xml.template
 COPY ./config/artifact_types.json /usr/share/jenkins/artifact_types.json
-COPY ./config/webhook_triggers.json /usr/share/jenkins/webhook_triggers.json

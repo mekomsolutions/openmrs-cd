@@ -120,14 +120,6 @@ module.exports = {
   getTempDirPath: function() {
     return "/tmp";
   },
-  getWebhookJsScriptPath: function() {
-    // relative to /app/src
-    return "webhook/webhook.js";
-  },
-  getTriggerJsScriptPath: function() {
-    // relative to /app/src
-    return "webhook/trigger.js";
-  },
   getCommitMetadataFilePath: function() {
     return path.resolve(
       module.exports.getTempDirPath(),
@@ -226,9 +218,6 @@ module.exports = {
   },
   getJobBuildDetailsEnvvarsName: function() {
     return "build_details.env";
-  },
-  getWebhookTriggersFilePath: function() {
-    return "/usr/share/jenkins/webhook_triggers.json";
   },
   getBuildArtifactEnvvarsName: function() {
     return "artifact.env";

@@ -1,7 +1,7 @@
 ## Developing Node JS scripts for the OpenMRS CD
 
 ### Code Structure
-**Remark:** This part of the dev. guide will evolve constantly.
+**Remark:** This part of the dev. guide will keep evolving. It might thus be out-of-date at a given point in time.
 ```
 app/src
 ├── const.js
@@ -28,20 +28,14 @@ app/src
 │   ├── host-preparation.js
 │   ├── prehost-preparation.js
 │   └── scripts.js
-├── utils
-│   ├── config.js
-│   ├── db.js
-│   └── utils.js
-└── webhook
-    ├── impl
-    │   └── github.js
-    ├── model.js
-    ├── trigger.js
-    └── webhook.js
+└── utils
+    ├── config.js
+    ├── db.js
+    └── utils.js
 ```
 Set aside const.js which, as the name suggests, is the location of global constants, there are two types of subfolders that should be distinguished when looking from the root level:
 1. **utils** that contain broad purpose libraries needed across the app.
-2. Jenkins jobs scripts implementations: **webhook**, **pipeline1**, **instance-event** and **pipeline3**.
+2. Jenkins jobs scripts implementations: **pipeline1**, **instance-event** and **pipeline3**.
 
 **Convention:** We are adopting the rule that the Node folder name is the exact name of the job within Jenkins, so as it is stated in the config.xml of the ad-hoc job.
 
@@ -120,7 +114,7 @@ Classes definitions that might be reusable across the entire app.
 #### Naming
 
 ##### Jenkins jobs
-Jenkins jobs are in lower case with hyphens between words. Eg: **webhook**, **instance-event**.
+Jenkins jobs are in lower case with hyphens between words. Eg: **github-webhook**, **instance-event**.
 ##### Jobs params 
 Jenkins jobs parameters are camelCased. Eg. **repoUrl**.
 ##### Custom env. vars

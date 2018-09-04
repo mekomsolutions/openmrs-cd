@@ -65,22 +65,10 @@ var setMockConfig = function(extraConfig) {
   mockConfig.getTempDirPath = function() {
     return testDirPath;
   };
-  mockConfig.getCommitMetadataFilePath = function() {
-    return prepareFile(
-      "tmp",
-      path.resolve("spec/webhook", "test_commit_metadata.json")
-    );
-  };
   mockConfig.getBuildArtifactJsonPath = function() {
     return prepareFile(
       realConfig.getRelativeBuildDirPath(),
       path.resolve("spec/utils/resources", "test_artifact_1.json")
-    );
-  };
-  mockConfig.getWebhookTriggersFilePath = function() {
-    return prepareFile(
-      "tmp",
-      path.resolve("spec/webhook", "test_webhook_triggers.json")
     );
   };
   mockConfig.getInstancesConfigPath = function() {
