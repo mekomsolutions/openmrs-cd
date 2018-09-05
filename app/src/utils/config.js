@@ -81,7 +81,7 @@ module.exports = {
    * Whether it is actual data or configuration files.
    */
   getAppDataDirPath: function() {
-    return process.env.APP_DATA_DIR_PATH; // this must be exist as a global property within Jenkins
+    return process.env.APP_DATA_DIR_PATH; // this must exist as a global property within Jenkins
   },
   getArtifactIdListFileName: function() {
     return "artifacts_ids.txt";

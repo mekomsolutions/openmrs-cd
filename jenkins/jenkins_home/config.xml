@@ -1,7 +1,7 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <hudson>
   <disabledAdministrativeMonitors/>
-  <version>2.121</version>
+  <version>2.129</version>
   <installStateName>RESTART</installStateName>
   <numExecutors>2</numExecutors>
   <mode>NORMAL</mode>
@@ -46,7 +46,7 @@
           </default>
           <int>2</int>
           <string>APP_DATA_DIR_PATH</string>
-          <string>$JENKINS_HOME/app_data</string>
+          <string>/var/lib/openmrs_cd/app_data</string>
           <string>BUILD_PATH</string>
           <string>$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER</string>
         </tree-map>
