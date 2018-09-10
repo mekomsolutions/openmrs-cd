@@ -7,6 +7,7 @@ USER root
 ARG APP_DATA_DIR=/var/lib/openmrs_cd/app_data
 VOLUME $APP_DATA_DIR
 RUN mkdir -p $APP_DATA_DIR
+RUN chown -R jenkins $APP_DATA_DIR
 
 RUN apt update
 RUN apt -y install nano
@@ -21,7 +22,6 @@ RUN apt -y install ruby-compass
 RUN apt -y install xvfb
 RUN apt -y install firefox-esr
 RUN apt -y install sudo
-RUN apt -y install rsync
 
 # Installing Node.js
 RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
