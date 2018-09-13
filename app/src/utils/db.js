@@ -43,6 +43,37 @@ module.exports = {
   },
 
   /*
+   * Removes an instance event from the database.
+   *
+   * @param {Object} instanceEvent - The instance event to remove.
+   *
+   * @return null
+   */
+  removeInstanceEvent: function(instanceEvent) {
+    var keyPairs = {
+      name: instanceEvent.name,
+      uuid: instanceEvent.uuid
+    };
+    return saveObject(
+      DM_INSTEVENTS,
+      config.getInstancesEventsDbPath(),
+      null,
+      keyPairs,
+      false,
+      null
+    );
+  },
+
+  /*
+   * Gets all instances events from database.
+   *
+   * @return [] if no instances events are found.
+   */
+  getAllInstancesEvents: function() {
+    return getAllObjects(DM_INSTEVENTS, config.getInstancesEventsDbPath());
+  },
+
+  /*
    * Gets all instances definitions from database.
    *
    * @return [] if no instances definitions are found.

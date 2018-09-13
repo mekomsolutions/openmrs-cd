@@ -18,5 +18,7 @@ module.exports = {
   ABSTRACT: "__abstract__",
   HEREDOC: "heredoc_delimiter_7e228d99",
   HEREDOC_2: "heredoc_delimiter_ec8cd90e",
-  SCRIPT_SEPARATOR: "\n"
+  SCRIPT_SEPARATOR: "\n",
+
+  INSTANCETYPE_PROD: "prod"
 };

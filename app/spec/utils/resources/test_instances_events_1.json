@@ -16,5 +16,41 @@
     ],
     "updated": "2018-04-20T17:41:01.584Z",
     "created": "2018-03-20T17:41:01.584Z"
+  },
+  {
+    "uuid": "3b623749-754a-438c-af95-6bdefdeeb25e",
+    "name": "syldavia-dev-1",
+    "type": "dev",
+    "artifacts": [
+      {
+        "type": "maven",
+        "value": {
+          "groupId": "net.mekomsolutions",
+          "artifactId": "openmrs-distro-syldavia",
+          "version": "1.8.3-SNAPSHOT",
+          "packaging": "zip"
+        }
+      }
+    ],
+    "updated": "2018-09-12T18:03:02.761Z",
+    "created": "2018-09-12T16:13:15.380Z"
+  },
+  {
+    "uuid": "b9b52a5e-e41c-47e3-a505-c9b43bee40b9",
+    "name": "acme-prod",
+    "type": "prod",
+    "artifacts": [
+      {
+        "type": "maven",
+        "value": {
+          "groupId": "net.mekomsolutions",
+          "artifactId": "bahmni-distro-acme",
+          "version": "3.0.0",
+          "packaging": "zip"
+        }
+      }
+    ],
+    "updated": "2018-09-12T18:03:02.761Z",
+    "created": "2018-09-12T16:13:15.380Z"
   }
 ]

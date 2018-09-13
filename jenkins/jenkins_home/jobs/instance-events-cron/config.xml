@@ -1,0 +1,54 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Browse the accumulated instance events for those that match the filtering criteria.&#xd;
+Then triggers the start/restart of instances by passing those events to the appropriate downstream job.</description>
+  <displayName>Instance Events Scheduler</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>H/20 * * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>node /opt/app/src/instance-event/filter-events.js
+# all events filtered to be processed are saved into filtered_instances_events.json
+</command>
+    </hudson.tasks.Shell>
+    <hudson.plugins.groovy.SystemGroovy plugin="groovy@2.0">
+      <source class="hudson.plugins.groovy.StringSystemScriptSource">
+        <script plugin="script-security@1.46">
+          <script>import hudson.model.*
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+
+def env = build.getEnvironment(listener)
+
+def downstreamJob = hudson.model.Hudson.instance.getJob(&quot;instance-event&quot;)
+def cause = new hudson.model.Cause.UpstreamCause(build)
+def causeAction = new hudson.model.CauseAction(cause) 
+
+def events = new JsonSlurper().parse( new File(&quot;${env.BUILD_PATH}/filtered_instances_events.json&quot;) )
+for (i = 0; i &lt; events.size(); i++) {
+  
+  def params = new StringParameterValue(&apos;instanceEvent&apos;, JsonOutput.toJson(events[i]))
+  def paramsAction = new ParametersAction(params) 
+
+  hudson.model.Hudson.instance.queue.schedule(downstreamJob, 0, causeAction, paramsAction)
+}</script>
+          <sandbox>false</sandbox>
+        </script>
+      </source>
+    </hudson.plugins.groovy.SystemGroovy>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

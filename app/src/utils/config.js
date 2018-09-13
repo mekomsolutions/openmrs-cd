@@ -2,6 +2,7 @@
 
 const path = require("path");
 const _ = require("lodash");
+const cst = require("../const.js");
 
 /**
  * Configuration API, typically to specify files or dirs locations.
@@ -262,6 +263,12 @@ module.exports = {
       "instances_events.json"
     );
   },
+  getFilteredInstancesEventsJsonPath: function() {
+    return path.resolve(
+      module.exports.getBuildDirPath(),
+      "filtered_instances_events.json"
+    );
+  },
   getArtifactsBuildParamsDbFileName: function() {
     return "artifacts_build_params.json";
   },
@@ -307,7 +314,7 @@ module.exports = {
     return ["1.0.0"];
   },
   getInstanceTypes: function() {
-    return ["debug", "dev", "staging", "prod"];
+    return ["debug", "dev", "staging", cst.INSTANCETYPE_PROD];
   },
   getInstanceDeploymentTypes: function() {
     return ["docker"];
