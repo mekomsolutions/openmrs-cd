@@ -7,7 +7,12 @@ IMPORTANT: We expect all SCM services to allow the configuration of its webhooks
 For example by appending the expected parameters to a configurable URL, such as &apos;?projectType=openmrsmodule&apos;</description>
   <displayName>GitHub Webhook</displayName>
   <keepDependencies>false</keepDependencies>
-  <properties/>
+  <properties>
+    <hudson.security.AuthorizationMatrixProperty>
+      <inheritanceStrategy class="org.jenkinsci.plugins.matrixauth.inheritance.InheritGlobalStrategy"/>
+      <permission>hudson.model.Item.Read:github</permission>
+    </hudson.security.AuthorizationMatrixProperty>
+  </properties>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
