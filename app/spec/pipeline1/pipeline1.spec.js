@@ -51,6 +51,17 @@ describe("Tests suite for pipeline1", function() {
       "utf8"
     );
 
+    // verif node 'naming'
+    expect(jenkinsFile).toContain(
+      'currentBuild.displayName = "${' +
+        config.varRepoUrl() +
+        '}".substring("${' +
+        config.varRepoUrl() +
+        '}".lastIndexOf("/") + 1) + " - " + "${' +
+        config.varBranchName() +
+        '}"'
+    );
+
     // verif 'checkout' stage
     expect(jenkinsFile).toContain(
       "checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: " +

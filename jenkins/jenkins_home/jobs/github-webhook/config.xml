@@ -7,12 +7,7 @@ IMPORTANT: We expect all SCM services to allow the configuration of its webhooks
 For example by appending the expected parameters to a configurable URL, such as &apos;?projectType=openmrsmodule&apos;</description>
   <displayName>GitHub Webhook</displayName>
   <keepDependencies>false</keepDependencies>
-  <properties>
-    <hudson.security.AuthorizationMatrixProperty>
-      <inheritanceStrategy class="org.jenkinsci.plugins.matrixauth.inheritance.InheritGlobalStrategy"/>
-      <permission>hudson.model.Item.Read:github</permission>
-    </hudson.security.AuthorizationMatrixProperty>
-  </properties>
+  <properties/>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
@@ -84,9 +79,14 @@ branchName=$branchName
 commitId=$commitId
 77051b05-4abb-4915-9177-10b0a5b7bca5</command>
     </hudson.tasks.Shell>
+    <EnvInjectBuilder plugin="envinject@2.1.5">
+      <info>
+        <propertiesFilePath>$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/commit_metadata.env</propertiesFilePath>
+      </info>
+    </EnvInjectBuilder>
     <org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater plugin="build-name-setter@1.6.9">
       <buildName>version.txt</buildName>
-      <macroTemplate>#${BUILD_NUMBER} - ${ENV,var=&quot;repoName&quot;} - ${ENV,var=&quot;ref&quot;} (${ENV,var=&quot;commitId&quot;})</macroTemplate>
+      <macroTemplate>${ENV,var=&quot;repoName&quot;} - ${ENV,var=&quot;branchName&quot;} (${ENV,var=&quot;commitId&quot;})</macroTemplate>
       <fromFile>false</fromFile>
       <fromMacro>true</fromMacro>
       <macroFirst>false</macroFirst>

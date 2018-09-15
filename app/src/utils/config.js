@@ -145,6 +145,9 @@ module.exports = {
   getBuildShellScriptName: function() {
     return "build.sh";
   },
+  getFilterEventsJsScriptName: function() {
+    return "filter-events.js";
+  },
   getBuildShellScriptPath: function() {
     return path.resolve(
       module.exports.getBuildDirPath(),
@@ -263,10 +266,13 @@ module.exports = {
       "instances_events.json"
     );
   },
+  getFilteredInstancesEventsFileName: function() {
+    return "filtered_instances_events.json";
+  },
   getFilteredInstancesEventsJsonPath: function() {
     return path.resolve(
       module.exports.getBuildDirPath(),
-      "filtered_instances_events.json"
+      module.exports.getFilteredInstancesEventsFileName()
     );
   },
   getArtifactsBuildParamsDbFileName: function() {
@@ -302,6 +308,9 @@ module.exports = {
   },
   getJobNameForInstanceEvent: function() {
     return "instance-event";
+  },
+  getJobNameForInstanceEventsCron: function() {
+    return "instance-events-cron";
   },
   getJobNameForPipeline1: function() {
     return "pipeline1";

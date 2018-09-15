@@ -62,7 +62,7 @@
     </org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
     <org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater plugin="build-name-setter@1.6.9">
       <buildName></buildName>
-      <macroTemplate>#${BUILD_NUMBER} - ${ENV,var=&quot;instanceName&quot;} (${ENV,var=&quot;instanceUuid&quot;})</macroTemplate>
+      <macroTemplate>${ENV,var=&quot;instanceName&quot;} - ${ENV,var=&quot;instanceUuid&quot;}</macroTemplate>
       <fromFile>false</fromFile>
       <fromMacro>true</fromMacro>
       <macroFirst>false</macroFirst>

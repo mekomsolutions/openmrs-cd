@@ -22,7 +22,7 @@ describe("validate-instance", function() {
     const ent = require("ent");
 
     // replay
-    var jenkinsFile = fs.readFileSync(
+    var jobConfigFile = fs.readFileSync(
       path.resolve(
         __rootPath__,
         "..",
@@ -32,33 +32,33 @@ describe("validate-instance", function() {
       ),
       "utf8"
     );
-    jenkinsFile = ent.decode(jenkinsFile);
+    jobConfigFile = ent.decode(jobConfigFile);
 
     // verif
-    expect(jenkinsFile).toContain(
+    expect(jobConfigFile).toContain(
       "<name>" + config.varInstanceEvent() + "</name>"
     );
-    expect(jenkinsFile).toContain(
+    expect(jobConfigFile).toContain(
       "<command>node /opt/app/src/" +
         config.getJobNameForInstanceEvent() +
         "/" +
         config.getInstanceEventJsScriptName()
     );
-    expect(jenkinsFile).toContain(
+    expect(jobConfigFile).toContain(
       "<propertiesFile>" +
         "$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/" +
         config.getProjectBuildTriggerEnvvarsName() +
         "</propertiesFile>"
     );
-    expect(jenkinsFile).toContain(
+    expect(jobConfigFile).toContain(
       "<projects>$" + config.varDownstreamJob() + "</projects>"
     );
-    expect(jenkinsFile).toContain(
-      '<macroTemplate>#${BUILD_NUMBER} - ${ENV,var="' +
+    expect(jobConfigFile).toContain(
+      '<macroTemplate>${ENV,var="' +
         config.varInstanceName() +
-        '"} (${ENV,var="' +
+        '"} - ${ENV,var="' +
         config.varInstanceUuid() +
-        '"})</macroTemplate>'
+        '"}</macroTemplate>'
     );
   });
 

@@ -39,7 +39,7 @@ def causeAction = new hudson.model.CauseAction(cause)
 def events = new JsonSlurper().parse( new File(&quot;${env.BUILD_PATH}/filtered_instances_events.json&quot;) )
 for (i = 0; i &lt; events.size(); i++) {
   
-  def params = new StringParameterValue(&apos;instanceEvent&apos;, JsonOutput.toJson(events[i]))
+  def params = new StringParameterValue(&quot;instanceEvent&quot;, JsonOutput.toJson(events[i]))
   def paramsAction = new ParametersAction(params) 
 
   hudson.model.Hudson.instance.queue.schedule(downstreamJob, 0, causeAction, paramsAction)

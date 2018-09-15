@@ -1,5 +1,13 @@
+// Name the build out of the parameters
+node {
+  currentBuild.displayName = "${repoUrl}".substring("${repoUrl}".lastIndexOf("/") + 1) + " - " + "${branchName}"
+}
+
 pipeline {
   agent any
+  options {
+    ansiColor('xterm')
+  }
   tools {
     maven 'Maven 3.5.0' 
     nodejs 'NodeJS 8.6.0'

@@ -55,6 +55,29 @@ describe("Tests suite for pipeline3", function() {
       "utf8"
     );
 
+    // verif node 'naming'
+    expect(jenkinsFile).toContain(
+      'def buildName = "${' + config.varInstanceUuid() + '}"'
+    );
+    expect(jenkinsFile).toContain(
+      "if (" +
+        config.varArtifactsChanges() +
+        ' == "true") { cause += "artifacts + " }'
+    );
+    expect(jenkinsFile).toContain(
+      "if (" + config.varDataChanges() + ' == "true") { cause += "data" + sep }'
+    );
+    expect(jenkinsFile).toContain(
+      "if (" +
+        config.varDeploymentChanges() +
+        ' == "true") { cause += "deployment" + sep }'
+    );
+    expect(jenkinsFile).toContain(
+      "if (" +
+        config.varCreation() +
+        ' == "true") { cause += "creation" + sep }'
+    );
+
     // verif 'pre-host prepare' stage
     expect(jenkinsFile).toContain(
       "sh 'node /opt/app/src/$JOB_NAME/" +

@@ -1,5 +1,23 @@
+// Name the build out of the parameters
+node {
+  def buildName = "${instanceUuid}"
+  def cause = ""
+  def sep = " + "
+  if (artifactsChanges == "true") { cause += "artifacts + " }
+  if (dataChanges == "true") { cause += "data" + sep }
+  if (deploymentChanges == "true") { cause += "deployment" + sep }
+  if (creation == "true") { cause += "creation" + sep }
+  cause = cause.substring(0, cause.length() - sep.length())
+  buildName += ": " + cause
+  currentBuild.displayName = buildName
+  currentBuild.description = buildName
+}
+
 pipeline {
   agent any
+  options {
+    ansiColor('xterm')
+  }
   tools {
     maven 'Maven 3.5.0' 
     nodejs 'NodeJS 8.6.0'

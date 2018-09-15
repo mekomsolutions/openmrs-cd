@@ -27,6 +27,51 @@ describe("filter-events", function() {
     tests.cleanup();
   });
 
+  it("should verify job parameters and references.", function() {
+    // deps
+    const __rootPath__ = require("app-root-path").path;
+    const config = require(path.resolve("src/utils/config"));
+    const ent = require("ent");
+
+    // replay
+    var jobConfigFile = fs.readFileSync(
+      path.resolve(
+        __rootPath__,
+        "..",
+        "jenkins/jenkins_home/jobs/" +
+          config.getJobNameForInstanceEventsCron() +
+          "/config.xml"
+      ),
+      "utf8"
+    );
+    jobConfigFile = ent.decode(jobConfigFile);
+
+    // verif
+    expect(jobConfigFile).toContain(
+      "<command>node /opt/app/src/" +
+        config.getJobNameForInstanceEvent() +
+        "/" +
+        config.getFilterEventsJsScriptName()
+    );
+    expect(jobConfigFile).toContain(
+      'def downstreamJob = hudson.model.Hudson.instance.getJob("' +
+        config.getJobNameForInstanceEvent() +
+        '")'
+    );
+    expect(jobConfigFile).toContain(
+      'def events = new JsonSlurper().parse( new File("${env.' +
+        config.varEnvvarBuildPath() +
+        "}/" +
+        config.getFilteredInstancesEventsFileName() +
+        '") )'
+    );
+    expect(jobConfigFile).toContain(
+      'def params = new StringParameterValue("' +
+        config.varInstanceEvent() +
+        '", JsonOutput.toJson(events[i]))'
+    );
+  });
+
   it("should extract non-prod events to a build-available file.", function() {
     // setup
     var beforeEvents = db.getAllInstancesEvents();
