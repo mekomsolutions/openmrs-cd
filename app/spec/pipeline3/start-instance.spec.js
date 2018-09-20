@@ -62,7 +62,7 @@ describe("Start instance scripts", function() {
     expect(script).toContain(scripts.remote(ssh, docker.restart(instanceUuid)));
   });
 
-  it("should generate bash script upon deployment changes.", function() {
+  fit("should generate bash script upon deployment changes.", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
     process.env[config.varDeploymentChanges()] = "true";
     var instanceDef = db.getInstanceDefinition(instanceUuid);
@@ -93,16 +93,26 @@ describe("Start instance scripts", function() {
       scripts.remote(ssh, docker.run(instanceUuid, instanceDef))
     );
     var tls = instanceDef.deployment.tls;
-    var publicDestPath = "/etc/ssl/";
-    var privateDestPath = "/etc/ssl/private/";
+    var keyDestPath = "/etc/ssl/";
 
     expectedScript.push(
       scripts.remote(
         ssh,
         docker.copy(
           instanceDef.uuid,
+          tls.value.privateKeyPath,
+          keyDestPath + "privkey.pem",
+          true
+        )
+      )
+    );
+    expectedScript.push(
+      scripts.remote(
+        ssh,
+        docker.copy(
+          instanceDef.uuid,
           tls.value.publicCertPath,
-          publicDestPath + "mekomsolutions.net.crt"
+          keyDestPath + "cert.pem"
         )
       )
     );
@@ -112,27 +122,11 @@ describe("Start instance scripts", function() {
         docker.copy(
           instanceDef.uuid,
           tls.value.chainCertsPath,
-          publicDestPath + "mekomsolutions.net.intermediate.crt"
+          keyDestPath + "chain.pem"
         )
       )
     );
-    expectedScript.push(
-      scripts.remote(
-        ssh,
-        docker.exec(instanceDef.uuid, "mkdir -m 700 " + privateDestPath)
-      )
-    );
-    expectedScript.push(
-      scripts.remote(
-        ssh,
-        docker.copy(
-          instanceDef.uuid,
-          tls.value.privateKeyPath,
-          privateDestPath + "mekomsolutions.net.key",
-          true
-        )
-      )
-    );
+    console.log(script)
 
     expectedScript = expectedScript.join(cst.SCRIPT_SEPARATOR);
     expect(script).toContain(expectedScript);

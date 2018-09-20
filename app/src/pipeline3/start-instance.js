@@ -64,15 +64,25 @@ if (process.env[config.varDeploymentChanges()] === "true") {
   if (!_.isEmpty(instanceDef.deployment.tls)) {
     var tls = instanceDef.deployment.tls;
     if (tls.type === "file") {
-      var publicDestPath = "/etc/ssl/";
-      var privateDestPath = "/etc/ssl/private/";
+      var keyDestPath = "/etc/ssl/";
+      script.body.push(
+        scripts.remote(
+          ssh,
+          container.copy(
+            instanceDef.uuid,
+            tls.value.privateKeyPath,
+            keyDestPath + "privkey.pem",
+            true
+          )
+        )
+      );
       script.body.push(
         scripts.remote(
           ssh,
           container.copy(
             instanceDef.uuid,
             tls.value.publicCertPath,
-            publicDestPath + "mekomsolutions.net.crt"
+            keyDestPath + "cert.pem"
           )
         )
       );
@@ -82,24 +92,7 @@ if (process.env[config.varDeploymentChanges()] === "true") {
           container.copy(
             instanceDef.uuid,
             tls.value.chainCertsPath,
-            publicDestPath + "mekomsolutions.net.intermediate.crt"
-          )
-        )
-      );
-      script.body.push(
-        scripts.remote(
-          ssh,
-          container.exec(instanceDef.uuid, "mkdir -m 700 " + privateDestPath)
-        )
-      );
-      script.body.push(
-        scripts.remote(
-          ssh,
-          container.copy(
-            instanceDef.uuid,
-            tls.value.privateKeyPath,
-            privateDestPath + "mekomsolutions.net.key",
-            true
+            keyDestPath + "chain.pem"
           )
         )
       );
@@ -114,7 +107,16 @@ if (process.env[config.varDeploymentChanges()] === "true") {
         container.exec(
           instanceDef.uuid,
           "chmod 755 /etc/bahmni-installer/update-apache-config.sh\n" +
-            "/etc/bahmni-installer/update-apache-config.sh /etc/httpd/conf.d/ssl.conf"
+            "/etc/bahmni-installer/update-apache-config.sh /etc/httpd/conf.d/ssl.conf" +
+            " " +
+            keyDestPath +
+            "privkey.pem" +
+            " " +
+            keyDestPath +
+            "cert.pem" +
+            " " +
+            keyDestPath +
+            "chain.pem"
         )
       )
     );
