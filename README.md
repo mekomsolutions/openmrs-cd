@@ -24,7 +24,7 @@ npm run all
 docker run --name openmrscd  -p 8080:8080 \
   -v ~/repos/openmrs-cd/app:/opt/app \
   -v ~/repos/openmrs-cd/jenkins/jenkins_home:/var/jenkins_home \
-  mekomsolutions/openmrscd:1.0.5-SNAPSHOT
+  mekomsolutions/openmrscd:latest
 ```
 Where `openmrscd` is the name of the Jenkins container.
 

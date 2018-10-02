@@ -4,10 +4,9 @@ MAINTAINER Mekom Solutions <support@mekomsolutions.com>
 USER root
 
 # Add the APP_DATA_DIR volume to keep OpenMRS CD data out of the Jenkins Home
-ARG APP_DATA_DIR=/var/lib/openmrs_cd/app_data
-VOLUME $APP_DATA_DIR
+ARG APP_DATA_DIR="/var/lib/openmrs_cd/app_data"
 RUN mkdir -p $APP_DATA_DIR
-RUN chown -R jenkins $APP_DATA_DIR
+RUN chown -R jenkins:jenkins $APP_DATA_DIR
 
 RUN apt update
 RUN apt -y install nano
