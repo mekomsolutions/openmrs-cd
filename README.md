@@ -13,7 +13,13 @@ cd ~/repos/
 git clone https://github.com/mekomsolutions/openmrs-cd && cd openmrs-cd
 ```
 
-**2** - Run a new container:
+**2** - Build the app:
+```
+cd ~/repos/openmrs-cd/app
+npm run all
+```
+
+**3** - Run a new container:
 ```
 docker run --name openmrscd  -p 8080:8080 \
   -v ~/repos/openmrs-cd/app:/opt/app \
@@ -24,7 +30,7 @@ Where `openmrscd` is the name of the Jenkins container.
 
 **Note:** _Not all components are deployed on a remote repo yet. That is why we use the `~/repos/openmrs-cd/` sources as mounted volumes._
 
-**3** - Launch the **artifact_repo.js** script to configure the artifacts repository credentials and artifact upload URLs:
+**4** - Launch the **artifact_repo.js** script to configure the artifacts repository credentials and artifact upload URLs:
 ```
 docker exec -it openmrscd \
   bash -c "cd /usr/share/jenkins/ && npm install && node artifact_repo.js"
