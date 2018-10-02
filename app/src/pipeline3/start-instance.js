@@ -220,7 +220,7 @@ if (process.env[config.varDataChanges()] === "true") {
       ssh,
       container.exec(
         instanceDef.uuid,
-        "if [ -d /opt/bahmni-event-log-service/ ]; then\n" +
+        "if [ -d /mnt/data/bahmni-event-log-service/ ]; then\n" +
           scripts.rsync(
             {},
             "/mnt/data/bahmni-event-log-service/application.properties",

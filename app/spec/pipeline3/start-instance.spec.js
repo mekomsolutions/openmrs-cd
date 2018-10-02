@@ -62,7 +62,7 @@ describe("Start instance scripts", function() {
     expect(script).toContain(scripts.remote(ssh, docker.restart(instanceUuid)));
   });
 
-  fit("should generate bash script upon deployment changes.", function() {
+  it("should generate bash script upon deployment changes.", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
     process.env[config.varDeploymentChanges()] = "true";
     var instanceDef = db.getInstanceDefinition(instanceUuid);
@@ -126,7 +126,6 @@ describe("Start instance scripts", function() {
         )
       )
     );
-    console.log(script)
 
     expectedScript = expectedScript.join(cst.SCRIPT_SEPARATOR);
     expect(script).toContain(expectedScript);
@@ -393,7 +392,7 @@ describe("Start instance scripts", function() {
         ssh,
         docker.exec(
           instanceUuid,
-          "if [ -d /opt/bahmni-event-log-service/ ]; then\n" +
+          "if [ -d /mnt/data/bahmni-event-log-service/ ]; then\n" +
             "rsync -avz /mnt/data/bahmni-event-log-service/application.properties /opt/bahmni-event-log-service/bahmni-event-log-service/WEB-INF/classes/application.properties\n" +
             "chown -R bahmni:bahmni /opt/bahmni-event-log-service/bahmni-event-log-service/WEB-INF/classes/application.properties\n" +
             "fi"
