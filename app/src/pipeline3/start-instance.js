@@ -174,11 +174,16 @@ if (process.env[config.varDataChanges()] === "true") {
       );
 
       var sqlCmd = "";
+      var waitForMySQL = "";
+
       if (sql.engine === "mysql") {
+        waitForMySQL =
+          "until ncat -w30 localhost 3306 --send-only </dev/null; do echo 'Waiting for database connection...'; sleep 5; done";
         var cat = "cat";
         if (path.basename(sql.sourceFile).endsWith(".gz")) {
           cat = "zcat";
         }
+
         sqlCmd =
           cat +
           " " +
@@ -189,6 +194,17 @@ if (process.env[config.varDataChanges()] === "true") {
           " -uroot -ppassword " +
           sql.database;
       }
+
+      var stopService = "";
+      if (sql.database == "openmrs") {
+        stopService = "sleep 30s; service " + sql.database + " stop";
+      }
+      script.body.push(
+        scripts.remote(ssh, container.exec(instanceDef.uuid, waitForMySQL))
+      );
+      script.body.push(
+        scripts.remote(ssh, container.exec(instanceDef.uuid, stopService))
+      );
       script.body.push(
         scripts.remote(ssh, container.exec(instanceDef.uuid, sqlCmd))
       );

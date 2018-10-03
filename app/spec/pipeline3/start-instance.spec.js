@@ -181,6 +181,15 @@ describe("Start instance scripts", function() {
     expect(script).toContain(
       scripts.remote(ssh, docker.exec(instanceUuid, sqlCmd))
     );
+    var stopService = "sleep 30s; service openmrs stop";
+    expect(script).toContain(
+      scripts.remote(ssh, docker.exec(instanceUuid, stopService))
+    );
+    var waitForMySQL =
+      "until ncat -w30 localhost 3306 --send-only </dev/null; do echo 'Waiting for database connection...'; sleep 5; done";
+    expect(script).toContain(
+      scripts.remote(ssh, docker.exec(instanceUuid, waitForMySQL))
+    );
   });
 
   it("should handle '.gz' data source files.", function() {
