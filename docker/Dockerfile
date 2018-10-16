@@ -36,8 +36,6 @@ USER jenkins
 
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
 
-COPY ./resources/security.groovy /usr/share/jenkins/init.groovy.d/security.groovy
-
 COPY ./config/plugins.txt /usr/share/jenkins/plugins.txt
 RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/plugins.txt
 
