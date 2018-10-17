@@ -44,7 +44,7 @@ for (i = 0; i &lt; events.size(); i++) {
 
   hudson.model.Hudson.instance.queue.schedule(downstreamJob, 0, causeAction, paramsAction)
 }</script>
-          <sandbox>false</sandbox>
+          <sandbox>true</sandbox>
         </script>
       </source>
     </hudson.plugins.groovy.SystemGroovy>

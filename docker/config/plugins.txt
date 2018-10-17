@@ -12,3 +12,4 @@ matrix-auth:2.3
 pipeline-utility-steps:2.1.0
 groovy:2.0
 ansicolor:0.5.2
+permissive-script-security:0.3

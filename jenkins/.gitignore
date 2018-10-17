@@ -32,9 +32,12 @@ jenkins_home/config-history/
 jenkins_home/queue.xml
 jenkins_home/org.jenkinsci.plugins.workflow.flow.FlowExecutionList.xml
 jenkins_home/jenkins.install.InstallUtil.lastExecVersion
-
-# Specific to pipeline2
-jenkins_home/history.json
+jenkins_home/jenkins.model.DownloadSettings.xml
+jenkins_home/jenkins.security.QueueItemAuthenticatorConfiguration.xml
+jenkins_home/jenkins.security.UpdateSiteWarningsConfiguration.xml
+jenkins_home/scriptApproval.xml
+jenkins_home/envinject-plugin-configuration.xml
+jenkins_home/jenkins.security.apitoken.ApiTokenPropertyConfiguration.xml
 
 # Only get the config.xml from any Jobs directory
 jenkins_home/jobs/*/builds
@@ -70,6 +73,8 @@ jenkins_home/identity.key
 jenkins_home/identity.key.enc
 jenkins_home/plugins
 jenkins_home/plugins.txt
+jenkins_home/org.jenkinsci.plugins.*
+jenkins_home/hudson.plugins.*
 
 # Contain local info and secrets
 jenkins_home/jenkins.model.JenkinsLocationConfiguration.xml
