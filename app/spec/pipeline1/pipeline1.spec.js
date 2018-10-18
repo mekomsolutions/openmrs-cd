@@ -32,6 +32,9 @@ describe("Tests suite for pipeline1", function() {
     );
     expect(jenkinsFile).toContain("<name>" + config.varCommitId() + "</name>");
     expect(jenkinsFile).toContain(
+      "<name>" + config.varArtifactsDeployment() + "</name>"
+    );
+    expect(jenkinsFile).toContain(
       "<scriptPath>jenkins/pipelines/" +
         config.getJobNameForPipeline1() +
         ".jenkinsfile</scriptPath>"

@@ -84,7 +84,7 @@ branchName=$branchName
 commitId=$commitId
 77051b05-4abb-4915-9177-10b0a5b7bca5</command>
     </hudson.tasks.Shell>
-    <EnvInjectBuilder plugin="envinject@2.1.5">
+    <EnvInjectBuilder plugin="envinject@2.1.6">
       <info>
         <propertiesFilePath>$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/commit_metadata.env</propertiesFilePath>
       </info>
@@ -109,6 +109,14 @@ commitId=$commitId
               <useMatrixChild>false</useMatrixChild>
               <onlyExactRuns>false</onlyExactRuns>
             </hudson.plugins.parameterizedtrigger.FileBuildParameters>
+            <hudson.plugins.parameterizedtrigger.BooleanParameters>
+              <configs>
+                <hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+                  <name>artifactsDeployment</name>
+                  <value>true</value>
+                </hudson.plugins.parameterizedtrigger.BooleanParameterConfig>
+              </configs>
+            </hudson.plugins.parameterizedtrigger.BooleanParameters>
           </configs>
           <projects>pipeline1</projects>
           <condition>SUCCESS</condition>

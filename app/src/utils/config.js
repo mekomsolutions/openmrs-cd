@@ -52,6 +52,9 @@ module.exports = {
   varCommitId: function() {
     return "commitId";
   },
+  varArtifactsDeployment: function() {
+    return "artifactsDeployment";
+  },
   varInstanceEvent: function() {
     return "instanceEvent";
   },

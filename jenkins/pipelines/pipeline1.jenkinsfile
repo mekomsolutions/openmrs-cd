@@ -28,6 +28,9 @@ pipeline {
       }
     }
     stage ('Deploy the built artifacts to their repository') {
+      when {
+        expression { return env.artifactsDeployment == "true" }
+      }
       steps {
         sh 'cat $BUILD_PATH/deploy.sh'
         sh '$BUILD_PATH/deploy.sh $JENKINS_HOME/artifact_repository.env'
