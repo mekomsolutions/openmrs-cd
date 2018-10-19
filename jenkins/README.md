@@ -25,7 +25,7 @@ or
 
 - Then run your container mapped with the _jenkins_home_ repo location (this may not be the exact command but the idea is here)
 ```
-docker run --name myjenkins -p 8080:8080 -v ~/repos/openmrs-ci/jenkins_home/jenkins_home:/var/jenkins_home mekomsolutions/openmrsci:1.0.0-SNAPSHOT 
+docker run --name openmrscd -p 8080:8080 -v ~/repos/openmrs-cd/jenkins/jenkins_home:/var/jenkins_home mekomsolutions/openmrscd:latest
 ```
 
 - Apply your changes on the CI

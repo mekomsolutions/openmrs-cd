@@ -80,7 +80,7 @@ describe("Tests suite for pipeline3", function() {
 
     // verif 'pre-host prepare' stage
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getPrehostPrepareJsScriptName() +
         "'"
     );
@@ -92,7 +92,7 @@ describe("Tests suite for pipeline3", function() {
         "'"
     );
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getUpdateStatusJsScriptName() +
         " $" +
         config.varEnvvarBuildPath() +
@@ -103,7 +103,7 @@ describe("Tests suite for pipeline3", function() {
 
     // verif 'host prepare' stage
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getHostPrepareJsScriptName() +
         "'"
     );
@@ -115,7 +115,7 @@ describe("Tests suite for pipeline3", function() {
         "'"
     );
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getUpdateStatusJsScriptName() +
         " $" +
         config.varEnvvarBuildPath() +
@@ -126,7 +126,7 @@ describe("Tests suite for pipeline3", function() {
 
     // verif 'start instance' stage
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getStartInstanceJsScriptName() +
         "'"
     );
@@ -138,7 +138,7 @@ describe("Tests suite for pipeline3", function() {
         "'"
     );
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getUpdateStatusJsScriptName() +
         " $" +
         config.varEnvvarBuildPath() +
@@ -149,7 +149,7 @@ describe("Tests suite for pipeline3", function() {
 
     // verif 'post start' stage
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getPostStartJsScriptName() +
         "'"
     );
@@ -163,7 +163,7 @@ describe("Tests suite for pipeline3", function() {
 
     // verif 'startup monitoring' stage
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getStartupMonitoringJsScriptName() +
         "'"
     );

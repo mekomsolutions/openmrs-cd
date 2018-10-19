@@ -35,7 +35,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>node /opt/app/src/instance-event/validate-instance.js
+      <command>node /opt/node-scripts/src/instance-event/validate-instance.js
 # the output of this job is exported in trigger.env
 </command>
     </hudson.tasks.Shell>

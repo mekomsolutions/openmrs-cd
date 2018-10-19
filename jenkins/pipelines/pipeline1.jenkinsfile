@@ -21,7 +21,7 @@ pipeline {
     }
     stage ('Build the project') {
       steps {
-        sh 'node /opt/app/src/$JOB_NAME/build.js'
+        sh 'node /opt/node-scripts/src/$JOB_NAME/build.js'
         sh 'cat $BUILD_PATH/build.sh'
         sh '$BUILD_PATH/build.sh'
         sh '. $BUILD_PATH/artifact.env ; mv $WORKSPACE/$buildPath/$filename $WORKSPACE/$destFilename'
@@ -38,7 +38,7 @@ pipeline {
     }
     stage ('Trigger possible downstream builds and/or save the current build parameters') {
       steps {
-        sh 'node /opt/app/src/$JOB_NAME/downstream-builds.js'
+        sh 'node /opt/node-scripts/src/$JOB_NAME/downstream-builds.js'
         script {
           def buildsParamsPath = "${env.BUILD_PATH}/builds_params.json"
           if (fileExists(buildsParamsPath)) {
@@ -57,7 +57,7 @@ pipeline {
     }
     stage ('Identify impacted instances and append instances events log') {
       steps {
-        sh 'node /opt/app/src/$JOB_NAME/identify-instances.js'
+        sh 'node /opt/node-scripts/src/$JOB_NAME/identify-instances.js'
       }
     }
   }

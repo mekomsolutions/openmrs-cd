@@ -3,4 +3,4 @@ node_js:
   - "9"
 
 script:
-  - cd app ; npm run all
+  - cd node-scripts ; npm run all

@@ -3,7 +3,7 @@
 ### Code Structure
 **Remark:** This part of the dev. guide will keep evolving. It might thus be out-of-date at a given point in time.
 ```
-app/src
+node-scripts/src
 ├── const.js
 ├── instance-event
 │   ├── validate-instance.js
@@ -34,7 +34,7 @@ app/src
     └── utils.js
 ```
 Set aside const.js which, as the name suggests, is the location of global constants, there are two types of subfolders that should be distinguished when looking from the root level:
-1. **utils** that contain broad purpose libraries needed across the app.
+1. **utils** that contain broad purpose libraries needed across the scripts.
 2. Jenkins jobs scripts implementations: **pipeline1**, **instance-event** and **pipeline3**.
 
 **Convention:** We are adopting the rule that the Node folder name is the exact name of the job within Jenkins, so as it is stated in the config.xml of the ad-hoc job.
@@ -44,7 +44,7 @@ Those should be self-explanatory and the developer should always keep an eye on 
 ```groovy
 stage ('Pre-host connection preparation') {
   steps {
-    sh 'node /opt/app/src/$JOB_NAME/prehost-preparation.js'
+    sh 'node /opt/node-scripts/src/$JOB_NAME/prehost-preparation.js'
     sh 'cat $BUILD_PATH/prehost-prepare.sh'
     sh '$BUILD_PATH/prehost-prepare.sh'
   }
@@ -107,7 +107,7 @@ The generic tool to **fetch** an object of a domain, please follow the JavaScrip
 Reusable and testable functions that are constantly needed. `findObject` and `removeObject` are particularly critical to db.js for instance, see [here](https://github.com/mekomsolutions/openmrs-cd/blob/d89776b66749179e36ca8abdebe8d0dac3f12e9e/app/src/utils/utils.js#L157-L221).
 
 ##### model.js
-Classes definitions that might be reusable across the entire app.
+Classes definitions that might be reusable across the scripts.
 
 ### Conventions and Patterns
 

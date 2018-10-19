@@ -13,16 +13,16 @@ cd ~/repos/
 git clone https://github.com/mekomsolutions/openmrs-cd && cd openmrs-cd
 ```
 
-**2** - Build the app:
+**2** - Build the Node scripts:
 ```
-cd ~/repos/openmrs-cd/app
+cd ~/repos/openmrs-cd/node-scripts
 npm run all
 ```
 
 **3** - Run a new container:
 ```
 docker run --name openmrscd  -p 8080:8080 \
-  -v ~/repos/openmrs-cd/app:/opt/app \
+  -v ~/repos/openmrs-cd/node-scripts:/opt/node-scripts \
   -v ~/repos/openmrs-cd/jenkins/jenkins_home:/var/jenkins_home \
   mekomsolutions/openmrscd:latest
 ```
@@ -47,28 +47,28 @@ This explains the structure and content of the root folder of the project:
 
 ```
 .
-├── app
 ├── docker
-└── jenkins
+├── jenkins
+└── node-scripts
 ```
 **app** is the Node JS area, **docker** holds the Dockerfile (and other resources needed to configure the container) and **jenkins** contains the parts of Jenkins home that are preconfigured, as well as the pipelines Jenkinsfiles.
 
 Gradle is used to run all build tasks and package all artifacts that make the OpenMRS CD.
 
-### The 'app' component
+### The 'node-scripts' component
 Developing on the OpenMRS CD means working in here most of the time.
 That is because the bulk of the logic of what the OpenMRS CD does lives here. Almost all Jenkins jobs are built on the following pattern:
 >Jenkins jobs run Node scripts that generate Bash scripts that in turn perform the core CD tasks.
 
 This is how one would build the underlying Node JS app:
 ```
-cd app/
+cd node-scripts/
 npm run all
 ```
 And this must be done before submitting code commits.
-However note that the code base is not really built into anything since the container links directly to **/app**, but this formats the code and runs the test suite.
+However note that the code base is not really built into anything since the container links directly to **/node-scripts**, but this formats the code and runs the test suite.
 
-The app developer guide can be found [here](app/README.md).
+The Node scripts developer guide can be found [here](node-scripts/README.md).
 
 ### The 'docker' component
 ```

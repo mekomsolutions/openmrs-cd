@@ -83,7 +83,9 @@ describe("Tests suite for pipeline1", function() {
 
     // verif 'build' stage
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" + config.getBuildJsScriptName() + "'"
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
+        config.getBuildJsScriptName() +
+        "'"
     );
     expect(jenkinsFile).toContain(
       "sh '$" +
@@ -119,7 +121,7 @@ describe("Tests suite for pipeline1", function() {
 
     // verif 'post-build' stage
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getPostBuildJsScriptName() +
         "'"
     );
@@ -160,7 +162,7 @@ describe("Tests suite for pipeline1", function() {
 
     // verif 'impacted instances' stage
     expect(jenkinsFile).toContain(
-      "sh 'node /opt/app/src/$JOB_NAME/" +
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getIdentifyInstancesJsScriptName() +
         "'"
     );

@@ -1,9 +1,9 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.mekomsolutions</groupId>
-  <artifactId>openmrs-config-cambodia</artifactId>
-  <name>OpenMRS config for the ODC</name>
-  <description>OpenMRS configuration for the 'OpenMRS distribution for Cambodia'</description>
+  <artifactId>bahmni-config-cambodia</artifactId>
+  <name>Bahmni config for the ODC</name>
+  <description>Bahmni configuration for the 'OpenMRS distribution for Cambodia'</description>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 

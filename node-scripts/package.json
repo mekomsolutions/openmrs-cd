@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "node-scripts",
   "version": "0.0.0",
   "description": "Node scripts for the OpenMRS CD",
   "dependencies": {

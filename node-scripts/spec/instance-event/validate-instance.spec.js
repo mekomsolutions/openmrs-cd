@@ -39,7 +39,7 @@ describe("validate-instance", function() {
       "<name>" + config.varInstanceEvent() + "</name>"
     );
     expect(jobConfigFile).toContain(
-      "<command>node /opt/app/src/" +
+      "<command>node /opt/node-scripts/src/" +
         config.getJobNameForInstanceEvent() +
         "/" +
         config.getInstanceEventJsScriptName()

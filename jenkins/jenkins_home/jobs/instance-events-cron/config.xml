@@ -19,7 +19,7 @@ Then triggers the start/restart of instances by passing those events to the appr
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>node /opt/app/src/instance-event/filter-events.js
+      <command>node /opt/node-scripts/src/instance-event/filter-events.js
 # all events filtered to be processed are saved into filtered_instances_events.json
 </command>
     </hudson.tasks.Shell>
