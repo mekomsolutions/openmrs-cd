@@ -1,15 +1,13 @@
-version = "1.0.0-SNAPSHOT"
-
 task npmBuild(type: Exec) {
   commandLine 'npm', 'run', 'all'
 }
 
-task archive(type: Zip) {
-  from ('./src')
-  baseName = "target/app"
+task copyScripts(type: Copy) {
+  from ("./src")
+  into ("$rootProject.buildDir/openmrs-cd/node-scripts")
   dependsOn npmBuild
 }
 
 task build() {
-  dependsOn npmBuild, archive
+  dependsOn npmBuild, copyScripts
 }

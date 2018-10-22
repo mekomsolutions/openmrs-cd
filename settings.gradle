@@ -1,1 +1,4 @@
-include 'docker', 'jenkins', 'resources', 'jobs', 'app'
+rootProject.name = 'openmrs-cd'
+
+include 'jenkins', 'node-scripts'
+// include 'docker', 'jenkins', 'node-scripts'

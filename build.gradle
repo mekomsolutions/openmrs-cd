@@ -1,1 +1,38 @@
-version = '3.0.0-SNAPSHOT'
+apply plugin: 'distribution'
+
+distZip.enabled = true
+distTar.enabled = false
+
+allprojects {
+  group = 'net.mekomsolutions'
+  version = '3.0.0-SNAPSHOT'
+}
+
+distributions {
+  main {
+    baseName = 'openmrs-cd'
+    contents {
+      from { "$buildDir/openmrs-cd" }
+    }
+  }
+}
+
+apply plugin: 'maven-publish'
+
+publishing {
+  publications {
+    myDistribution(MavenPublication) {
+      artifact distZip
+    }
+  }
+  repositories {
+    maven {
+      name 'mks-repo'
+      url mksRepoUrl
+      credentials {
+        username = mksRepoUsername
+        password = mksRepoPassword
+      }
+    }
+  }
+}

@@ -1,8 +1,8 @@
-version = "1.0.0-SNAPSHOT"
+task copyJenkinsHome(type: Copy) {
+  from ("./jenkins_home")
+  into ("$rootProject.buildDir/openmrs-cd/jenkins_home/")
+}
 
-apply plugin: 'java'
-
-task archive(type: Zip) {
-  from 'jenkins_home'
-  baseName = "jenkins_home"
+task build() {
+  dependsOn copyJenkinsHome
 }
