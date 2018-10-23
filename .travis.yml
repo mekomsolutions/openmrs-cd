@@ -1,6 +1,17 @@
-language: node_js
-node_js:
-  - "9"
+language: groovy
+
+sudo: required
+
+services:
+  - docker
+
+addons:
+  node_js: "9"
+
+matrix:
+  fast_finish: true
 
 script:
-  - cd node-scripts ; npm run all
+  - gradle build
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - gradle deploy

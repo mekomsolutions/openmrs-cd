@@ -1,4 +1,3 @@
 rootProject.name = 'openmrs-cd'
 
-include 'jenkins', 'node-scripts'
-// include 'docker', 'jenkins', 'node-scripts'
+include 'docker', 'jenkins', 'node-scripts'

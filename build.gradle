@@ -8,6 +8,7 @@ allprojects {
   version = '3.0.0-SNAPSHOT'
 }
 
+// subprojects are supposed to copy their output files under /openmrs-cd inside the main build dir
 distributions {
   main {
     baseName = 'openmrs-cd'
@@ -19,6 +20,11 @@ distributions {
 
 apply plugin: 'maven-publish'
 
+// this is to work both locally (via gradle.properties) and on Travis CI (via envvars)
+def repoUrl = hasProperty('mksRepoUrl') ? mksRepoUrl : System.getenv('mksRepoUrl')
+def repoUsername = hasProperty('mksRepoUsername') ? mksRepoUsername : System.getenv('mksRepoUsername')
+def repoPassword = hasProperty('mksRepoPassword') ? mksRepoPassword : System.getenv('mksRepoPassword')
+
 publishing {
   publications {
     myDistribution(MavenPublication) {
@@ -28,11 +34,15 @@ publishing {
   repositories {
     maven {
       name 'mks-repo'
-      url mksRepoUrl
+      url repoUrl
       credentials {
-        username = mksRepoUsername
-        password = mksRepoPassword
+        username = repoUsername
+        password = repoPassword
       }
     }
   }
+}
+
+task deploy() {
+  dependsOn assemble, publish
 }

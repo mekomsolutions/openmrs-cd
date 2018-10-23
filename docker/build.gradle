@@ -1,13 +1,10 @@
-version = "latest"
-
 buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.bmuschko:gradle-docker-plugin:3.2.0'
-    }
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.bmuschko:gradle-docker-plugin:3.2.0'
+  }
 }
 
 apply plugin: 'com.bmuschko.docker-remote-api'
@@ -16,24 +13,37 @@ apply plugin: 'com.bmuschko.docker-remote-api'
 import com.bmuschko.gradle.docker.tasks.image.*
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 def dockerHubRepo = "mekomsolutions/openmrscd"
+def getShortCommit() {
+  return ['sh', '-c', 'git log -1 --format=%h'].execute().text.trim()
+}
 
 task buildDockerImage(type: DockerBuildImage) {
   inputDir = file('.')
-  tags = [dockerHubRepo + ':' + version]
-}
-
-task pushDockerImage(type: DockerPushImage) {
-  imageName = dockerHubRepo + ':' + version
+  tags = [dockerHubRepo + ':' + version, dockerHubRepo + ':' + 'latest', dockerHubRepo + ':' + getShortCommit()]
 }
 
 task build() {
   dependsOn buildDockerImage
 }
 
+// one push per tag:
+
+task pushDockerImageForVersion(type: DockerPushImage) {
+  imageName = dockerHubRepo + ':' + version
+}
+
+task pushDockerImageForLatest(type: DockerPushImage) {
+  imageName = dockerHubRepo + ':' + 'latest'
+}
+
+task pushDockerImageForCommitId(type: DockerPushImage) {
+  imageName = dockerHubRepo + ':' + getShortCommit()
+}
+
 task deploy() {
-  dependsOn buildDockerImage, pushDockerImage
+  dependsOn buildDockerImage, pushDockerImageForVersion, pushDockerImageForLatest, pushDockerImageForCommitId
 }
