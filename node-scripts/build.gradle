@@ -4,10 +4,16 @@ task npmBuild(type: Exec) {
 
 task copyScripts(type: Copy) {
   from ("./src")
-  into ("$rootProject.buildDir/openmrs-cd/node-scripts")
+  into ("$rootProject.buildDir/openmrs-cd/node-scripts/src")
+  dependsOn npmBuild
+}
+
+task copyDependencies(type: Copy) {
+  from ("./node_modules")
+  into ("$rootProject.buildDir/openmrs-cd/node-scripts/node_modules")
   dependsOn npmBuild
 }
 
 task build() {
-  dependsOn npmBuild, copyScripts
+  dependsOn npmBuild, copyScripts, copyDependencies
 }
