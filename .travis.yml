@@ -8,10 +8,5 @@ services:
 addons:
   node_js: "9"
 
-matrix:
-  fast_finish: true
-
 script:
-  - gradle build
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - gradle deploy
+  - gradle build && echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin && gradle deploy
