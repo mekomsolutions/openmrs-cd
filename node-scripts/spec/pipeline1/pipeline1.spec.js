@@ -159,6 +159,11 @@ describe("Tests suite for pipeline1", function() {
         config.varRepoUrl() +
         "'])"
     );
+    expect(jenkinsFile).toContain(
+      "booleanParam(name: '" +
+        config.varArtifactsDeployment() +
+        "', value: true)"
+    );
 
     // verif 'impacted instances' stage
     expect(jenkinsFile).toContain(

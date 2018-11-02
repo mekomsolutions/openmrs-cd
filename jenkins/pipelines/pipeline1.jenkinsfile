@@ -48,7 +48,8 @@ pipeline {
               [ \
                 string(name: 'projectType', value: params[i]['projectType']), \
                 string(name: 'repoUrl', value: params[i]['repoUrl']), \
-                string(name: 'branchName', value: params[i]['branchName']) \
+                string(name: 'branchName', value: params[i]['branchName']), \
+                booleanParam(name: 'artifactsDeployment', value: true) \
               ]
             }
           }

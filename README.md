@@ -72,13 +72,26 @@ When developing on the CD the best is to mount the Docker volumes right out of t
 
 **1** - Clone the openmrs-cd repository:
 
-**Note:** _we assume that cloned repositories should go into the home `~/repos` folder._
+**Note:** _we assume that cloned repositories should go into the home `~/repos` folder. Adapt the commands below in accordance to your own local setup._
 ```bash
 mkdir -p ~/repos && cd ~/repos && \
   git clone https://github.com/mekomsolutions/openmrs-cd && cd openmrs-cd
 ```
+**2** - Build the Node scripts:
+```bash
+gradle node-scripts:build
+```
 
-**2** - Run the `openmrscd` container based on the `latest` tag:
+**3** - Run the `openmrscd` container based on the `latest` tag:
+```bash
+docker run --name openmrscd  -p 8080:8080 \
+  -v ~/repos/openmrs-cd/node-scripts:/opt/node-scripts \
+  -v ~/repos/openmrs-cd/jenkins/jenkins_home:/var/jenkins_home \
+  -v ~/.m2:/var/jenkins_home/.m2 \
+  -v ~/Documents/openmrs-cd/app_data:/var/lib/openmrs_cd/app_data \
+  mekomsolutions/openmrscd:latest
+```
+The last two mounted volumes are 'nice to have', they ensure that the CD reuses your local .m2 and that the app data are extracted out of the container to some convenient location. In its most minimal form however the above Docker command becomes:
 ```bash
 docker run --name openmrscd  -p 8080:8080 \
   -v ~/repos/openmrs-cd/node-scripts:/opt/node-scripts \
