@@ -11,34 +11,36 @@ describe("Tests suite for pipeline3", function() {
   it("should verify job parameters.", function() {
     // deps
     const __rootPath__ = require("app-root-path").path;
+    const ent = require("ent");
 
     // replay
-    var jenkinsFile = fs.readFileSync(
+    var jobConfigFile = fs.readFileSync(
       __rootPath__ +
         "/../jenkins/jenkins_home/jobs/" +
         config.getJobNameForPipeline3() +
         "/config.xml",
       "utf8"
     );
+    jobConfigFile = ent.decode(jobConfigFile);
 
     // verif
-    expect(jenkinsFile).toContain(
+    expect(jobConfigFile).toContain(
       "<name>" + config.varInstanceUuid() + "</name>"
     );
-    expect(jenkinsFile).toContain(
+    expect(jobConfigFile).toContain(
       "<name>" + config.varArtifactsChanges() + "</name>"
     );
-    expect(jenkinsFile).toContain(
+    expect(jobConfigFile).toContain(
       "<name>" + config.varDeploymentChanges() + "</name>"
     );
-    expect(jenkinsFile).toContain(
+    expect(jobConfigFile).toContain(
       "<name>" + config.varDataChanges() + "</name>"
     );
-    expect(jenkinsFile).toContain("<name>" + config.varCreation() + "</name>");
-    expect(jenkinsFile).toContain(
-      "<scriptPath>jenkins/pipelines/" +
-        config.getJobNameForPipeline3() +
-        ".jenkinsfile</scriptPath>"
+    expect(jobConfigFile).toContain(
+      "<name>" + config.varCreation() + "</name>"
+    );
+    expect(jobConfigFile).toContain(
+      "<script>node {\n  load '../jenkinsfile.groovy'\n}</script>"
     );
   });
 
@@ -49,9 +51,9 @@ describe("Tests suite for pipeline3", function() {
     // replay
     var jenkinsFile = fs.readFileSync(
       __rootPath__ +
-        "/../jenkins/pipelines/" +
+        "/../jenkins/jenkins_home/jobs/" +
         config.getJobNameForPipeline3() +
-        ".jenkinsfile",
+        "/jenkinsfile.groovy",
       "utf8"
     );
 
