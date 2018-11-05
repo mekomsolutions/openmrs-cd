@@ -3,13 +3,12 @@
 ### Code Structure
 **Remark:** This part of the dev. guide will keep evolving. It might thus be out-of-date at a given point in time.
 ```
-node-scripts/src
+node-scripts/src/
 ├── const.js
 ├── instance-event
+│   ├── filter-events.js
 │   ├── validate-instance.js
 │   └── validator.js
-├── models
-│   └── model.js
 ├── pipeline1
 │   ├── build.js
 │   ├── commons.js
@@ -26,14 +25,19 @@ node-scripts/src
 │   └── post-build.js
 ├── pipeline3
 │   ├── host-preparation.js
+│   ├── post-start.js
 │   ├── prehost-preparation.js
-│   └── scripts.js
+│   ├── scripts.js
+│   ├── start-instance.js
+│   ├── startup-monitoring.js
+│   └── update-status.js
 └── utils
-    ├── config.js
-    ├── db.js
-    └── utils.js
+    ├── config.js
+    ├── db.js
+    ├── model.js
+    └── utils.js
 ```
-Set aside const.js which, as the name suggests, is the location of global constants, there are two types of subfolders that should be distinguished when looking from the root level:
+Set aside const.js which as the name suggests is the location of global constants, there are two types of subfolders that should be distinguished when looking from the root level:
 1. **utils** that contain broad purpose libraries needed across the scripts.
 2. Jenkins jobs scripts implementations: **pipeline1**, **instance-event** and **pipeline3**.
 
@@ -263,4 +267,4 @@ $ tree /var/folders/q7/gqgtc_ys2492hqqt7hb9xw_w0000gn/T/b4xxq
                 ├── builds_params.json
                 └── test_empty_artifacts_ids.txt
 ```
-The generated test folder above illustrates that those framework-sensitive tests do indeed reproduce what Jenkins home would look like at run time.
+The generated test folder above illustrates that those framework-sensitive tests do indeed reproduce what Jenkins home would look like at runtime.

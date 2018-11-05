@@ -104,39 +104,28 @@ Developing on the OpenMRS CD means working in here most of the time.
 That is because the bulk of the logic of what the OpenMRS CD does lives here. Almost all Jenkins jobs are built on the following pattern:
 >Jenkins jobs run Node scripts that generate Bash scripts that in turn perform the core CD tasks.
 
-This is how one would build the underlying Node JS app:
+This is how one would build the underlying Node JS scripts:
 ```bash
-cd node-scripts/
-gradle build
+gradle node-scripts:build
 ```
 And this must be done before submitting code commits.
 However note that the code base is not really built into anything since the container links directly to **/node-scripts**, but this formats the code and runs the test suite.
 
-The Node scripts developer guide can be found [here](node-scripts/README.md).
+A detailed developer guide about the Node scripts can be found [here](readme/node-scripts/README.md).
 
 ### The 'docker' component
-```bash
-cd docker/
-gradle build
-```
-This task builds the Docker image used as a base for the OpenMRS CD. See the [Dockerfile](docker/Dockerfile).
-
-```bash
-gradle deploy
-```
-This deploys the Docker image on the Mekom Solutions Docker Hub repository. This is not run by default or by the parent build, see below.
+See [here](readme/docker/README.md).
 
 ### The 'jenkins' component
 
-OpenMRS CD not only needs a Docker image for its binaries but also requires a 'Jenkins home' folder that provides the Jenkins preconfiguration.
+OpenMRS CD not only needs a Docker image for its binaries but also requires a 'Jenkins home' folder that provides a pre-configured Jenkins setup:
 
 ```bash
-cd jenkins/
-gradle build
+gradle jenkins:build
 ```
 This will package a zip archive of the jenkins folder.
 
-**Note:** _Developing with the jenkins component may require to use `git clean -Xdf` from time to time. Please read the [note for developpers](jenkins/README.md) first._
+**Note:** _Developing with the jenkins component may require to use `git clean -Xdf` from time to time. Please read the [note for developpers](readme/jenkins/README.md) first._
 
 ### The parent project (root folder)
 
