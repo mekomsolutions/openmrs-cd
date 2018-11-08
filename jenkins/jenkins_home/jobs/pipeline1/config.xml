@@ -57,8 +57,70 @@ Certain projects require to pinpoint to an exact commit rather than using the ti
     </hudson.model.ParametersDefinitionProperty>
   </properties>
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.58">
-    <script>node {
-  load &apos;../jenkinsfile.groovy&apos;
+    <script>// Name the build out of the parameters
+node {
+  currentBuild.displayName = &quot;${repoUrl}&quot;.substring(&quot;${repoUrl}&quot;.lastIndexOf(&quot;/&quot;) + 1) + &quot; - &quot; + &quot;${branchName}&quot;
+}
+
+pipeline {
+  agent any
+  options {
+    ansiColor(&apos;xterm&apos;)
+  }
+  tools {
+    maven &apos;Maven 3.5.0&apos; 
+    nodejs &apos;NodeJS 8.6.0&apos;
+  }
+  stages {
+    stage (&apos;Checkout the code and identify all Maven artifacts&apos;) {
+      steps {
+        checkout scm: [$class: &apos;GitSCM&apos;, userRemoteConfigs: [[url: repoUrl]], branches: [[name: branchName]]], poll: false
+        sh &apos;find . -mindepth 1 -maxdepth 2 -name pom.xml -exec xmllint --xpath &quot;//*[local-name()=\&apos;project\&apos;]/*[local-name()=\&apos;artifactId\&apos;]/text()&quot; {} \\; -exec echo \\; &gt; $BUILD_PATH/artifacts_ids.txt&apos;
+      }
+    }
+    stage (&apos;Build the project&apos;) {
+      steps {
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/build.js&apos;
+        sh &apos;cat $BUILD_PATH/build.sh&apos;
+        sh &apos;$BUILD_PATH/build.sh&apos;
+        sh &apos;. $BUILD_PATH/artifact.env ; mv $WORKSPACE/$buildPath/$filename $WORKSPACE/$destFilename&apos;
+      }
+    }
+    stage (&apos;Deploy the built artifacts to their repository&apos;) {
+      when {
+        expression { return env.artifactsDeployment == &quot;true&quot; }
+      }
+      steps {
+        sh &apos;cat $BUILD_PATH/deploy.sh&apos;
+        sh &apos;$BUILD_PATH/deploy.sh $JENKINS_HOME/artifact_repository.env&apos;
+      }
+    }
+    stage (&apos;Trigger possible downstream builds and/or save the current build parameters&apos;) {
+      steps {
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/downstream-builds.js&apos;
+        script {
+          def buildsParamsPath = &quot;${env.BUILD_PATH}/builds_params.json&quot;
+          if (fileExists(buildsParamsPath)) {
+            def params = readJSON file: buildsParamsPath
+            for (i = 0; i &lt; params.size(); i++) {
+              build job: &apos;pipeline1&apos;, wait: false, parameters: \
+              [ \
+                string(name: &apos;projectType&apos;, value: params[i][&apos;projectType&apos;]), \
+                string(name: &apos;repoUrl&apos;, value: params[i][&apos;repoUrl&apos;]), \
+                string(name: &apos;branchName&apos;, value: params[i][&apos;branchName&apos;]), \
+                booleanParam(name: &apos;artifactsDeployment&apos;, value: true) \
+              ]
+            }
+          }
+        }
+      }
+    }
+    stage (&apos;Identify impacted instances and append instances events log&apos;) {
+      steps {
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/identify-instances.js&apos;
+      }
+    }
+  }
 }</script>
     <sandbox>true</sandbox>
   </definition>

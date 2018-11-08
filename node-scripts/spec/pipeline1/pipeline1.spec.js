@@ -38,26 +38,27 @@ describe("Tests suite for pipeline1", function() {
     expect(jobConfigFile).toContain(
       "<name>" + config.varArtifactsDeployment() + "</name>"
     );
-    expect(jobConfigFile).toContain(
-      "<script>node {\n  load '../jenkinsfile.groovy'\n}</script>"
-    );
   });
 
   it("should verify pipeline steps scripts.", function() {
     // deps
+    const XML = require("pixl-xml");
     const __rootPath__ = require("app-root-path").path;
 
     // replay
-    var jenkinsFile = fs.readFileSync(
-      __rootPath__ +
-        "/../jenkins/jenkins_home/jobs/" +
-        config.getJobNameForPipeline1() +
-        "/jenkinsfile.groovy",
-      "utf8"
+    var configXml = XML.parse(
+      fs.readFileSync(
+        __rootPath__ +
+          "/../jenkins/jenkins_home/jobs/" +
+          config.getJobNameForPipeline1() +
+          "/config.xml",
+        "utf-8"
+      )
     );
+    var pipelineScript = configXml.definition.script;
 
     // verif node 'naming'
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       'currentBuild.displayName = "${' +
         config.varRepoUrl() +
         '}".substring("${' +
@@ -68,14 +69,14 @@ describe("Tests suite for pipeline1", function() {
     );
 
     // verif 'checkout' stage
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: " +
         config.varRepoUrl() +
         "]], branches: [[name: " +
         config.varBranchName() +
         "]]], poll: false"
     );
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "sh 'find . -mindepth 1 -maxdepth 2 -name pom.xml -exec xmllint --xpath \"//*[local-name()=\\'project\\']/*[local-name()=\\'artifactId\\']/text()\" {} \\\\; -exec echo \\\\; > $" +
         config.varEnvvarBuildPath() +
         "/" +
@@ -84,19 +85,19 @@ describe("Tests suite for pipeline1", function() {
     );
 
     // verif 'build' stage
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getBuildJsScriptName() +
         "'"
     );
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "sh '$" +
         config.varEnvvarBuildPath() +
         "/" +
         config.getBuildShellScriptName() +
         "'"
     );
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "sh '. $" +
         config.varEnvvarBuildPath() +
         "/" +
@@ -111,7 +112,7 @@ describe("Tests suite for pipeline1", function() {
     );
 
     // verif 'deploy' stage
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "sh '$" +
         config.varEnvvarBuildPath() +
         "/" +
@@ -122,53 +123,53 @@ describe("Tests suite for pipeline1", function() {
     );
 
     // verif 'post-build' stage
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getPostBuildJsScriptName() +
         "'"
     );
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       'def buildsParamsPath = "${env.' +
         config.varEnvvarBuildPath() +
         "}/" +
         config.getDownstreamBuildParamsJsonName() +
         '"'
     );
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "def params = readJSON file: buildsParamsPath"
     );
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "build job: '" + config.getJobNameForPipeline1() + "', wait: false"
     );
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "string(name: '" +
         config.varProjectType() +
         "', value: params[i]['" +
         config.varProjectType() +
         "'])"
     );
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "string(name: '" +
         config.varBranchName() +
         "', value: params[i]['" +
         config.varBranchName() +
         "'])"
     );
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "string(name: '" +
         config.varRepoUrl() +
         "', value: params[i]['" +
         config.varRepoUrl() +
         "'])"
     );
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "booleanParam(name: '" +
         config.varArtifactsDeployment() +
         "', value: true)"
     );
 
     // verif 'impacted instances' stage
-    expect(jenkinsFile).toContain(
+    expect(pipelineScript).toContain(
       "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
         config.getIdentifyInstancesJsScriptName() +
         "'"

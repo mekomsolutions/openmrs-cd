@@ -4,7 +4,6 @@ const path = require("path");
 const fs = require("fs");
 const log = require("npmlog");
 const _ = require("lodash");
-const XML = require("pixl-xml");
 
 const model = require("../utils/model");
 const utils = require("../utils/utils");

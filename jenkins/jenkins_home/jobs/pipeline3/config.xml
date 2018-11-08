@@ -54,8 +54,96 @@ Depending on the context and the instance definition it can setup and run a new 
     </hudson.model.ParametersDefinitionProperty>
   </properties>
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.58">
-    <script>node {
-  load &apos;../jenkinsfile.groovy&apos;
+    <script>// Name the build out of the parameters
+node {
+  def buildName = &quot;${instanceUuid}&quot;
+  def cause = &quot;&quot;
+  def sep = &quot; + &quot;
+  if (artifactsChanges == &quot;true&quot;) { cause += &quot;artifacts + &quot; }
+  if (dataChanges == &quot;true&quot;) { cause += &quot;data&quot; + sep }
+  if (deploymentChanges == &quot;true&quot;) { cause += &quot;deployment&quot; + sep }
+  if (creation == &quot;true&quot;) { cause += &quot;creation&quot; + sep }
+  cause = cause.substring(0, cause.length() - sep.length())
+  buildName += &quot;: &quot; + cause
+  currentBuild.displayName = buildName
+  currentBuild.description = buildName
+}
+
+pipeline {
+  agent any
+  options {
+    ansiColor(&apos;xterm&apos;)
+  }
+  tools {
+    maven &apos;Maven 3.5.0&apos; 
+    nodejs &apos;NodeJS 8.6.0&apos;
+  }
+  stages {
+    stage (&apos;Pre-host connection preparation&apos;) {
+      steps {
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/prehost-preparation.js&apos;
+        sh &apos;cat $BUILD_PATH/prehost-prepare.sh&apos;
+        sh &apos;$BUILD_PATH/prehost-prepare.sh&apos;
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+      }
+    }
+    stage (&apos;Host preparation&apos;) {
+      steps {
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/host-preparation.js&apos;
+        sh &apos;cat $BUILD_PATH/host-prepare.sh&apos;
+        sh &apos;$BUILD_PATH/host-prepare.sh&apos;
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+      }
+    }
+    stage (&apos;Maintenance mode: ON&apos;) {
+      when {
+        expression { return false }
+      }
+      steps {
+        sh &apos;echo &quot;Stage/steps awaiting implementation... Skipping.&quot;&apos;
+      }
+    }
+    stage (&apos;Production host preparation&apos;) {
+      when {
+        expression { return false }
+      }
+      steps {
+        sh &apos;echo &quot;Stage/steps awaiting implementation... Skipping.&quot;&apos;
+      }
+    }
+    stage (&apos;Start or restart the instance&apos;) {
+      steps {
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/start-instance.js&apos;
+        sh &apos;cat $BUILD_PATH/start-instance.sh&apos;
+        sh &apos;$BUILD_PATH/start-instance.sh&apos;
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+      }
+    }
+    stage (&apos;Instance startup status monitoring&apos;) {
+      steps {
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/startup-monitoring.js&apos;
+        sh &apos;cat $BUILD_PATH/startup-monitoring.sh&apos;
+        sh &apos;$BUILD_PATH/startup-monitoring.sh&apos;
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+      }
+    }
+    stage (&apos;Post startup actions&apos;) {
+      steps {
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/post-start.js&apos;
+        sh &apos;cat $BUILD_PATH/post-start.sh&apos;
+        sh &apos;$BUILD_PATH/post-start.sh&apos;
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+      }
+    }
+    stage (&apos;Maintenance mode: OFF&apos;) {
+      when {
+        expression { return false }
+      }
+      steps {
+        sh &apos;echo &quot;Stage/steps awaiting implementation... Skipping.&quot;&apos;
+      }
+    }
+  }
 }</script>
     <sandbox>true</sandbox>
   </definition>
