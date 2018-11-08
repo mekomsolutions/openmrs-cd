@@ -1,9 +1,17 @@
-# OpenMRS CD
-> A dockerized [Jenkins](https://jenkins.io/) server ready to manage [OpenMRS](https://openmrs.org/) and [Bahmni](https://www.bahmni.org/) instances.
+![alt tag](readme/ocd3.png)
+
+# OpenMRS CD 3 (OCD3)
+> A dockerized [Jenkins](https://jenkins.io/) server ready to manage dockerized [OpenMRS](https://openmrs.org/) and [Bahmni](https://www.bahmni.org/) instances.
+
+OCD3 in a nutshell:
+* Builds and deploys all OpenMRS or Bahmni related software artifacts.
+* Provides a definition framework for OpenMRS and Bahmni servers.
+* Delivers server instances to Linux-powered hosts.
+* Tracks code and configuration changes and propagates them to its managed server instances.
 
 ## Quick Start
 
-The following steps describe a way to gather the OpenMRS CD artifacts locally and run the Docker container based on them. In a Un\*x shell:
+The following steps describe a way to gather OCD3 artifacts locally and run the Docker container based on them. In a Un\*x shell:
 
 **1** - Set the target version:
 ```bash
@@ -52,7 +60,7 @@ And answer the prompted questions.
 
 ## Developer Guide
 
->OpenMRS CD is a Dockerized Jenkins with preconfigured jobs. Those jobs run Node JS scripts or Node-generated Bash scripts.
+>OCD3 is a Dockerized Jenkins with preconfigured jobs. Those jobs run Node JS scripts or Node-generated Bash scripts.
 
 This explains the structure and content of the root folder of the project:
 
@@ -64,7 +72,7 @@ This explains the structure and content of the root folder of the project:
 ```
 **node-scripts** is the Node JS scripts area, **docker** holds the Dockerfile (and other resources needed to configure the container) and **jenkins** contains the parts of Jenkins home that are preconfigured, as well as the pipelines' Jenkinsfiles.
 
-Gradle is used to run all build tasks and package all artifacts that make the OpenMRS CD.
+Gradle is used to run all build tasks and package all artifacts that make OCD3.
 
 ### Working out of the sources directly
 
@@ -100,8 +108,8 @@ docker run --name openmrscd  -p 8080:8080 \
 ```
 
 ### The 'node-scripts' component
-Developing on the OpenMRS CD means working in here most of the time.
-That is because the bulk of the logic of what the OpenMRS CD does lives here. Almost all Jenkins jobs are built on the following pattern:
+Developing on OCD3 means working in here most of the time.
+That is because the bulk of the logic of what OCD3 does lives here. Almost all Jenkins jobs are built on the following pattern:
 >Jenkins jobs run Node scripts that generate Bash scripts that in turn perform the core CD tasks.
 
 This is how one would build the underlying Node JS scripts:
@@ -118,7 +126,7 @@ See [here](readme/docker/README.md).
 
 ### The 'jenkins' component
 
-OpenMRS CD not only needs a Docker image for its binaries but also requires a 'Jenkins home' folder that provides a pre-configured Jenkins setup:
+OCD3 not only needs a Docker image for its binaries but also requires a 'Jenkins home' folder that provides a pre-configured Jenkins setup:
 
 ```bash
 gradle jenkins:build

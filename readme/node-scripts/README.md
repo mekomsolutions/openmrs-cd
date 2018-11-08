@@ -1,4 +1,4 @@
-## Developing Node JS scripts for the OpenMRS CD
+## Developing Node JS scripts for OCD3
 
 ### Code Structure
 **Remark:** This part of the dev. guide will keep evolving. It might thus be out-of-date at a given point in time.

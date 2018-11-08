@@ -2,10 +2,10 @@
 
 By default a Jenkins home folder contains configuration files, binaries (for instance plugins) or historic build files etc, all mixed up together.
 
-In order to just create a clean OpenMRS CI that comes with no historical data or conflicting plugins binaries or anything, we want to only commit a minimal set of files in the Jenkins home folder and let the rest of the missing files be rebuilt by Jenkins itslef (those files are built at startup)
+In order to just create a clean OCD3 that comes with no historical data or conflicting plugins binaries or anything, we want to only commit a minimal set of files in the Jenkins home folder and let the rest of the missing files be rebuilt by Jenkins itslef (those files are built at startup)
 
 To do so, we have **gitignored many files and folders** that we consider not being pure configuration files.
-And as a consequence of this, when a developer will start an OpenMRS CI Docker container with its jenkins_home mounted at the repository location, Jenkins will fill this folder with a lot of files.
+And as a consequence of this, when a developer will start an OCD3 Docker container with its jenkins_home mounted at the repository location, Jenkins will fill this folder with a lot of files.
 
 ### 2 problems are emerging:
 
@@ -19,7 +19,7 @@ The key to that is to use the `git clean -Xdf` parameter to delete all the gitig
 Let's describe the process in details:
 
 - Checkout the sources
-`git checkout https://github.com/mekomsolutions/openmrs-ci`
+`git checkout https://github.com/mekomsolutions/openmrs-cd`
 or
 `git pull` (if you have had cloned the repo already)
 
@@ -28,7 +28,7 @@ or
 docker run --name openmrscd -p 8080:8080 -v ~/repos/openmrs-cd/jenkins/jenkins_home:/var/jenkins_home mekomsolutions/openmrscd:latest
 ```
 
-- Apply your changes on the CI
+- Apply your changes on OCD3
 
 - Commit __locally__
 

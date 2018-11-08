@@ -1,5 +1,5 @@
-# The OpenMRS CD Jenkins Docker image
-The OpenMRS CD leverages a Jenkins Docker container with a number of pre-installed plugins. And once in a while the Docker image must be changed, for instance when:
+# OCD3 Jenkins Docker image
+OCD3 leverages a Jenkins Docker container with a number of pre-installed plugins. And once in a while the Docker image must be changed, for instance when:
 * A new plugin must be installed.
 * An existing plugin must be upgraded or removed.
 * Jenkins itself must be upgraded.
