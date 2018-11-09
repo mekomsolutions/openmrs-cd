@@ -1,83 +1,31 @@
-jenkins_home/.m2/*
-!jenkins_home/.m2/.gitignore
-jenkins_home/tools
-jenkins_home/artifact_repository*
-jenkins_home/.cache/
-jenkins_home/.config/
-jenkins_home/.mozilla/
-jenkins_home/.npm/
-jenkins_home/.java
-jenkins_home/.ivy2/
-jenkins_home/.sbt/
-jenkins_home/.ssh/
-jenkins_home/.emacs.d/
-jenkins_home/logs/
-jenkins_home/nodes/
-jenkins_home/.gitconfig
-jenkins_home/.viminfo
-jenkins_home/.bash_history
-jenkins_home/log
-jenkins_home/jenkins-tests
-jenkins_home/*.log
-jenkins_home/*.tmp
-jenkins_home/*.old
-jenkins_home/*.bak
-jenkins_home/*.jar
-jenkins_home/*.swp
-jenkins_home/.owner
-jenkins_home/terracotta/
-jenkins_home/updates/
-jenkins_home/fingerprints/
-jenkins_home/config-history/
-jenkins_home/queue.xml
-jenkins_home/org.jenkinsci.plugins.workflow.flow.FlowExecutionList.xml
-jenkins_home/jenkins.install.InstallUtil.lastExecVersion
-jenkins_home/jenkins.model.DownloadSettings.xml
-jenkins_home/jenkins.security.QueueItemAuthenticatorConfiguration.xml
-jenkins_home/jenkins.security.UpdateSiteWarningsConfiguration.xml
-jenkins_home/scriptApproval.xml
-jenkins_home/envinject-plugin-configuration.xml
-jenkins_home/jenkins.security.apitoken.ApiTokenPropertyConfiguration.xml
+# Ignore everything except .gitignore and build.gradle
+*
+!.gitignore
+!build.gradle
 
-# Only get the config.xml from any Jobs directory
-jenkins_home/jobs/*/builds
-jenkins_home/jobs/*/modules
-jenkins_home/jobs/*/htmlreports
-jenkins_home/jobs/*/last*
-jenkins_home/jobs/*/next*
-jenkins_home/jobs/*/*.csv
-jenkins_home/jobs/*/*.txt
-jenkins_home/jobs/*/*.log
-jenkins_home/jobs/*/workspace
-jenkins_home/jobs/*/modules
+# Take Jenkins home folder and ignore its content except config.xml
+!jenkins_home
+jenkins_home/*
+!jenkins_home/config.xml
 
-# Process jobs that exist in folders
-jenkins_home/jobs/**/jobs/*/builds
-jenkins_home/jobs/**/jobs/*/modules
-jenkins_home/jobs/**/jobs/*/htmlreports
-jenkins_home/jobs/**/jobs/*/last*
-jenkins_home/jobs/**/jobs/*/next*
-jenkins_home/jobs/**/jobs/*/*.csv
-jenkins_home/jobs/**/jobs/*/*.txt
-jenkins_home/jobs/**/jobs/*/*.log
-jenkins_home/jobs/**/jobs/*/workspace
-jenkins_home/jobs/**/jobs/*/modules
+# Keeping the Maven and Node installations Global Tool Configurations
+!jenkins_home/hudson.tasks.Maven.xml
+!jenkins_home/jenkins.plugins.nodejs.tools.NodeJSInstallation.xml
 
-# More files
-jenkins_home/war
-jenkins_home/workspace
-jenkins_home/secrets
-jenkins_home/users
-jenkins_home/secret.key*
-jenkins_home/identity.key
-jenkins_home/identity.key.enc
-jenkins_home/plugins
-jenkins_home/plugins.txt
-jenkins_home/org.jenkinsci.plugins.*
-jenkins_home/hudson.plugins.*
+# Keeping custom security.groovy
+!jenkins_home/init.groovy.d
+!jenkins_home/init.groovy.d/security.groovy
 
-# Contain local info and secrets
-jenkins_home/jenkins.model.JenkinsLocationConfiguration.xml
-jenkins_home/jenkins.mvn.GlobalMavenConfig.xml
-jenkins_home/credentials.xml
-jenkins_home/hudson.scm.CVSSCM.xml
+# Take the jobs folder, ignore its content except folders
+# Ignore their content except config.xml
+!jenkins_home/jobs
+jenkins_home/jobs/*
+!jenkins_home/jobs/*/
+!jenkins_home/jobs/*/config.xml
+
+# Take the users folder, ignore its content except folders
+# Ignore their content except config.xml
+!jenkins_home/users
+jenkins_home/users/*
+!jenkins_home/users/*/
+!jenkins_home/users/*/config.xml

@@ -1,8 +1,12 @@
+task gitCleanup() {
+  ['sh', '-c', 'git clean -Xdf'].execute()
+}
+
 task copyJenkinsHome(type: Copy) {
   from ("./jenkins_home")
   into ("$rootProject.buildDir/openmrs-cd/jenkins_home/")
 }
 
 task build() {
-  dependsOn copyJenkinsHome
+  dependsOn gitCleanup, copyJenkinsHome
 }
