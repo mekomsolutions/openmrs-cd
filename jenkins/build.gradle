@@ -1,5 +1,6 @@
-task gitCleanup() {
-  ['sh', '-c', 'git clean -Xdf'].execute()
+task gitCleanup(type: Exec) {
+  workingDir './jenkins_home'
+  commandLine 'git', 'clean', '-Xdf'
 }
 
 task copyJenkinsHome(type: Copy) {
