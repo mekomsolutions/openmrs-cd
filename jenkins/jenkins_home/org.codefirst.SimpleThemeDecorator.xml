@@ -1,0 +1,11 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<org.codefirst.SimpleThemeDecorator plugin="simple-theme-plugin@0.5.1">
+  <elements>
+    <org.jenkinsci.plugins.simpletheme.CssUrlThemeElement>
+      <url>/userContent/layout/style.css</url>
+    </org.jenkinsci.plugins.simpletheme.CssUrlThemeElement>
+    <org.jenkinsci.plugins.simpletheme.FaviconUrlThemeElement>
+      <url>/userContent/layout/favicon.ico</url>
+    </org.jenkinsci.plugins.simpletheme.FaviconUrlThemeElement>
+  </elements>
+</org.codefirst.SimpleThemeDecorator>
