@@ -10,6 +10,7 @@ jenkins_home/*
 
 # Theming
 !jenkins_home/org.codefirst.SimpleThemeDecorator.xml
+!io.jenkins.plugins.logintheme.LoginTheme.xml
 
 # Keeping the Maven and Node installations Global Tool Configurations
 !jenkins_home/hudson.tasks.Maven.xml

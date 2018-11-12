@@ -14,3 +14,4 @@ groovy:2.0
 ansicolor:0.5.2
 permissive-script-security:0.3
 simple-theme-plugin:0.5.1
+login-theme:1.0
