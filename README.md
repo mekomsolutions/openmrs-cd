@@ -28,22 +28,24 @@ mvn dependency:get \
 ```
 **3** - Unpack everything into openmrs-cd on the home folder:
 ```bash
-cd ~ && \
-mvn dependency:copy \
-  -Dartifact=net.mekomsolutions:openmrs-cd:$VERSION:zip \
-  -DoutputDirectory=. && \
-unzip ./openmrs-cd-$VERSION.zip && rm ./openmrs-cd-$VERSION.zip && mv ./openmrs-cd-$VERSION ./openmrs-cd
+mvn dependency:copy -Dartifact=net.mekomsolutions:openmrs-cd:$VERSION:zip -DoutputDirectory=/tmp/ && unzip /tmp/openmrs-cd-$VERSION.zip -d /tmp/ && rm /tmp/openmrs-cd-$VERSION.zip && rsync -av --delete /tmp/openmrs-cd-$VERSION/ ~/openmrs-cd/ && rm -r /tmp/openmrs-cd-$VERSION
 ```
 
 **4** - Run the `openmrscd` container:
 ```bash
-docker run --name openmrscd  -p 8080:8080 \
+docker run -dti --name openmrscd  -p 8080:8080 \
   -v ~/openmrs-cd/node-scripts:/opt/node-scripts \
   -v ~/openmrs-cd/jenkins_home:/var/jenkins_home \
   -v ~/openmrs-cd/app_data:/var/lib/openmrs_cd/app_data \
   mekomsolutions/openmrscd:$VERSION
 ```
 After the container has started, the customized Jenkins instance will be accessible at [http://localhost:8080](http://localhost:8080) with the following credentials: **admin** / **password**.
+
+Authorize 'jenkins' user to write to the app_data folder:
+```bash
+docker exec -it openmrscd \
+  bash -c "sudo chown -R jenkins:jenkins /var/lib/openmrs_cd/app_data/"
+```
 
 **Attention:** _The app data folder will contain the CD's file-based database. Make sure to keep it in a safe location._
 
