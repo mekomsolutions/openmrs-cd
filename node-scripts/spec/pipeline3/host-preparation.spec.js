@@ -29,10 +29,6 @@ describe("Host preparation scripts", function() {
     process.env[config.varDataChanges()] = "false";
 
     instanceUuid = "cacb5448-46b0-4808-980d-5521775671c0";
-    remoteHostConnectionStr = "ec2-user@54.154.133.95";
-    sshCommand = "ssh -T " + remoteHostConnectionStr + " -p 22 <<";
-    rsyncCommand = "rsync -avz";
-    remoteRsyncCommand = rsyncCommand + " -e 'ssh -p 22' ";
   });
 
   afterEach(function() {
@@ -61,14 +57,10 @@ describe("Host preparation scripts", function() {
     expect(script).toContain("mkdir -p " + hostArtifactsDir);
     var srcDir = process.env.WORKSPACE + "/" + instanceUuid + "/artifacts/";
 
-    expect(script).toContain(
-      remoteRsyncCommand +
-        srcDir +
-        " " +
-        remoteHostConnectionStr +
-        ":" +
-        hostArtifactsDir
-    );
+    var ssh = instanceDef.deployment.host.value;
+    ssh.remoteDst = true;
+
+    expect(script).toContain(scripts.rsync(ssh, srcDir, hostArtifactsDir));
   });
 
   it("should generate bash script upon deployment changes.", function() {
@@ -113,14 +105,15 @@ describe("Host preparation scripts", function() {
       "utf8"
     );
     var hostDataDir = instanceDef.deployment.hostDir + "/data";
+    var ssh = instanceDef.deployment.host.value;
+    var srcDir =
+      "/var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae/data/";
+
     expect(script).toContain(
-      sshCommand +
-        heredocDelimiter +
-        "\n" +
-        "sudo " +
-        rsyncCommand +
-        " /var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae/data/ " +
-        hostDataDir
+      scripts.remote(
+        ssh,
+        scripts.rsync(ssh, srcDir, hostDataDir, true, false, "", true)
+      )
     );
   });
   it("should fail when instance to copy is non-existing.", function() {

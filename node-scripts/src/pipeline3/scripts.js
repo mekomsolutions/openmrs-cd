@@ -129,6 +129,9 @@ module.exports = {
       script += "\n";
     }
     var remoteScript = "";
+    if (!ssh.shell) {
+      ssh.shell = "/bin/bash";
+    }
 
     remoteScript +=
       "ssh -T " +
@@ -137,6 +140,8 @@ module.exports = {
       ssh.ip +
       " -p " +
       ssh.port +
+      " " +
+      ssh.shell +
       " <<" +
       heredoc +
       "\n";
