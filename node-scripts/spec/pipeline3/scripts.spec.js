@@ -10,10 +10,36 @@ describe("Scripts", function() {
   const utils = require(path.resolve("src/utils/utils"));
   const cst = require(path.resolve("src/const"));
   const heredoc_2 = cst.HEREDOC_2;
+  const heredoc = cst.HEREDOC;
 
   const scripts = require(path.resolve(
     "src/" + config.getJobNameForPipeline3() + "/scripts"
   ));
+
+  it("should generate remote commands.", function() {
+    // setup
+    var ssh = {
+      user: "user",
+      ip: "host",
+      port: "22"
+    };
+
+    // verif
+    expect(scripts.remote(ssh, "echo test")).toEqual(
+      "ssh -T " +
+        ssh.user +
+        "@" +
+        ssh.ip +
+        " -p " +
+        ssh.port +
+        " /bin/bash <<" +
+        heredoc +
+        "\n" +
+        "echo test\n" +
+        heredoc +
+        "\n"
+    );
+  });
 
   it("should add or remove trailing slashes to directory paths.", function() {
     expect(scripts.trailSlash("foo", true)).toEqual("foo/");
