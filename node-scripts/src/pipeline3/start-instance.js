@@ -226,6 +226,19 @@ script.body.push(
   )
 );
 
+// Set the Timezone if provided
+if (instanceDef.deployment.timezone) {
+  script.body.push(
+    scripts.remote(
+      ssh,
+      container.exec(
+        instanceDef.uuid,
+        scripts.setTimezone(instanceDef.deployment.timezone)
+      )
+    )
+  );
+}
+
 // TODO: Remove this block to provide it an 'additionalScript' in the instance definition
 // Copy the Bahmni Event Log Service properties file
 if (process.env[config.varDataChanges()] === "true") {

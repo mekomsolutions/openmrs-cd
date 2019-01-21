@@ -410,7 +410,30 @@ describe("Start instance scripts", function() {
     );
     expect(script).toContain(expectedScript.join(cst.SCRIPT_SEPARATOR));
   });
+  it("should call the setTimezone method", function() {
+    process.env[config.varInstanceUuid()] = instanceUuid;
+    process.env[config.varDeploymentChanges()] = "true";
+    process.env[config.varCreation()] = "false";
+    var instanceDef = db.getInstanceDefinition(instanceUuid);
 
+    // replay
+    proxyquire(
+      path.resolve(
+        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
+      ),
+      tests.stubs()
+    );
+
+    // verif
+    var script = fs.readFileSync(
+      path.resolve(
+        config.getBuildDirPath(),
+        config.getStartInstanceScriptName()
+      ),
+      "utf8"
+    );
+    expect(script).toContain(scripts.setTimezone("Asia/Phnom_Penh"));
+  });
   it("should call the computeAdditionalScripts method.", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
     process.env[config.varDataChanges()] = "true";

@@ -207,6 +207,13 @@ describe("Scripts", function() {
     );
   });
 
+  it("should set timezone", function() {
+    expect(scripts.setTimezone("Europe/Paris")).toEqual(
+      "mv /etc/localtime /etc/localtime.backup\n" +
+        "ln -s /usr/share/zoneinfo/Europe/Paris /etc/localtime"
+    );
+  });
+
   it("should linkComponents", function() {
     var mockUtils = Object.assign({}, utils);
     mockUtils.random = function() {

@@ -303,6 +303,16 @@ module.exports = {
     }
   },
   /*
+   * Method to return scripts to set the server Timezone.
+   *
+   */
+  setTimezone: function(timezone) {
+    var script = "";
+    script += "mv /etc/localtime /etc/localtime.backup\n";
+    script += "ln -s /usr/share/zoneinfo/" + timezone + " /etc/localtime";
+    return script;
+  },
+  /*
    * Implementation of script utils to specifically manipulate Docker containers.
    *
    */

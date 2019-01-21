@@ -31,6 +31,7 @@
     ],
     "deployment": {
       "hostDir": "/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0",
+      "timezone": "Asia/Phnom_Penh",
       "type": "docker",
       "value": {
         "image": "mekomsolutions/bahmni",
