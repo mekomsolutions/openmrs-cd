@@ -106,7 +106,7 @@ if (process.env[config.varDataChanges()] === "true") {
             "",
             sourceDataDir,
             instanceDataDir,
-            null,
+            true,
             null,
             null,
             true

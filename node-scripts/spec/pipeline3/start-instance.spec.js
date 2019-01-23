@@ -161,21 +161,6 @@ describe("Start instance scripts", function() {
     var ssh = instanceDef.deployment.host.value;
     var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
 
-    var changePerms = "chmod 775 /etc/bahmni-installer/move-mysql-datadir.sh\n";
-    var moveMysqlFolder =
-      "sh -c '/etc/bahmni-installer/move-mysql-datadir.sh /etc/my.cnf /mnt/data/mysql_datadir'\n";
-    var chown = "chown -R mysql:mysql /mnt/data/mysql_datadir";
-
-    var expectedScript = [];
-    expectedScript.push(
-      scripts.remote(
-        ssh,
-        docker.exec(instanceUuid, changePerms + moveMysqlFolder + chown)
-      )
-    );
-
-    expect(script).toContain(expectedScript.join(cst.SCRIPT_SEPARATOR));
-
     var sqlCmd =
       "cat /tmp/n32bg/demo-data.sql | mysql -uroot -ppassword openmrs";
     expect(script).toContain(
@@ -197,8 +182,8 @@ describe("Start instance scripts", function() {
     process.env[config.varDataChanges()] = "true";
     var instanceDef = db.getInstanceDefinition(instanceUuid);
 
-    instanceDef.data[1].value.sourceFile =
-      instanceDef.data[1].value.sourceFile + ".gz";
+    instanceDef.data[2].value.sourceFile =
+      instanceDef.data[2].value.sourceFile + ".gz";
     db.saveInstanceDefinition(instanceDef, instanceUuid);
 
     var mockUtils = Object.assign({}, utils);
@@ -279,94 +264,14 @@ describe("Start instance scripts", function() {
     var ssh = instanceDef.deployment.host.value;
     var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
 
-    var expectedComponentsToLink = [];
-    expectedComponentsToLink.push("artifacts", "data");
-
     var expectedScript = scripts.remote(
       ssh,
       docker.exec(
         instanceDef.uuid,
-        scripts_.linkComponents(
-          _.uniq(expectedComponentsToLink),
-          instanceDef.deployment.links
-        )
+        scripts_.linkComponents(instanceDef.deployment.links)
       )
     );
 
-    expect(script).toContain(expectedScript);
-
-    process.env[config.varDataChanges()] = "true";
-    process.env[config.varDeploymentChanges()] = "false";
-    process.env[config.varArtifactsChanges()] = "false";
-    process.env[config.varCreation()] = "true";
-
-    // replay
-    proxyquire(
-      path.resolve(
-        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
-      ),
-      stubs
-    );
-
-    // verif
-    var script = fs.readFileSync(
-      path.resolve(
-        config.getBuildDirPath(),
-        config.getStartInstanceScriptName()
-      ),
-      "utf8"
-    );
-
-    expectedComponentsToLink = [];
-    expectedComponentsToLink.push("data");
-
-    var expectedScript = scripts.remote(
-      ssh,
-      docker.exec(
-        instanceDef.uuid,
-        scripts_.linkComponents(
-          _.uniq(expectedComponentsToLink),
-          instanceDef.deployment.links
-        )
-      )
-    );
-    expect(script).toContain(expectedScript);
-
-    process.env[config.varDataChanges()] = "false";
-    process.env[config.varDeploymentChanges()] = "false";
-    process.env[config.varArtifactsChanges()] = "true";
-    process.env[config.varCreation()] = "true";
-
-    // replay
-    proxyquire(
-      path.resolve(
-        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
-      ),
-      stubs
-    );
-
-    // verif
-    var script = fs.readFileSync(
-      path.resolve(
-        config.getBuildDirPath(),
-        config.getStartInstanceScriptName()
-      ),
-      "utf8"
-    );
-
-    expectedComponentsToLink = [];
-    expectedComponentsToLink.push("artifacts");
-
-    var expectedScript = scripts.remote(
-      ssh,
-      docker.exec(
-        instanceDef.uuid,
-        scripts_.linkComponents(
-          _.uniq(expectedComponentsToLink),
-          instanceDef.deployment.links
-        )
-      )
-    );
     expect(script).toContain(expectedScript);
   });
 

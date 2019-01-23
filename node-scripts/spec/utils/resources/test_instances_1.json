@@ -62,56 +62,82 @@
           "type": "artifact",
           "component": "openmrsmodule",
           "source": "/mnt/artifacts/openmrs_modules",
-          "target": "/opt/openmrs/modules"
+          "target": "/opt/openmrs/modules",
+          "user": "bahmni",
+          "group": "bahmni"
         },
         {
           "type": "artifact",
           "component": "openmrscore",
           "source": "/mnt/artifacts/openmrs_core/*.war",
-          "target": "/opt/openmrs/openmrs.war"
+          "target": "/opt/openmrs/openmrs.war",
+          "user": "bahmni",
+          "group": "bahmni"
         },
         {
           "type": "artifact",
           "component": "bahmniconfig",
           "source": "/mnt/artifacts/bahmni_config",
-          "target": "/opt/bahmni-web/etc/bahmni_config"
+          "target": "/opt/bahmni-web/etc/bahmni_config",
+          "user": "bahmni",
+          "group": "bahmni"
         },
         {
           "type": "artifact",
           "component": "openmrsconfig",
           "source": "/mnt/artifacts/openmrs_config",
-          "target": "/opt/openmrs/configuration"
+          "target": "/opt/openmrs/configuration",
+          "user": "bahmni",
+          "group": "bahmni"
         },
         {
           "type": "artifact",
           "component": "bahmniapps",
           "source": "/mnt/artifacts/bahmni_emr/bahmniapps",
-          "target": "/opt/bahmni-web/etc/bahmniapps"
+          "target": "/opt/bahmni-web/etc/bahmniapps",
+          "user": "bahmni",
+          "group": "bahmni"
         },
         {
           "type": "artifact",
           "component": "bahmniconnect",
           "source":
             "/mnt/artifacts/bahmni_emr/bahmniconnect/bahmni-connect-apps",
-          "target": "/opt/bahmni-offline/bahmni-connect-apps"
+          "target": "/opt/bahmni-offline/bahmni-connect-apps",
+          "user": "bahmni",
+          "group": "bahmni"
         },
         {
           "type": "data",
           "component": "db_dumps",
           "source": "/mnt/data/db_dumps",
-          "target": "/data"
+          "target": "/data",
+          "user": "bahmni",
+          "group": "bahmni"
         },
         {
           "type": "data",
           "component": "bahmni_home",
           "source": "/mnt/data/bahmni_home",
-          "target": "/home/bahmni"
+          "target": "/home/bahmni",
+          "user": "bahmni",
+          "group": "bahmni"
         },
         {
           "type": "data",
           "component": "configuration_checksums",
           "source": "/mnt/data/configuration_checksums",
-          "target": "/opt/openmrs/configuration_checksums"
+          "target": "/opt/openmrs/configuration_checksums",
+          "user": "bahmni",
+          "group": "bahmni"
+        },
+        {
+          "type": "data",
+          "component": "mysql_datadir",
+          "source": "/mnt/data/mysql_datadir",
+          "target": "/var/lib/mysql",
+          "user": "mysql",
+          "group": "mysql"
         }
       ]
     },
@@ -120,6 +146,13 @@
         "type": "instance",
         "value": {
           "uuid": "50b6cf72-0e80-457d-8141-a0c8c85d4dae"
+        }
+      },
+      {
+        "type": "instance",
+        "value": {
+          "dataDir":
+            "/var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae/data"
         }
       },
       {

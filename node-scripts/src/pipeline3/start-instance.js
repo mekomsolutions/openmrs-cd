@@ -50,7 +50,7 @@ var componentsToLink = [];
 var finalRestart = false;
 if (process.env[config.varArtifactsChanges()] === "true") {
   finalRestart = true;
-  componentsToLink.push("artifacts");
+  componentsToLink.push("artifact");
 }
 
 // 'deployment'
@@ -136,19 +136,6 @@ if (process.env[config.varDataChanges()] === "true") {
     componentsToLink.push("data");
 
     if (data.type === "instance") {
-      // Move MySQL data dir
-      var mySQLDatadir = "/mnt/data/mysql_datadir";
-      var moveMySQLFolder = "";
-      moveMySQLFolder +=
-        "chmod 775 /etc/bahmni-installer/move-mysql-datadir.sh\n";
-      moveMySQLFolder +=
-        "sh -c '/etc/bahmni-installer/move-mysql-datadir.sh /etc/my.cnf " +
-        mySQLDatadir +
-        "'\n";
-      moveMySQLFolder += "chown -R mysql:mysql " + mySQLDatadir;
-      script.body.push(
-        scripts.remote(ssh, container.exec(instanceDef.uuid, moveMySQLFolder))
-      );
       script.body.push(
         scripts.remote(ssh, container.restart(instanceDef.uuid))
       );
@@ -211,6 +198,9 @@ if (process.env[config.varDataChanges()] === "true") {
     }
   });
 }
+// If instance is new, all links should be processed in order to initialize the folders
+// If instance is new, folders should be initialized
+//
 
 // Link mounted folders based on the components to link
 script.body.push(
@@ -218,10 +208,7 @@ script.body.push(
     ssh,
     container.exec(
       instanceDef.uuid,
-      scripts.linkComponents(
-        _.uniq(componentsToLink),
-        instanceDef.deployment.links
-      )
+      scripts.linkComponents(instanceDef.deployment.links)
     )
   )
 );

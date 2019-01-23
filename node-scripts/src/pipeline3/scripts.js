@@ -7,6 +7,7 @@ const uuid = require("uuid/v4");
 const cst = require("../const");
 const heredoc = cst.HEREDOC;
 const heredoc_2 = cst.HEREDOC_2;
+const heredoc_3 = cst.HEREDOC_3;
 const utils = require("../utils/utils");
 const model = require("../utils/model");
 
@@ -214,76 +215,144 @@ module.exports = {
   *
   * @param {String} source - The source path to be linked.
    * @param {String} target - The target to which to link the source.
-   * @param {Boolean} removeIfExists - Will remove the 'target' if it exists already.
-   * @param {Boolean} create - Will create the 'target' (as a directory) if it is not already present.
+   * @param {String} user - The owner of the folder to be set.
+   * @param {String} group - The owner's group of the folder to be set.
    */
-  linkFolder: function(source, target, removeIfExists, create) {
+  linkFolder: function(source, target, user, group) {
     var script = "";
-    if (removeIfExists) {
-      script += "if [ -e " + target + " ]; then\n";
-      script += "echo \"'" + target + "' exists. Backing it up...\"\n";
-      script += module.exports.rsync(
-        {},
-        target,
-        target +
-          "_" +
-          utils
-            .random()
-            .toString(36)
-            .slice(-5) +
-          ".backup"
-      );
-      script += "rm -rf " + target + "\n";
-      script += "fi\n";
-    }
-    if (create) {
-      script += "if [ ! -e " + source + " ]; then\n";
-      script += "mkdir -p " + source + "\n";
-      script += "fi\n";
-    }
 
-    script += 'echo "MountPoint: ' + source + ", Target: " + target + '"\n';
+    script +=
+      "if [[ ( ! -e " + source + " ) && ( -e " + target + " ) ]]; then\n";
+    script += module.exports.logInfo(
+      "'" + source + "' does not exist and '" + target + "' exists."
+    );
+    script += module.exports.logWarn(
+      "Will create '" +
+        source +
+        "' and initialize it with '" +
+        target +
+        "' data first."
+    );
+    script += module.exports.logInfo("Creating '" + source + "'.");
+    script += "mkdir -p " + source + "\n";
+
+    script += module.exports.logInfo(
+      "Initialize '" + source + "' with '" + target + "' data."
+    );
+    script += module.exports.rsync({}, target, source, true);
+    script += "else\n";
+    script += module.exports.logInfo(
+      "'" + source + "' exists and/or '" + target + "' does not exist."
+    );
+    script += module.exports.logInfo("-> Skipping initialization.");
+    script += "fi\n";
+
+    script +=
+      "if [[ ( ! -e " + source + " ) && ( ! -e " + target + " ) ]]; then\n";
+    script += module.exports.logInfo(
+      "Neither '" + source + "' nor '" + target + "' exist."
+    );
+    script += module.exports.logInfo("Creating '" + source + "'.");
+    script += "mkdir -p " + source + "\n";
+    script += "fi\n";
+
+    script += "if [[ ( -e " + source + " ) && ( -e " + target + " ) ]]; then\n";
+    script += module.exports.logInfo(
+      "Both '" + source + "' and '" + target + "' exist."
+    );
+    script += module.exports.logInfo(
+      "Will link '" + source + "' to folder '" + target + "'."
+    );
+    script += module.exports.logInfo("Backing up '" + target + "' first.");
+    script += module.exports.rsync({}, target, target + ".backup", true);
+    script += module.exports.logInfo("Remove '" + target + "'");
+    script += "rm -rf " + target + "\n";
+    script += "fi\n";
+
+    script += module.exports.logInfo(
+      "Symlinking '" + source + "' to target '" + target + "'"
+    );
     script += "ln -s " + source + " " + target + "\n";
-    script += "chown -R bahmni:bahmni " + source + "\n";
+    script += "chown -R " + user + ":" + group + " " + source + "\n";
 
     return script;
   },
-  linkComponents: function(componentsToLink, links) {
+  linkComponents: function(links) {
     var script = "";
-    if (!_.isEmpty(componentsToLink)) {
-      script += "# Link mounted folder...\n\n";
-    }
-    componentsToLink.forEach(function(componentToLink) {
-      if (componentToLink === "artifacts") {
-        links.forEach(function(item) {
-          if (item.type === "artifact") {
-            script += "# '" + item.component + "' component:\n";
-            script += module.exports.linkFolder(
-              item.source,
-              item.target,
-              true,
-              false
-            );
-            script += "\n";
-          }
-        });
-      }
-      if (componentToLink === "data") {
-        links.forEach(function(item) {
-          if (item.type === "data") {
-            script += "# '" + item.component + "' component:\n";
-            script += module.exports.linkFolder(
-              item.source,
-              item.target,
-              true,
-              true
-            );
-            script += "\n";
-          }
-        });
-      }
+
+    links.forEach(function(item) {
+      script += module.exports.logInfo(
+        "Processing links for '" +
+          item.component +
+          "' component (type: " +
+          item.type +
+          ")"
+      );
+      script += module.exports.linkFolder(
+        item.source,
+        item.target,
+        item.user,
+        item.group,
+        true
+      );
+      script += module.exports.logInfo(
+        "'" + item.component + "' component successfully linked."
+      );
+      script += module.exports.log("");
     });
+
     return script;
+  },
+  color: function(type, text) {
+    var text = Object.is(text, undefined) ? "" : text;
+    var colorMap = {
+      INFO: "34m",
+      WARN: "33m",
+      ERROR: "31m"
+    };
+    return (
+      "[\\e[1m\\e[" +
+      colorMap[type] +
+      type +
+      "\\e[0m] \\e[34m" +
+      text +
+      "\\e[0m"
+    );
+  },
+  colorInfo: function(text) {
+    return module.exports.color("INFO", text);
+  },
+  colorWarn: function(text) {
+    return module.exports.color("WARN", text);
+  },
+  colorError: function(text) {
+    return module.exports.color("ERROR", text);
+  },
+  logInfo: function(text) {
+    return module.exports.log(text, module.exports.colorInfo());
+  },
+  logWarn: function(text) {
+    return module.exports.log(text, module.exports.colorWarn());
+  },
+  logError: function(text) {
+    return module.exports.log(text, module.exports.colorError());
+  },
+  log: function(text, linePrefix) {
+    var text = Object.is(text, undefined) ? "" : text;
+    var linePrefix = Object.is(linePrefix, undefined) ? "" : linePrefix;
+
+    //https://stackoverflow.com/a/33817423
+    return (
+      "readarray textToPrint << " +
+      heredoc_3 +
+      "\n" +
+      linePrefix +
+      text +
+      "\n" +
+      heredoc_3 +
+      "\n" +
+      "printf '%b' \"\\\\\\${textToPrint[@]#}\"\n"
+    );
   },
   /*
    * Method to return the appropriate implementation of scripts utilities for the given deployment type.
@@ -328,7 +397,7 @@ module.exports = {
      */
     ifExists: function(containerName, ifExistsCommand, elseCommand) {
       var script = "";
-      script += "set -xe\n";
+      script += "set -e\n";
       script +=
         "container=\\$(docker ps -a --filter name=" +
         containerName +
@@ -352,7 +421,7 @@ module.exports = {
      */
     restart: function(containerName) {
       var script = "";
-      script += "set -xe\n";
+      script += "set -e\n";
       script += "docker restart " + containerName + "\n";
       return module.exports.docker.ifExists(containerName, script);
     },
@@ -366,7 +435,7 @@ module.exports = {
      */
     remove: function(containerName) {
       var script = "";
-      script += "set -xe\n";
+      script += "set -e\n";
       script += "docker stop " + containerName + "\n";
       script += "docker rm -v " + containerName + "\n";
       return module.exports.docker.ifExists(containerName, script);
@@ -385,7 +454,7 @@ module.exports = {
       var docker = instanceDef.deployment.value;
 
       var script = "";
-      script += "set -xe\n";
+      script += "set -e\n";
 
       var scriptArgs = [];
       scriptArgs.push("docker run -dit");
@@ -434,14 +503,14 @@ module.exports = {
      */
     exec: function(containerName, command) {
       var script = "";
-      script += "set -xe\n";
+      script += "set -e\n";
       script +=
         "docker exec -i " +
         containerName +
         " /bin/bash -s <<" +
         heredoc_2 +
         "\n";
-      script += "set -xe\n";
+      script += "set -e\n";
       script += command + "\n";
       script += heredoc_2;
 

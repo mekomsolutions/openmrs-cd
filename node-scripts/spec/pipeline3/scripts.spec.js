@@ -9,8 +9,9 @@ describe("Scripts", function() {
   const config = require(path.resolve("src/utils/config"));
   const utils = require(path.resolve("src/utils/utils"));
   const cst = require(path.resolve("src/const"));
-  const heredoc_2 = cst.HEREDOC_2;
   const heredoc = cst.HEREDOC;
+  const heredoc_2 = cst.HEREDOC_2;
+  const heredoc_3 = cst.HEREDOC_3;
 
   const scripts = require(path.resolve(
     "src/" + config.getJobNameForPipeline3() + "/scripts"
@@ -117,7 +118,7 @@ describe("Scripts", function() {
     };
 
     expect(docker.run("cambodia1", instanceDef)).toEqual(
-      "set -xe\n" +
+      "set -e\n" +
         "docker run -dit --restart unless-stopped " +
         "--publish 8180:80 --publish 8733:443 --label type=dev --label group=tlc " +
         "--name cambodia1 --hostname bahmni " +
@@ -129,7 +130,7 @@ describe("Scripts", function() {
   it("should generate ifExists wrapper", function() {
     var docker = scripts.getDeploymentScripts("docker");
     expect(docker.ifExists("cambodia1", "cmd1\n", "cmd2\n")).toEqual(
-      "set -xe\n" +
+      "set -e\n" +
         "container=\\$(docker ps -a --filter name=cambodia1 --format {{.Names}})\n" +
         'if [ "\\$container" == "cambodia1" ]\n' +
         "then cmd1\n" +
@@ -137,7 +138,7 @@ describe("Scripts", function() {
         "fi\n"
     );
     expect(docker.ifExists("cambodia1")).toEqual(
-      "set -xe\n" +
+      "set -e\n" +
         "container=\\$(docker ps -a --filter name=cambodia1 --format {{.Names}})\n" +
         'if [ "\\$container" == "cambodia1" ]\n' +
         "then echo\n" +
@@ -149,7 +150,7 @@ describe("Scripts", function() {
   it("should generate Docker restart command", function() {
     var docker = scripts.getDeploymentScripts("docker");
     expect(docker.restart("cambodia1")).toEqual(
-      docker.ifExists("cambodia1", "set -xe\n" + "docker restart cambodia1\n")
+      docker.ifExists("cambodia1", "set -e\n" + "docker restart cambodia1\n")
     );
   });
 
@@ -158,7 +159,7 @@ describe("Scripts", function() {
     expect(docker.remove("cambodia1")).toEqual(
       docker.ifExists(
         "cambodia1",
-        "set -xe\ndocker stop cambodia1\ndocker rm -v cambodia1\n"
+        "set -e\ndocker stop cambodia1\ndocker rm -v cambodia1\n"
       )
     );
   });
@@ -166,11 +167,11 @@ describe("Scripts", function() {
   it("should generate Docker exec command", function() {
     var docker = scripts.getDeploymentScripts("docker");
     expect(docker.exec("cambodia1", "echo 'test'")).toEqual(
-      "set -xe\n" +
+      "set -e\n" +
         "docker exec -i cambodia1 /bin/bash -s <<" +
         heredoc_2 +
         "\n" +
-        "set -xe\n" +
+        "set -e\n" +
         "echo 'test'\n" +
         heredoc_2 +
         "\n"
@@ -195,16 +196,20 @@ describe("Scripts", function() {
       { "../utils/utils": mockUtils }
     );
 
-    expect(scripts_.linkFolder("source123", "target123", true)).toEqual(
-      "if [ -e target123 ]; then\n" +
-        "echo \"'target123' exists. Backing it up...\"\n" +
-        "rsync -avz target123 target123_56789.backup\n" +
-        "rm -rf target123\n" +
-        "fi\n" +
-        'echo "MountPoint: source123, Target: target123"\n' +
-        "ln -s source123 target123\n" +
-        "chown -R bahmni:bahmni source123\n"
+    var expectedScript = scripts_.linkFolder(
+      "source123",
+      "target123",
+      "bahmni",
+      "bahmni",
+      true
     );
+
+    expect(expectedScript).toContain("rsync -avz target123/ target123.backup");
+    expect(expectedScript).toContain("mkdir -p source123");
+    expect(expectedScript).toContain("rsync -avz target123/ source123");
+    expect(expectedScript).toContain("rm -rf target123");
+    expect(expectedScript).toContain("ln -s source123 target123");
+    expect(expectedScript).toContain("chown -R bahmni:bahmni source123");
   });
 
   it("should set timezone", function() {
@@ -225,57 +230,45 @@ describe("Scripts", function() {
       { "../utils/utils": mockUtils }
     );
 
-    var componentsToLink = ["artifacts"];
     var links = [
       {
         type: "artifact",
         component: "bahmniconnect",
         source: "/mnt/artifacts/bahmni_emr/bahmniconnect/bahmni-connect-apps",
-        target: "/opt/bahmni-offline/bahmni-connect-apps"
+        target: "/opt/bahmni-offline/bahmni-connect-apps",
+        user: "bahmni",
+        group: "bahmni"
       },
       {
         type: "data",
         component: "db_dumps",
         source: "/mnt/data/db_dumps",
-        target: "/data"
+        target: "/data",
+        user: "mysql",
+        group: "mysql"
       }
     ];
 
-    var expectedScript = "";
+    var artifactsLinks = "";
+    artifactsLinks += scripts_.linkFolder(
+      links[0].source,
+      links[0].target,
+      links[0].user,
+      links[0].group,
+      true
+    );
+    var dataLinks = "";
+    dataLinks += scripts_.linkFolder(
+      links[1].source,
+      links[1].target,
+      links[1].user,
+      links[1].group,
+      true
+    );
 
-    links.forEach(function(item) {
-      if (item.type === "artifact") {
-        expectedScript += "# '" + item.component + "' component:\n";
-        expectedScript += scripts_.linkFolder(
-          item.source,
-          item.target,
-          true,
-          false
-        );
-        expectedScript += "\n";
-      }
-    });
-
-    var actualScript = "";
-    actualScript = scripts_.linkComponents(componentsToLink, links);
-
-    expect(actualScript).toContain(expectedScript);
-    componentsToLink.push("data");
-    actualScript = scripts_.linkComponents(componentsToLink, links);
-
-    links.forEach(function(item) {
-      if (item.type === "data") {
-        expectedScript += "# '" + item.component + "' component:\n";
-        expectedScript += scripts_.linkFolder(
-          item.source,
-          item.target,
-          true,
-          true
-        );
-        expectedScript += "\n";
-      }
-    });
-    expect(actualScript).toContain(expectedScript);
+    var actualScript = scripts_.linkComponents(links);
+    expect(actualScript).toContain(artifactsLinks);
+    expect(actualScript).toContain(dataLinks);
   });
 
   it("should compute additional instance's scripts", function() {
