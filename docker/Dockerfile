@@ -10,6 +10,7 @@ RUN chown -R jenkins:jenkins $APP_DATA_DIR
 
 RUN apt update
 RUN apt -y install nano
+RUN apt -y install jq
 RUN apt -y install openssh-server
 RUN apt -y install rsync
 RUN apt -y install libxml2-utils # for xmllint
