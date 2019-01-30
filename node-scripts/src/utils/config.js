@@ -339,7 +339,8 @@ module.exports = {
    */
   getInstanceDefinitionAliasesMap: function(instanceDef) {
     return {
-      uuid: instanceDef.uuid
+      uuid: instanceDef.uuid,
+      name: instanceDef.name
     };
   },
 
