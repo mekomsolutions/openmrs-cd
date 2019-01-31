@@ -58,75 +58,43 @@ var container = scripts.getDeploymentScripts(instanceDef.deployment.type);
 
 if (process.env[config.varDeploymentChanges()] === "true") {
   script.body.push(scripts.remote(ssh, container.remove(instanceDef.uuid)));
-  script.body.push(
-    scripts.remote(ssh, container.run(instanceDef.uuid, instanceDef))
-  );
+  var mounts = {
+    "/mnt": hostDir
+  };
+
+  var setTLS = "";
+
   if (!_.isEmpty(instanceDef.deployment.tls)) {
     var tls = instanceDef.deployment.tls;
     if (tls.type === "file") {
-      var keyDestPath = "/etc/ssl/";
-      script.body.push(
-        scripts.remote(
-          ssh,
-          container.copy(
-            instanceDef.uuid,
-            tls.value.privateKeyPath,
-            keyDestPath + "privkey.pem",
-            true
-          )
-        )
-      );
-      script.body.push(
-        scripts.remote(
-          ssh,
-          container.copy(
-            instanceDef.uuid,
-            tls.value.publicCertPath,
-            keyDestPath + "cert.pem"
-          )
-        )
-      );
-      script.body.push(
-        scripts.remote(
-          ssh,
-          container.copy(
-            instanceDef.uuid,
-            tls.value.chainCertsPath,
-            keyDestPath + "chain.pem"
-          )
-        )
-      );
-    } else if (tls.type === "vault") {
-      // TODO: Implement fetching TLS certs via Vault
-    } else if (tls.type === "letsEncrypt") {
-      // TODO: Implement setting up TLS certs using Let's Encrypt
+      mounts[
+        scripts.trailSlash(tls.value.keysFolder, false)
+      ] = scripts.trailSlash(tls.value.hostKeysFolder, false);
     }
-    script.body.push(
-      scripts.remote(
-        ssh,
-        container.exec(
-          instanceDef.uuid,
-          "chmod 755 /etc/bahmni-installer/update-apache-config.sh\n" +
-            "/etc/bahmni-installer/update-apache-config.sh /etc/httpd/conf.d/ssl.conf" +
-            " " +
-            keyDestPath +
-            "privkey.pem" +
-            " " +
-            keyDestPath +
-            "cert.pem" +
-            " " +
-            keyDestPath +
-            "chain.pem"
-        )
-      )
-    );
-    script.body.push(
-      scripts.remote(
-        ssh,
-        container.exec(instanceDef.uuid, "service httpd restart")
+    setTLS += scripts.remote(
+      ssh,
+      container.exec(
+        instanceDef.uuid,
+        scripts.logInfo("Configuring TLS certs") +
+          tls.value.webServerUpdateScript +
+          " " +
+          tls.value.webServerConfFile +
+          " " +
+          scripts.trailSlash(tls.value.keysFolder, true) +
+          tls.value.privateKeyFilename +
+          " " +
+          scripts.trailSlash(tls.value.keysFolder, true) +
+          tls.value.publicCertFilename +
+          " " +
+          scripts.trailSlash(tls.value.keysFolder, true) +
+          tls.value.chainCertsFilename
       )
     );
   }
+  script.body.push(
+    scripts.remote(ssh, container.run(instanceDef.uuid, instanceDef, mounts))
+  );
+  script.body.push(setTLS);
 }
 
 // 'data'
@@ -236,7 +204,8 @@ if (process.env[config.varDataChanges()] === "true") {
       ssh,
       container.exec(
         instanceDef.uuid,
-        "if [ -d /mnt/data/bahmni-event-log-service/ ]; then\n" +
+        scripts.logInfo("Setting Bahmni Event Log Service") +
+          "if [ -d /mnt/data/bahmni-event-log-service/ ]; then\n" +
           scripts.rsync(
             {},
             "/mnt/data/bahmni-event-log-service/application.properties",

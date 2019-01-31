@@ -52,9 +52,14 @@
       "tls": {
         "type": "file",
         "value": {
-          "privateKeyPath": "/a/path",
-          "publicCertPath": "/b/path",
-          "chainCertsPath": "/c/path"
+          "hostKeysFolder": "/host_folder/ssl",
+          "privateKeyFilename": "key.pem",
+          "publicCertFilename": "cert.pem",
+          "chainCertsFilename": "chain.pem",
+          "keysFolder": "/etc/ssl",
+          "webServerConfFile": "/etc/httpd/conf.d/ssl.conf",
+          "webServerUpdateScript":
+            "/etc/bahmni-installer/update-apache-config.sh"
         }
       },
       "links": [

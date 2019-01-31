@@ -377,8 +377,9 @@ module.exports = {
    */
   setTimezone: function(timezone) {
     var script = "";
+    script += module.exports.logInfo("Setting server timezone to " + timezone);
     script += "mv /etc/localtime /etc/localtime.backup\n";
-    script += "ln -s /usr/share/zoneinfo/" + timezone + " /etc/localtime";
+    script += "ln -s /usr/share/zoneinfo/" + timezone + " /etc/localtime\n";
     return script;
   },
   /*
@@ -449,7 +450,7 @@ module.exports = {
      *
      * @return {String} The script as a string.
      */
-    run: function(containerName, instanceDef) {
+    run: function(containerName, instanceDef, mounts) {
       var hostDir = instanceDef.deployment.hostDir;
       var docker = instanceDef.deployment.value;
 
@@ -475,9 +476,6 @@ module.exports = {
       scriptArgs.push("--name " + containerName);
       scriptArgs.push("--hostname bahmni");
 
-      var mounts = {
-        "/mnt": hostDir
-      };
       Object.keys(mounts).forEach(function(key) {
         scriptArgs.push(
           "--mount type=bind,source=" + mounts[key] + ",target=" + key

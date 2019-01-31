@@ -117,7 +117,11 @@ describe("Scripts", function() {
       }
     };
 
-    expect(docker.run("cambodia1", instanceDef)).toEqual(
+    var mounts = {
+      "/mnt": instanceDef.deployment.hostDir
+    };
+
+    expect(docker.run("cambodia1", instanceDef, mounts)).toEqual(
       "set -e\n" +
         "docker run -dit --restart unless-stopped " +
         "--publish 8180:80 --publish 8733:443 --label type=dev --label group=tlc " +
@@ -213,7 +217,7 @@ describe("Scripts", function() {
   });
 
   it("should set timezone", function() {
-    expect(scripts.setTimezone("Europe/Paris")).toEqual(
+    expect(scripts.setTimezone("Europe/Paris")).toContain(
       "mv /etc/localtime /etc/localtime.backup\n" +
         "ln -s /usr/share/zoneinfo/Europe/Paris /etc/localtime"
     );

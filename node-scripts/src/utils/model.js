@@ -47,10 +47,22 @@ class DockerDeployment {
  * Describes a File TLS deployment section
  */
 class FileTLSDeployment {
-  constructor(privateKeyPath, publicCertPath, chainCertsPath) {
-    this.privateKeyPath = privateKeyPath;
-    this.publicCertPath = publicCertPath;
-    this.chainCertsPath = chainCertsPath;
+  constructor(
+    hostKeysFolder,
+    privateKeyFilename,
+    publicCertFilename,
+    chainCertsFilename,
+    keysFolder,
+    webServerConfFile,
+    webServerUpdateScript
+  ) {
+    this.hostKeysFolder = hostKeysFolder;
+    this.privateKeyFilename = privateKeyFilename;
+    this.publicCertFilename = publicCertFilename;
+    this.chainCertsFilename = chainCertsFilename;
+    this.keysFolder = keysFolder;
+    this.webServerConfFile = webServerConfFile;
+    this.webServerUpdateScript = webServerUpdateScript;
   }
 }
 

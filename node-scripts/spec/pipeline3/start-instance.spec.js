@@ -89,46 +89,33 @@ describe("Start instance scripts", function() {
 
     var expectedScript = [];
     expectedScript.push(scripts.remote(ssh, docker.remove(instanceUuid)));
-    expectedScript.push(
-      scripts.remote(ssh, docker.run(instanceUuid, instanceDef))
-    );
+
     var tls = instanceDef.deployment.tls;
-    var keyDestPath = "/etc/ssl/";
+    var mounts = {
+      "/mnt": instanceDef.deployment.hostDir
+    };
+    mounts[tls.value.keysFolder] = tls.value.hostKeysFolder;
 
     expectedScript.push(
-      scripts.remote(
-        ssh,
-        docker.copy(
-          instanceDef.uuid,
-          tls.value.privateKeyPath,
-          keyDestPath + "privkey.pem",
-          true
-        )
-      )
+      scripts.remote(ssh, docker.run(instanceUuid, instanceDef, mounts))
     );
-    expectedScript.push(
-      scripts.remote(
-        ssh,
-        docker.copy(
-          instanceDef.uuid,
-          tls.value.publicCertPath,
-          keyDestPath + "cert.pem"
-        )
-      )
-    );
-    expectedScript.push(
-      scripts.remote(
-        ssh,
-        docker.copy(
-          instanceDef.uuid,
-          tls.value.chainCertsPath,
-          keyDestPath + "chain.pem"
-        )
-      )
-    );
+    var setTLS =
+      tls.value.webServerUpdateScript +
+      " " +
+      tls.value.webServerConfFile +
+      " " +
+      scripts.trailSlash(tls.value.keysFolder, true) +
+      tls.value.privateKeyFilename +
+      " " +
+      scripts.trailSlash(tls.value.keysFolder, true) +
+      tls.value.publicCertFilename +
+      " " +
+      scripts.trailSlash(tls.value.keysFolder, true) +
+      tls.value.chainCertsFilename;
 
     expectedScript = expectedScript.join(cst.SCRIPT_SEPARATOR);
     expect(script).toContain(expectedScript);
+    expect(script).toContain(setTLS);
   });
 
   it("should generate bash script upon data changes.", function() {
@@ -306,7 +293,8 @@ describe("Start instance scripts", function() {
         ssh,
         docker.exec(
           instanceUuid,
-          "if [ -d /mnt/data/bahmni-event-log-service/ ]; then\n" +
+          scripts.logInfo("Setting Bahmni Event Log Service") +
+            "if [ -d /mnt/data/bahmni-event-log-service/ ]; then\n" +
             "rsync -avz /mnt/data/bahmni-event-log-service/application.properties /opt/bahmni-event-log-service/bahmni-event-log-service/WEB-INF/classes/application.properties\n" +
             "chown -R bahmni:bahmni /opt/bahmni-event-log-service/bahmni-event-log-service/WEB-INF/classes/application.properties\n" +
             "fi"
