@@ -612,5 +612,77 @@ module.exports = {
       restartNeeded: restartNeeded
     };
     return computedScript;
+  },
+  applyData(instanceDef) {
+    var script = [];
+    switch (type) {
+      case "sql":
+        var sql = data.value;
+        var randomFolderName = utils
+          .random()
+          .toString(36)
+          .slice(-5);
+        var destFolder = "/tmp/" + randomFolderName + "/";
+        script.push(
+          container.exec(instanceDef.uuid, "mkdir -p " + destFolder) +
+            "\n" +
+            container.copy(instanceDef.uuid, sql.sourceFile, destFolder)
+        );
+        var sqlCmd = "";
+        var waitForMySQL = "";
+        var sourceFilePath = destFolder + path.basename(sql.sourceFile);
+        switch (sql.engine) {
+          case "mysql":
+            script.push(module.exports.mySqlRestore(sourceFilePath, sql));
+          case "bahmni":
+            script.push(module.exports.bahmniRestore(sourceFilePath, sql));
+        }
+    }
+    return script;
+  },
+  mySqlRestore(sourceFolder, sourceFile, sql) {
+    var waitForMySQL =
+      "until ncat -w30 localhost 3306 --send-only </dev/null; do echo 'Waiting for database connection...'; sleep 5; done";
+    var cat = "cat";
+    if (sourceFile.endsWith(".gz")) {
+      cat = "zcat";
+    }
+    var stopService = "sleep 30s; service " + sql.database + " stop";
+
+    var applySqlCommand =
+      cat +
+      " " +
+      module.exports.trailSlash(sourceFolder, true) +
+      sourceFile +
+      " | " +
+      sql.engine +
+      " -u" +
+      sql.user +
+      " -p" +
+      sql.password +
+      " " +
+      sql.database;
+
+    return waitForMySQL + "\n" + stopService + "\n" + applySqlCommand;
+  },
+  bahmniRestore(sourceFolder, sourceFile, sql) {
+    var dataPath = "/data/" + sql.database + "/";
+    var createDataFolder = "mkdir -p " + dataPath;
+    var moveFileInDataFolder =
+      "mv " +
+      module.exports.trailSlash(sourceFolder, true) +
+      sourceFile +
+      " " +
+      dataPath +
+      sourceFile;
+    var bahmniRestore =
+      "bahmni -i local restore --restore_type=db --options=" +
+      sql.database +
+      " --strategy=dump --restore_point=" +
+      sourceFile;
+
+    return (
+      createDataFolder + "\n" + moveFileInDataFolder + "\n" + bahmniRestore
+    );
   }
 };

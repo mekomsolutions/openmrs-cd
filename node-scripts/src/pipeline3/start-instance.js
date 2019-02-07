@@ -97,79 +97,6 @@ if (process.env[config.varDeploymentChanges()] === "true") {
   script.body.push(setTLS);
 }
 
-// 'data'
-
-if (process.env[config.varDataChanges()] === "true") {
-  instanceDef.data.forEach(function(data) {
-    componentsToLink.push("data");
-
-    if (data.type === "instance") {
-      script.body.push(
-        scripts.remote(ssh, container.restart(instanceDef.uuid))
-      );
-    }
-    if (
-      data.type === "sql" &&
-      (data.executionStage === currentStage || _.isEmpty(data.executionStage))
-    ) {
-      var sql = data.value;
-      var randomFolderName = utils
-        .random()
-        .toString(36)
-        .slice(-5);
-      var destFolder = "/tmp/" + randomFolderName + "/";
-      Object.assign(ssh, { remoteDst: false, remoteSrc: false });
-      script.body.push(
-        scripts.remote(
-          ssh,
-          container.exec(instanceDef.uuid, "mkdir -p " + destFolder) +
-            "\n" +
-            container.copy(instanceDef.uuid, sql.sourceFile, destFolder)
-        )
-      );
-
-      var sqlCmd = "";
-      var waitForMySQL = "";
-
-      if (sql.engine === "mysql") {
-        waitForMySQL =
-          "until ncat -w30 localhost 3306 --send-only </dev/null; do echo 'Waiting for database connection...'; sleep 5; done";
-        var cat = "cat";
-        if (path.basename(sql.sourceFile).endsWith(".gz")) {
-          cat = "zcat";
-        }
-
-        sqlCmd =
-          cat +
-          " " +
-          destFolder +
-          path.basename(sql.sourceFile) +
-          " | " +
-          sql.engine +
-          " -uroot -ppassword " +
-          sql.database;
-      }
-
-      var stopService = "";
-      if (sql.database == "openmrs") {
-        stopService = "sleep 30s; service " + sql.database + " stop";
-      }
-      script.body.push(
-        scripts.remote(ssh, container.exec(instanceDef.uuid, waitForMySQL))
-      );
-      script.body.push(
-        scripts.remote(ssh, container.exec(instanceDef.uuid, stopService))
-      );
-      script.body.push(
-        scripts.remote(ssh, container.exec(instanceDef.uuid, sqlCmd))
-      );
-    }
-  });
-}
-// If instance is new, all links should be processed in order to initialize the folders
-// If instance is new, folders should be initialized
-//
-
 // Link mounted folders based on the components to link
 script.body.push(
   scripts.remote(
@@ -180,6 +107,74 @@ script.body.push(
     )
   )
 );
+// Restart after linking folders
+script.body.push(scripts.remote(ssh, container.restart(instanceDef.uuid)));
+
+// 'data'
+if (process.env[config.varDataChanges()] === "true") {
+  instanceDef.data.forEach(function(data) {
+    componentsToLink.push("data");
+    var applyData = {
+      instance: function() {
+        // Nothing to do when providing an 'instance'
+      },
+      sql: function() {
+        var sql = data.value;
+        var randomFolderName = utils
+          .random()
+          .toString(36)
+          .slice(-5);
+        var destFolder = "/tmp/" + randomFolderName + "/";
+        Object.assign(ssh, { remoteDst: false, remoteSrc: false });
+        script.body.push(
+          scripts.remote(
+            ssh,
+            container.exec(instanceDef.uuid, "mkdir -p " + destFolder) +
+              "\n" +
+              container.copy(instanceDef.uuid, sql.sourceFile, destFolder)
+          )
+        );
+
+        var sqlCmd = "";
+        var waitForMySQL = "";
+        var applyEngine = {
+          mysql: function() {
+            script.body.push(
+              scripts.remote(
+                ssh,
+                container.exec(
+                  instanceDef.uuid,
+                  scripts.mySqlRestore(
+                    destFolder,
+                    path.basename(sql.sourceFile),
+                    sql
+                  )
+                )
+              )
+            );
+          },
+          bahmni: function() {
+            script.body.push(
+              scripts.remote(
+                ssh,
+                container.exec(
+                  instanceDef.uuid,
+                  scripts.bahmniRestore(
+                    destFolder,
+                    path.basename(sql.sourceFile),
+                    sql
+                  )
+                )
+              )
+            );
+          }
+        };
+        applyEngine[sql.engine]();
+      }
+    };
+    applyData[data.type]();
+  });
+}
 
 // Set the Timezone if provided
 if (instanceDef.deployment.timezone) {
@@ -194,31 +189,6 @@ if (instanceDef.deployment.timezone) {
   );
 }
 
-// TODO: Remove this block to provide it an 'additionalScript' in the instance definition
-// Copy the Bahmni Event Log Service properties file
-if (process.env[config.varDataChanges()] === "true") {
-  var appPropsFilePath =
-    "/opt/bahmni-event-log-service/bahmni-event-log-service/WEB-INF/classes/application.properties";
-  script.body.push(
-    scripts.remote(
-      ssh,
-      container.exec(
-        instanceDef.uuid,
-        scripts.logInfo("Setting Bahmni Event Log Service") +
-          "if [ -d /mnt/data/bahmni-event-log-service/ ]; then\n" +
-          scripts.rsync(
-            {},
-            "/mnt/data/bahmni-event-log-service/application.properties",
-            appPropsFilePath
-          ) +
-          "chown -R bahmni:bahmni " +
-          appPropsFilePath +
-          "\nfi"
-      )
-    )
-  );
-  finalRestart = true;
-}
 var computedScript = scripts.computeAdditionalScripts(
   script.body,
   instanceDef,

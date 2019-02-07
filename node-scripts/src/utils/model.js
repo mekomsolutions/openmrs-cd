@@ -93,10 +93,12 @@ class InstanceData {
  * Describes a SQL Data section
  */
 class SqlData {
-  constructor(engine, database, sourceFile) {
+  constructor(engine, database, sourceFile, user, password) {
     this.engine = engine;
     this.database = database;
     this.sourceFile = sourceFile;
+    this.user = user;
+    this.password = password;
   }
 }
 

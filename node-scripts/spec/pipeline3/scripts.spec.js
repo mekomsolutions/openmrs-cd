@@ -406,4 +406,34 @@ describe("Scripts", function() {
     ]);
     expect(scriptsToRun.restartNeeded).toBeTruthy();
   });
+  it("should generate Bahmni restore commands", function() {
+    var sql = {
+      engine: "bahmni",
+      database: "openmrs",
+      sourceFile: "/var/reference-data/demo-data.sql",
+      user: "root",
+      password: "password"
+    };
+    expect(scripts.bahmniRestore("/a/path", "b.sql", sql)).toContain(
+      "mv /a/path/b.sql /data/openmrs/b.sql\n" +
+        "bahmni -i local restore --restore_type=db --options=openmrs --strategy=dump --restore_point=b.sql"
+    );
+  });
+  it("should generate MySQL restore commands", function() {
+    var sql = {
+      engine: "mysql",
+      database: "openmrs",
+      sourceFile: "/var/reference-data/demo-data.sql",
+      user: "root",
+      password: "password"
+    };
+    var waitForMySQL =
+      "until ncat -w30 localhost 3306 --send-only </dev/null; do echo 'Waiting for database connection...'; sleep 5; done";
+    var stopService = "sleep 30s; service openmrs stop";
+    var sqlCmd = "cat /a/path/b.sql | mysql -uroot -ppassword openmrs";
+
+    expect(scripts.mySqlRestore("/a/path", "b.sql", sql)).toContain(
+      waitForMySQL + "\n" + stopService + "\n" + sqlCmd
+    );
+  });
 });

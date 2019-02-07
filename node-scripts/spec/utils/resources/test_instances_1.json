@@ -166,7 +166,20 @@
         "value": {
           "engine": "mysql",
           "database": "openmrs",
-          "sourceFile": "/var/reference-data/demo-data.sql"
+          "sourceFile": "/var/reference-data/demo-data.sql",
+          "user": "root",
+          "password": "password"
+        }
+      },
+      {
+        "type": "sql",
+        "executionStage": "5",
+        "value": {
+          "engine": "bahmni",
+          "database": "openmrs",
+          "sourceFile": "/var/reference-data/demo-data.sql.gz",
+          "user": "root",
+          "password": "password"
         }
       },
       {

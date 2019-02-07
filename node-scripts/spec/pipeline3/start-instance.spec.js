@@ -148,19 +148,30 @@ describe("Start instance scripts", function() {
     var ssh = instanceDef.deployment.host.value;
     var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
 
-    var sqlCmd =
-      "cat /tmp/n32bg/demo-data.sql | mysql -uroot -ppassword openmrs";
+    var destFolder = "/tmp/n32bg/";
+    var sql = instanceDef.data[2].value;
+
+    // ensure MySQL Restore is called when engine is 'mysql'
     expect(script).toContain(
-      scripts.remote(ssh, docker.exec(instanceUuid, sqlCmd))
+      scripts.remote(
+        ssh,
+        docker.exec(
+          instanceDef.uuid,
+          scripts.mySqlRestore(destFolder, path.basename(sql.sourceFile), sql)
+        )
+      )
     );
-    var stopService = "sleep 30s; service openmrs stop";
+    // ensure Bahmni Restore is called when engine is 'bahmni'
+    sql = instanceDef.data[3].value;
+
     expect(script).toContain(
-      scripts.remote(ssh, docker.exec(instanceUuid, stopService))
-    );
-    var waitForMySQL =
-      "until ncat -w30 localhost 3306 --send-only </dev/null; do echo 'Waiting for database connection...'; sleep 5; done";
-    expect(script).toContain(
-      scripts.remote(ssh, docker.exec(instanceUuid, waitForMySQL))
+      scripts.remote(
+        ssh,
+        docker.exec(
+          instanceDef.uuid,
+          scripts.bahmniRestore(destFolder, path.basename(sql.sourceFile), sql)
+        )
+      )
     );
   });
 
@@ -202,9 +213,7 @@ describe("Start instance scripts", function() {
       "zcat /tmp/" +
       testRandomString.slice(-5) +
       "/demo-data.sql.gz | mysql -uroot -ppassword openmrs";
-    expect(script).toContain(
-      scripts.remote(ssh, docker.exec(instanceUuid, sqlCmd))
-    );
+    expect(script).toContain(instanceUuid, sqlCmd);
   });
 
   it("should link mounted folders.", function() {
@@ -260,48 +269,6 @@ describe("Start instance scripts", function() {
     );
 
     expect(script).toContain(expectedScript);
-  });
-
-  it("should handle Bahmni Event Log Service properties file.", function() {
-    process.env[config.varInstanceUuid()] = instanceUuid;
-    process.env[config.varDataChanges()] = "true";
-    process.env[config.varCreation()] = "false";
-    var instanceDef = db.getInstanceDefinition(instanceUuid);
-
-    // replay
-    proxyquire(
-      path.resolve(
-        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
-      ),
-      tests.stubs()
-    );
-
-    // verif
-    var script = fs.readFileSync(
-      path.resolve(
-        config.getBuildDirPath(),
-        config.getStartInstanceScriptName()
-      ),
-      "utf8"
-    );
-    var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
-
-    var expectedScript = [];
-    expectedScript.push(
-      scripts.remote(
-        ssh,
-        docker.exec(
-          instanceUuid,
-          scripts.logInfo("Setting Bahmni Event Log Service") +
-            "if [ -d /mnt/data/bahmni-event-log-service/ ]; then\n" +
-            "rsync -avz /mnt/data/bahmni-event-log-service/application.properties /opt/bahmni-event-log-service/bahmni-event-log-service/WEB-INF/classes/application.properties\n" +
-            "chown -R bahmni:bahmni /opt/bahmni-event-log-service/bahmni-event-log-service/WEB-INF/classes/application.properties\n" +
-            "fi"
-        )
-      )
-    );
-    expect(script).toContain(expectedScript.join(cst.SCRIPT_SEPARATOR));
   });
   it("should call the setTimezone method", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
