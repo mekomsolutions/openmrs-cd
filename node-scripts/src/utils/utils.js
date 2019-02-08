@@ -77,6 +77,7 @@ module.exports = {
     var flat = module.exports.flattenObject(object);
     for (var property in flat) {
       if (flat.hasOwnProperty(property)) {
+        flat[property] = flat[property] == undefined ? "" : flat[property];
         envvars +=
           property +
           "=" +

@@ -66,11 +66,12 @@ describe("Utils", function() {
       more: "stuff",
       ipsum: {
         lorem: "latin"
-      }
+      },
+      final: undefined
     };
 
     var expectedResult =
-      "level1_level2_level3_more=stuff\nlevel1_level2_level3_other=stuff\nlevel1_level2_level3_level4_the=end\nlevel1_level2still_last=one\nlevel1_am=bored\nmore=stuff\nipsum_lorem=latin\n";
+      "level1_level2_level3_more=stuff\nlevel1_level2_level3_other=stuff\nlevel1_level2_level3_level4_the=end\nlevel1_level2still_last=one\nlevel1_am=bored\nmore=stuff\nipsum_lorem=latin\nfinal=\n";
     var envvar = utils.convertToEnvVar(realDeepObject);
     expect(envvar).toEqual(expectedResult);
   });

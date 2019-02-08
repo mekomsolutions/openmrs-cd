@@ -1,0 +1,16 @@
+{
+  "uuid": "74a0033f-a1d1-46fc-bc41-73bf0339fdb3",
+  "name": "cambodia-prod-1",
+  "type": "prod",
+  "artifacts": [
+    {
+      "type": "maven",
+      "value": {
+        "groupId": "net.mekomsolutions",
+        "artifactId": "openmrs-distro-cambodia",
+        "version": "1.1.0-SNAPSHOT",
+        "packaging": "zip"
+      }
+    }
+  ]
+}

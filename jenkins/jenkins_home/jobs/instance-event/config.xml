@@ -44,6 +44,20 @@
         <propertiesFilePath>$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/trigger.env</propertiesFilePath>
       </info>
     </EnvInjectBuilder>
+    <org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater plugin="build-name-setter@1.6.9">
+      <buildName></buildName>
+      <macroTemplate>${ENV,var=&quot;instanceName&quot;} - ${ENV,var=&quot;instanceUuid&quot;}</macroTemplate>
+      <fromFile>false</fromFile>
+      <fromMacro>true</fromMacro>
+      <macroFirst>false</macroFirst>
+    </org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater>
+    <hudson.tasks.Shell>
+      <command>if [ &quot;$downstream_job&quot; = &quot;&quot; ]; then
+echo &quot;downstream_job variable is empty. Aborting.&quot;
+exit 1
+fi
+exit 0</command>
+    </hudson.tasks.Shell>
     <org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.3.6">
       <condition class="org.jenkins_ci.plugins.run_condition.core.AlwaysRun" plugin="run-condition@1.2"/>
       <buildStep class="hudson.plugins.parameterizedtrigger.TriggerBuilder" plugin="parameterized-trigger@2.35.2">
@@ -68,13 +82,6 @@
       </buildStep>
       <runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$Fail" plugin="run-condition@1.2"/>
     </org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
-    <org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater plugin="build-name-setter@1.6.9">
-      <buildName></buildName>
-      <macroTemplate>${ENV,var=&quot;instanceName&quot;} - ${ENV,var=&quot;instanceUuid&quot;}</macroTemplate>
-      <fromFile>false</fromFile>
-      <fromMacro>true</fromMacro>
-      <macroFirst>false</macroFirst>
-    </org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater>
   </builders>
   <publishers/>
   <buildWrappers>

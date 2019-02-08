@@ -39,17 +39,29 @@ log.info("", "Instance Event being processed:\n" + instanceEvent);
 validator.validateInstanceDefinition(instanceEvent, isNewInstance);
 
 //
-// adding/merging the instance definition event (in)to the list of managed instances
-//
-db.saveInstanceDefinition(instanceEvent);
-
-//
-// setting the downstream job parameters
+// A 'prod' type existing instance should not trigger any downstream job (https://mekomsolutions.atlassian.net/browse/INFRA-201)
 //
 var downstreamJobParams = {};
-downstreamJobParams[
-  config.varDownstreamJob()
-] = config.getJobNameForPipeline3();
+
+if (!isNewInstance && _.isEqual(existingInstance.type, "prod")) {
+  log.warn(
+    "",
+    "Existing instance '" +
+      instanceEvent.name +
+      "' is of type 'prod'. No modification will be applied. Aborting.\n"
+  );
+  // Setting downstream job to empty
+  downstreamJobParams[config.varDownstreamJob()] = "";
+} else {
+  // Adding/merging the instance definition event (in)to the list of managed instances
+  db.saveInstanceDefinition(instanceEvent);
+
+  // Setting downstream job to Pipeline3
+  downstreamJobParams[
+    config.varDownstreamJob()
+  ] = config.getJobNameForPipeline3();
+}
+
 downstreamJobParams[config.varInstanceUuid()] = instanceEvent.uuid;
 var displayName = instanceEvent.name ? instanceEvent.name : "no-name-set";
 downstreamJobParams[config.varInstanceName()] = displayName;

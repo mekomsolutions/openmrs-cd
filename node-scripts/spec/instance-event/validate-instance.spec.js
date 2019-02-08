@@ -175,4 +175,54 @@ describe("validate-instance", function() {
     // after
     tests.cleanup();
   });
+  it("should set empty downstream job value when processing a 'prod' type existing instance.", function() {
+    // setup
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    var stubs = tests.stubs();
+    const config = tests.config();
+    const db = proxyquire(cst.DBPATH, stubs);
+
+    process.env[config.varInstanceEvent()] = fs.readFileSync(
+      path.resolve(
+        "spec/instance-event/resources/test_instance_definition_3.json"
+      ),
+      "utf8"
+    );
+
+    // pre-verif
+    var instanceEvent = JSON.parse(process.env[config.varInstanceEvent()]);
+    var beforeInstance = db.getInstanceDefinition(instanceEvent.uuid);
+    expect(beforeInstance).not.toEqual({});
+
+    // replay
+    proxyquire(fileInTest, stubs);
+
+    // verif that the instances list is **not** updated
+    var updatedInstance = db.getInstanceDefinition(instanceEvent.uuid);
+    expect(updatedInstance.artifacts).not.toEqual(instanceEvent.artifacts);
+
+    // verif that the 'trigger' properties file is correctly generated
+    var triggerParams = {};
+    // Downstream job should be empty
+    triggerParams[config.varDownstreamJob()] = "";
+    triggerParams[config.varInstanceUuid()] = instanceEvent.uuid;
+    triggerParams[config.varInstanceName()] = "cambodia-prod-1";
+    triggerParams[config.varArtifactsChanges()] = JSON.stringify(true);
+    triggerParams[config.varDeploymentChanges()] = JSON.stringify(false);
+    triggerParams[config.varDataChanges()] = JSON.stringify(false);
+    triggerParams[config.varCreation()] = JSON.stringify(false);
+
+    expect(
+      fs.readFileSync(
+        path.resolve(
+          config.getBuildDirPath(),
+          config.getProjectBuildTriggerEnvvarsName()
+        ),
+        "utf8"
+      )
+    ).toEqual(utils.convertToEnvVar(triggerParams));
+
+    // after
+    tests.cleanup();
+  });
 });

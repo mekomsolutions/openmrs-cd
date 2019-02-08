@@ -263,5 +263,40 @@
         }
       }
     }
+  },
+  {
+    "uuid": "74a0033f-a1d1-46fc-bc41-73bf0339fdb3",
+    "status": "Instance running.",
+    "name": "cambodia-prod-1",
+    "description": "Prod server for ODC.",
+    "type": "prod",
+    "version": "1.0.0",
+    "artifacts": [
+      {
+        "type": "maven",
+        "value": {
+          "groupId": "net.mekomsolutions",
+          "artifactId": "openmrs-distro-cambodia",
+          "version": "1.0.0",
+          "packaging": "zip"
+        }
+      }
+    ],
+    "deployment": {
+      "hostDir": "/var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae",
+      "type": "docker",
+      "value": {
+        "image": "mekomsolutions/bahmni",
+        "tag": "cambodia-release-0.90"
+      },
+      "host": {
+        "type": "ssh",
+        "value": {
+          "ip": "10.99.0.34",
+          "user": "cdagent",
+          "port": "22"
+        }
+      }
+    }
   }
 ]
