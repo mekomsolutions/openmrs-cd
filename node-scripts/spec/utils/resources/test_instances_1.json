@@ -31,6 +31,20 @@
     ],
     "deployment": {
       "hostDir": "/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0",
+      "maintenanceUrl": "http://cd05.mekomsolutions.net:8950/",
+      "proxies": [
+        {
+          "type": "dockerApacheMacro",
+          "value": {
+            "containerName": "proxy_macro",
+            "confFolder": "/etc/httpd/conf.d",
+            "macroName": "VHost",
+            "port": "8903",
+            "targetUrl": "http://cd05.mekomsolutions.net:8900/"
+          }
+        }
+      ],
+      "selinux": "true",
       "timezone": "Asia/Phnom_Penh",
       "type": "docker",
       "value": {

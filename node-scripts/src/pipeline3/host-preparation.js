@@ -68,11 +68,28 @@ if (process.env[config.varArtifactsChanges()] === "true") {
 // 'deployment'
 
 if (process.env[config.varDeploymentChanges()] === "true") {
+  var container = scripts[instanceDef.deployment.type];
   var docker = instanceDef.deployment.value;
   // TODO: most likely a `docker login` here
   script.body.push(
     scripts.remote(ssh, "docker pull " + docker.image + ":" + docker.tag + "\n")
   );
+  // Configure proxy servers
+  var proxies = instanceDef.deployment.proxies;
+  if (!_.isEmpty(proxies)) {
+    proxies.forEach(function(proxy) {
+      script.body.push(
+        scripts.remote(
+          ssh,
+          scripts[proxy.type].createProxy(
+            proxy.value,
+            instanceDef.deployment.maintenanceUrl,
+            instanceDef.deployment.selinux
+          )
+        )
+      );
+    });
+  }
 }
 
 // 'data'

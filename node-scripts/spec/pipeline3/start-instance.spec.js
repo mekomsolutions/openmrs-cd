@@ -57,7 +57,7 @@ describe("Start instance scripts", function() {
       "utf8"
     );
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
+    var docker = scripts[instanceDef.deployment.type];
 
     expect(script).toContain(scripts.remote(ssh, docker.restart(instanceUuid)));
   });
@@ -85,7 +85,7 @@ describe("Start instance scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
+    var docker = scripts[instanceDef.deployment.type];
 
     var expectedScript = [];
     expectedScript.push(scripts.remote(ssh, docker.remove(instanceUuid)));
@@ -146,7 +146,7 @@ describe("Start instance scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
+    var docker = scripts[instanceDef.deployment.type];
 
     var destFolder = "/tmp/n32bg/";
     var sql = instanceDef.data[2].value;
@@ -207,7 +207,7 @@ describe("Start instance scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
+    var docker = scripts[instanceDef.deployment.type];
 
     var sqlCmd =
       "zcat /tmp/" +
@@ -258,7 +258,7 @@ describe("Start instance scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
+    var docker = scripts[instanceDef.deployment.type];
 
     var expectedScript = scripts.remote(
       ssh,
@@ -317,7 +317,7 @@ describe("Start instance scripts", function() {
       "utf8"
     );
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
+    var docker = scripts[instanceDef.deployment.type];
 
     var expectedScript = [];
     expectedScript.push(

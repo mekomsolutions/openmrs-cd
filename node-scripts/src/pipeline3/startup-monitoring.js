@@ -45,7 +45,7 @@ script.body = [];
 script.body.push("set -e\n");
 
 var finalRestart = false;
-var container = scripts.getDeploymentScripts(instanceDef.deployment.type);
+var container = scripts[instanceDef.deployment.type];
 
 var computedScript = scripts.computeAdditionalScripts(
   script.body,

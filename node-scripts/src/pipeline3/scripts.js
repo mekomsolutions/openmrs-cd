@@ -355,23 +355,6 @@ module.exports = {
     );
   },
   /*
-   * Method to return the appropriate implementation of scripts utilities for the given deployment type.
-   *
-   */
-  getDeploymentScripts: function(type) {
-    if (type === "docker") {
-      var docker = module.exports.docker;
-      return new model.DockerDeploymentScripts(
-        docker.ifExists,
-        docker.restart,
-        docker.remove,
-        docker.run,
-        docker.exec,
-        docker.copy
-      );
-    }
-  },
-  /*
    * Method to return scripts to set the server Timezone.
    *
    */
@@ -581,9 +564,7 @@ module.exports = {
     var restartNeeded = false;
 
     scriptsToRun.forEach(function(item) {
-      var deploymentTypeScripts = module.exports.getDeploymentScripts(
-        instanceDef.deployment.type
-      );
+      var deploymentTypeScripts = module.exports[instanceDef.deployment.type];
       var runScript = "";
       if (item.type === "shell") {
         runScript += module.exports.remote(
@@ -684,5 +665,71 @@ module.exports = {
     return (
       createDataFolder + "\n" + moveFileInDataFolder + "\n" + bahmniRestore
     );
+  },
+  dockerApacheMacro: {
+    createProxy(proxy, maintenanceUrl, selinux) {
+      var apacheConfFolder =
+        module.exports.trailSlash(proxy.confFolder, true) + "use_macro";
+      var sudo = "sudo su";
+      var apacheConfFile = "10-" + proxy.port + ".conf";
+      var apacheConf = "";
+      apacheConf +=
+        "Use " +
+        proxy.macroName +
+        " " +
+        proxy.port +
+        " " +
+        proxy.targetUrl +
+        " " +
+        maintenanceUrl +
+        " maintenance_off\\n";
+      apacheConf += "UndefMacro " + proxy.macroName;
+
+      var semanage = "";
+      if (selinux == "true") {
+        semanage =
+          "semanage port -a -t http_port_t -p tcp " + proxy.port + "\n";
+      }
+
+      return (
+        sudo +
+        "\n" +
+        "echo -e '" +
+        apacheConf +
+        "' > " +
+        apacheConfFolder +
+        "/" +
+        apacheConfFile +
+        "\n" +
+        semanage +
+        module.exports.dockerApacheMacro.reload(proxy)
+      );
+    },
+    reload(proxy) {
+      return module.exports.docker.exec(
+        proxy.containerName,
+        "apachectl graceful"
+      );
+    },
+    maintenance(mode, proxy) {
+      var apacheConfFile = "10-" + proxy.port + ".conf";
+      var array = ["on", "off"];
+      if (mode) {
+        array = ["off", "on"];
+      }
+      return (
+        "sudo su\n" +
+        "sed -i 's/maintenance_" +
+        array[0] +
+        "/maintenance_" +
+        array[1] +
+        "/g' " +
+        proxy.confFolder +
+        "/use_macro/" +
+        apacheConfFile +
+        "\n" +
+        module.exports.dockerApacheMacro.reload(proxy)
+      );
+    }
   }
 };

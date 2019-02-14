@@ -84,6 +84,16 @@ describe("Host preparation scripts", function() {
     expect(script).toContain(
       "docker pull mekomsolutions/bahmni:cambodia-release-0.90"
     );
+
+    // ensure proxies have been setup
+    var proxy = instanceDef.deployment.proxies[0];
+    expect(script).toContain(
+      scripts["dockerApacheMacro"].createProxy(
+        proxy.value,
+        instanceDef.deployment.maintenanceUrl,
+        instanceDef.deployment.selinux
+      )
+    );
   });
 
   it("should generate bash script upon data changes.", function() {

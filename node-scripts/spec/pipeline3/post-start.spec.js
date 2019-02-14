@@ -58,7 +58,7 @@ describe("Post start scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
+    var docker = scripts[instanceDef.deployment.type];
 
     expect(script).toContain("/some/script.sh");
     expect(script).toContain(docker.restart(instanceUuid));
@@ -68,7 +68,7 @@ describe("Post start scripts", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
     process.env[config.varDeploymentChanges()] = "true";
     var instanceDef = db.getInstanceDefinition(instanceUuid);
-    var container = scripts.getDeploymentScripts(instanceDef.deployment.type);
+    var container = scripts[instanceDef.deployment.type];
 
     // replay
     proxyquire(

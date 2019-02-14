@@ -54,7 +54,7 @@ if (process.env[config.varArtifactsChanges()] === "true") {
 }
 
 // 'deployment'
-var container = scripts.getDeploymentScripts(instanceDef.deployment.type);
+var container = scripts[instanceDef.deployment.type];
 
 if (process.env[config.varDeploymentChanges()] === "true") {
   script.body.push(scripts.remote(ssh, container.remove(instanceDef.uuid)));
@@ -98,17 +98,19 @@ if (process.env[config.varDeploymentChanges()] === "true") {
 }
 
 // Link mounted folders based on the components to link
-script.body.push(
-  scripts.remote(
-    ssh,
-    container.exec(
-      instanceDef.uuid,
-      scripts.linkComponents(instanceDef.deployment.links)
+if (!_.isEmpty(instanceDef.deployment.links)) {
+  script.body.push(
+    scripts.remote(
+      ssh,
+      container.exec(
+        instanceDef.uuid,
+        scripts.linkComponents(instanceDef.deployment.links)
+      )
     )
-  )
-);
-// Restart after linking folders
-script.body.push(scripts.remote(ssh, container.restart(instanceDef.uuid)));
+  );
+  // Restart after linking folders
+  script.body.push(scripts.remote(ssh, container.restart(instanceDef.uuid)));
+}
 
 // 'data'
 if (process.env[config.varDataChanges()] === "true") {

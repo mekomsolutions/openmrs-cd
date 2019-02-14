@@ -61,7 +61,7 @@ describe("Startup monitoring scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
+    var docker = scripts[instanceDef.deployment.type];
 
     expect(script).toContain("/another/script.sh");
   });

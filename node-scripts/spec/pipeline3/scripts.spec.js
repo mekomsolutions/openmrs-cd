@@ -98,7 +98,7 @@ describe("Scripts", function() {
   });
 
   it("should generate Docker run command", function() {
-    var docker = scripts.getDeploymentScripts("docker");
+    var docker = scripts["docker"];
 
     var instanceDef = {
       type: "dev",
@@ -132,7 +132,7 @@ describe("Scripts", function() {
   });
 
   it("should generate ifExists wrapper", function() {
-    var docker = scripts.getDeploymentScripts("docker");
+    var docker = scripts["docker"];
     expect(docker.ifExists("cambodia1", "cmd1\n", "cmd2\n")).toEqual(
       "set -e\n" +
         "container=\\$(docker ps -a --filter name=cambodia1 --format {{.Names}})\n" +
@@ -152,14 +152,14 @@ describe("Scripts", function() {
   });
 
   it("should generate Docker restart command", function() {
-    var docker = scripts.getDeploymentScripts("docker");
+    var docker = scripts["docker"];
     expect(docker.restart("cambodia1")).toEqual(
       docker.ifExists("cambodia1", "set -e\n" + "docker restart cambodia1\n")
     );
   });
 
   it("should generate Docker remove command", function() {
-    var docker = scripts.getDeploymentScripts("docker");
+    var docker = scripts["docker"];
     expect(docker.remove("cambodia1")).toEqual(
       docker.ifExists(
         "cambodia1",
@@ -169,7 +169,7 @@ describe("Scripts", function() {
   });
 
   it("should generate Docker exec command", function() {
-    var docker = scripts.getDeploymentScripts("docker");
+    var docker = scripts["docker"];
     expect(docker.exec("cambodia1", "echo 'test'")).toEqual(
       "set -e\n" +
         "docker exec -i cambodia1 /bin/bash -s <<" +
@@ -183,7 +183,7 @@ describe("Scripts", function() {
   });
 
   it("should generate Docker copy command", function() {
-    var docker = scripts.getDeploymentScripts("docker");
+    var docker = scripts["docker"];
     expect(docker.copy("cambodia1", "/tmp/test1", "/tmp/test2")).toEqual(
       "docker cp /tmp/test1 cambodia1:/tmp/test2\n"
     );
@@ -298,7 +298,7 @@ describe("Scripts", function() {
         type: "docker"
       }
     };
-    var docker = scripts.getDeploymentScripts(instanceDef.deployment.type);
+    var docker = scripts[instanceDef.deployment.type];
 
     process.env[config.varDataChanges()] = "true";
     process.env[config.varArtifactsChanges()] = "true";
@@ -434,6 +434,54 @@ describe("Scripts", function() {
 
     expect(scripts.mySqlRestore("/a/path", "b.sql", sql)).toContain(
       waitForMySQL + "\n" + stopService + "\n" + sqlCmd
+    );
+  });
+  it("should generate dockerApacheMacro commands", function() {
+    var proxy = {
+      containerName: "proxy_macro",
+      confFolder: "/etc/httpd/conf.d",
+      macroName: "Macro",
+      port: "8900",
+      targetUrl: "http://cd05.mks.net:8920"
+    };
+    var createProxy = scripts.dockerApacheMacro.createProxy(
+      proxy,
+      "http://maintenance.mks.net:8950",
+      "true"
+    );
+
+    expect(createProxy).toContain(
+      "echo -e 'Use Macro 8900 http://cd05.mks.net:8920 http://maintenance.mks.net:8950 maintenance_off\\n" +
+        "UndefMacro Macro' > /etc/httpd/conf.d/use_macro/10-8900.conf\n"
+    );
+    expect(createProxy).toContain(scripts.dockerApacheMacro.reload(proxy));
+
+    expect(createProxy).toContain(
+      "semanage port -a -t http_port_t -p tcp 8900"
+    );
+
+    expect(
+      scripts.dockerApacheMacro.createProxy(
+        proxy,
+        "http://maintenance.mks.net:8950",
+        "false"
+      )
+    ).not.toContain(
+      "semanage port -a -t http_port_t -p tcp 8900\n" +
+        scripts.dockerApacheMacro.reload("proxy")
+    );
+
+    expect(scripts.dockerApacheMacro.reload(proxy)).toContain(
+      "apachectl graceful"
+    );
+
+    expect(scripts.dockerApacheMacro.maintenance(true, proxy)).toContain(
+      "sed -i 's/maintenance_off/maintenance_on/g' /etc/httpd/conf.d/use_macro/10-8900.conf\n" +
+        scripts.dockerApacheMacro.reload(proxy)
+    );
+    expect(scripts.dockerApacheMacro.maintenance(false, proxy)).toContain(
+      "sed -i 's/maintenance_on/maintenance_off/g' /etc/httpd/conf.d/use_macro/10-8900.conf\n" +
+        scripts.dockerApacheMacro.reload(proxy)
     );
   });
 });
