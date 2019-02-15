@@ -682,8 +682,7 @@ module.exports = {
         proxy.targetUrl +
         " " +
         maintenanceUrl +
-        " maintenance_off\\n";
-      apacheConf += "UndefMacro " + proxy.macroName;
+        " maintenance_off";
 
       var semanage = "";
       if (selinux == "true") {

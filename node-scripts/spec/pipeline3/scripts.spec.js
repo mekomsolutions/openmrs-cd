@@ -451,8 +451,7 @@ describe("Scripts", function() {
     );
 
     expect(createProxy).toContain(
-      "echo -e 'Use Macro 8900 http://cd05.mks.net:8920 http://maintenance.mks.net:8950 maintenance_off\\n" +
-        "UndefMacro Macro' > /etc/httpd/conf.d/use_macro/10-8900.conf\n"
+      "echo -e 'Use Macro 8900 http://cd05.mks.net:8920 http://maintenance.mks.net:8950 maintenance_off' > /etc/httpd/conf.d/use_macro/10-8900.conf\n"
     );
     expect(createProxy).toContain(scripts.dockerApacheMacro.reload(proxy));
 
