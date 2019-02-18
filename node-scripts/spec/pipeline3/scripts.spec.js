@@ -112,7 +112,8 @@ describe("Scripts", function() {
           ports: {
             "443": "8733",
             "80": "8180"
-          }
+          },
+          networks: ["network1", "network2"]
         }
       }
     };
@@ -125,7 +126,7 @@ describe("Scripts", function() {
       "set -e\n" +
         "docker run -dit --restart unless-stopped " +
         "--publish 8180:80 --publish 8733:443 --label type=dev --label group=tlc " +
-        "--name cambodia1 --hostname bahmni " +
+        "--name cambodia1 --hostname bahmni --network network1 --network network2 " +
         "--mount type=bind,source=/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0,target=/mnt " +
         "mekomsolutions/bahmni:cambodia-release-0.90\n"
     );

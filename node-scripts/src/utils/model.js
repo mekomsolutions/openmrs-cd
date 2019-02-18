@@ -36,10 +36,11 @@ class Script {
  * Describes a Docker deployment
  */
 class DockerDeployment {
-  constructor(image, tag, ports) {
+  constructor(image, tag, ports, networks) {
     this.image = image;
     this.tag = tag;
     this.ports = ports;
+    this.networks = networks;
   }
 }
 

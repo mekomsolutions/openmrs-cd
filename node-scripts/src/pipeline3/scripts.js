@@ -459,6 +459,10 @@ module.exports = {
       scriptArgs.push("--name " + containerName);
       scriptArgs.push("--hostname bahmni");
 
+      docker.networks.forEach(function(network) {
+        scriptArgs.push("--network " + network);
+      });
+
       Object.keys(mounts).forEach(function(key) {
         scriptArgs.push(
           "--mount type=bind,source=" + mounts[key] + ",target=" + key

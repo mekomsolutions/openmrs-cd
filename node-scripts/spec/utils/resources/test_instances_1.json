@@ -53,7 +53,8 @@
         "ports": {
           "443": "8733",
           "80": "8180"
-        }
+        },
+        "networks": ["network1"]
       },
       "host": {
         "type": "ssh",
