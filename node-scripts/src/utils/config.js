@@ -184,6 +184,15 @@ module.exports = {
   getHostPrepareStatusCode: function() {
     return "2";
   },
+  getMaintenanceOnJsScriptName: function() {
+    return "maintenance-on.js";
+  },
+  getMaintenanceOnScriptName: function() {
+    return "set-maintenance-on.sh";
+  },
+  getMaintenanceOnStatusCode: function() {
+    return "3";
+  },
   getStartInstanceJsScriptName: function() {
     return "start-instance.js";
   },
@@ -210,6 +219,15 @@ module.exports = {
   },
   getStartupMonitoringStatusCode: function() {
     return "6";
+  },
+  getMaintenanceOffJsScriptName: function() {
+    return "maintenance-off.js";
+  },
+  getMaintenanceOffScriptName: function() {
+    return "set-maintenance-off.sh";
+  },
+  getMaintenanceOffStatusCode: function() {
+    return "8";
   },
   getUpdateStatusJsScriptName: function() {
     return "update-status.js";

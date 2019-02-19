@@ -1,5 +1,5 @@
 <?xml version='1.1' encoding='UTF-8'?>
-<flow-definition plugin="workflow-job@2.26">
+<flow-definition plugin="workflow-job@2.29">
   <actions>
     <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.3.2"/>
     <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.3.2">
@@ -14,14 +14,6 @@ Depending on the context and the instance definition it can setup and run a new 
   <displayName>Run Instance</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <jenkins.model.BuildDiscarderProperty>
-      <strategy class="hudson.tasks.LogRotator">
-        <daysToKeep>-1</daysToKeep>
-        <numToKeep>5</numToKeep>
-        <artifactDaysToKeep>-1</artifactDaysToKeep>
-        <artifactNumToKeep>-1</artifactNumToKeep>
-      </strategy>
-    </jenkins.model.BuildDiscarderProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -52,8 +44,16 @@ Depending on the context and the instance definition it can setup and run a new 
         </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>5</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
   </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.58">
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.60">
     <script>// Name the build out of the parameters
 node {
   def buildName = &quot;${instanceUuid}&quot;
@@ -96,11 +96,11 @@ pipeline {
       }
     }
     stage (&apos;Maintenance mode: ON&apos;) {
-      when {
-        expression { return false }
-      }
-      steps {
-        sh &apos;echo &quot;Stage/steps awaiting implementation... Skipping.&quot;&apos;
+       steps {
+       sh &apos;node /opt/node-scripts/src/$JOB_NAME/maintenance-on.js&apos;
+        sh &apos;cat $BUILD_PATH/set-maintenance-on.sh&apos;
+        sh &apos;$BUILD_PATH/set-maintenance-on.sh&apos;
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
       }
     }
     stage (&apos;Production host preparation&apos;) {
@@ -136,12 +136,12 @@ pipeline {
       }
     }
     stage (&apos;Maintenance mode: OFF&apos;) {
-      when {
-        expression { return false }
-      }
       steps {
-        sh &apos;echo &quot;Stage/steps awaiting implementation... Skipping.&quot;&apos;
-      }
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/maintenance-off.js&apos;
+        sh &apos;cat $BUILD_PATH/set-maintenance-off.sh&apos;
+        sh &apos;$BUILD_PATH/set-maintenance-off.sh&apos;
+        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+       }
     }
   }
 }</script>

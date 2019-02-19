@@ -127,6 +127,29 @@ describe("Tests suite for pipeline3", function() {
         "'"
     );
 
+    // verif 'maintenance on' stage
+    expect(pipelineScript).toContain(
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
+        config.getMaintenanceOnJsScriptName() +
+        "'"
+    );
+    expect(pipelineScript).toContain(
+      "sh '$" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getMaintenanceOnScriptName() +
+        "'"
+    );
+    expect(pipelineScript).toContain(
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
+        config.getUpdateStatusJsScriptName() +
+        " $" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getStatusFileName() +
+        "'"
+    );
+
     // verif 'start instance' stage
     expect(pipelineScript).toContain(
       "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
@@ -175,6 +198,29 @@ describe("Tests suite for pipeline3", function() {
         config.varEnvvarBuildPath() +
         "/" +
         config.getStartupMonitoringScriptName() +
+        "'"
+    );
+
+    // verif 'maintenance on' stage
+    expect(pipelineScript).toContain(
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
+        config.getMaintenanceOffJsScriptName() +
+        "'"
+    );
+    expect(pipelineScript).toContain(
+      "sh '$" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getMaintenanceOffScriptName() +
+        "'"
+    );
+    expect(pipelineScript).toContain(
+      "sh 'node /opt/node-scripts/src/$JOB_NAME/" +
+        config.getUpdateStatusJsScriptName() +
+        " $" +
+        config.varEnvvarBuildPath() +
+        "/" +
+        config.getStatusFileName() +
         "'"
     );
   });
