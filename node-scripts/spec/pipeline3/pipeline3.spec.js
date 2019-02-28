@@ -65,7 +65,7 @@ describe("Tests suite for pipeline3", function() {
     expect(pipelineScript).toContain(
       "if (" +
         config.varArtifactsChanges() +
-        ' == "true") { cause += "artifacts + " }'
+        ' == "true") { cause += "artifacts" + sep }'
     );
     expect(pipelineScript).toContain(
       "if (" + config.varDataChanges() + ' == "true") { cause += "data" + sep }'
@@ -223,5 +223,43 @@ describe("Tests suite for pipeline3", function() {
         config.getStatusFileName() +
         "'"
     );
+
+    // verif the 'Load Jenkins Credentials' stage
+    var fetchInstance =
+      "     sh 'node /opt/node-scripts/src/$JOB_NAME/" +
+      config.getFetchInstanceDefJsScriptName() +
+      "'\n" +
+      "     def instanceDefJSON = sh (\n" +
+      "      script: '$BUILD_PATH/" +
+      config.getFetchInstanceDefScriptName() +
+      "',\n" +
+      "      returnStdout: true\n" +
+      "     )\n" +
+      "     def instanceDef = new JsonSlurperClassic().parseText(instanceDefJSON)";
+
+    expect(pipelineScript).toContain(fetchInstance);
+
+    var fetchCredentials =
+      '     def filter = ["${instanceDef.group}", "${instanceDef.group}_${instanceDef.type}"]\n' +
+      "     def credentials = []\n" +
+      "     for (key in filter) {\n" +
+      "      println \"\\033[1m\\033[34m[INFO]\\033[0m Fetching '${key}' Jenkins Credential.\"\n" +
+      "      try {\n" +
+      "       withCredentials([string(credentialsId: key, variable: 'SECRET')]) {\n" +
+      "        credentials.push(new JsonSlurperClassic().parseText(env.SECRET))\n" +
+      "        println \"\\033[1m\\033[34m[INFO]\\033[0m Sucessfully fetched '${key}' Jenkins Credential.\"\n" +
+      "       }\n" +
+      "      } catch (CredentialNotFoundException e) {\n" +
+      "       println \"\\033[1m\\033[33m[WARN]\\033[0m '${key}' Jenkins Credential not found. Skipping.\"\n" +
+      "       currentBuild.result = 'SUCCESS'\n" +
+      "      }\n" +
+      "     }";
+
+    expect(pipelineScript).toContain(fetchCredentials);
+
+    var saveSecrets =
+      "jenkinsCredentials = new JsonBuilder(credentials).toPrettyString()";
+
+    expect(pipelineScript).toContain(saveSecrets);
   });
 });

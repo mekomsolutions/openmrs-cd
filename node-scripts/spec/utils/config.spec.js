@@ -28,4 +28,30 @@ describe("The config object", function() {
       )
     );
   });
+  it("should get secrets from environment.", function() {
+    const envJSON = [
+      {
+        password: "p@ssword",
+        username: "root"
+      },
+      {
+        password: "8HNVdvdgh765"
+      }
+    ];
+    const envJSONAsString = JSON.stringify(envJSON);
+
+    process.env[config.getSecretsEnvVar()] = envJSONAsString;
+
+    var expectedSecrets = {
+      username: "root",
+      password: "8HNVdvdgh765"
+    };
+
+    expect(config.getSecrets().password).toEqual(expectedSecrets.password);
+    expect(config.getSecrets().password).not.toEqual(envJSON.username);
+
+    process.env[config.getSecretsEnvVar()] = "";
+
+    expect(config.getSecrets()).toEqual({});
+  });
 });

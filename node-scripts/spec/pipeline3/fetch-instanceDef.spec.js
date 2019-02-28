@@ -1,6 +1,6 @@
 "use strict";
 
-describe("'maintenance-on' and 'maintenance-off' scripts", function() {
+describe("'fetch-instanceDef' scripts", function() {
   // deps
   const fs = require("fs");
   const path = require("path");
@@ -35,7 +35,7 @@ describe("'maintenance-on' and 'maintenance-off' scripts", function() {
     tests.cleanup();
   });
 
-  it("should set maintenance to ON", function() {
+  it("should fetch a given instance and return it as JSON", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
 
     var instanceDef = db.getInstanceDefinition(instanceUuid);
@@ -43,7 +43,10 @@ describe("'maintenance-on' and 'maintenance-off' scripts", function() {
     // replay
     proxyquire(
       path.resolve(
-        "src/" + config.getJobNameForPipeline3() + "/maintenance-on.js"
+        "src/" +
+          config.getJobNameForPipeline3() +
+          "/" +
+          config.getFetchInstanceDefJsScriptName()
       ),
       tests.stubs()
     );
@@ -52,40 +55,11 @@ describe("'maintenance-on' and 'maintenance-off' scripts", function() {
     var script = fs.readFileSync(
       path.resolve(
         config.getBuildDirPath(),
-        config.getMaintenanceOnScriptName()
+        config.getFetchInstanceDefScriptName()
       ),
       "utf8"
     );
     var proxies = instanceDef.deployment.proxies;
-    expect(script).toContain(
-      scripts[proxies[0].type].maintenance(true, proxies[0].value)
-    );
-  });
-
-  it("should set maintenance to OFF", function() {
-    process.env[config.varInstanceUuid()] = instanceUuid;
-
-    var instanceDef = db.getInstanceDefinition(instanceUuid);
-
-    // replay
-    proxyquire(
-      path.resolve(
-        "src/" + config.getJobNameForPipeline3() + "/maintenance-off.js"
-      ),
-      tests.stubs()
-    );
-
-    // verif
-    var script = fs.readFileSync(
-      path.resolve(
-        config.getBuildDirPath(),
-        config.getMaintenanceOffScriptName()
-      ),
-      "utf8"
-    );
-    var proxies = instanceDef.deployment.proxies;
-    expect(script).toContain(
-      scripts[proxies[0].type].maintenance(false, proxies[0].value)
-    );
+    expect(script).toContain(JSON.stringify(instanceDef));
   });
 });
