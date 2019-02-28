@@ -1,4 +1,5 @@
 "use strict";
+
 /**
  * Main script of the 'startup-monitoring' stage.
  *
@@ -16,6 +17,7 @@ const db = require(cst.DBPATH);
 
 const scripts = require("./scripts");
 
+const secrets = config.getSecrets();
 const currentStage = config.getStartupMonitoringStatusCode();
 
 //

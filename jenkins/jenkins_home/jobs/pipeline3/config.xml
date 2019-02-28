@@ -55,95 +55,155 @@ Depending on the context and the instance definition it can setup and run a new 
   </properties>
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.60">
     <script>// Name the build out of the parameters
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurperClassic
+import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
+
+def jenkinsCredentials = &quot;&quot;
+
 node {
-  def buildName = &quot;${instanceUuid}&quot;
-  def cause = &quot;&quot;
-  def sep = &quot; + &quot;
-  if (artifactsChanges == &quot;true&quot;) { cause += &quot;artifacts + &quot; }
-  if (dataChanges == &quot;true&quot;) { cause += &quot;data&quot; + sep }
-  if (deploymentChanges == &quot;true&quot;) { cause += &quot;deployment&quot; + sep }
-  if (creation == &quot;true&quot;) { cause += &quot;creation&quot; + sep }
-  cause = cause.substring(0, cause.length() - sep.length())
-  buildName += &quot;: &quot; + cause
-  currentBuild.displayName = buildName
-  currentBuild.description = buildName
+ def buildName = &quot;${instanceUuid}&quot;
+ def cause = &quot;&quot;
+ def sep = &quot; + &quot;
+ if (artifactsChanges == &quot;true&quot;) { cause += &quot;artifacts&quot; + sep }
+ if (dataChanges == &quot;true&quot;) { cause += &quot;data&quot; + sep }
+ if (deploymentChanges == &quot;true&quot;) { cause += &quot;deployment&quot; + sep }
+ if (creation == &quot;true&quot;) { cause += &quot;creation&quot; + sep }
+ cause = cause.substring(0, cause.length() - sep.length())
+ buildName += &quot;: &quot; + cause
+ currentBuild.displayName = buildName
+ currentBuild.description = buildName
 }
 
 pipeline {
-  agent any
-  options {
-    ansiColor(&apos;xterm&apos;)
-  }
-  tools {
-    maven &apos;Maven 3.5.0&apos; 
-    nodejs &apos;NodeJS 8.6.0&apos;
-  }
-  stages {
-    stage (&apos;Pre-host connection preparation&apos;) {
-      steps {
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/prehost-preparation.js&apos;
-        sh &apos;cat $BUILD_PATH/prehost-prepare.sh&apos;
-        sh &apos;$BUILD_PATH/prehost-prepare.sh&apos;
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
-      }
-    }
-    stage (&apos;Host preparation&apos;) {
-      steps {
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/host-preparation.js&apos;
-        sh &apos;cat $BUILD_PATH/host-prepare.sh&apos;
-        sh &apos;$BUILD_PATH/host-prepare.sh&apos;
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
-      }
-    }
-    stage (&apos;Maintenance mode: ON&apos;) {
-       steps {
-       sh &apos;node /opt/node-scripts/src/$JOB_NAME/maintenance-on.js&apos;
-        sh &apos;cat $BUILD_PATH/set-maintenance-on.sh&apos;
-        sh &apos;$BUILD_PATH/set-maintenance-on.sh&apos;
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
-      }
-    }
-    stage (&apos;Production host preparation&apos;) {
-      when {
-        expression { return false }
-      }
-      steps {
-        sh &apos;echo &quot;Stage/steps awaiting implementation... Skipping.&quot;&apos;
-      }
-    }
-    stage (&apos;Start or restart the instance&apos;) {
-      steps {
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/start-instance.js&apos;
-        sh &apos;cat $BUILD_PATH/start-instance.sh&apos;
-        sh &apos;$BUILD_PATH/start-instance.sh&apos;
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
-      }
-    }
-    stage (&apos;Instance startup status monitoring&apos;) {
-      steps {
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/startup-monitoring.js&apos;
-        sh &apos;cat $BUILD_PATH/startup-monitoring.sh&apos;
-        sh &apos;$BUILD_PATH/startup-monitoring.sh&apos;
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
-      }
-    }
-    stage (&apos;Post startup actions&apos;) {
-      steps {
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/post-start.js&apos;
-        sh &apos;cat $BUILD_PATH/post-start.sh&apos;
-        sh &apos;$BUILD_PATH/post-start.sh&apos;
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
-      }
-    }
-    stage (&apos;Maintenance mode: OFF&apos;) {
-      steps {
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/maintenance-off.js&apos;
-        sh &apos;cat $BUILD_PATH/set-maintenance-off.sh&apos;
-        sh &apos;$BUILD_PATH/set-maintenance-off.sh&apos;
-        sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+ agent any
+ options {
+  ansiColor(&apos;xterm&apos;)
+ }
+ tools {
+  maven &apos;Maven 3.5.0&apos;
+  nodejs &apos;NodeJS 8.6.0&apos;
+ }
+ stages {
+  stage(&apos;Load Jenkins Credentials&apos;) {
+   steps {
+    script {
+     // Fetch the instance definition to retrieve &apos;group&apos; and &apos;type&apos; values
+     sh &apos;node /opt/node-scripts/src/$JOB_NAME/fetch-instance-def.js&apos;
+     def instanceDefJSON = sh (
+      script: &apos;$BUILD_PATH/fetch-instance-def.sh&apos;,
+      returnStdout: true
+     )
+     def instanceDef = new JsonSlurperClassic().parseText(instanceDefJSON)
+
+     // Fetch Jenkins Credentials for the Group and Type
+     def filter = [&quot;${instanceDef.group}&quot;, &quot;${instanceDef.group}_${instanceDef.type}&quot;]
+     def credentials = []
+     for (key in filter) {
+      println &quot;\033[1m\033[34m[INFO]\033[0m Fetching &apos;${key}&apos; Jenkins Credential.&quot;
+      try {
+       withCredentials([string(credentialsId: key, variable: &apos;SECRET&apos;)]) {
+        credentials.push(new JsonSlurperClassic().parseText(env.SECRET))
+        println &quot;\033[1m\033[34m[INFO]\033[0m Sucessfully fetched &apos;${key}&apos; Jenkins Credential.&quot;
        }
+      } catch (CredentialNotFoundException e) {
+       println &quot;\033[1m\033[33m[WARN]\033[0m &apos;${key}&apos; Jenkins Credential not found. Skipping.&quot;
+       currentBuild.result = &apos;SUCCESS&apos;
+      }
+     }
+     if (credentials.size() == 0) {
+      println &quot;\033[1m\033[33m[WARN]\033[0m No Jenkins Credentials found. Won&apos;t be able to process secrets (if any) in the instance definition.&quot;
+     }
+
+     // Save the Jenkins Credentials as JSON
+     jenkinsCredentials = new JsonBuilder(credentials).toPrettyString()
     }
+   }
   }
+  stage(&apos;Pre-host connection preparation&apos;) {
+   environment {
+    SECRETS = &quot;${jenkinsCredentials}&quot;
+   }
+   steps {
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/prehost-preparation.js&apos;
+    sh &apos;$BUILD_PATH/prehost-prepare.sh&apos;
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+   }
+  }
+  stage(&apos;Host preparation&apos;) {
+   environment {
+    SECRETS = &quot;${jenkinsCredentials}&quot;
+   }
+   steps {
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/host-preparation.js&apos;
+    sh &apos;$BUILD_PATH/host-prepare.sh&apos;
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+   }
+  }
+  stage(&apos;Maintenance mode: ON&apos;) {
+   environment {
+    SECRETS = &quot;${jenkinsCredentials}&quot;
+   }
+   steps {
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/maintenance-on.js&apos;
+    sh &apos;$BUILD_PATH/set-maintenance-on.sh&apos;
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+   }
+  }
+  stage(&apos;Production host preparation&apos;) {
+   environment {
+    SECRETS = &quot;${jenkinsCredentials}&quot;
+   }
+   when {
+    expression {
+     return false
+    }
+   }
+   steps {
+    sh &apos;echo &quot;Stage/steps awaiting implementation... Skipping.&quot;&apos;
+   }
+  }
+  stage(&apos;Start or restart the instance&apos;) {
+   environment {
+    SECRETS = &quot;${jenkinsCredentials}&quot;
+   }
+   steps {
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/start-instance.js&apos;
+    sh &apos;$BUILD_PATH/start-instance.sh&apos;
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+   }
+  }
+  stage(&apos;Instance startup status monitoring&apos;) {
+   environment {
+    SECRETS = &quot;${jenkinsCredentials}&quot;
+   }
+   steps {
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/startup-monitoring.js&apos;
+    sh &apos;$BUILD_PATH/startup-monitoring.sh&apos;
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+   }
+  }
+  stage(&apos;Post startup actions&apos;) {
+   environment {
+    SECRETS = &quot;${jenkinsCredentials}&quot;
+   }
+   steps {
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/post-start.js&apos;
+    sh &apos;$BUILD_PATH/post-start.sh&apos;
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+   }
+  }
+  stage(&apos;Maintenance mode: OFF&apos;) {
+   environment {
+    SECRETS = &quot;${jenkinsCredentials}&quot;
+   }
+   steps {
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/maintenance-off.js&apos;
+    sh &apos;$BUILD_PATH/set-maintenance-off.sh&apos;
+    sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
+   }
+  }
+ }
 }</script>
     <sandbox>true</sandbox>
   </definition>

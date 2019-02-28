@@ -1,6 +1,7 @@
 "use strict";
 
 const path = require("path");
+const log = require("npmlog");
 const _ = require("lodash");
 const cst = require("../const.js");
 
@@ -165,6 +166,12 @@ module.exports = {
       module.exports.getBuildDirPath(),
       module.exports.getDeployShellScriptName()
     );
+  },
+  getFetchInstanceDefJsScriptName: function() {
+    return "fetch-instance-def.js";
+  },
+  getFetchInstanceDefScriptName: function() {
+    return "fetch-instance-def.sh";
   },
   getPrehostPrepareJsScriptName: function() {
     return "prehost-preparation.js";
@@ -367,5 +374,35 @@ module.exports = {
   },
   getStatusFileName: function() {
     return "status.json";
+  },
+  /**
+   * The environment variable that stores secrets
+   */
+  getSecretsEnvVar: function() {
+    return "SECRETS";
+  },
+  /**
+   * Fetches raw JSON secrets array from the environment and returns a consolidated secret object where all array entries have been merged into one single object.
+   * The merge strategy is that the 'n' index element of the array will be replaced by 'n+1'
+   *
+   *  Eg: [ {"username": "root", "password": "default"} , { "password": "765EGrgfv65" } ]
+   *     returns:
+   *      [ {"username": "root", "password": "765EGrgfv65" } ]
+   */
+  getSecrets: function() {
+    const rawSecretsArray = process.env[module.exports.getSecretsEnvVar()];
+    var consolidatedSecrets = {};
+    if (_.isEmpty(rawSecretsArray)) {
+      log.error(
+        "",
+        "Trying to retrieve secrets from an 'undefined' raw secrets array. Did you correctly inject the environment at the pipeline 'stage' level?"
+      );
+    } else {
+      var secrets = JSON.parse(rawSecretsArray);
+      secrets.forEach(function(item) {
+        consolidatedSecrets = Object.assign(consolidatedSecrets, item);
+      });
+    }
+    return consolidatedSecrets;
   }
 };
