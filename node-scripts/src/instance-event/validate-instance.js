@@ -38,17 +38,36 @@ log.info("", "Instance Event being processed:\n" + instanceEvent);
 //
 validator.validateInstanceDefinition(instanceEvent, isNewInstance);
 
-//
-// A 'prod' type existing instance should not trigger any downstream job (https://mekomsolutions.atlassian.net/browse/INFRA-201)
-//
 var downstreamJobParams = {};
-
 if (!isNewInstance && _.isEqual(existingInstance.type, "prod")) {
+  //
+  // A 'prod' type existing instance should not trigger any downstream job (https://mekomsolutions.atlassian.net/browse/INFRA-201)
+  //
   log.warn(
     "",
     "Existing instance '" +
       instanceEvent.name +
-      "' is of type 'prod'. No modification will be applied. Aborting.\n"
+      "' is of type 'prod' or is set to 'active:false'. No modification will be applied. Aborting.\n"
+  );
+  // Setting downstream job to empty
+  downstreamJobParams[config.varDownstreamJob()] = "";
+} else if (
+  //
+  // Handle 'active' flag
+  //
+  instanceEvent.active == "false" ||
+  (_.isEmpty(instanceEvent.active) && existingInstance.active == "false")
+) {
+  db.saveInstanceDefinition({
+    uuid: existingInstance.uuid,
+    name: existingInstance.name,
+    active: "false"
+  });
+  log.warn(
+    "",
+    "Instance '" +
+      existingInstance.name +
+      "' is considered inactive. Aborting.\n"
   );
   // Setting downstream job to empty
   downstreamJobParams[config.varDownstreamJob()] = "";
@@ -76,10 +95,17 @@ downstreamJobParams[config.varDataChanges()] = JSON.stringify(
 );
 downstreamJobParams[config.varCreation()] = JSON.stringify(isNewInstance);
 
+// Set the build name
+var buildName = [];
+buildName[config.varBuildName()] =
+  existingInstance.active == "false" ? "[INACTIVE] " : "";
+buildName[config.varBuildName()] +=
+  existingInstance.name + " - " + existingInstance.uuid;
+
 //
-// Export the downstream job parameters as a 'trigger' properties file
+// Export the downstream job parameters as a 'environment' properties file
 //
 fs.writeFileSync(
-  config.getProjectBuildTriggerEnvvarsPath(),
-  utils.convertToEnvVar(downstreamJobParams)
+  config.getProjectBuildEnvvarsPath(),
+  utils.convertToEnvVar(Object.assign(buildName, downstreamJobParams))
 );

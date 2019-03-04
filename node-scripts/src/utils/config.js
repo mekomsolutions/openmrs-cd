@@ -239,13 +239,13 @@ module.exports = {
   getUpdateStatusJsScriptName: function() {
     return "update-status.js";
   },
-  getProjectBuildTriggerEnvvarsName: function() {
-    return "trigger.env";
+  getProjectBuildEnvvarsName: function() {
+    return "environment.env";
   },
-  getProjectBuildTriggerEnvvarsPath: function() {
+  getProjectBuildEnvvarsPath: function() {
     return path.resolve(
       module.exports.getBuildDirPath(),
-      module.exports.getProjectBuildTriggerEnvvarsName()
+      module.exports.getProjectBuildEnvvarsName()
     );
   },
   getJobBuildDetailsEnvvarsName: function() {
