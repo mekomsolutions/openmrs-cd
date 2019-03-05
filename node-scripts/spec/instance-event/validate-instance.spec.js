@@ -87,7 +87,7 @@ describe("validate-instance", function() {
 
     var skipCondition =
       'if [ "$downstream_job" = "" ]; then\n' +
-      "\techo \"'downstream_job' list is empty. Aborting.\"\n" +
+      "\techo \"\\e[1m\\e[31m[ERR]\\e[0m 'downstream_job' list is empty. Aborting.\"\n" +
       "\texit 1\n" +
       "fi\n" +
       "exit 0";

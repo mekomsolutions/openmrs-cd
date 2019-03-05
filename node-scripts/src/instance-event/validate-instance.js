@@ -39,7 +39,7 @@ log.info("", "Instance Event being processed:\n" + instanceEvent);
 validator.validateInstanceDefinition(instanceEvent, isNewInstance);
 
 var downstreamJobParams = {};
-if (!isNewInstance && _.isEqual(existingInstance.type, "prod")) {
+if (!isNewInstance && _.isEqual(existingInstance.type, cst.INSTANCETYPE_PROD)) {
   //
   // A 'prod' type existing instance should not trigger any downstream job (https://mekomsolutions.atlassian.net/browse/INFRA-201)
   //
@@ -98,8 +98,6 @@ downstreamJobParams[config.varCreation()] = JSON.stringify(isNewInstance);
 // Set the build name
 var buildName = [];
 buildName[config.varBuildName()] =
-  existingInstance.active == "false" ? "[INACTIVE] " : "";
-buildName[config.varBuildName()] +=
   existingInstance.name + " - " + existingInstance.uuid;
 
 //
