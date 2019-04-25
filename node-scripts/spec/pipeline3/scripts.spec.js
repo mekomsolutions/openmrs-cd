@@ -483,29 +483,29 @@ describe("Scripts", function() {
       "sed -i 's/maintenance_on/maintenance_off/g' /etc/httpd/conf.d/use_macro/10-8900.conf\n" +
         scripts.dockerApacheMacro.reload(proxy)
     );
-  }); 
+  });
 
-  it("should properly create folder creation script", function () {
+  it("should properly create folder creation script", function() {
     var folderPath = "test_folder";
     var user = "user";
-    var group = "group"
-    
+    var group = "group";
+
     expect(scripts.initFolder(folderPath, user)).toEqual(
-      "sudo mkdir -p test_folder\n" +
-      "sudo chown -R user:user test_folder\n\n"
+      "sudo mkdir -p test_folder\n" + "sudo chown -R user:user test_folder\n\n"
     );
 
     expect(scripts.initFolder(folderPath, user, true)).toEqual(
       "sudo mkdir -p test_folder\n" +
-      "sudo chown -R user:user test_folder\n" + 
-      "rm -rf test_folder/*" + "\n"
+        "sudo chown -R user:user test_folder\n" +
+        "rm -rf test_folder/*" +
+        "\n"
     );
 
     expect(scripts.initFolder(folderPath, user, true, group)).toEqual(
       "sudo mkdir -p test_folder\n" +
-      "sudo chown -R user:group test_folder\n" + 
-      "rm -rf test_folder/*" + "\n"
+        "sudo chown -R user:group test_folder\n" +
+        "rm -rf test_folder/*" +
+        "\n"
     );
-    
   });
 });
