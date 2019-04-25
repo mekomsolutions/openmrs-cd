@@ -154,8 +154,9 @@ module.exports = {
     return script;
   },
 
-  initFolder: function(folderPath, user, wipe) {
-    var group = user;
+  initFolder: function(folderPath, user, wipe, group) {
+    if (group == null)
+      group = user;
     var script = "";
 
     script += "sudo mkdir -p " + folderPath;

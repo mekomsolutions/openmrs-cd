@@ -484,7 +484,7 @@ describe("Scripts", function() {
         scripts.dockerApacheMacro.reload(proxy)
     );
   }); 
-  
+
   it("should properly create folder creation script", function () {
     var folderPath = "test_folder";
     var user = "user";
@@ -498,6 +498,12 @@ describe("Scripts", function() {
     expect(scripts.initFolder(folderPath, user, true)).toEqual(
       "sudo mkdir -p test_folder\n" +
       "sudo chown -R user:user test_folder\n" + 
+      "rm -rf test_folder/*" + "\n"
+    );
+
+    expect(scripts.initFolder(folderPath, user, true, group)).toEqual(
+      "sudo mkdir -p test_folder\n" +
+      "sudo chown -R user:group test_folder\n" + 
       "rm -rf test_folder/*" + "\n"
     );
     
