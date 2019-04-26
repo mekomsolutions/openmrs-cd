@@ -46,7 +46,12 @@ script.body = "set -xe\n";
 
 if (process.env[config.varArtifactsChanges()] === "true") {
   var artifactsDirPath = config.getCDArtifactsDirPath(instanceDef.uuid);
-  script.body += scripts.initFolder(artifactsDirPath, "jenkins", true);
+  script.body += scripts.initFolder(
+    artifactsDirPath,
+    "jenkins",
+    "jenkins",
+    true
+  );
 
   instanceDef.artifacts.forEach(function(artifact) {
     script.body += scripts.fetchArtifact(artifact, artifactsDirPath);

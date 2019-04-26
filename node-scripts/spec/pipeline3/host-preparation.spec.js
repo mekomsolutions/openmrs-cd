@@ -54,10 +54,12 @@ describe("Host preparation scripts", function() {
       "utf8"
     );
     var hostArtifactsDir = instanceDef.deployment.hostDir + "/artifacts";
-    expect(script).toContain("mkdir -p " + hostArtifactsDir);
+    var ssh = instanceDef.deployment.host.value;
+    expect(script).toContain(
+      scripts.initFolder(hostArtifactsDir, ssh.user, ssh.group)
+    );
     var srcDir = process.env.WORKSPACE + "/" + instanceUuid + "/artifacts/";
 
-    var ssh = instanceDef.deployment.host.value;
     ssh.remoteDst = true;
 
     expect(script).toContain(scripts.rsync(ssh, srcDir, hostArtifactsDir));

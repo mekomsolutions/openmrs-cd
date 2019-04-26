@@ -484,4 +484,28 @@ describe("Scripts", function() {
         scripts.dockerApacheMacro.reload(proxy)
     );
   });
+
+  it("should properly create folder creation script", function() {
+    var folderPath = "test_folder";
+    var user = "user";
+    var group = "group";
+
+    expect(scripts.initFolder(folderPath, user)).toEqual(
+      "sudo mkdir -p test_folder\n" + "sudo chown -R user:user test_folder\n\n"
+    );
+
+    expect(scripts.initFolder(folderPath, user, null, true)).toEqual(
+      "sudo mkdir -p test_folder\n" +
+        "sudo chown -R user:user test_folder\n" +
+        "rm -rf test_folder/*" +
+        "\n"
+    );
+
+    expect(scripts.initFolder(folderPath, user, group, true)).toEqual(
+      "sudo mkdir -p test_folder\n" +
+        "sudo chown -R user:group test_folder\n" +
+        "rm -rf test_folder/*" +
+        "\n"
+    );
+  });
 });

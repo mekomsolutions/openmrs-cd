@@ -61,6 +61,7 @@
         "value": {
           "ip": "54.154.133.95",
           "user": "ec2-user",
+          "group": "jenkins",
           "port": "22"
         }
       },
