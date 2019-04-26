@@ -47,7 +47,7 @@ script.body = [];
 script.body.push("set -xe\n");
 
 script.body.push(
-  scripts.remote(ssh, scripts.initFolder(hostDir, ssh.user, false, ssh.group))
+  scripts.remote(ssh, scripts.initFolder(hostDir, ssh.user, ssh.group, false))
 );
 
 // 'artifacts'
@@ -57,7 +57,7 @@ if (process.env[config.varArtifactsChanges()] === "true") {
   script.body.push(
     scripts.remote(
       ssh,
-      scripts.initFolder(hostArtifactsDir, ssh.user, false, ssh.group),
+      scripts.initFolder(hostArtifactsDir, ssh.user, ssh.group, false),
       true
     )
   );

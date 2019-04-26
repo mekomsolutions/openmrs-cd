@@ -154,7 +154,7 @@ module.exports = {
     return script;
   },
 
-  initFolder: function(folderPath, user, wipe, group) {
+  initFolder: function(folderPath, user, group, wipe) {
     if (group == null) group = user;
     var script = "";
 

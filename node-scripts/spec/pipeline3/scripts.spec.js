@@ -494,14 +494,14 @@ describe("Scripts", function() {
       "sudo mkdir -p test_folder\n" + "sudo chown -R user:user test_folder\n\n"
     );
 
-    expect(scripts.initFolder(folderPath, user, true)).toEqual(
+    expect(scripts.initFolder(folderPath, user, null, true)).toEqual(
       "sudo mkdir -p test_folder\n" +
         "sudo chown -R user:user test_folder\n" +
         "rm -rf test_folder/*" +
         "\n"
     );
 
-    expect(scripts.initFolder(folderPath, user, true, group)).toEqual(
+    expect(scripts.initFolder(folderPath, user, group, true)).toEqual(
       "sudo mkdir -p test_folder\n" +
         "sudo chown -R user:group test_folder\n" +
         "rm -rf test_folder/*" +
