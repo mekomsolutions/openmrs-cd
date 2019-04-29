@@ -141,9 +141,9 @@ module.exports = {
       ssh.ip +
       " -p " +
       ssh.port +
-      " --login " +
+      " " +
       ssh.shell +
-      " <<" +
+      " --login <<" +
       heredoc +
       "\n";
     remoteScript += script;
