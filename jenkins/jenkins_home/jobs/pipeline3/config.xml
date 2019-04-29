@@ -126,6 +126,7 @@ pipeline {
    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/prehost-preparation.js&apos;
+    sh &apos;cat $BUILD_PATH/prehost-prepare.sh&apos;
     sh &apos;$BUILD_PATH/prehost-prepare.sh&apos;
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
    }
@@ -136,6 +137,7 @@ pipeline {
    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/host-preparation.js&apos;
+    sh &apos;cat $BUILD_PATH/host-prepare.sh&apos;
     sh &apos;$BUILD_PATH/host-prepare.sh&apos;
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
    }
@@ -146,6 +148,7 @@ pipeline {
    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/maintenance-on.js&apos;
+    sh &apos;cat $BUILD_PATH/set-maintenance-on.sh&apos;
     sh &apos;$BUILD_PATH/set-maintenance-on.sh&apos;
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
    }
@@ -169,6 +172,7 @@ pipeline {
    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/start-instance.js&apos;
+    sh &apos;cat $BUILD_PATH/start-instance.sh&apos;
     sh &apos;$BUILD_PATH/start-instance.sh&apos;
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
    }
@@ -179,6 +183,7 @@ pipeline {
    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/startup-monitoring.js&apos;
+    sh &apos;cat $BUILD_PATH/startup-monitoring.sh&apos;
     sh &apos;$BUILD_PATH/startup-monitoring.sh&apos;
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
    }
@@ -189,6 +194,7 @@ pipeline {
    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/post-start.js&apos;
+    sh &apos;cat $BUILD_PATH/post-start.sh&apos;
     sh &apos;$BUILD_PATH/post-start.sh&apos;
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
    }
@@ -199,6 +205,7 @@ pipeline {
    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/maintenance-off.js&apos;
+    sh &apos;cat $BUILD_PATH/set-maintenance-off.sh&apos;
     sh &apos;$BUILD_PATH/set-maintenance-off.sh&apos;
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
    }
