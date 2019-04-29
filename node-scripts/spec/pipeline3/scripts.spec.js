@@ -33,6 +33,7 @@ describe("Scripts", function() {
         ssh.ip +
         " -p " +
         ssh.port +
+        " --login" +
         " /bin/bash <<" +
         heredoc +
         "\n" +
