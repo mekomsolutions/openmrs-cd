@@ -165,7 +165,9 @@ describe("Tests suite for pipeline1", function() {
     expect(pipelineScript).toContain(
       "booleanParam(name: '" +
         config.varArtifactsDeployment() +
-        "', value: true)"
+        "', value: params[i]['" +
+        config.varArtifactsDeployment() +
+        "'])"
     );
 
     // verif 'impacted instances' stage

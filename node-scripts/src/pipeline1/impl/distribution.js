@@ -37,6 +37,12 @@ module.exports = {
 
     projectBuild.postBuildActions = function(args) {
       postBuildActions(args.pom);
+
+      cmns.mavenPostBuildActions(
+        args.pom.groupId,
+        args.artifactsIds,
+        args.pom.version
+      );
     };
 
     return projectBuild;
@@ -88,7 +94,8 @@ var postBuildActions = function(pom) {
   var buildJobParams = _.pick(process.env, [
     config.varProjectType(),
     config.varRepoUrl(),
-    config.varBranchName()
+    config.varBranchName(),
+    config.varArtifactsDeployment()
   ]);
   db.saveArtifactBuildParams(artifactKey, buildJobParams);
 };

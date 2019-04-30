@@ -45,6 +45,7 @@ describe("Post build", function() {
     process.env[config.varRepoUrl()] =
       "https://github.com/mekomsolutions/openmrs-distro-cambodia";
     process.env[config.varBranchName()] = "master";
+    process.env[config.varArtifactsDeployment()] = "false";
 
     // replay
     proxyquire(
@@ -84,6 +85,7 @@ describe("Post build", function() {
       "https://github.com/mekomsolutions/openmrs-distro-cambodia"
     );
     expect(params[config.varBranchName()]).toEqual("master");
+    expect(params[config.varArtifactsDeployment()]).toEqual("false");
   });
 
   it("should analyze and process Bahmni Core POM files.", function() {
