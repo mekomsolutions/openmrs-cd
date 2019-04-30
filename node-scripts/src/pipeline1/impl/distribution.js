@@ -48,6 +48,17 @@ var postBuildActions = function(pom) {
   //  Building the list of dependencies (as artifact keys).
   //
   var deps = [];
+
+  if (!_.isEmpty(pom.parent)) {
+    deps.push(
+      utils.toArtifactKey(
+        pom.parent.groupId,
+        pom.parent.artifactId,
+        pom.parent.version
+      )
+    );
+  }
+
   pom.dependencies.dependency.forEach(function(dep) {
     var propKey = dep.version.substring(2).slice(0, -1); // "${foo.version}" -> "foo.version"
 

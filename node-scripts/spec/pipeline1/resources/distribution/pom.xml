@@ -16,6 +16,12 @@
     <url>http://www.mekomsolutions.com</url>
   </organization>
 
+  <parent>
+    <groupId>net.mekomsolutions</groupId>
+    <artifactId>bahmni-distro-haiti</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
   <properties>
 
     <distro.baseDir>${project.build.directory}/${project.artifactId}-${project.version}</distro.baseDir>
@@ -28,14 +34,14 @@
 
     <!-- Core -->
     <openMRSVersion>2.1.1</openMRSVersion>
-    
+
     <!-- Configs -->
     <openmrsconfigVersion>1.0.2</openmrsconfigVersion>
     <bahmniconfigVersion>1.0.2</bahmniconfigVersion>
 
     <!-- Bahmni Apps -->
     <bahmniappsRevision>a63f511</bahmniappsRevision>
-    
+
     <!-- In dev -->
 
     <!-- Bahmni modules -->
@@ -49,7 +55,7 @@
     <bedmanagementVersion>5.6.0</bedmanagementVersion>
     <mailappenderVersion>0.90-SNAPSHOT</mailappenderVersion>
     <appointmentsVersion>1.0-SNAPSHOT</appointmentsVersion>
-    
+
     <!-- OpenMRS modules -->
     <addresshierarchyVersion>2.11.0</addresshierarchyVersion>
     <exti18nVersion>1.0.0</exti18nVersion>
@@ -72,7 +78,7 @@
     <uilibraryVersion>2.0.5</uilibraryVersion>
     <webservices.restVersion>2.20.0</webservices.restVersion>
     <auditLogVersion>1.0-SNAPSHOT</auditLogVersion>
-    
+
   </properties>
 
   <dependencies>

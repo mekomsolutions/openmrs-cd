@@ -79,6 +79,13 @@ describe("Script triggering downstream builds", function() {
     );
     var depsArray = deps["dependencies"];
 
+    expect(depsArray.length).toEqual(37);
+
+    expect(
+      depsArray.indexOf(
+        "net.mekomsolutions|bahmni-distro-haiti|1.0.0-SNAPSHOT"
+      ) > -1
+    ).toBeTruthy();
     expect(
       depsArray.indexOf("net.mekomsolutions|openmrs-config-cambodia|1.0.1") > -1
     ).not.toBeTruthy();
