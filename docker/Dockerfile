@@ -1,27 +1,18 @@
-FROM jenkins/jenkins:2.162
-MAINTAINER Mekom Solutions <support@mekomsolutions.com> 
+FROM jenkins/jenkins:2.184
+MAINTAINER Mekom Solutions <support@mekomsolutions.com>
 
 USER root
 
 # Add the APP_DATA_DIR volume to keep OpenMRS CD data out of the Jenkins Home
 ARG APP_DATA_DIR="/var/lib/openmrs_cd/app_data"
-RUN mkdir -p $APP_DATA_DIR
-RUN chown -R jenkins:jenkins $APP_DATA_DIR
+RUN mkdir -p $APP_DATA_DIR && chown -R jenkins:jenkins $APP_DATA_DIR
 
 RUN apt update
-RUN apt -y install nano
-RUN apt -y install jq
-RUN apt -y install openssh-server
-RUN apt -y install rsync
-RUN apt -y install libxml2-utils # for xmllint
+RUN apt -y install nano jq openssh-server rsync libxml2-utils
 
 # These packages are needed for Jenkins to build some projects.
 # This is because the Jenkins server is used as its own agent. Build tasks are running directly on it.
-RUN apt -y install ruby-full
-RUN apt -y install ruby-compass
-RUN apt -y install xvfb
-RUN apt -y install firefox-esr
-RUN apt -y install sudo
+RUN apt -y install ruby-full ruby-compass xvfb firefox-esr sudo
 
 # Installing Node.js
 RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
