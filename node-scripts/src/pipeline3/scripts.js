@@ -14,7 +14,7 @@ const model = require("../utils/model");
 module.exports = {
   /*
    * Trails slashes or not:
-   * 
+   *
    * foo + true ➔  foo/
    * foo + false ➔  foo
    * foo/ + false ➔  foo
@@ -41,7 +41,7 @@ module.exports = {
   /*
    * Turns a path into a remote path based on the SSH information.
    *    Eg. /tmp ➔  cdadgent@10.99.0.4:/tmp
-   * 
+   *
    * @param {Object} ssh - The SSH parameters, eg:
    *    {
    *      user: "cdagent",
@@ -49,7 +49,7 @@ module.exports = {
    *    }
    *
    * @param {String} ppath - The path to 'remotify'.
-   * 
+   *
    * @return {String} The remote path
    */
   remotePath: function(ssh, ppath) {
@@ -61,7 +61,7 @@ module.exports = {
 
   /*
    * 'rsync' source to destination
-   * 
+   *
    * @param {Object} ssh - The SSH parameters, eg:
    *    {
    *      user: "cdagent",
@@ -113,7 +113,7 @@ module.exports = {
 
   /*
    * Turns a script into an SSH remote script based on the SSH parameters and using bash's heredoc.
-   * 
+   *
    * @param {Object} ssh - The SSH parameters, eg:
    *    {
    *      user: "cdagent",
@@ -169,7 +169,7 @@ module.exports = {
 
   /*
    * Generates a script that fetches an instance's artifacts to save them a specified location.
-   * 
+   *
    * @param {Object} artifact - An 'artifact' section of the artifacts part of the instance definition.
    * @param {String} destPath - The destination part where to save the fecthed artifact.
    *
@@ -298,7 +298,7 @@ module.exports = {
       script += module.exports.logInfo(
         "'" + item.component + "' component successfully linked."
       );
-      script += module.exports.log("");
+      script += module.exports.logInfo("");
     });
 
     return script;
@@ -372,7 +372,7 @@ module.exports = {
   docker: {
     /*
      * Util function that wraps the passed commands so each is applied either accordingly.
-     * 
+     *
      * @param {String} containerName - The name of the container.
      * @param {String} ifExistsCommand - The command that should run if the container exists.
      * @param {String} elseCommand - The command that will run if the container does *not* exist.
@@ -398,7 +398,7 @@ module.exports = {
 
     /*
      * Generates a script that restarts the passed container.
-     * 
+     *
      * @param {String} containerName - The name of the container to restart.
      *
      * @return {String} The script as a string.
@@ -412,7 +412,7 @@ module.exports = {
 
     /*
      * Generates a script to remove the passed container.
-     * 
+     *
      * @param {String} containerName - The name of the container to remove.
      *
      * @return {String} The script as a string.
@@ -427,21 +427,26 @@ module.exports = {
 
     /*
      * Run a new container with the appropriate options.
-     * 
+     *
      * @param {String} containerName - The name of the container to run.
      * @param {Object} instanceDef - The instance definition of the instance to start.
      *
      * @return {String} The script as a string.
      */
     run: function(containerName, instanceDef, mounts) {
-      var hostDir = instanceDef.deployment.hostDir;
-      var docker = instanceDef.deployment.value;
+      const docker = instanceDef.deployment.value;
 
       var script = "";
       script += "set -e\n";
 
       var scriptArgs = [];
       scriptArgs.push("docker run -dit");
+
+      if (docker.privileged == "true") {
+        scriptArgs.push("--privileged")
+        scriptArgs.push("-v /sys/fs/cgroup:/sys/fs/cgroup:ro");
+      }
+
       scriptArgs.push("--restart unless-stopped");
 
       Object.keys(docker.ports).forEach(function(key) {
@@ -475,12 +480,18 @@ module.exports = {
         script += arg;
         script += !scriptArgs[index + 1] ? "" : " ";
       });
+
+      if (docker.privileged == "true") {
+        script += "\n";
+        script += "docker exec " + containerName + " /tmp/start_bahmni.sh"
+      }
+
       return script + "\n";
     },
 
     /*
      * Executes the passed shell command into the container.
-     * 
+     *
      * @param {String} containerName - The name of the container on which to execute the command.
      * @param {String} command - The command to execute.
      *
@@ -504,7 +515,7 @@ module.exports = {
 
     /*
      * Copy 'source' located on the host to the container's 'destination'.
-     * 
+     *
      * @param {String} containerName - The name of the container onto which to copy the data.
      * @param {String} source - The source file to be copied on the container.
      * @param {String} destination - The destination location for this file.

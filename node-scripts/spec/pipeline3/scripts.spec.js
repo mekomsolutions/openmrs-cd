@@ -131,6 +131,11 @@ describe("Scripts", function() {
         "--mount type=bind,source=/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0,target=/mnt " +
         "mekomsolutions/bahmni:cambodia-release-0.90\n"
     );
+
+    instanceDef.deployment.value.privileged = "true";
+    expect(docker.run("cambodia1", instanceDef, mounts)).toContain("--privileged");
+    expect(docker.run("cambodia1", instanceDef, mounts)).toContain("-v /sys/fs/cgroup:/sys/fs/cgroup:ro");
+    expect(docker.run("cambodia1", instanceDef, mounts)).toContain("docker exec cambodia1 /tmp/start_bahmni.sh");
   });
 
   it("should generate ifExists wrapper", function() {

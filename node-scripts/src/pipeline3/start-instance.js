@@ -139,8 +139,6 @@ if (process.env[config.varDataChanges()] === "true") {
           )
         );
 
-        var sqlCmd = "";
-        var waitForMySQL = "";
         var applyEngine = {
           mysql: function() {
             script.body.push(
