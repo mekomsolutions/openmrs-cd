@@ -29,11 +29,9 @@ module.exports = {
     };
 
     projectBuild.postBuildActions = function(args) {
-      var artifactsIds = [];
-      artifactsIds.push(args.pseudoPom.artifactId);
       cmns.mavenPostBuildActions(
         args.pseudoPom.groupId,
-        artifactsIds,
+        [args.pseudoPom.artifactId],
         args.pseudoPom.version
       );
     };

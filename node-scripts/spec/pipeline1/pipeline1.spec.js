@@ -509,4 +509,40 @@ describe("Tests suite for pipeline1", function() {
       true
     );
   });
+
+  it("should getArtifact, getBuildScript and getDeployScript for 'odooaddon'.", function() {
+    // setup
+    const projectType = "odooaddon";
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/generated-pom.xml"
+    );
+
+    // replay
+    var projectBuild = require(folderInTest +
+      "/impl/" +
+      projectType).getInstance();
+    var artifact = projectBuild.getArtifact({ pom: pom });
+    var buildScript = projectBuild.getBuildScript();
+    var deployScript = projectBuild.getDeployScript(artifact);
+
+    // verif
+    expect(artifact.name).toEqual("odoo_initializer");
+    expect(artifact.version).toEqual("1.0-SNAPSHOT");
+    expect(artifact.extension).toEqual("zip");
+    expect(artifact.filename).toEqual("odoo_initializer-1.0-SNAPSHOT.zip");
+    expect(artifact.destFilename).toEqual("odoo_initializer-1.0-SNAPSHOT.zip");
+    expect(artifact.buildPath).toEqual("build");
+
+    expect(buildScript.type).toEqual("#!/bin/bash");
+    expect(buildScript.body).toEqual("./gradlew clean install\n");
+
+    expect(deployScript.type).toEqual("#!/bin/bash");
+    expect(deployScript.body).toContain(
+      "./gradlew publish -PrepoId=${NEXUS_REPO_ID} -Purl=${ARTIFACT_UPLOAD_URL_odooaddon}"
+    );
+  });
 });

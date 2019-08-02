@@ -122,6 +122,9 @@ module.exports = {
   getBuildPomPath: function() {
     return path.resolve(process.env.WORKSPACE, "pom.xml");
   },
+  getGradleBuildPomPath: function() {
+    return path.resolve(process.env.WORKSPACE, "generated-pom.xml");
+  },
   getTempDirPath: function() {
     return "/tmp";
   },
