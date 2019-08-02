@@ -133,9 +133,15 @@ describe("Scripts", function() {
     );
 
     instanceDef.deployment.value.privileged = "true";
-    expect(docker.run("cambodia1", instanceDef, mounts)).toContain("--privileged");
-    expect(docker.run("cambodia1", instanceDef, mounts)).toContain("-v /sys/fs/cgroup:/sys/fs/cgroup:ro");
-    expect(docker.run("cambodia1", instanceDef, mounts)).toContain("docker exec cambodia1 /tmp/start_bahmni.sh");
+    expect(docker.run("cambodia1", instanceDef, mounts)).toContain(
+      "--privileged"
+    );
+    expect(docker.run("cambodia1", instanceDef, mounts)).toContain(
+      "-v /sys/fs/cgroup:/sys/fs/cgroup:ro"
+    );
+    expect(docker.run("cambodia1", instanceDef, mounts)).toContain(
+      "docker exec cambodia1 /tmp/start_bahmni.sh"
+    );
   });
 
   it("should generate ifExists wrapper", function() {

@@ -24,7 +24,8 @@
         "443": "8443",
         "80": "8080"
       },
-      "networks": ["network1"]
+      "networks": ["network1"],
+      "privileged": "false"
     },
     "host": {
       "type": "ssh",

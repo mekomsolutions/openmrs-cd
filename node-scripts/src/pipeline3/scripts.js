@@ -443,7 +443,7 @@ module.exports = {
       scriptArgs.push("docker run -dit");
 
       if (docker.privileged == "true") {
-        scriptArgs.push("--privileged")
+        scriptArgs.push("--privileged");
         scriptArgs.push("-v /sys/fs/cgroup:/sys/fs/cgroup:ro");
       }
 
@@ -483,7 +483,7 @@ module.exports = {
 
       if (docker.privileged == "true") {
         script += "\n";
-        script += "docker exec " + containerName + " /tmp/start_bahmni.sh"
+        script += "docker exec " + containerName + " /tmp/start_bahmni.sh";
       }
 
       return script + "\n";
