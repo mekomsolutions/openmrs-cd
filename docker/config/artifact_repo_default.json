@@ -5,5 +5,6 @@
   "ARTIFACT_UPLOAD_URL_openmrscore": "https://nexus.mekomsolutions.net/repository/maven-snapshots",
   "ARTIFACT_UPLOAD_URL_bahmniconfig": "https://nexus.mekomsolutions.net/repository/maven-snapshots",
   "ARTIFACT_UPLOAD_URL_bahmniapps": "https://nexus.mekomsolutions.net/repository/maven-commits",
-  "ARTIFACT_UPLOAD_URL_odooaddon": "https://nexus.mekomsolutions.net/repository/maven-snapshots"
+  "ARTIFACT_UPLOAD_URL_odooaddon": "https://nexus.mekomsolutions.net/repository/maven-snapshots",
+  "ARTIFACT_UPLOAD_URL_odooconfig": "https://nexus.mekomsolutions.net/repository/maven-snapshots"
 }
