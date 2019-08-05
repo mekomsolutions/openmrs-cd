@@ -93,6 +93,9 @@ downstreamJobParams[config.varDeploymentChanges()] = JSON.stringify(
 downstreamJobParams[config.varDataChanges()] = JSON.stringify(
   !_.isEmpty(instanceEvent.data)
 );
+downstreamJobParams[config.varPropertiesChanges()] = JSON.stringify(
+  !_.isEmpty(instanceEvent.properties)
+);
 downstreamJobParams[config.varCreation()] = JSON.stringify(isNewInstance);
 
 // Set the build name
@@ -105,5 +108,5 @@ buildName[config.varBuildName()] =
 //
 fs.writeFileSync(
   config.getProjectBuildEnvvarsPath(),
-  utils.convertToEnvVar(Object.assign(buildName, downstreamJobParams))
+  utils.convertToProperties(Object.assign(buildName, downstreamJobParams))
 );

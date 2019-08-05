@@ -293,4 +293,44 @@ describe("The instances config validator", function() {
       ]);
     }).not.toThrow();
   });
+
+  it("should validate an instances properties section.", function() {
+    // deps
+    const model = require(path.resolve("src/utils/model"));
+
+    // setup
+    var _script_ = require(fileInTest);
+
+    // verif
+    expect(_script_.validatePropertiesConfig(null)).toBeTruthy();
+    expect(_script_.validatePropertiesConfig(undefined)).toBeTruthy();
+    expect(_script_.validatePropertiesConfig({})).toBeTruthy();
+    expect(function() {
+      _script_.validatePropertiesConfig("not an array");
+    }).toThrow();
+
+    expect(function() {
+      _script_.validatePropertiesConfig([
+        {
+          filename: ""
+        }
+      ]);
+    }).toThrow();
+    expect(function() {
+      _script_.validatePropertiesConfig([
+        {
+          location: "instance"
+        }
+      ]);
+    }).toThrow();
+    expect(function() {
+      _script_.validatePropertiesConfig([
+        {
+          filename: "erp.propeties",
+          path: "/a/path",
+          properties: ""
+        }
+      ]);
+    }).not.toThrow();
+  });
 });

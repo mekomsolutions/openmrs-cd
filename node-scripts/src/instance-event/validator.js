@@ -24,6 +24,8 @@ module.exports = {
     module.exports.validateArtifactsConfig(instanceDef.artifacts, isNew);
 
     module.exports.validateDataConfig(instanceDef.data, isNew);
+
+    module.exports.validatePropertiesConfig(instanceDef.properties, isNew);
   },
 
   validateBaseConfig: function(instanceDef, isNew) {
@@ -239,6 +241,39 @@ module.exports = {
       } else {
         log.error("", "Illegal argument: the data section is malformed.");
         throw new Error();
+      }
+    });
+  },
+
+  validatePropertiesConfig: function(properties, isNew) {
+    if (_.isEmpty(properties)) {
+      return true;
+    }
+
+    if (!_.isArray(properties)) {
+      throw new Error(
+        "The properties section of the instance must be of type Array, aborting."
+      );
+    }
+    var allPropertiesEmpty = true;
+    properties.forEach(function(property) {
+      allPropertiesEmpty &= validatePropertySection(property, isNew);
+    });
+
+    function validatePropertySection(property) {
+      if (_.isEmpty(property)) {
+        return true;
+      }
+      return false;
+    }
+    properties.forEach(function(property) {
+      if (
+        JSON.stringify(Object.keys(property).sort()) !==
+        JSON.stringify(Object.keys(new model.Property()).sort())
+      ) {
+        throw new Error(
+          "The Property should be provided as an instance of 'Property'."
+        );
       }
     });
   },

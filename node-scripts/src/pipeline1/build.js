@@ -61,7 +61,7 @@ fs.chmodSync(config.getDeployShellScriptPath(), "0755");
 //
 fs.writeFileSync(
   config.getBuildArtifactEnvvarsPath(),
-  utils.convertToEnvVar(artifact)
+  utils.convertToProperties(artifact)
 );
 fs.writeFileSync(
   config.getBuildArtifactJsonPath(),

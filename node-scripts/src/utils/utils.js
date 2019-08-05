@@ -49,18 +49,17 @@ module.exports = {
   /**
    * https://gist.github.com/penguinboy/762197
    */
-  flattenObject: function(ob) {
+  flattenObject: function(ob, separator = "_") {
     var toReturn = {};
 
     for (var i in ob) {
       if (!ob.hasOwnProperty(i)) continue;
 
       if (typeof ob[i] == "object") {
-        var flatObject = module.exports.flattenObject(ob[i]);
+        var flatObject = module.exports.flattenObject(ob[i], separator);
         for (var x in flatObject) {
           if (!flatObject.hasOwnProperty(x)) continue;
-
-          toReturn[i + "_" + x] = flatObject[x];
+          toReturn[i + separator + x] = flatObject[x];
         }
       } else {
         toReturn[i] = ob[i];
@@ -72,9 +71,9 @@ module.exports = {
   /**
    * @return Returns a concatenated string of all the object's properties.
    */
-  convertToEnvVar: function(object) {
+  convertToProperties: function(object, depthSeparator) {
     var envvars = "";
-    var flat = module.exports.flattenObject(object);
+    var flat = module.exports.flattenObject(object, depthSeparator);
     for (var property in flat) {
       if (flat.hasOwnProperty(property)) {
         flat[property] = flat[property] == undefined ? "" : flat[property];

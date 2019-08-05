@@ -80,6 +80,6 @@ describe("Project build script", function() {
 
     expect(
       fs.readFileSync(config.getBuildArtifactEnvvarsPath(), "utf8")
-    ).toEqual(utils.convertToEnvVar(actualArtifact));
+    ).toEqual(utils.convertToProperties(actualArtifact));
   });
 });

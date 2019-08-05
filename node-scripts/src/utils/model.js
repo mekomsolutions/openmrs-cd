@@ -211,6 +211,17 @@ class DockerDeploymentScripts {
   }
 }
 
+/**
+ * Aims at describing an instance property file
+ */
+class Property {
+  constructor(filename, path, properties) {
+    this.filename = filename;
+    this.path = path;
+    this.properties = properties;
+  }
+}
+
 module.exports = {
   CommitMetadata: CommitMetadata,
   Script: Script,
@@ -224,5 +235,6 @@ module.exports = {
   ProjectBuild: ProjectBuild,
   Descriptor: Descriptor,
   ServerEvent: ServerEvent,
-  DockerDeploymentScripts: DockerDeploymentScripts
+  DockerDeploymentScripts: DockerDeploymentScripts,
+  Property: Property
 };

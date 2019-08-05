@@ -42,6 +42,11 @@ Depending on the context and the instance definition it can setup and run a new 
           <description>Tells whether there has been deployment changes and hence whether the deployment section should be (re)processed.</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>propertiesChanges</name>
+          <description>Tells whether there has been properties changes and hence whether the properties section should be (re)processed.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
     <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.0.8"/>
@@ -69,6 +74,7 @@ node {
  if (artifactsChanges == &quot;true&quot;) { cause += &quot;artifacts&quot; + sep }
  if (dataChanges == &quot;true&quot;) { cause += &quot;data&quot; + sep }
  if (deploymentChanges == &quot;true&quot;) { cause += &quot;deployment&quot; + sep }
+ if (propertiesChanges == &quot;true&quot;) { cause += &quot;properties&quot; + sep }
  if (creation == &quot;true&quot;) { cause += &quot;creation&quot; + sep }
  cause = cause.substring(0, cause.length() - sep.length())
  buildName += &quot;: &quot; + cause

@@ -25,6 +25,7 @@ describe("Start instance scripts", function() {
     process.env[config.varArtifactsChanges()] = "false";
     process.env[config.varDeploymentChanges()] = "false";
     process.env[config.varDataChanges()] = "false";
+    process.env[config.varPropertiesChanges()] = "false";
     process.env[config.varCreation()] = "false";
 
     instanceUuid = "cacb5448-46b0-4808-980d-5521775671c0";
@@ -333,5 +334,51 @@ describe("Start instance scripts", function() {
       )
     );
     expect(script).toContain(expectedScript.join(cst.SCRIPT_SEPARATOR));
+  });
+
+  it("should generate bash script upon properties changes.", function() {
+    process.env[config.varInstanceUuid()] = instanceUuid;
+    process.env[config.varPropertiesChanges()] = "true";
+    var instanceDef = db.getInstanceDefinition(instanceUuid);
+
+    var mockUtils = Object.assign({}, utils);
+    mockUtils.random = function() {
+      return testRandomString;
+    };
+
+    // replay
+    proxyquire(
+      path.resolve(
+        "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
+      ),
+      tests.stubs({ "../utils/utils": mockUtils })
+    );
+
+    // verif
+    var script = fs.readFileSync(
+      path.resolve(
+        config.getBuildDirPath(),
+        config.getStartInstanceScriptName()
+      ),
+      "utf8"
+    );
+
+    var ssh = instanceDef.deployment.host.value;
+    var docker = scripts[instanceDef.deployment.type];
+    var property = instanceDef.properties[0];
+
+    // ensure Properties file is correctly created
+    expect(script).toContain(
+      scripts.remote(
+        ssh,
+        docker.exec(
+          instanceDef.uuid,
+          "echo '" +
+            utils.convertToProperties(property.properties, ".") +
+            "' > " +
+            path.resolve(property.path, property.filename)
+        )
+      )
+    );
   });
 });

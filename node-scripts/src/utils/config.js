@@ -41,6 +41,9 @@ module.exports = {
   varDataChanges: function() {
     return "dataChanges";
   },
+  varPropertiesChanges: function() {
+    return "propertiesChanges";
+  },
   varCreation: function() {
     return "creation";
   },

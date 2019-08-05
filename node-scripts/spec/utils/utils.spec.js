@@ -72,7 +72,12 @@ describe("Utils", function() {
 
     var expectedResult =
       "level1_level2_level3_more=stuff\nlevel1_level2_level3_other=stuff\nlevel1_level2_level3_level4_the=end\nlevel1_level2still_last=one\nlevel1_am=bored\nmore=stuff\nipsum_lorem=latin\nfinal=\n";
-    var envvar = utils.convertToEnvVar(realDeepObject);
+    var envvar = utils.convertToProperties(realDeepObject);
+    expect(envvar).toEqual(expectedResult);
+
+    var expectedResult =
+      "level1.level2.level3.more=stuff\nlevel1.level2.level3.other=stuff\nlevel1.level2.level3.level4.the=end\nlevel1.level2still.last=one\nlevel1.am=bored\nmore=stuff\nipsum.lorem=latin\nfinal=\n";
+    var envvar = utils.convertToProperties(realDeepObject, ".");
     expect(envvar).toEqual(expectedResult);
   });
 
@@ -104,7 +109,9 @@ describe("Utils", function() {
     MockDate.reset();
 
     // setup
-    var obj = { status: "foobar" };
+    var obj = {
+      status: "foobar"
+    };
 
     // replay
     utils.setObjectStatus(obj);

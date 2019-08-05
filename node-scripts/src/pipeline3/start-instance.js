@@ -178,6 +178,34 @@ if (process.env[config.varDataChanges()] === "true") {
   });
 }
 
+// 'properties'
+if (process.env[config.varPropertiesChanges()] === "true") {
+  instanceDef.properties.forEach(function(property) {
+    const extension = property.filename.split(".").pop();
+    var writeFile = {
+      properties: function() {
+        return utils.convertToProperties(property.properties, ".");
+      },
+      json: function() {
+        return JSON.stringify(property.properties);
+      }
+    };
+    var output = writeFile[extension]();
+    script.body.push(
+      scripts.remote(
+        ssh,
+        container.exec(
+          instanceDef.uuid,
+          "echo '" +
+            output +
+            "' > " +
+            path.resolve(property.path, property.filename)
+        )
+      )
+    );
+  });
+}
+
 // Set the Timezone if provided
 if (instanceDef.deployment.timezone) {
   script.body.push(

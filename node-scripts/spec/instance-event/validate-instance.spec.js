@@ -127,7 +127,7 @@ describe("validate-instance", function() {
         ),
         "utf8"
       )
-    ).toContain(utils.convertToEnvVar(environment));
+    ).toContain(utils.convertToProperties(environment));
 
     // after
     tests.cleanup();
@@ -174,6 +174,7 @@ describe("validate-instance", function() {
     environment[config.varArtifactsChanges()] = JSON.stringify(true);
     environment[config.varDeploymentChanges()] = JSON.stringify(true);
     environment[config.varDataChanges()] = JSON.stringify(true);
+    environment[config.varPropertiesChanges()] = JSON.stringify(true);
     environment[config.varCreation()] = JSON.stringify(true);
 
     expect(
@@ -184,7 +185,7 @@ describe("validate-instance", function() {
         ),
         "utf8"
       )
-    ).toContain(utils.convertToEnvVar(environment));
+    ).toContain(utils.convertToProperties(environment));
 
     // after
     tests.cleanup();
@@ -222,7 +223,7 @@ describe("validate-instance", function() {
         ),
         "utf8"
       )
-    ).toContain(utils.convertToEnvVar(environment));
+    ).toContain(utils.convertToProperties(environment));
 
     // after
     tests.cleanup();
@@ -277,7 +278,7 @@ describe("validate-instance", function() {
         ),
         "utf8"
       )
-    ).toContain(utils.convertToEnvVar(environment));
+    ).toContain(utils.convertToProperties(environment));
 
     // set back to 'active:true' and ensure that the instance is updated this time
     process.env[config.varInstanceEvent()] = JSON.stringify(

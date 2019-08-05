@@ -54,5 +54,15 @@
         "password": "password"
       }
     }
+  ],
+  "properties": [
+    {
+      "filename": "erp.properties",
+      "path": "/opt/openmrs/",
+      "properties": {
+        "erp.database": "odoo",
+        "erp.username": "admin"
+      }
+    }
   ]
 }
