@@ -64,6 +64,9 @@ node {
 
 pipeline {
   agent any
+  options {
+    ansiColor(&apos;xterm&apos;)
+  }
   tools {
     maven &apos;Maven 3.5.0&apos;
     nodejs &apos;NodeJS 8.6.0&apos;
