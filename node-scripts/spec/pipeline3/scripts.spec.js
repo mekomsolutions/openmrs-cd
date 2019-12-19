@@ -140,7 +140,7 @@ describe("Scripts", function() {
       "-v /sys/fs/cgroup:/sys/fs/cgroup:ro"
     );
     expect(docker.run("cambodia1", instanceDef, mounts)).toContain(
-      "docker exec cambodia1 /tmp/start_bahmni.sh"
+      "docker exec cambodia1 /opt/bahmni-utils-scripts/start_bahmni.sh"
     );
   });
 
