@@ -31,7 +31,7 @@ For example by appending the expected parameters to a configurable URL, such as 
         </org.jenkinsci.plugins.gwt.GenericVariable>
         <org.jenkinsci.plugins.gwt.GenericVariable>
           <expressionType>JSONPath</expressionType>
-          <key>ref</key>
+          <key>scmRef</key>
           <value>$.ref</value>
           <regexpFilter></regexpFilter>
           <defaultValue></defaultValue>
@@ -71,7 +71,7 @@ For example by appending the expected parameters to a configurable URL, such as 
       <command>#!/bin/bash&quot;
 
 # The branch name is behind the last slash of the &apos;ref&apos;
-branchName=${ref##*/}
+branchName=${scmRef##*/}
 
 # Truncating the commit ID to 7 chars
 commitId=$(echo $commitId | cut -c1-7)
