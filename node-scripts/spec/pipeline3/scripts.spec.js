@@ -139,9 +139,6 @@ describe("Scripts", function() {
     expect(docker.run("cambodia1", instanceDef, mounts)).toContain(
       "-v /sys/fs/cgroup:/sys/fs/cgroup:ro"
     );
-    expect(docker.run("cambodia1", instanceDef, mounts)).toContain(
-      "docker exec cambodia1 /opt/bahmni-utils-scripts/start_bahmni.sh"
-    );
   });
 
   it("should generate ifExists wrapper", function() {

@@ -481,14 +481,6 @@ module.exports = {
         script += !scriptArgs[index + 1] ? "" : " ";
       });
 
-      if (docker.privileged == "true") {
-        script += "\n";
-        script +=
-          "docker exec " +
-          containerName +
-          " /opt/bahmni-utils-scripts/start_bahmni.sh";
-      }
-
       return script + "\n";
     },
 
