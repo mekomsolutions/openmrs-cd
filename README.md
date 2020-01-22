@@ -39,7 +39,7 @@ docker run -dti --name openmrscd  -p 8080:8080 \
   -v ~/openmrs-cd/app_data:/var/lib/openmrs_cd/app_data \
   mekomsolutions/openmrscd:$VERSION
 ```
-After the container has started, the customized Jenkins instance will be accessible at [http://localhost:8080](http://localhost:8080) with the following credentials: **admin** / **password**.
+After the container has started, the customized Jenkins instance will be accessible at [http://172.17.0.1:8080](http://172.17.0.1:8080) with the following credentials: **admin** / **password**.
 
 Authorize 'jenkins' user to write to the app_data folder:
 ```bash
