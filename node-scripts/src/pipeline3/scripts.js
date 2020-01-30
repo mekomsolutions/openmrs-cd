@@ -395,6 +395,19 @@ module.exports = {
 
       return script;
     },
+    /*
+     * Generates a script that pulls a Docker image
+     *
+     * @param {String} image - The name of the image to pull
+     * @param {String} tag - The tag of the image to pull
+     *
+     * @return {String} The script as a string.
+     */
+    pull: function(image, tag) {
+      var script = "";
+      script = "docker pull " + image + ":" + tag + "\n";
+      return script;
+    },
 
     /*
      * Generates a script that restarts the passed container.

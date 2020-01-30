@@ -79,10 +79,7 @@ if (process.env[config.varDeploymentChanges()] === "true") {
   var container = instanceDef.deployment.value;
   // TODO: most likely a `docker login` here
   script.body.push(
-    scripts.remote(
-      ssh,
-      "docker pull " + container.image + ":" + container.tag + "\n"
-    )
+    scripts.remote(ssh, containerScripts.pull(container.image, container.tag))
   );
   // Configure proxy servers
   var proxies = instanceDef.deployment.proxies;
