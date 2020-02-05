@@ -397,6 +397,24 @@ module.exports = {
     },
 
     /*
+     * Generates a script that pulls a Docker image
+     *
+     * @param {Object} deploymentValue - image and tag for Docker containers
+     *
+     * @return {String} The script as a string.
+     */
+    prepareDeployment: function(deploymentValue) {
+      var script = "";
+      script =
+        "docker pull " +
+        deploymentValue.image +
+        ":" +
+        deploymentValue.tag +
+        "\n";
+      return script;
+    },
+
+    /*
      * Generates a script that restarts the passed container.
      *
      * @param {String} containerName - The name of the container to restart.
@@ -515,7 +533,7 @@ module.exports = {
      * @param {String} source - The source file to be copied on the container.
      * @param {String} destination - The destination location for this file.
      * @param {String} sudo - Apply the command as sudo
-    *
+     *
      * @return {String} The script as a string.
      */
     copy: function(containerName, source, destination, sudo) {
@@ -529,6 +547,44 @@ module.exports = {
       return script + "\n";
     }
   },
+
+  /*
+  *
+  * Implementation of script utils to specifically manipulate Docker containers with Docker Compose
+  *
+  */
+
+  dockerCompose: {
+    /*
+     * Generates a script that prepare stack for Docker Compose
+     *
+     * @param {Object} deploymentValue - Contain some values to populate env file
+     *
+     * @return {String} The script as a string.
+     */
+    prepareDeployment: function(deploymentValue) {
+      var script = "";
+      script += "git clone " + deploymentValue.gitUrl + "\n";
+      script += "git checkout " + deploymentValue.gitCommit + "\n";
+      script += "cd bahmni-docker\n";
+      script +=
+        "echo -e 'OPENMRS_CONFIG_PATH=\"" +
+        deploymentValue.openmrsConfigPath +
+        '"\n BAHMNI_CONFIG_PATH="' +
+        deploymentValue.bahmniConfigPath +
+        '"\n OPENMRS_MODULES_PATH="' +
+        deploymentValue.openmrsModulesPath +
+        '"\n BAHMNI_HOME="' +
+        deploymentValue.bahmniHome +
+        '"\n TIMEZONE="' +
+        deploymentValue.timezone +
+        '"\n BAHMNI_MART_CRON_TIME="' +
+        deploymentValue.bahmniCron +
+        "\"\n' > .env";
+      return script;
+    }
+  },
+
   /**
    * Determines if a script should be run at a given stage and adds it to the final script
    *

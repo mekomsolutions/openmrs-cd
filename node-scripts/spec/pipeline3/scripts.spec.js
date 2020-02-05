@@ -161,6 +161,41 @@ describe("Scripts", function() {
     );
   });
 
+  it("should generate prepareDeployment wrapper for 'docker' type", function() {
+    var docker = scripts["docker"];
+    var deployment = {
+      value: {
+        image: "image1",
+        tag: "tag1"
+      }
+    };
+    expect(docker.prepareDeployment(deployment.value)).toEqual(
+      "docker pull image1:tag1\n"
+    );
+  });
+
+  it("should generate prepareDeployment wrapper for 'dockerCompose' type", function() {
+    var docker = scripts["dockerCompose"];
+    var deployment = {
+      value: {
+        gitUrl: "https://github.com/mekomsolutions/bahmni-distro-haiti",
+        gitCommit: "master",
+        openmrsConfigPath: "/home/test/",
+        bahmniConfigPath: "/home/test/",
+        openmrsModulesPath: "/home/test/",
+        bahmniHome: "/home/test/",
+        timezone: "Asia/Cambodia",
+        bahmniCron: "* * * * *"
+      }
+    };
+    expect(docker.prepareDeployment(deployment.value)).toEqual(
+      "git clone https://github.com/mekomsolutions/bahmni-distro-haiti\n" +
+        "git checkout master\n" +
+        "cd bahmni-docker\n" +
+        'echo -e \'OPENMRS_CONFIG_PATH="/home/test/"\n BAHMNI_CONFIG_PATH="/home/test/"\n OPENMRS_MODULES_PATH="/home/test/"\n BAHMNI_HOME="/home/test/"\n TIMEZONE="Asia/Cambodia"\n BAHMNI_MART_CRON_TIME="* * * * *"\n\' > .env'
+    );
+  });
+
   it("should generate Docker restart command", function() {
     var docker = scripts["docker"];
     expect(docker.restart("cambodia1")).toEqual(
