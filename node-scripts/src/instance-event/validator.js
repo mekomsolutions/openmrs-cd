@@ -181,6 +181,17 @@ module.exports = {
     }
   },
 
+  validateDockerComposeDeploymentConfigValue: function(value) {
+    if (
+      JSON.stringify(Object.keys(value).sort()) !==
+      JSON.stringify(Object.keys(new model.DockerComposeDeployment()).sort())
+    ) {
+      throw new Error(
+        "The DockerCompose deployment value should be provided as an instance of 'DockerComposeDeployment'."
+      );
+    }
+  },
+
   validateFileTLSDeploymentConfigValue: function(value) {
     if (
       JSON.stringify(Object.keys(value).sort()) !==
@@ -282,6 +293,7 @@ module.exports = {
     return {
       maven: module.exports.validateMavenArtifactConfigValue,
       docker: module.exports.validateDockerDeploymentConfigValue,
+      dockerCompose: module.exports.validateDockerComposeDeploymentConfigValue,
       file: module.exports.validateFileTLSDeploymentConfigValue,
       vault: module.exports.validateVaultTLSDeploymentConfigValue
     };

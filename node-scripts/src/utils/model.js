@@ -46,6 +46,31 @@ class DockerDeployment {
 }
 
 /**
+ * Describes a DockerCompose deployment
+ */
+class DockerComposeDeployment {
+  constructor(
+    gitUrl,
+    gitCommit,
+    openmrsConfigPath,
+    bahmniConfigPath,
+    openmrsModulesPath,
+    bahmniHome,
+    timezone,
+    bahmniCron
+  ) {
+    this.gitUrl = gitUrl;
+    this.gitCommit = gitCommit;
+    this.openmrsConfigPath = openmrsConfigPath;
+    this.bahmniConfigPath = bahmniConfigPath;
+    this.openmrsModulesPath = openmrsModulesPath;
+    this.bahmniHome = bahmniHome;
+    this.timezone = timezone;
+    this.bahmniCron = bahmniCron;
+  }
+}
+
+/**
  * Describes a File TLS deployment section
  */
 class FileTLSDeployment {
@@ -201,9 +226,10 @@ class ServerEvent {
  * Docker deployment scripts
  */
 class DockerDeploymentScripts {
-  constructor(ifExists, restart, remove, run, exec, copy) {
+  constructor(ifExists, restart, prepareDeployment, remove, run, exec, copy) {
     this.ifExists = ifExists;
     this.restart = restart;
+    this.prepareDeployment = prepareDeployment;
     this.remove = remove;
     this.run = run;
     this.exec = exec;
@@ -229,6 +255,7 @@ module.exports = {
   InstanceData: InstanceData,
   SqlData: SqlData,
   DockerDeployment: DockerDeployment,
+  DockerComposeDeployment: DockerComposeDeployment,
   FileTLSDeployment: FileTLSDeployment,
   VaultTLSDeployment: VaultTLSDeployment,
   Artifact: Artifact,

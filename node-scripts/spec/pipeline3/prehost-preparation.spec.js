@@ -47,7 +47,9 @@ describe("Pre-host preparation scripts", function() {
       "\n" +
       "rm -rf " +
       artifactsPath +
-      "/*\n" +
+      "/* " +
+      artifactsPath +
+      "/.[a-zA-Z0-9_-]*\n" +
       "mvn dependency:copy -Dartifact=net.mekomsolutions:openmrs-distro-cambodia:1.1.0-SNAPSHOT:zip " +
       "-DoutputDirectory=" +
       artifactsPath +

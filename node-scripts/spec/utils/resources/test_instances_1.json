@@ -276,10 +276,16 @@
     ],
     "deployment": {
       "hostDir": "/var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae",
-      "type": "docker",
+      "type": "dockerCompose",
       "value": {
-        "image": "mekomsolutions/bahmni",
-        "tag": "cambodia-release-0.90"
+        "gitUrl": "https://github.com/mekomsolutions/bahmni-distro-haiti",
+        "gitCommit": "ee09229bd027f66e5ea7a0212fd45df4f937b3d8",
+        "openmrsConfigPath": "/home/test/",
+        "bahmniConfigPath": "/home/test/",
+        "openmrsModulesPath": "/home/test/",
+        "bahmniHome": "/home/test/",
+        "timezone": "Asia/Cambodia",
+        "bahmniCron": "* * * * *"
       },
       "host": {
         "type": "ssh",

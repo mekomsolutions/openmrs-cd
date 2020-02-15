@@ -83,10 +83,10 @@ describe("Host preparation scripts", function() {
       path.resolve(config.getBuildDirPath(), config.getHostPrepareScriptName()),
       "utf8"
     );
+    var deploymentScripts = scripts[instanceDef.deployment.type];
     expect(script).toContain(
-      "docker pull mekomsolutions/bahmni:cambodia-release-0.90"
+      deploymentScripts.prepareDeployment(instanceDef)
     );
-
     // ensure proxies have been setup
     var proxy = instanceDef.deployment.proxies[0];
     expect(script).toContain(
@@ -95,6 +95,29 @@ describe("Host preparation scripts", function() {
         instanceDef.deployment.maintenanceUrl,
         instanceDef.deployment.selinux
       )
+    );
+  });
+
+  it("should generate bash script upon deployment changes for 'dockerCompose' type.", function() {
+    instanceUuid = "50b6cf72-0e80-457d-8141-a0c8c85d4dae";
+    process.env[config.varInstanceUuid()] = instanceUuid;
+    process.env[config.varDeploymentChanges()] = "true";
+    var instanceDef = db.getInstanceDefinition(instanceUuid);
+    // replay
+    proxyquire(
+      path.resolve(
+        "src/" + config.getJobNameForPipeline3() + "/host-preparation.js"
+      ),
+      tests.stubs()
+    );
+    // verif
+    var script = fs.readFileSync(
+      path.resolve(config.getBuildDirPath(), config.getHostPrepareScriptName()),
+      "utf8"
+    );
+    var deploymentScripts = scripts[instanceDef.deployment.type];
+    expect(script).toContain(
+      deploymentScripts.prepareDeployment(instanceDef)
     );
   });
 

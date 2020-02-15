@@ -176,22 +176,38 @@ describe("Scripts", function() {
 
   it("should generate prepareDeployment wrapper for 'dockerCompose' type", function() {
     var docker = scripts["dockerCompose"];
-    var deployment = {
-      value: {
-        gitUrl: "https://github.com/mekomsolutions/bahmni-distro-haiti",
-        gitCommit: "master",
-        openmrsConfigPath: "/home/test/",
-        bahmniConfigPath: "/home/test/",
-        openmrsModulesPath: "/home/test/",
-        bahmniHome: "/home/test/",
-        timezone: "Asia/Cambodia",
-        bahmniCron: "* * * * *"
+    var instanceDef = {
+      name: "sanpedro-dev",
+      deployment: {
+        value: {
+          gitUrl: "https://github.com/mekomsolutions/bahmni-distro-haiti",
+          gitCommit: "ee09229bd027f66e5ea7a0212fd45df4f937b3d8",
+          openmrsConfigPath: "/home/test/",
+          bahmniConfigPath: "/home/test/",
+          openmrsModulesPath: "/home/test/",
+          bahmniHome: "/home/test/",
+          timezone: "Asia/Cambodia",
+          bahmniCron: "* * * * *"
+        },
+        host: {
+          type: "ssh",
+          value: {
+            user: "test"
+          }
+        }
       }
     };
-    expect(docker.prepareDeployment(deployment.value)).toEqual(
-      "git clone https://github.com/mekomsolutions/bahmni-distro-haiti\n" +
-        "git checkout master\n" +
-        "cd bahmni-docker\n" +
+    expect(docker.prepareDeployment(instanceDef)).toEqual(
+      scripts.initFolder(
+        "/opt/bahmni-docker/" + instanceDef.name,
+        instanceDef.deployment.host.value.user,
+        null,
+        true
+      ) +
+        "\n" +
+        "git clone https://github.com/mekomsolutions/bahmni-distro-haiti /opt/bahmni-docker/sanpedro-dev\n" +
+        "cd /opt/bahmni-docker/" + instanceDef.name + "\n" +
+        "git checkout ee09229bd027f66e5ea7a0212fd45df4f937b3d8\n" +
         'echo -e \'OPENMRS_CONFIG_PATH="/home/test/"\n BAHMNI_CONFIG_PATH="/home/test/"\n OPENMRS_MODULES_PATH="/home/test/"\n BAHMNI_HOME="/home/test/"\n TIMEZONE="Asia/Cambodia"\n BAHMNI_MART_CRON_TIME="* * * * *"\n\' > .env'
     );
   });
@@ -541,14 +557,14 @@ describe("Scripts", function() {
     expect(scripts.initFolder(folderPath, user, null, true)).toEqual(
       "sudo mkdir -p test_folder\n" +
         "sudo chown -R user:user test_folder\n" +
-        "rm -rf test_folder/*" +
+        "rm -rf test_folder/* test_folder/.[a-zA-Z0-9_-]*" +
         "\n"
     );
 
     expect(scripts.initFolder(folderPath, user, group, true)).toEqual(
       "sudo mkdir -p test_folder\n" +
         "sudo chown -R user:group test_folder\n" +
-        "rm -rf test_folder/*" +
+        "rm -rf test_folder/* test_folder/.[a-zA-Z0-9_-]*" +
         "\n"
     );
   });

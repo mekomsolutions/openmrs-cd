@@ -75,15 +75,12 @@ if (process.env[config.varArtifactsChanges()] === "true") {
 // 'deployment'
 
 if (process.env[config.varDeploymentChanges()] === "true") {
-  var containerScripts = scripts[instanceDef.deployment.type];
-  var container = instanceDef.deployment.value;
-  // TODO: most likely a `docker login` here
+  var deploymentScripts = scripts[instanceDef.deployment.type];
+  var deploymentValue = instanceDef.deployment.value;
   script.body.push(
-    scripts.remote(
-      ssh,
-      "docker pull " + container.image + ":" + container.tag + "\n"
-    )
+    scripts.remote(ssh, deploymentScripts.prepareDeployment(instanceDef))
   );
+
   // Configure proxy servers
   var proxies = instanceDef.deployment.proxies;
   if (!_.isEmpty(proxies)) {

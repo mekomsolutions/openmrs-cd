@@ -161,7 +161,7 @@ module.exports = {
     script += "sudo mkdir -p " + folderPath;
     script += "\n";
     script += "sudo chown -R " + user + ":" + group + " " + folderPath + "\n";
-    script += wipe == true ? "rm -rf " + folderPath + "/*" : "";
+    script += wipe == true ? "rm -rf " + folderPath + "/*" + " " + folderPath + "/.[a-zA-Z0-9_-]*" : "";
     script += "\n";
 
     return script;
@@ -558,15 +558,31 @@ module.exports = {
     /*
      * Generates a script that prepare stack for Docker Compose
      *
-     * @param {Object} deploymentValue - Contain some values to populate env file
+     * @param {Object} instanceDef - The instance definition of the instance to start.
      *
      * @return {String} The script as a string.
      */
-    prepareDeployment: function(deploymentValue) {
+    prepareDeployment: function(instanceDef) {
+      var destDir = "/opt/bahmni-docker/" + instanceDef.name;
+      var user = instanceDef.deployment.host.value.user;
+      var deploymentValue = instanceDef.deployment.value;
       var script = "";
-      script += "git clone " + deploymentValue.gitUrl + "\n";
+
+      script +=
+        module.exports.initFolder(
+          destDir,
+          user,
+          null,
+          true
+        ) + "\n";
+      script +=
+        "git clone " +
+        deploymentValue.gitUrl +
+        " " +
+        destDir +
+        "\n";
+      script += "cd " + destDir + "\n";
       script += "git checkout " + deploymentValue.gitCommit + "\n";
-      script += "cd bahmni-docker\n";
       script +=
         "echo -e 'OPENMRS_CONFIG_PATH=\"" +
         deploymentValue.openmrsConfigPath +
