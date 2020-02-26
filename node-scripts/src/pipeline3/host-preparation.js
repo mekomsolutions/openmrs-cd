@@ -76,9 +76,14 @@ if (process.env[config.varArtifactsChanges()] === "true") {
 
 if (process.env[config.varDeploymentChanges()] === "true") {
   var deploymentScripts = scripts[instanceDef.deployment.type];
-  var deploymentValue = instanceDef.deployment.value;
   script.body.push(
-    scripts.remote(ssh, deploymentScripts.prepareDeployment(instanceDef))
+    scripts.remote(
+      ssh,
+      deploymentScripts.prepareDeployment(
+        instanceDef.deployment,
+        instanceDef.name
+      )
+    )
   );
 
   // Configure proxy servers

@@ -141,7 +141,14 @@ describe("Scripts", function() {
     );
   });
 
-  it("should generate ifExists wrapper", function() {
+  it("should generate run command for 'dockerCompose' type", function() {
+    var docker = scripts["dockerCompose"];
+    expect(docker.run("sanpedro-dev")).toEqual(
+      "set -e\ncd /opt/bahmni-docker/sanpedro-dev\ndocker-compose up\n"
+    );
+  });
+
+  it("should generate ifExists wrapper for 'docker' type", function() {
     var docker = scripts["docker"];
     expect(docker.ifExists("cambodia1", "cmd1\n", "cmd2\n")).toEqual(
       "set -e\n" +
@@ -161,6 +168,26 @@ describe("Scripts", function() {
     );
   });
 
+  it("should generate ifExists wrapper for 'dockerCompose' type", function() {
+    var docker = scripts["dockerCompose"];
+    expect(docker.ifExists("sanpedro-dev", "cmd1\n", "cmd2\n")).toEqual(
+      "set -e\n" +
+        "container=\\$(docker ps -a --filter name=sanpedro-dev --format {{.Names}})\n" +
+        'if [[ "\\$container" =~ "sanpedro-dev" ]]\n' +
+        "then cmd1\n" +
+        "else cmd2\n" +
+        "fi\n"
+    );
+    expect(docker.ifExists("sanpedro-dev")).toEqual(
+      "set -e\n" +
+        "container=\\$(docker ps -a --filter name=sanpedro-dev --format {{.Names}})\n" +
+        'if [[ "\\$container" =~ "sanpedro-dev" ]]\n' +
+        "then echo\n" +
+        "else echo\n" +
+        "fi\n"
+    );
+  });
+
   it("should generate prepareDeployment wrapper for 'docker' type", function() {
     var docker = scripts["docker"];
     var deployment = {
@@ -169,7 +196,7 @@ describe("Scripts", function() {
         tag: "tag1"
       }
     };
-    expect(docker.prepareDeployment(deployment.value)).toEqual(
+    expect(docker.prepareDeployment(deployment)).toEqual(
       "docker pull image1:tag1\n"
     );
   });
@@ -179,6 +206,7 @@ describe("Scripts", function() {
     var instanceDef = {
       name: "sanpedro-dev",
       deployment: {
+        hostDir: "/opt/bahmni-docker/",
         value: {
           gitUrl: "https://github.com/mekomsolutions/bahmni-distro-haiti",
           gitCommit: "ee09229bd027f66e5ea7a0212fd45df4f937b3d8",
@@ -197,18 +225,23 @@ describe("Scripts", function() {
         }
       }
     };
-    expect(docker.prepareDeployment(instanceDef)).toEqual(
+    expect(
+      docker.prepareDeployment(instanceDef.deployment, instanceDef.name)
+    ).toEqual(
       scripts.initFolder(
-        "/opt/bahmni-docker/" + instanceDef.name,
+        instanceDef.deployment.hostDir + instanceDef.name,
         instanceDef.deployment.host.value.user,
         null,
         true
       ) +
         "\n" +
         "git clone https://github.com/mekomsolutions/bahmni-distro-haiti /opt/bahmni-docker/sanpedro-dev\n" +
-        "cd /opt/bahmni-docker/" + instanceDef.name + "\n" +
+        "cd " +
+        instanceDef.deployment.hostDir +
+        instanceDef.name +
+        "\n" +
         "git checkout ee09229bd027f66e5ea7a0212fd45df4f937b3d8\n" +
-        'echo -e \'OPENMRS_CONFIG_PATH="/home/test/"\n BAHMNI_CONFIG_PATH="/home/test/"\n OPENMRS_MODULES_PATH="/home/test/"\n BAHMNI_HOME="/home/test/"\n TIMEZONE="Asia/Cambodia"\n BAHMNI_MART_CRON_TIME="* * * * *"\n\' > .env'
+        "echo -e 'OPENMRS_CONFIG_PATH=/home/test/\nBAHMNI_CONFIG_PATH=/home/test/\nOPENMRS_MODULES_PATH=/home/test/\nBAHMNI_HOME=/home/test/\nTIMEZONE=Asia/Cambodia\nBAHMNI_MART_CRON_TIME=* * * * *\n' > .env"
     );
   });
 
@@ -219,12 +252,36 @@ describe("Scripts", function() {
     );
   });
 
+  it("should generate Docker Compose restart command", function() {
+    var docker = scripts["dockerCompose"];
+    expect(docker.restart("sanpedro-dev", "/opt/bahmni-docker/")).toEqual(
+      docker.ifExists(
+        "sanpedro-dev",
+        "set -e\n" +
+        "cd /opt/bahmni-docker/sanpedro-dev\n"  +
+        "docker-compose restart\n"
+      )
+    );
+  });
+
   it("should generate Docker remove command", function() {
     var docker = scripts["docker"];
     expect(docker.remove("cambodia1")).toEqual(
       docker.ifExists(
         "cambodia1",
         "set -e\ndocker stop cambodia1\ndocker rm -v cambodia1\n"
+      )
+    );
+  });
+
+  it("should generate Docker Compose remove command", function() {
+    var docker = scripts["dockerCompose"];
+    expect(docker.remove("sanpedro-dev", "/opt/bahmni-docker")).toEqual(
+      docker.ifExists(
+        "sanpedro-dev",
+        "set -e\n" +
+        "cd /opt/bahmni-docker/sanpedro-dev\n" +
+        "docker-compose down\n"
       )
     );
   });

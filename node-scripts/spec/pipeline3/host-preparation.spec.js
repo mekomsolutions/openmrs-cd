@@ -65,7 +65,7 @@ describe("Host preparation scripts", function() {
     expect(script).toContain(scripts.rsync(ssh, srcDir, hostArtifactsDir));
   });
 
-  it("should generate bash script upon deployment changes.", function() {
+  fit("should generate bash script upon deployment changes.", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
     process.env[config.varDeploymentChanges()] = "true";
     var instanceDef = db.getInstanceDefinition(instanceUuid);
@@ -85,7 +85,10 @@ describe("Host preparation scripts", function() {
     );
     var deploymentScripts = scripts[instanceDef.deployment.type];
     expect(script).toContain(
-      deploymentScripts.prepareDeployment(instanceDef)
+      deploymentScripts.prepareDeployment(
+        instanceDef.deployment,
+        instanceDef.name
+      )
     );
     // ensure proxies have been setup
     var proxy = instanceDef.deployment.proxies[0];
@@ -95,29 +98,6 @@ describe("Host preparation scripts", function() {
         instanceDef.deployment.maintenanceUrl,
         instanceDef.deployment.selinux
       )
-    );
-  });
-
-  it("should generate bash script upon deployment changes for 'dockerCompose' type.", function() {
-    instanceUuid = "50b6cf72-0e80-457d-8141-a0c8c85d4dae";
-    process.env[config.varInstanceUuid()] = instanceUuid;
-    process.env[config.varDeploymentChanges()] = "true";
-    var instanceDef = db.getInstanceDefinition(instanceUuid);
-    // replay
-    proxyquire(
-      path.resolve(
-        "src/" + config.getJobNameForPipeline3() + "/host-preparation.js"
-      ),
-      tests.stubs()
-    );
-    // verif
-    var script = fs.readFileSync(
-      path.resolve(config.getBuildDirPath(), config.getHostPrepareScriptName()),
-      "utf8"
-    );
-    var deploymentScripts = scripts[instanceDef.deployment.type];
-    expect(script).toContain(
-      deploymentScripts.prepareDeployment(instanceDef)
     );
   });
 

@@ -10,6 +10,7 @@ const heredoc_2 = cst.HEREDOC_2;
 const heredoc_3 = cst.HEREDOC_3;
 const utils = require("../utils/utils");
 const model = require("../utils/model");
+const config = require("../utils/config");
 
 module.exports = {
   /*
@@ -161,7 +162,10 @@ module.exports = {
     script += "sudo mkdir -p " + folderPath;
     script += "\n";
     script += "sudo chown -R " + user + ":" + group + " " + folderPath + "\n";
-    script += wipe == true ? "rm -rf " + folderPath + "/*" + " " + folderPath + "/.[a-zA-Z0-9_-]*" : "";
+    script +=
+      wipe == true
+        ? "rm -rf " + folderPath + "/*" + " " + folderPath + "/.[a-zA-Z0-9_-]*"
+        : "";
     script += "\n";
 
     return script;
@@ -403,13 +407,13 @@ module.exports = {
      *
      * @return {String} The script as a string.
      */
-    prepareDeployment: function(deploymentValue) {
+    prepareDeployment: function(deployment, instanceName) {
       var script = "";
       script =
         "docker pull " +
-        deploymentValue.image +
+        deployment.value.image +
         ":" +
-        deploymentValue.tag +
+        deployment.value.tag +
         "\n";
       return script;
     },
@@ -556,48 +560,101 @@ module.exports = {
 
   dockerCompose: {
     /*
-     * Generates a script that prepare stack for Docker Compose
+     * Util function that wraps the passed commands so each is applied either accordingly.
      *
-     * @param {Object} instanceDef - The instance definition of the instance to start.
+     * @param {String} containerName - The name of the container.
+     * @param {String} ifExistsCommand - The command that should run if the container exists.
+     * @param {String} elseCommand - The command that will run if the container does *not* exist.
      *
      * @return {String} The script as a string.
      */
-    prepareDeployment: function(instanceDef) {
-      var destDir = "/opt/bahmni-docker/" + instanceDef.name;
-      var user = instanceDef.deployment.host.value.user;
-      var deploymentValue = instanceDef.deployment.value;
+    ifExists: function(containerName, ifExistsCommand, elseCommand) {
+      var script = "";
+      script += "set -e\n";
+      script +=
+        "container=\\$(docker ps -a --filter name=" +
+        containerName +
+        " --format {{.Names}})\n";
+      script += 'if [[ "\\$container" =~ "' + containerName + '" ]]\n';
+      script += "then ";
+      script += !_.isEmpty(ifExistsCommand) ? ifExistsCommand : "echo\n";
+      script += "else ";
+      script += !_.isEmpty(elseCommand) ? elseCommand : "echo\n";
+      script += "fi\n";
+
+      return script;
+    },
+
+    /*
+     * Generates a script that prepare stack for Docker Compose
+     *
+     * @param {Object} deployment - .
+     *
+     * @return {String} The script as a string.
+     */
+    prepareDeployment: function(deployment, instanceName) {
+      var destDir = deployment.hostDir + instanceName;
+      var user = deployment.host.value.user;
+      var deploymentValue = deployment.value;
       var script = "";
 
-      script +=
-        module.exports.initFolder(
-          destDir,
-          user,
-          null,
-          true
-        ) + "\n";
-      script +=
-        "git clone " +
-        deploymentValue.gitUrl +
-        " " +
-        destDir +
-        "\n";
+      script += module.exports.initFolder(destDir, user, null, true) + "\n";
+      script += "git clone " + deploymentValue.gitUrl + " " + destDir + "\n";
       script += "cd " + destDir + "\n";
       script += "git checkout " + deploymentValue.gitCommit + "\n";
       script +=
-        "echo -e 'OPENMRS_CONFIG_PATH=\"" +
+        "echo -e 'OPENMRS_CONFIG_PATH=" +
         deploymentValue.openmrsConfigPath +
-        '"\n BAHMNI_CONFIG_PATH="' +
+        "\nBAHMNI_CONFIG_PATH=" +
         deploymentValue.bahmniConfigPath +
-        '"\n OPENMRS_MODULES_PATH="' +
+        "\nOPENMRS_MODULES_PATH=" +
         deploymentValue.openmrsModulesPath +
-        '"\n BAHMNI_HOME="' +
+        "\nBAHMNI_HOME=" +
         deploymentValue.bahmniHome +
-        '"\n TIMEZONE="' +
+        "\nTIMEZONE=" +
         deploymentValue.timezone +
-        '"\n BAHMNI_MART_CRON_TIME="' +
+        "\nBAHMNI_MART_CRON_TIME=" +
         deploymentValue.bahmniCron +
-        "\"\n' > .env";
+        "\n' > .env";
       return script;
+    },
+
+    /*
+     * Generates a script that restarts the passed container.
+     *
+     * @param {String} containerName - The name of the container to restart.
+     *
+     * @return {String} The script as a string.
+     */
+    restart: function(instanceName, hostDir) {
+      var script = "";
+      script += "set -e\n";
+      script += "cd " + hostDir + instanceName + "\n";
+      script += "docker-compose restart\n";
+      return module.exports.dockerCompose.ifExists(instanceName, script);
+    },
+
+    run: function (instanceName, hostDir) {
+      var script = "";
+      script += "set -e\n"
+      script += "cd " + hostDir + instanceName + "\n";
+      script += "docker-compose up\n";
+      return script;
+    },
+
+    /*
+     * Generates a script to down all containers started with Docker Compose.
+     *
+     * @param {String} instanceName - The name of the servers to remove.
+     *
+     * @return {String} The script as a string.
+     */
+    remove: function(instanceName, hostDir) {
+      var script = "";
+      script += "set -e\n";
+      script += "cd " + hostDir + instanceName + "\n";
+      script += "docker-compose down\n";
+      return module.exports.dockerCompose.ifExists(instanceName, script);
     }
   },
 

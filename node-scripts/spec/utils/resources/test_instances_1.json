@@ -275,7 +275,7 @@
       }
     ],
     "deployment": {
-      "hostDir": "/var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae",
+      "hostDir": "/opt/bahmni-docker/",
       "type": "dockerCompose",
       "value": {
         "gitUrl": "https://github.com/mekomsolutions/bahmni-distro-haiti",
