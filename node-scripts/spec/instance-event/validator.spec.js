@@ -88,7 +88,7 @@ describe("The instances config validator", function() {
         {
           type: "docker",
           hostDir: "",
-          value: new model.DockerDeployment()
+          value: new model.DockerMonolithDeployment()
         },
         true
       );
@@ -98,7 +98,7 @@ describe("The instances config validator", function() {
         {
           type: "docker",
           hostDir: { not_a: "dir path" },
-          value: new model.DockerDeployment()
+          value: new model.DockerMonolithDeployment()
         },
         true
       );
@@ -108,7 +108,7 @@ describe("The instances config validator", function() {
         {
           type: "docker",
           hostDir: "/tmp/{{uuid}}",
-          value: new model.DockerDeployment()
+          value: new model.DockerMonolithDeployment()
         },
         true
       );
@@ -120,7 +120,7 @@ describe("The instances config validator", function() {
         {
           type: "docker",
           hostDir: "/tmp/{{uuid}}",
-          value: new model.DockerDeployment(),
+          value: new model.DockerMonolithDeployment(),
           tls: {
             type: "file",
             value: { "1": "not a valid field" }
@@ -134,7 +134,7 @@ describe("The instances config validator", function() {
         {
           type: "docker",
           hostDir: "/tmp/{{uuid}}",
-          value: new model.DockerDeployment(),
+          value: new model.DockerMonolithDeployment(),
           tls: {
             type: "file",
             value: new model.FileTLSDeployment()
@@ -150,7 +150,7 @@ describe("The instances config validator", function() {
         {
           type: "docker",
           hostDir: "/tmp/{{uuid}}",
-          value: new model.DockerDeployment(),
+          value: new model.DockerMonolithDeployment(),
           tls: {
             type: "vault",
             value: { "1": "not a valid field" }
@@ -164,7 +164,7 @@ describe("The instances config validator", function() {
         {
           type: "docker",
           hostDir: "/tmp/{{uuid}}",
-          value: new model.DockerDeployment(),
+          value: new model.DockerMonolithDeployment(),
           tls: {
             type: "vault",
             value: new model.VaultTLSDeployment()

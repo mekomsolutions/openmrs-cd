@@ -35,7 +35,7 @@ if (_.isEmpty(instanceDef)) {
 //  Host metadata
 //
 var ssh = instanceDef.deployment.host.value; // TODO this should be extracted based on the host type
-var hostDir = instanceDef.deployment.hostDir;
+var hostDir = path.resolve(instanceDef.deployment.hostDir, instanceDef.name).toString();
 
 //
 //  Building the script
@@ -75,11 +75,10 @@ if (process.env[config.varArtifactsChanges()] === "true") {
 // 'deployment'
 
 if (process.env[config.varDeploymentChanges()] === "true") {
-  var containerScripts = scripts[instanceDef.deployment.type];
-  var container = instanceDef.deployment.value;
+  const deploymentScripts = require("./impl/" + instanceDef.deployment.type);
   // TODO: most likely a `docker login` here
   script.body.push(
-    scripts.remote(ssh, containerScripts.pull(container.image, container.tag))
+    deploymentScripts.hostPreparation.getDeploymentScript(instanceDef)
   );
   // Configure proxy servers
   var proxies = instanceDef.deployment.proxies;
@@ -102,6 +101,7 @@ if (process.env[config.varDeploymentChanges()] === "true") {
 // 'data'
 
 if (process.env[config.varDataChanges()] === "true") {
+  // shouldn't this be managed by docker/docker-compose?
   instanceDef.data.forEach(function(data) {
     var instanceDataDir = hostDir + "/data";
     var sourceDataDir;

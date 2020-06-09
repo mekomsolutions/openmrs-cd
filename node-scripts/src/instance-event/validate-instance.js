@@ -25,6 +25,7 @@ const uuid = require("uuid/v4");
 var instanceEvent = {};
 if (process.env[config.varInstanceEvent()]) {
   instanceEvent = JSON.parse(process.env[config.varInstanceEvent()]);
+  console.log(instanceEvent);
 }
 var existingInstance = db.getInstanceDefinition(
   instanceEvent.uuid,

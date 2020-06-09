@@ -34,7 +34,6 @@ if (_.isEmpty(instanceDef)) {
 //  Host metadata
 //
 var ssh = instanceDef.deployment.host.value; // TODO this should be extracted based on the host type
-var hostDir = instanceDef.deployment.hostDir;
 
 //
 //  Building the script
@@ -47,7 +46,7 @@ script.body = [];
 script.body.push("set -e\n");
 
 var finalRestart = false;
-var container = scripts[instanceDef.deployment.type];
+var container = require("./impl/" + instanceDef.deployment.type);
 
 var computedScript = scripts.computeAdditionalScripts(
   script.body,

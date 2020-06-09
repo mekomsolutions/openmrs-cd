@@ -30,7 +30,7 @@
       }
     ],
     "deployment": {
-      "hostDir": "/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0",
+      "hostDir": "/var/docker-volumes/{{name}}",
       "maintenanceUrl": "http://cd05.mekomsolutions.net:8950/",
       "proxies": [
         {
@@ -46,7 +46,7 @@
       ],
       "selinux": "true",
       "timezone": "Asia/Phnom_Penh",
-      "type": "docker",
+      "type": "dockerMonolith",
       "value": {
         "image": "mekomsolutions/bahmni",
         "tag": "cambodia-release-0.90",
@@ -276,7 +276,7 @@
     ],
     "deployment": {
       "hostDir": "/var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae",
-      "type": "docker",
+      "type": "dockerMonolith",
       "value": {
         "image": "mekomsolutions/bahmni",
         "tag": "cambodia-release-0.90"
@@ -311,7 +311,7 @@
     ],
     "deployment": {
       "hostDir": "/var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae",
-      "type": "docker",
+      "type": "dockerMonolith",
       "value": {
         "image": "mekomsolutions/bahmni",
         "tag": "cambodia-release-0.90"

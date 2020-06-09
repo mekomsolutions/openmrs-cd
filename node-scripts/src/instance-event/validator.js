@@ -170,13 +170,25 @@ module.exports = {
     }
   },
 
-  validateDockerDeploymentConfigValue: function(value) {
+  validateDockerMonolithDeploymentConfigValue: function(value) {
     if (
       JSON.stringify(Object.keys(value).sort()) !==
-      JSON.stringify(Object.keys(new model.DockerDeployment()).sort())
+      JSON.stringify(Object.keys(new model.DockerMonolithDeployment()).sort())
     ) {
       throw new Error(
         "The Docker deployment value should be provided as an instance of 'DockerDeployment'."
+      );
+    }
+  },
+  validateDockerComposeDeploymentConfigValue: function(value) {
+    console.log(JSON.stringify(Object.keys(value).sort()));
+    console.log(Object.keys(new model.DockerComposeDeployment()).sort());
+    if (
+      JSON.stringify(Object.keys(value).sort()) !==
+      JSON.stringify(Object.keys(new model.DockerComposeDeployment()).sort())
+    ) {
+      throw new Error(
+        "The Docker compose deployment value should be provided as an instance of 'DockerDeployment'."
       );
     }
   },
@@ -281,9 +293,12 @@ module.exports = {
   getConfigValidatorsMap: function() {
     return {
       maven: module.exports.validateMavenArtifactConfigValue,
-      docker: module.exports.validateDockerDeploymentConfigValue,
+      dockerMonolith:
+        module.exports.validateDockerMonolithDeploymentConfigValue,
       file: module.exports.validateFileTLSDeploymentConfigValue,
-      vault: module.exports.validateVaultTLSDeploymentConfigValue
+      vault: module.exports.validateVaultTLSDeploymentConfigValue,
+      docker: module.exports.validateDockerMonolithDeploymentConfigValue,
+      dockerCompose: module.exports.validateDockerComposeDeploymentConfigValue
     };
   }
 };

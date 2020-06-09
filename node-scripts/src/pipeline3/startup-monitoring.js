@@ -47,7 +47,7 @@ script.body = [];
 script.body.push("set -e\n");
 
 var finalRestart = false;
-var container = scripts[instanceDef.deployment.type];
+var container = require("./impl/" + instanceDef.deployment.type);
 
 var computedScript = scripts.computeAdditionalScripts(
   script.body,

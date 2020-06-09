@@ -101,7 +101,7 @@ module.exports = {
     return pom;
   },
 
-  /*
+  /**
    * Saves an instance event to the database.
    *
    * @param {Object/model.Script} script - The script object.
@@ -164,6 +164,7 @@ module.exports = {
   findObject: function(keyPairs, objects) {
     var filteredObjects = _.filter(objects, function(o) {
       var results = [];
+      console.log(keyPairs);
       Object.keys(keyPairs).forEach(function(keyName) {
         var keyVal = keyPairs[keyName];
         if (_.isEmpty(keyVal)) {
@@ -177,6 +178,8 @@ module.exports = {
       });
 
       var found = results[0];
+      console.log(found);
+      console.log(results);
       if (!results.every(val => val === found)) {
         throw new Error(
           "Illegal state: search keys were only partially matched when searching collection"
