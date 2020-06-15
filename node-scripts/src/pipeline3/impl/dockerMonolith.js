@@ -13,7 +13,6 @@ module.exports = {
   preHostPreparation: {
     getDeploymentScript: function(instanceDef) {
       // TODO: 'docker' deployment should fetch image at this stage and load it at hostPreparation stage
-      // Similar to what is done on 'docker-compose'
       return "";
     },
     getDataScript: function(instanceDef) {
@@ -46,6 +45,7 @@ module.exports = {
   startInstance: {
     getDeploymentScript: function(instanceDef) {
       var scripts = require("../scripts");
+      var ssh = instanceDef.deployment.host.value;
       var script = "";
       script += scripts.remote(
         instanceDef.deployment.host.value,
@@ -96,7 +96,7 @@ module.exports = {
           "\n" +
           scripts.remote(
             ssh,
-            container.exec(
+              module.exports.exec(
               instanceDef,
               scripts.setTimezone(instanceDef.deployment.timezone)
             )

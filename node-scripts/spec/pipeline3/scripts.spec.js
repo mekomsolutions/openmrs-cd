@@ -421,12 +421,12 @@ describe("Scripts", function() {
     var filename = ".env";
 
     expect(scripts.writeProperty(envVar, value, filename)).toEqual(
-      'if ! grep -R "^[#]*s*KEY=.*" .env > /dev/null; then\n' +
+      'if ! grep -R "^[#]*s*KEY.*" .env > /dev/null; then\n' +
         "\techo \"APPENDING because 'KEY' not found\"\n" +
         '\techo "KEY=env.value" >> .env\n' +
         "else\n" +
         "\techo \"SETTING because 'KEY' found already\"\n" +
-        '\tsed -ir "s/^[#]*\\s*KEY=.*/KEY=env.value/" .env\n' +
+        '\tsed -i "s/^[#]*\\s*KEY.*/KEY=env.value/" .env\n' +
         "fi\n"
     );
   });
@@ -462,7 +462,7 @@ describe("Scripts", function() {
     };
   });
 
-  fit("should generate 'git clone' script", function() {
+  it("should generate 'git clone' script", function() {
     var gitUrl = "git@github:mekomsolutions/bahmni-docker.git";
     var commitId = "12b9a94";
 
@@ -471,7 +471,7 @@ describe("Scripts", function() {
         "cd /path/to/distro && git checkout 12b9a94\n"
     );
   });
-  fit("should generate 'distro.env file'", () => {
+  it("should generate 'distro.env file'", () => {
     var instanceDef = {
       name: "hsc-dev",
       uuid: "1-22-333",
@@ -501,8 +501,5 @@ describe("Scripts", function() {
         prop3: "value3"
       }
     };
-      console.log(
-          scripts.createEnvVarFile(instanceDef)
-      );
   })
 });

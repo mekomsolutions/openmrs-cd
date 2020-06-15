@@ -178,8 +178,6 @@ module.exports = {
       });
 
       var found = results[0];
-      console.log(found);
-      console.log(results);
       if (!results.every(val => val === found)) {
         throw new Error(
           "Illegal state: search keys were only partially matched when searching collection"

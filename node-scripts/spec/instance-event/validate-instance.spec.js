@@ -152,14 +152,7 @@ describe("validate-instance", function() {
     var savedInstance = db.getInstanceDefinition(null, instanceEvent.name);
     expect(savedInstance.artifacts).toEqual(instanceEvent.artifacts);
 
-    // substitute instanceEvent aliases so it can be compared to the expected savedInstance
-    instanceEvent.uuid = savedInstance.uuid;
-    var aliasesMap = config.getInstanceDefinitionAliasesMap(instanceEvent);
-    instanceEvent = JSON.parse(
-      S(JSON.stringify(instanceEvent)).template(aliasesMap).s
-    );
-
-    var uuid = savedInstance.uuid;
+    delete savedInstance.uuid;
     delete savedInstance.created;
     delete savedInstance.updated;
     delete savedInstance.status;

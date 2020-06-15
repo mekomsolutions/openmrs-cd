@@ -181,8 +181,6 @@ module.exports = {
     }
   },
   validateDockerComposeDeploymentConfigValue: function(value) {
-    console.log(JSON.stringify(Object.keys(value).sort()));
-    console.log(Object.keys(new model.DockerComposeDeployment()).sort());
     if (
       JSON.stringify(Object.keys(value).sort()) !==
       JSON.stringify(Object.keys(new model.DockerComposeDeployment()).sort())

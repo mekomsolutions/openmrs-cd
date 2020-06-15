@@ -111,24 +111,18 @@ module.exports = {
    *
    * @return The complete updated version of the instance definition.
    */
-  saveInstanceDefinition: function(instanceToSave, status) {
-    if (_.isEmpty(instanceToSave.uuid)) {
-      instanceToSave.uuid = uuid();
+  saveInstanceDefinition: function(instanceEventToSave, status) {
+    if (_.isEmpty(instanceEventToSave.uuid)) {
+      instanceEventToSave.uuid = uuid();
     }
-    // substitute aliases that may be present in the instance definition
-    var aliasesMap = config.getInstanceDefinitionAliasesMap(instanceToSave);
-    instanceToSave = JSON.parse(
-      S(JSON.stringify(instanceToSave)).template(aliasesMap).s
-    );
-
     var keyPairs = {
-      name: instanceToSave.name,
-      uuid: instanceToSave.uuid
+      name: instanceEventToSave.name,
+      uuid: instanceEventToSave.uuid
     };
     return saveObject(
       DM_INSTDEFS,
       config.getInstancesConfigPath(),
-      instanceToSave,
+      instanceEventToSave,
       keyPairs,
       false,
       status
