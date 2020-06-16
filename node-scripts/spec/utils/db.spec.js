@@ -202,6 +202,7 @@ describe("db", function() {
     expect(actualInstance).toEqual(instance);
   });
 
+
   it("should update an instance definition.", function() {
     // setup
     var instances = {};

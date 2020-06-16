@@ -327,8 +327,11 @@ module.exports = {
       module.exports.getArtifactDependenciesConfigFileName()
     );
   },
-  getBuildJsScriptName: function() {
-    return "build.js";
+  /**
+   * The path whereto docker projects are copied on the CD server.
+   */
+  getCDDockerDirPath: function(instanceUuid) {
+    return path.resolve(process.env.WORKSPACE, instanceUuid, "docker");
   },
   /**
    * The path whereto artifacts of an instance are fetched on the CD server.
@@ -336,7 +339,6 @@ module.exports = {
   getCDArtifactsDirPath: function(instanceUuid) {
     return path.resolve(process.env.WORKSPACE, instanceUuid, "artifacts");
   },
-
   getJobNameForGitHubWebhook: function() {
     return "github-webhook";
   },
@@ -360,19 +362,10 @@ module.exports = {
     return ["debug", "dev", "staging", cst.INSTANCETYPE_PROD];
   },
   getInstanceDeploymentTypes: function() {
-    return ["docker"];
+    return ["docker", "dockerMonolith", "dockerCompose"];
   },
   getInstanceArtifactsTypes: function() {
     return ["maven"];
-  },
-  /**
-   * Possible aliases to use in an instance definition, and their mapped value
-   */
-  getInstanceDefinitionAliasesMap: function(instanceDef) {
-    return {
-      uuid: instanceDef.uuid,
-      name: instanceDef.name
-    };
   },
 
   getInstanceEventsProperties: function() {

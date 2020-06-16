@@ -8,12 +8,15 @@ describe("Start instance scripts", function() {
 
   const proxyquire = require("proxyquire");
   const cst = require(path.resolve("src/const"));
-  var tests, stubs, utils, config, scripts, db;
+  const dockerContainer = require(path.resolve("src/pipeline3/impl/docker"));
+  var tests, stubs, utils, config, scripts, db, dockerImpl;
   var instanceUuid, testRandomString;
 
   beforeEach(function() {
     utils = require(path.resolve("src/utils/utils"));
+    dockerImpl = require(path.resolve("src/pipeline3/impl/docker"));
     tests = require(path.resolve("spec/utils/testUtils"));
+    // docker = require(path.resolve("src/pipeline3/impl/docker"))
     stubs = tests.stubs();
 
     config = tests.config();
@@ -58,9 +61,10 @@ describe("Start instance scripts", function() {
       "utf8"
     );
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts[instanceDef.deployment.type];
 
-    expect(script).toContain(scripts.remote(ssh, docker.restart(instanceUuid)));
+    expect(script).toContain(
+      scripts.remote(ssh, dockerContainer.restart(instanceDef))
+    );
   });
 
   it("should generate bash script upon deployment changes.", function() {
@@ -86,19 +90,19 @@ describe("Start instance scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts[instanceDef.deployment.type];
 
     var expectedScript = [];
-    expectedScript.push(scripts.remote(ssh, docker.remove(instanceUuid)));
+    expectedScript.push(
+      scripts.remote(ssh, dockerContainer.remove(instanceDef))
+    );
 
     var tls = instanceDef.deployment.tls;
     var mounts = {
       "/mnt": instanceDef.deployment.hostDir
     };
     mounts[tls.value.keysFolder] = tls.value.hostKeysFolder;
-
     expectedScript.push(
-      scripts.remote(ssh, docker.run(instanceUuid, instanceDef, mounts))
+      scripts.remote(ssh, dockerContainer.run(instanceDef, mounts))
     );
     var setTLS =
       tls.value.webServerUpdateScript +
@@ -122,19 +126,25 @@ describe("Start instance scripts", function() {
   it("should generate bash script upon data changes.", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
     process.env[config.varDataChanges()] = "true";
-    var instanceDef = db.getInstanceDefinition(instanceUuid);
 
     var mockUtils = Object.assign({}, utils);
     mockUtils.random = function() {
       return testRandomString;
     };
+    var startInstanceDataScriptMock = "Get StartInstance Data Script";
 
+    var mockDocker = Object.assign({}, dockerImpl);
+    mockDocker.startInstance = {
+      getDataScript: function() {
+        return startInstanceDataScriptMock;
+      }
+    };
     // replay
     proxyquire(
       path.resolve(
         "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
       ),
-      tests.stubs({ "../utils/utils": mockUtils })
+      tests.stubs({ "./impl/dockerMonolith": mockDocker })
     );
 
     // verif
@@ -146,34 +156,8 @@ describe("Start instance scripts", function() {
       "utf8"
     );
 
-    var ssh = instanceDef.deployment.host.value;
-    var docker = scripts[instanceDef.deployment.type];
-
-    var destFolder = "/tmp/n32bg/";
-    var sql = instanceDef.data[2].value;
-
-    // ensure MySQL Restore is called when engine is 'mysql'
-    expect(script).toContain(
-      scripts.remote(
-        ssh,
-        docker.exec(
-          instanceDef.uuid,
-          scripts.mySqlRestore(destFolder, path.basename(sql.sourceFile), sql)
-        )
-      )
-    );
-    // ensure Bahmni Restore is called when engine is 'bahmni'
-    sql = instanceDef.data[3].value;
-
-    expect(script).toContain(
-      scripts.remote(
-        ssh,
-        docker.exec(
-          instanceDef.uuid,
-          scripts.bahmniRestore(destFolder, path.basename(sql.sourceFile), sql)
-        )
-      )
-    );
+    // ensure Container DataScript is called
+    expect(script).toContain(startInstanceDataScriptMock);
   });
 
   it("should handle '.gz' data source files.", function() {
@@ -207,9 +191,6 @@ describe("Start instance scripts", function() {
       "utf8"
     );
 
-    var ssh = instanceDef.deployment.host.value;
-    var docker = scripts[instanceDef.deployment.type];
-
     var sqlCmd =
       "zcat /tmp/" +
       testRandomString.slice(-5) +
@@ -226,7 +207,7 @@ describe("Start instance scripts", function() {
       return testRandomString;
     };
 
-    var stubs = tests.stubs({ "../utils/utils": mockUtils }, null, {
+    var stubs = tests.stubs({ "../../utils/utils": mockUtils }, null, {
       "./scripts": path.resolve(
         "src/" + config.getJobNameForPipeline3() + "/scripts"
       )
@@ -259,12 +240,11 @@ describe("Start instance scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts[instanceDef.deployment.type];
 
     var expectedScript = scripts.remote(
       ssh,
-      docker.exec(
-        instanceDef.uuid,
+      dockerContainer.exec(
+        instanceDef,
         scripts_.linkComponents(instanceDef.deployment.links)
       )
     );
@@ -318,17 +298,19 @@ describe("Start instance scripts", function() {
       "utf8"
     );
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts[instanceDef.deployment.type];
 
     var expectedScript = [];
     expectedScript.push(
-      scripts.remote(ssh, docker.exec(instanceDef.uuid, "/stage/5/script.sh"))
+      scripts.remote(
+        ssh,
+        dockerContainer.exec(instanceDef, "/stage/5/script.sh")
+      )
     );
     expectedScript.push(
       scripts.remote(
         ssh,
-        docker.exec(
-          instanceDef.uuid,
+        dockerContainer.exec(
+          instanceDef,
           "/usr/bin/bahmni -i local.inventory concat-configs"
         )
       )
@@ -351,10 +333,10 @@ describe("Start instance scripts", function() {
       path.resolve(
         "src/" + config.getJobNameForPipeline3() + "/start-instance.js"
       ),
-      tests.stubs({ "../utils/utils": mockUtils })
+      tests.stubs({ "../../utils/utils": mockUtils }) //
     );
 
-    // verif
+    // verify
     var script = fs.readFileSync(
       path.resolve(
         config.getBuildDirPath(),
@@ -364,15 +346,15 @@ describe("Start instance scripts", function() {
     );
 
     var ssh = instanceDef.deployment.host.value;
-    var docker = scripts[instanceDef.deployment.type];
     var property = instanceDef.properties[0];
 
     // ensure Properties file is correctly created
+    console.log(script);
     expect(script).toContain(
       scripts.remote(
         ssh,
-        docker.exec(
-          instanceDef.uuid,
+        dockerContainer.exec(
+          instanceDef,
           "echo '" +
             utils.convertToProperties(property.properties, ".") +
             "' > " +

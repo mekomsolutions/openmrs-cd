@@ -7,10 +7,10 @@
 * Helper function to test if a given object implements all its prototype methods
 * @params 'instance' is an instance of 'objectClass'
 *
-* In order to identify which superclass methods of the prototype should be implemented, this test assumes 
+* In order to identify which superclass methods of the prototype should be implemented, this test assumes
 * that non-implemented methods declared in the model definition are returning a special string.
-* Any method in the prototype that retuns that string is considered as a method to be implemented.
-* 
+* Any method in the prototype that returns that string is considered as a method to be implemented.
+*
 */
 const log = require("npmlog");
 const path = require("path");

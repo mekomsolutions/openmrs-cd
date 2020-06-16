@@ -59,7 +59,7 @@ describe("Script triggering downstream builds", function() {
       config.getBuildArtifactJsonPath(),
       JSON.stringify(artifact, null, 2)
     );
-    fs.writeFileSync(config.getArtifactIdListFilePath(), []);
+    fs.writeFileSync(config.getArtifactIdListFilePath(), "");
 
     //
     // replay

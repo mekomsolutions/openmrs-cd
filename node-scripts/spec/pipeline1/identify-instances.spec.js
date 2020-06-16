@@ -51,6 +51,7 @@ describe("Instances identification", function() {
         version: pom.version
       }
     };
+
     fs.writeFileSync(
       config.getBuildArtifactJsonPath(),
       JSON.stringify(artifact, null, 2)
@@ -60,9 +61,10 @@ describe("Instances identification", function() {
       artifactId: "foo-bar-arty",
       version: "2.0.0-SNAPSHOT"
     };
-    fs.writeFileSync(config.getArtifactIdListFilePath(), [
+    fs.writeFileSync(
+      config.getArtifactIdListFilePath(),
       utils.toArtifactKey(arty2.groupId, arty2.artifactId, arty2.version)
-    ]);
+    );
 
     var beforeInstanceEvents = JSON.parse(
       fs.readFileSync(config.getInstancesEventsDbPath(), "utf-8")

@@ -61,6 +61,8 @@ describe("Post start scripts", function() {
     var docker = scripts[instanceDef.deployment.type];
 
     expect(script).toContain("/some/script.sh");
-    expect(script).toContain(docker.restart(instanceUuid));
+    expect(script).toContain(
+      require(path.resolve("src/pipeline3/impl/docker")).restart(instanceDef)
+    );
   });
 });
