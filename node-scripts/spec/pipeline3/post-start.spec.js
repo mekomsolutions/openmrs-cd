@@ -62,7 +62,7 @@ describe("Post start scripts", function() {
 
     expect(script).toContain("/some/script.sh");
     expect(script).toContain(
-      require(path.resolve("src/pipeline3/impl/docker")).restart(instanceUuid)
+      require(path.resolve("src/pipeline3/impl/docker")).restart(instanceDef)
     );
   });
 });

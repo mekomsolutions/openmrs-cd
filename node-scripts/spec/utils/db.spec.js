@@ -202,44 +202,45 @@ describe("db", function() {
     expect(actualInstance).toEqual(instance);
   });
 
-  // it("should update an instance definition.", function() {
-  //   // setup
-  //   var instances = {};
-  //   var instance = JSON.parse(
-  //     fs.readFileSync(
-  //       path.resolve(
-  //         "spec/instance-event/resources/test_instance_definition_1.json"
-  //       ),
-  //       "utf8"
-  //     )
-  //   );
-  //
-  //   // pre-verif
-  //   instances = JSON.parse(
-  //     fs.readFileSync(config.getInstancesConfigPath(), "utf8")
-  //   );
-  //   var beforeInstance = utils.findObject(
-  //     { uuid: instance.uuid, name: instance.name },
-  //     instances
-  //   );
-  //   expect(beforeInstance).not.toEqual({});
-  //   expect(beforeInstance).not.toEqual(instance);
-  //
-  //   // replay
-  //   instance = db.saveInstanceDefinition(instance, "status: updating instance");
-  //
-  //   // verif
-  //   instances = JSON.parse(
-  //     fs.readFileSync(config.getInstancesConfigPath(), "utf8")
-  //   );
-  //   var actualInstance = fixObjectDates(
-  //     utils.findObject({ uuid: instance.uuid, name: instance.name }, instances)
-  //   );
-  //
-  //   expect(actualInstance).toEqual(
-  //     fixObjectDates(Object.assign(beforeInstance, instance))
-  //   );
-  // });
+
+  it("should update an instance definition.", function() {
+    // setup
+    var instances = {};
+    var instance = JSON.parse(
+      fs.readFileSync(
+        path.resolve(
+          "spec/instance-event/resources/test_instance_definition_1.json"
+        ),
+        "utf8"
+      )
+    );
+
+    // pre-verif
+    instances = JSON.parse(
+      fs.readFileSync(config.getInstancesConfigPath(), "utf8")
+    );
+    var beforeInstance = utils.findObject(
+      { uuid: instance.uuid, name: instance.name },
+      instances
+    );
+    expect(beforeInstance).not.toEqual({});
+    expect(beforeInstance).not.toEqual(instance);
+
+    // replay
+    instance = db.saveInstanceDefinition(instance, "status: updating instance");
+
+    // verif
+    instances = JSON.parse(
+      fs.readFileSync(config.getInstancesConfigPath(), "utf8")
+    );
+    var actualInstance = fixObjectDates(
+      utils.findObject({ uuid: instance.uuid, name: instance.name }, instances)
+    );
+
+    expect(actualInstance).toEqual(
+      fixObjectDates(Object.assign(beforeInstance, instance))
+    );
+  });
 
   it("should delete an instance definition.", function() {
     // setup

@@ -20,7 +20,7 @@ describe("Scripts", function() {
       type: "dev",
       group: "tlc",
       deployment: {
-        hostDir: "/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0",
+        hostDir: "/var/docker-volumes/",
         type: "dockerCompose",
         value: {
           image: "mekomsolutions/bahmni",
@@ -62,43 +62,59 @@ describe("Scripts", function() {
       ).toEqual("");
     });
 
-    // fit("should generate docker compose Host Preparation deployment script", () => {
-    //   console.log(dockerCompose.hostPreparation.getDeploymentScript(instanceDef))
-    //   expect(
-    //     dockerCompose.hostPreparation.getDeploymentScript(instanceDef)
-    //   ).toEqual(
-    //     scripts.remote(
-    //       instanceDef.deployment.host.value,
-    //       path.join(
-    //         config.getCDDockerDirPath(instanceDef.uuid),
-    //         "bahmni_docker"
-    //       ),
-    //       path.join(
-    //         instanceDef.deployment.hostDir,
-    //         instanceDef.name,
-    //         "bahmni_docker"
-    //       ),
-    //       true
-    //     ) +
-    //       scripts.remote(
-    //         instanceDef.deployment.host.value,
-    //         path.join(
-    //           config.getCDDockerDirPath(instanceDef.uuid),
-    //           "bahmni_images"
-    //         ),
-    //         path.join(
-    //           instanceDef.deployment.hostDir,
-    //           instanceDef.name,
-    //           "bahmni_images"
-    //         ),
-    //         true
-    //       ) +
-    //       scripts.remote(
-    //         instanceDef.deployment.host.value,
-    //         "docker load < /var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0/cambodia1/bahmni_images/cambodia1_images.tar\n"
-    //       )
-    //   );
-    // });
+    it("should generate docker compose Host Preparation deployment script", () => {
+      let expected = scripts.remote(
+          instanceDef.deployment.host.value,
+          scripts.gitClone(
+              instanceDef.deployment.value.gitUrl,
+              path
+                  .resolve(
+                      instanceDef.deployment.hostDir,
+                      instanceDef.name,
+                      "bahmni_docker"
+                  )
+                  .toString(),
+              instanceDef.deployment.value.commitId
+          )) + "\n" +
+          scripts.remote(
+              instanceDef.deployment.host.value,
+              scripts.createEnvVarFile(instanceDef)
+              ) + "\n" +
+          scripts.remote(
+              instanceDef.deployment.host.value,
+              "cd " +
+              path
+                  .resolve(
+                      instanceDef.deployment.hostDir,
+                      instanceDef.name,
+                      "bahmni_docker"
+                  )
+                  .toString() +
+              " && docker-compose -p " +
+              instanceDef.name +
+              " --env-file=" +
+              path
+                  .resolve(
+                      instanceDef.deployment.hostDir,
+                      instanceDef.name,
+                      instanceDef.name + ".env"
+                  )
+                  .toString() +
+              " build --pull" +
+              "\n"
+          ) + scripts.remote(
+              instanceDef.deployment.host.value,
+              "sudo chown -R root:root " +
+              path
+                  .resolve(
+                      instanceDef.deployment.hostDir,
+                      instanceDef.name
+                  ).toString()
+          );
+      expect(
+        dockerCompose.hostPreparation.getDeploymentScript(instanceDef)
+      ).toEqual(expected);
+    });
 
     it("should generate docker compose Host Preparation data script", () => {
       expect(dockerCompose.hostPreparation.getDataScript(instanceDef)).toEqual(
@@ -116,8 +132,8 @@ describe("Scripts", function() {
       expect(
         dockerCompose.startInstance.getDeploymentScript(instanceDef)
       ).toEqual(scripts.remote(instanceDef.deployment.host.value,
-        "cd /var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0/cambodia1/bahmni_docker && " +
-        "docker-compose -p cambodia1 --env-file=/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0/cambodia1/cambodia1.env up -d"
+        "cd /var/docker-volumes/" + instanceDef.name + "/bahmni_docker && " +
+        "docker-compose -p " + instanceDef.name + " --env-file=/var/docker-volumes/" + instanceDef.name + "/" + instanceDef.name + ".env up -d"
       ));
     });
 

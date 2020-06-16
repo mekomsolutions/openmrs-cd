@@ -61,7 +61,7 @@ if (process.env[config.varDeploymentChanges()] === "true") {
 if (!_.isEmpty(instanceDef.deployment.links)) {
   script.body.push(container.setLinks(instanceDef));
   // Restart after linking folders
-  script.body.push(scripts.remote(ssh, container.restart(instanceDef.uuid)));
+  script.body.push(scripts.remote(ssh, container.restart(instanceDef)));
 }
 
 // 'data'

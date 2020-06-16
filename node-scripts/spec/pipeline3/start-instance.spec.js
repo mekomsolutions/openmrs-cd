@@ -63,7 +63,7 @@ describe("Start instance scripts", function() {
     var ssh = instanceDef.deployment.host.value;
 
     expect(script).toContain(
-      scripts.remote(ssh, dockerContainer.restart(instanceUuid))
+      scripts.remote(ssh, dockerContainer.restart(instanceDef))
     );
   });
 
