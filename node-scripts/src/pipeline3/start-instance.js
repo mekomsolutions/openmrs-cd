@@ -104,7 +104,7 @@ script.body = computedScript.script;
 finalRestart += computedScript.restartNeeded;
 
 if (finalRestart) {
-  script.body.push(scripts.remote(ssh, container.restart(instanceDef))); // refactor to work on both docker , docker-compose
+  script.body.push(scripts.remote(ssh, container.restart(instanceDef)));
 }
 
 script.body = script.body.join(cst.SCRIPT_SEPARATOR);

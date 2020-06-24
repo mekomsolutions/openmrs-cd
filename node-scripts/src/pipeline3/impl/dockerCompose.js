@@ -142,10 +142,19 @@ module.exports = {
        * @return {String} The script as a string.
        */
   ifExists: function() {},
-  restart: function() {
-    return "";
-    return "";
-  },
+  restart: function(instanceDef, sudo) {
+    let script = "";
+    let path = require("path");
+    let distPath = path.resolve(
+        instanceDef.deployment.hostDir, instanceDef.name,
+        "bahmni_docker").toString();
+    script += "cd " + distPath + " && ";
+    if (sudo) {
+      script += "sudo ";
+    }
+    script += "docker-compose -p " + instanceDef.name + " restart ";
+
+    return script + "\n";},
   remove: function(instanceDef, sudo) {
     let script = "";
     let path = require("path");
@@ -183,15 +192,22 @@ module.exports = {
     let path = require("path");
     let propPath = path.resolve(
         instanceDef.deployment.hostDir, instanceDef.name,
-        "bahmni_docker/properties", property.filename
+        "bahmni_docker/properties"
         ).toString();
+    let propFilePath = path.resolve(
+        propPath,
+        property.filename
+    ).toString()
     script += require("../scripts").remote(
         instanceDef.deployment.host.value,
-        "echo < " + output + " > " + propPath
+        "\n" +
+        "if [[ ! -e " + propFilePath + " ]]; then\n" +
+        "sudo mkdir -p " + propPath + "\n" +
+        "sudo touch " + propFilePath + "\n" +
+        "fi\n" +
+        "sudo bash -c 'cat > " + propFilePath + " <<EOF \n" + output + "\nEOF'\n"
     );
     return script;
   },
-  setLinks: function(instanceDef) {
-    return "";
-  }
+  setLinks: function() {}
 };

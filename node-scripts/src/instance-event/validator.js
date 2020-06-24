@@ -291,8 +291,7 @@ module.exports = {
   getConfigValidatorsMap: function() {
     return {
       maven: module.exports.validateMavenArtifactConfigValue,
-      dockerMonolith:
-        module.exports.validateDockerMonolithDeploymentConfigValue,
+      dockerMonolith: module.exports.validateDockerMonolithDeploymentConfigValue,
       file: module.exports.validateFileTLSDeploymentConfigValue,
       vault: module.exports.validateVaultTLSDeploymentConfigValue,
       docker: module.exports.validateDockerMonolithDeploymentConfigValue,

@@ -59,6 +59,7 @@
     {
       "filename": "erp.properties",
       "path": "/opt/openmrs/",
+      "service": "",
       "properties": {
         "erp.database": "odoo",
         "erp.username": "admin"

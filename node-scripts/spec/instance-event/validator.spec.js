@@ -328,7 +328,8 @@ describe("The instances config validator", function() {
         {
           filename: "erp.propeties",
           path: "/a/path",
-          properties: ""
+          properties: "",
+          service: ""
         }
       ]);
     }).not.toThrow();

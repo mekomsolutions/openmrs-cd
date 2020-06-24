@@ -64,12 +64,10 @@ if (process.env[config.varArtifactsChanges()] === "true") {
 
 // 'data'
 
-// if (process.env[config.varDataChanges()] === "true") {
 script.body += scripts.remote(
   instanceDef.deployment.host.value,
   containerScripts.preHostPreparation.getDataScript(instanceDef)
 );
-// }
 
 //
 //  Saving the script in the current build dir.
@@ -89,4 +87,3 @@ fs.writeFileSync(
   JSON.stringify({ status: currentStage })
 );
 
-// all this is OK and i don't see it effected by the deployment type

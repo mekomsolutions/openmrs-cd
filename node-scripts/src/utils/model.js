@@ -49,11 +49,9 @@ class DockerMonolithDeployment {
  * Describe a Docker Compose deployment
  */
 class DockerComposeDeployment {
-  // TODO: Should be tested
-  constructor(gitUrl, commitId, ports, networks) {
+  constructor(gitUrl, commitId, networks) {
     this.gitUrl = gitUrl;
     this.commitId = commitId;
-    this.ports = ports;
     this.networks = networks;
   }
 }
@@ -228,9 +226,10 @@ class DockerMonolithDeploymentScripts {
  * Aims at describing an instance property file
  */
 class Property {
-  constructor(filename, path, properties) {
+  constructor(filename, path, properties, service) {
     this.filename = filename;
     this.path = path;
+    this.service = service;
     this.properties = properties;
   }
 }

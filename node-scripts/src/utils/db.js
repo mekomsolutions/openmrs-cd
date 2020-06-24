@@ -115,6 +115,11 @@ module.exports = {
     if (_.isEmpty(instanceEventToSave.uuid)) {
       instanceEventToSave.uuid = uuid();
     }
+    // substitute aliases that may be present in the instance definition
+    var aliasesMap = config.getInstanceDefinitionAliasesMap(instanceEventToSave);
+    instanceEventToSave = JSON.parse(
+        S(JSON.stringify(instanceEventToSave)).template(aliasesMap).s
+    );
     var keyPairs = {
       name: instanceEventToSave.name,
       uuid: instanceEventToSave.uuid

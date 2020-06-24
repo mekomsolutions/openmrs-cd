@@ -167,7 +167,6 @@ module.exports = {
     return script;
   },
   gitClone: function(repo, destPath, commitId) {
-    // TODO: Should be tested
     var script = "";
     script += "git clone " + repo + " " + destPath;
     script += "\n";

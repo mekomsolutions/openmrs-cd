@@ -4,6 +4,7 @@
 target
 **/.DS_Store
 README.html
+.project
 
 # Ignore Gradle GUI config
 gradle-app.setting
