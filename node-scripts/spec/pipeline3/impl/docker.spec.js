@@ -247,7 +247,7 @@ describe("Scripts", function() {
             "set -e\n" +
               "docker run -dit --restart unless-stopped --publish 8180:80 --publish 8733:443 --label type=dev --label group=tlc --name " +
               instanceDef.uuid +
-              " --hostname bahmni --network network1 --network network2 --mount type=bind,source=/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0,target=/mnt mekomsolutions/bahmni:cambodia-release-0.90\n"
+              " --hostname bahmni --network network1 --network network2 --mount type=bind,source=/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0/cambodia1,target=/mnt mekomsolutions/bahmni:cambodia-release-0.90\n"
           )
       );
     });

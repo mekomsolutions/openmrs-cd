@@ -17,8 +17,6 @@ const config = require(cst.CONFIGPATH);
 const db = require(cst.DBPATH);
 
 const scripts = require("./scripts");
-
-const secrets = config.getSecrets();
 const currentStage = config.getHostPrepareStatusCode();
 
 //
@@ -35,7 +33,10 @@ if (_.isEmpty(instanceDef)) {
 //  Host metadata
 //
 var ssh = instanceDef.deployment.host.value; // TODO this should be extracted based on the host type
-var hostDir = instanceDef.deployment.hostDir;
+var hostDir = hostDir = path.resolve(
+    instanceDef.deployment.hostDir,
+    instanceDef.name
+);
 
 //
 //  Building the script

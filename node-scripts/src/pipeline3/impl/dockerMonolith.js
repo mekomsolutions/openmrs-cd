@@ -44,6 +44,7 @@ module.exports = {
   // Start Instance
   startInstance: {
     getDeploymentScript: function(instanceDef) {
+      const path = require("path");
       var scripts = require("../scripts");
       var ssh = instanceDef.deployment.host.value;
       var script = "";
@@ -53,7 +54,10 @@ module.exports = {
       );
       script += "\n";
       var mounts = {
-        "/mnt": instanceDef.deployment.hostDir
+        "/mnt": path.resolve(
+            instanceDef.deployment.hostDir,
+            instanceDef.name
+        )
       };
 
       var setTLS = "";

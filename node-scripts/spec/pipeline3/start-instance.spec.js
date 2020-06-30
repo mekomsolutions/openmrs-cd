@@ -98,7 +98,7 @@ describe("Start instance scripts", function() {
 
     var tls = instanceDef.deployment.tls;
     var mounts = {
-      "/mnt": instanceDef.deployment.hostDir
+      "/mnt": path.resolve(instanceDef.deployment.hostDir, instanceDef.name)
     };
     mounts[tls.value.keysFolder] = tls.value.hostKeysFolder;
     expectedScript.push(

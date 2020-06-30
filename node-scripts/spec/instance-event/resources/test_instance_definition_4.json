@@ -12,19 +12,19 @@
     }
   ],
   "deployment":{
-    "hostDir":"/var/volume/bahmni",
+    "hostDir":"/var/volumes/bahmni",
     "type":"dockerCompose",
     "value":{
       "networks":[
         "network1"
       ],
-      "commitId":"origin/INFRA-224",
-      "gitUrl":"https://github.com/chinzou/bahmni-docker.git"
+      "commitId":"master",
+      "gitUrl":"https://github.com/mekomsolutions/bahmni-docker.git"
     },
     "host":{
       "type":"ssh",
       "value":{
-        "ip":"172.10.0.1",
+        "ip":"172.17.0.1",
         "user":"centos",
         "port":"22"
       }
@@ -45,18 +45,17 @@
         "erp.host":"${ODOO_HOST}",
         "erp.port":"${ODOO_PORT}",
         "erp.user":"${ODOO_USER}",
-        "erp.password":"${ODOO_PASSWORD}",
-        "erp.database":"${ODOO_DB}"
+        "erp.password":"password",
+        "erp.database":"odoo"
       }
     }
   ],
   "envVars":{
-    "OPENMRS_OWAS_PATH":"/var/volume/bahmni/artifacts/openmrs_core",
-    "OPENMRS_MODULES_PATH":"/var/volume/bahmni/artifacts/openmrs_modules",
-    "OPENMRS_CONFIG_PATH":"/var/volume/bahmni/artifacts/openmrs_config",
-    "BAHMNI_CONFIG_PATH":"/var/volume/bahmni/artifacts/bahmni_config",
-    "BAHMNI_APPS_PATH":"/var/volume/bahmni/artifacts/bahmni_emr/bahmniapps",
-    "ODOO_EXTRA_ADDONS":"/var/volume/bahmni/artifacts/odoo_addons",
-    "ODOO_CONFIG_PATH":"/var/volume/bahmni/artifacts/odoo_config"
+    "OPENMRS_MODULES_PATH":"/var/volumes/bahmni/hsc-dev/artifacts/openmrs_modules",
+    "OPENMRS_CONFIG_PATH":"/var/volumes/bahmni/hsc-dev/artifacts/openmrs_config",
+    "BAHMNI_CONFIG_PATH":"/var/volumes/bahmni/hsc-dev/artifacts/bahmni_config",
+    "BAHMNI_APPS_PATH":"/var/volumes/bahmni/hsc-dev/artifacts/bahmni_emr/bahmniapps",
+    "ODOO_EXTRA_ADDONS":"/var/volumes/bahmni/hsc-dev/artifacts/odoo_addons",
+    "ODOO_CONFIG_PATH":"/var/volumes/bahmni/hsc-dev/artifacts/odoo_config"
   }
 }
