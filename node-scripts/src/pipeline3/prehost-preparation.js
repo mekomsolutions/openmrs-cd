@@ -22,6 +22,9 @@ const scripts = require("./scripts");
 
 const currentStage = config.getPrehostPrepareStatusCode();
 
+// Fetch secrets:
+// const secrets = config.getSecrets();
+
 //
 //  Fetching the instance definition based on the provided UUID
 //

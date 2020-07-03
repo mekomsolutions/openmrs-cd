@@ -6,7 +6,7 @@ const cst = require("../../const");
 const heredoc_2 = cst.HEREDOC_2;
 const utils = require("../../utils/utils");
 /**
- * Implementation of script utils to specifically manipulate Docker containers.
+ * Scripts to manipulate Docker "Monolith" type of containers.
  */
 module.exports = {
   // PreHost Preparation
