@@ -415,7 +415,7 @@ describe("Scripts", function() {
     );
   });
 
-  it("should generate 'replace environment variable' script", function() {
+  it("should generate script to set or replace environment variables", function() {
     var envVar = "KEY";
     var value = "env.value";
     var filename = ".env";
@@ -431,7 +431,7 @@ describe("Scripts", function() {
     );
   });
 
-  it("should generate 'create distro.env file' script", function() {
+  it("should generate script to create environment file", function() {
     var instanceDef = {
       name: "hsc-dev",
       uuid: "1-22-333",
@@ -444,6 +444,7 @@ describe("Scripts", function() {
         }
       ],
       deployment: {
+        hostDir: "/var/docker-volumes/{{uuid}}",
         host: {
           type: "ssh",
           value: {
@@ -456,13 +457,33 @@ describe("Scripts", function() {
       },
       envVars: {
         prop: "value",
-        prop2: "value2",
-        prop3: "value3"
+        prop2: "value2"
       }
     };
+    expect(scripts.createEnvVarFile(instanceDef)).toEqual(
+      "if [[ ! -e /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env ]]; then\n" +
+      "    mkdir -p /var/docker-volumes/{{uuid}}/hsc-dev\n" +
+      "    touch /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\n" +
+      "fi\n" +
+      "\ncp /var/docker-volumes/{{uuid}}/hsc-dev/bahmni_docker/.env /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\n" +
+      "if ! grep -R \"^[#]*s*prop.*\" /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env > /dev/null; then\n" +
+      "\techo \"APPENDING because 'prop' not found\"\n" +
+      "\techo \"prop=value\" >> /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\n" +
+      "else\n" +
+      "\techo \"SETTING because 'prop' found already\"\n" +
+      "\tsed -i \"s/^[#]*\\s*prop.*/prop=value/\" /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\n" +
+      "fi\n" +
+      "if ! grep -R \"^[#]*s*prop2.*\" /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env > /dev/null; then\n" +
+      "\techo \"APPENDING because 'prop2' not found\"\n" +
+      "\techo \"prop2=value2\" >> /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\n" +
+      "else\n" +
+      "\techo \"SETTING because 'prop2' found already\"\n" +
+      "\tsed -i \"s/^[#]*\\s*prop2.*/prop2=value2/\" /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\nfi\n"
+        );
+
   });
 
-  it("should generate 'git clone' script", function() {
+  it("should generate script to clone a Git repo", function() {
     var gitUrl = "git@github:mekomsolutions/bahmni-docker.git";
     var commitId = "12b9a94";
 
@@ -471,35 +492,4 @@ describe("Scripts", function() {
         "cd /path/to/distro && git checkout 12b9a94\n"
     );
   });
-  it("should generate 'distro.env file'", () => {
-    var instanceDef = {
-      name: "hsc-dev",
-      uuid: "1-22-333",
-      scripts: [
-        {
-          type: "shell",
-          executionStage: "6",
-          conditions: ["data"],
-          value: "/a/script.sh"
-        }
-      ],
-      deployment: {
-        hostDir: "/path/to/root",
-        host: {
-          type: "ssh",
-          value: {
-            ip: "54.154.133.95",
-            user: "ec2-user",
-            port: "22"
-          }
-        },
-        type: "dockerCompose"
-      },
-      envVars: {
-        prop: "/to/prop/path",
-        prop2: "value2",
-        prop3: "value3"
-      }
-    };
-  })
 });
