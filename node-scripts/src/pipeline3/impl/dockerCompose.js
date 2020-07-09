@@ -195,7 +195,7 @@ module.exports = {
     script +=
       "docker-compose -p " +
       instanceDef.name +
-      " exec " +
+      " exec -T " +
       service +
       " /bin/bash -s <<" +
       heredoc_2 +
