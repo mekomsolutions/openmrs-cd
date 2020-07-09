@@ -175,7 +175,7 @@ module.exports = {
     if (sudo) {
       script += "sudo ";
     }
-    script += "docker-compose down -v " + instanceDef.name;
+    script += "docker-compose -p " + instanceDef.name + " down -v ";
 
     return script + "\n";
   },
@@ -193,7 +193,13 @@ module.exports = {
       .toString();
     script += "cd " + distPath + " && ";
     script +=
-      "docker-compose exec " + service + " /bin/bash -s <<" + heredoc_2 + "\n";
+      "docker-compose -p " +
+      instanceDef.name +
+      " exec " +
+      service +
+      " /bin/bash -s <<" +
+      heredoc_2 +
+      "\n";
     script += "set -e\n";
     script += command + "\n";
     script += heredoc_2;
