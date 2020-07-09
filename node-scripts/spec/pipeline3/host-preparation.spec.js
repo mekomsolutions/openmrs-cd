@@ -53,7 +53,8 @@ describe("Host preparation scripts", function() {
       path.resolve(config.getBuildDirPath(), config.getHostPrepareScriptName()),
       "utf8"
     );
-    var hostArtifactsDir = instanceDef.deployment.hostDir + "/" + instanceDef.name + "/artifacts";
+    var hostArtifactsDir =
+      instanceDef.deployment.hostDir + "/" + instanceDef.name + "/artifacts";
     var ssh = instanceDef.deployment.host.value;
     expect(script).toContain(
       scripts.initFolder(hostArtifactsDir, ssh.user, ssh.group)
@@ -116,7 +117,8 @@ describe("Host preparation scripts", function() {
       path.resolve(config.getBuildDirPath(), config.getHostPrepareScriptName()),
       "utf8"
     );
-    var hostDataDir = instanceDef.deployment.hostDir + "/" + instanceDef.name + "/data";
+    var hostDataDir =
+      instanceDef.deployment.hostDir + "/" + instanceDef.name + "/data";
     var ssh = instanceDef.deployment.host.value;
     var srcDir =
       "/var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae/data/";

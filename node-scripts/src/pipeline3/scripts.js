@@ -608,7 +608,7 @@ module.exports = {
    */
   writeProperty(propertyName, value, filename) {
     var script = "";
-    "string".replace(/\//g, 'ForwardSlash');
+    "string".replace(/\//g, "ForwardSlash");
     value = value.replace(/\//g, "\\/");
 
     script += `if ! grep -R "^[#]*\s*${propertyName}.*" ${filename} > /dev/null; then\n`;
@@ -622,40 +622,42 @@ module.exports = {
   },
 
   createEnvVarFile(instanceDef) {
-
     let script = "";
 
     var distEnvFile = path
-        .resolve(
-            instanceDef.deployment.hostDir,
-            instanceDef.name,
-            instanceDef.name + ".env"
-        )
-        .toString();
+      .resolve(
+        instanceDef.deployment.hostDir,
+        instanceDef.name,
+        instanceDef.name + ".env"
+      )
+      .toString();
 
     var envFile = path
-        .resolve(
-            instanceDef.deployment.hostDir,
-            instanceDef.name,
-            "bahmni_docker",
-            ".env"
-        )
-        .toString();
+      .resolve(
+        instanceDef.deployment.hostDir,
+        instanceDef.name,
+        "bahmni_docker",
+        ".env"
+      )
+      .toString();
 
     script +=
-
-        "if [[ ! -e " + distEnvFile + " ]]; then\n" +
-        "    mkdir -p " + path
-            .resolve(instanceDef.deployment.hostDir, instanceDef.name)
-            .toString() +"\n" +
-        "    touch " + distEnvFile + "\n" +
-        "fi\n";
-
+      "if [[ ! -e " +
+      distEnvFile +
+      " ]]; then\n" +
+      "    mkdir -p " +
+      path
+        .resolve(instanceDef.deployment.hostDir, instanceDef.name)
+        .toString() +
+      "\n" +
+      "    touch " +
+      distEnvFile +
+      "\n" +
+      "fi\n";
 
     script += "\ncp " + envFile + " " + distEnvFile + "\n";
 
     for (let property in instanceDef.envVars) {
-
       script += module.exports.writeProperty(
         property,
         instanceDef.envVars[property],

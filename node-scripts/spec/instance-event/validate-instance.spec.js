@@ -155,7 +155,7 @@ describe("validate-instance", function() {
     instanceEvent.uuid = savedInstance.uuid;
     var aliasesMap = config.getInstanceDefinitionAliasesMap(instanceEvent);
     instanceEvent = JSON.parse(
-        S(JSON.stringify(instanceEvent)).template(aliasesMap).s
+      S(JSON.stringify(instanceEvent)).template(aliasesMap).s
     );
 
     var uuid = savedInstance.uuid;

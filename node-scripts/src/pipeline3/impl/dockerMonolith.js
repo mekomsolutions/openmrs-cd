@@ -54,10 +54,7 @@ module.exports = {
       );
       script += "\n";
       var mounts = {
-        "/mnt": path.resolve(
-            instanceDef.deployment.hostDir,
-            instanceDef.name
-        )
+        "/mnt": path.resolve(instanceDef.deployment.hostDir, instanceDef.name)
       };
 
       var setTLS = "";
@@ -100,7 +97,7 @@ module.exports = {
           "\n" +
           scripts.remote(
             ssh,
-              module.exports.exec(
+            module.exports.exec(
               instanceDef,
               scripts.setTimezone(instanceDef.deployment.timezone)
             )

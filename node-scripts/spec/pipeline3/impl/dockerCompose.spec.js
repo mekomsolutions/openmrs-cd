@@ -29,7 +29,8 @@ describe("Scripts", function() {
             "443": "8733",
             "80": "8180"
           },
-          networks: ["network1", "network2"]
+          networks: ["network1", "network2"],
+          services: ["proxy", "openmrs", "mysql"]
         },
         host: {
           type: "ssh",
@@ -45,9 +46,7 @@ describe("Scripts", function() {
     it("should generate docker compose Pre-Host Preparation deployment script", () => {
       expect(
         dockerCompose.preHostPreparation.getDeploymentScript(instanceDef)
-      ).toEqual(
-        ""
-      );
+      ).toEqual("");
     });
 
     it("should generate docker compose Pre-Host Preparation data script", () => {
@@ -63,54 +62,57 @@ describe("Scripts", function() {
     });
 
     it("should generate docker compose Host Preparation deployment script", () => {
-      let expected = scripts.remote(
+      let expected =
+        scripts.remote(
           instanceDef.deployment.host.value,
           scripts.gitClone(
-              instanceDef.deployment.value.gitUrl,
-              path
-                  .resolve(
-                      instanceDef.deployment.hostDir,
-                      instanceDef.name,
-                      "bahmni_docker"
-                  )
-                  .toString(),
-              instanceDef.deployment.value.commitId
-          )) + "\n" +
-          scripts.remote(
-              instanceDef.deployment.host.value,
-              scripts.createEnvVarFile(instanceDef)
-              ) + "\n" +
-          scripts.remote(
-              instanceDef.deployment.host.value,
-              "cd " +
-              path
-                  .resolve(
-                      instanceDef.deployment.hostDir,
-                      instanceDef.name,
-                      "bahmni_docker"
-                  )
-                  .toString() +
-              " && docker-compose -p " +
-              instanceDef.name +
-              " --env-file=" +
-              path
-                  .resolve(
-                      instanceDef.deployment.hostDir,
-                      instanceDef.name,
-                      instanceDef.name + ".env"
-                  )
-                  .toString() +
-              " build --pull" +
-              "\n"
-          ) + scripts.remote(
-              instanceDef.deployment.host.value,
-              "sudo chown -R root:root " +
-              path
-                  .resolve(
-                      instanceDef.deployment.hostDir,
-                      instanceDef.name
-                  ).toString()
-          );
+            instanceDef.deployment.value.gitUrl,
+            path
+              .resolve(
+                instanceDef.deployment.hostDir,
+                instanceDef.name,
+                "bahmni_docker"
+              )
+              .toString(),
+            instanceDef.deployment.value.commitId
+          )
+        ) +
+        "\n" +
+        scripts.remote(
+          instanceDef.deployment.host.value,
+          scripts.createEnvVarFile(instanceDef)
+        ) +
+        "\n" +
+        scripts.remote(
+          instanceDef.deployment.host.value,
+          "cd " +
+            path
+              .resolve(
+                instanceDef.deployment.hostDir,
+                instanceDef.name,
+                "bahmni_docker"
+              )
+              .toString() +
+            " && docker-compose -p " +
+            instanceDef.name +
+            " --env-file=" +
+            path
+              .resolve(
+                instanceDef.deployment.hostDir,
+                instanceDef.name,
+                instanceDef.name + ".env"
+              )
+              .toString() +
+            " build --pull proxy openmrs mysql" +
+            "\n"
+        ) +
+        scripts.remote(
+          instanceDef.deployment.host.value,
+          "sudo chown -R root:root " +
+            path
+              .resolve(instanceDef.deployment.hostDir, instanceDef.name)
+              .toString()
+        );
       expect(
         dockerCompose.hostPreparation.getDeploymentScript(instanceDef)
       ).toEqual(expected);
@@ -131,10 +133,21 @@ describe("Scripts", function() {
     it("should generate docker compose Start Instance deployment script", () => {
       expect(
         dockerCompose.startInstance.getDeploymentScript(instanceDef)
-      ).toEqual(scripts.remote(instanceDef.deployment.host.value,
-        "cd /var/docker-volumes/" + instanceDef.name + "/bahmni_docker && " +
-        "docker-compose -p " + instanceDef.name + " --env-file=/var/docker-volumes/" + instanceDef.name + "/" + instanceDef.name + ".env up -d"
-      ));
+      ).toEqual(
+        scripts.remote(
+          instanceDef.deployment.host.value,
+          "cd /var/docker-volumes/" +
+            instanceDef.name +
+            "/bahmni_docker && " +
+            "docker-compose -p " +
+            instanceDef.name +
+            " --env-file=/var/docker-volumes/" +
+            instanceDef.name +
+            "/" +
+            instanceDef.name +
+            ".env up -d proxy openmrs mysql"
+        )
+      );
     });
 
     it("should generate docker compose Start Instance data script", () => {

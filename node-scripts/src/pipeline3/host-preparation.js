@@ -36,10 +36,10 @@ if (_.isEmpty(instanceDef)) {
 //  Host metadata
 //
 var ssh = instanceDef.deployment.host.value; // TODO this should be extracted based on the host type
-var hostDir = hostDir = path.resolve(
-    instanceDef.deployment.hostDir,
-    instanceDef.name
-);
+var hostDir = (hostDir = path.resolve(
+  instanceDef.deployment.hostDir,
+  instanceDef.name
+));
 
 //
 //  Building the script

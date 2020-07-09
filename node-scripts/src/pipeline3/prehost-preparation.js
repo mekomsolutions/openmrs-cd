@@ -89,4 +89,3 @@ fs.writeFileSync(
   path.resolve(config.getBuildDirPath(), config.getStatusFileName()),
   JSON.stringify({ status: currentStage })
 );
-

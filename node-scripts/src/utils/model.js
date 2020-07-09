@@ -49,10 +49,11 @@ class DockerMonolithDeployment {
  * Describe a Docker Compose deployment
  */
 class DockerComposeDeployment {
-  constructor(gitUrl, commitId, networks) {
+  constructor(gitUrl, commitId, networks, services) {
     this.gitUrl = gitUrl;
     this.commitId = commitId;
     this.networks = networks;
+    this.services = services;
   }
 }
 
