@@ -145,7 +145,8 @@ describe("Scripts", function() {
             instanceDef.name +
             "/" +
             instanceDef.name +
-            ".env up -d proxy openmrs mysql"
+            ".env up -d" +
+            dockerCompose.getInstanceServices(instanceDef)
         )
       );
     });
@@ -160,6 +161,105 @@ describe("Scripts", function() {
       expect(
         dockerCompose.startInstance.getArtifactsScript(instanceDef)
       ).toEqual("");
+    });
+
+    it("should  generate docker compose restart Instance script", () => {
+      expect(dockerCompose.restart(instanceDef, false)).toEqual(
+        "cd " +
+          instanceDef.deployment.hostDir +
+          instanceDef.name +
+          "/bahmni_docker && docker-compose -p " +
+          instanceDef.name +
+          " restart \n"
+      );
+    });
+
+    it("should generate docker compose exec script", () => {
+      expect(
+        dockerCompose.exec(instanceDef, "touch file.txt", "openmrs")
+      ).toEqual(
+        "set -e\ncd " +
+          instanceDef.deployment.hostDir +
+          instanceDef.name +
+          "/bahmni_docker " +
+          "&& docker-compose -p " +
+          instanceDef.name +
+          " exec -T openmrs /bin/bash -s <<heredoc_delimiter_ec8cd90e\n" +
+          "set -e\ntouch file.txt\nheredoc_delimiter_ec8cd90e\n"
+      );
+    });
+
+    it("should generate docker-compose script to check if it exists", () => {
+      expect(dockerCompose.ifExists()).toEqual(undefined);
+    });
+
+    it("should generate docker-compose pull script", () => {
+      expect(dockerCompose.pull()).toEqual(undefined);
+    });
+
+    it("should generate docker-compose remove script", () => {
+      expect(dockerCompose.remove(instanceDef, true)).toEqual(
+        "cd " +
+          instanceDef.deployment.hostDir +
+          instanceDef.name +
+          "/bahmni_docker && " +
+          "sudo docker-compose -p " +
+          instanceDef.name +
+          " down -v \n"
+      );
+    });
+
+    it("should generate docker-compose setProperties script", function() {
+      expect(
+        dockerCompose.setProperties(
+          instanceDef,
+          {
+            filename: "erp.properties",
+            path: "/opt/openmrs/",
+            service: "openmrs",
+            properties: {
+              "erp.database": "odoo",
+              "erp.username": "admin"
+            }
+          },
+          "erp.database=odoo\nerp.username=admin"
+        )
+      ).toEqual(
+        scripts.remote(
+          instanceDef.deployment.host.value,
+          "\n" +
+            "if [[ ! -e " +
+            instanceDef.deployment.hostDir +
+            instanceDef.name +
+            "/bahmni_docker" +
+            "/properties/erp.properties ]]; then\n" +
+            "sudo mkdir -p " +
+            instanceDef.deployment.hostDir +
+            instanceDef.name +
+            "/bahmni_docker/properties\n" +
+            "sudo touch " +
+            instanceDef.deployment.hostDir +
+            instanceDef.name +
+            "/bahmni_docker/properties/erp.properties\n" +
+            "fi\n" +
+            "sudo bash -c 'cat > " +
+            instanceDef.deployment.hostDir +
+            instanceDef.name +
+            "/bahmni_docker/properties/erp.properties <<EOF \n" +
+            "erp.database=odoo\nerp.username=admin\n" +
+            "EOF'\n"
+        )
+      );
+    });
+
+    it("should generate docker-compose setLinks script", function() {
+      expect(dockerCompose.setLinks()).toEqual(undefined);
+    });
+
+    it("should generate docker-compose getInstanceServices script", function() {
+      expect(dockerCompose.getInstanceServices(instanceDef)).toEqual(
+        " proxy openmrs mysql"
+      );
     });
   });
 });
