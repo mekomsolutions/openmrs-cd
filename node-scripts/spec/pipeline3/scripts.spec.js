@@ -422,10 +422,10 @@ describe("Scripts", function() {
 
     expect(scripts.writeProperty(envVar, value, filename)).toEqual(
       'if ! grep -R "^[#]*s*KEY.*" .env > /dev/null; then\n' +
-        "\techo \"APPENDING because 'KEY' not found\"\n" +
+        "\techo \"'KEY' is not found in file '.env'. Appending...\"\n" +
         '\techo "KEY=env.value" >> .env\n' +
         "else\n" +
-        "\techo \"SETTING because 'KEY' found already\"\n" +
+        "\techo \"'KEY' is found in file '.env'. Updating...\"\n" +
         '\tsed -i "s/^[#]*\\s*KEY.*/KEY=env.value/" .env\n' +
         "fi\n"
     );
@@ -444,7 +444,7 @@ describe("Scripts", function() {
         }
       ],
       deployment: {
-        hostDir: "/var/docker-volumes/{{uuid}}",
+        hostDir: "/var/docker-volumes",
         host: {
           type: "ssh",
           value: {
@@ -461,24 +461,21 @@ describe("Scripts", function() {
       }
     };
     expect(scripts.createEnvVarFile(instanceDef)).toEqual(
-      "if [[ ! -e /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env ]]; then\n" +
-        "    mkdir -p /var/docker-volumes/{{uuid}}/hsc-dev\n" +
-        "    touch /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\n" +
+      "if [[ ! -e /var/docker-volumes/hsc-dev/hsc-dev.env ]]; then\n" +
+        "    mkdir -p /var/docker-volumes/hsc-dev\n" +
+        "    touch /var/docker-volumes/hsc-dev/hsc-dev.env\n" +
         "fi\n" +
-        "\ncp /var/docker-volumes/{{uuid}}/hsc-dev/bahmni_docker/.env /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\n" +
-        'if ! grep -R "^[#]*s*prop.*" /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env > /dev/null; then\n' +
-        "\techo \"APPENDING because 'prop' not found\"\n" +
-        '\techo "prop=value" >> /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\n' +
-        "else\n" +
-        "\techo \"SETTING because 'prop' found already\"\n" +
-        '\tsed -i "s/^[#]*\\s*prop.*/prop=value/" /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\n' +
-        "fi\n" +
-        'if ! grep -R "^[#]*s*prop2.*" /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env > /dev/null; then\n' +
-        "\techo \"APPENDING because 'prop2' not found\"\n" +
-        '\techo "prop2=value2" >> /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\n' +
-        "else\n" +
-        "\techo \"SETTING because 'prop2' found already\"\n" +
-        '\tsed -i "s/^[#]*\\s*prop2.*/prop2=value2/" /var/docker-volumes/{{uuid}}/hsc-dev/hsc-dev.env\nfi\n'
+        "\ncp /var/docker-volumes/hsc-dev/bahmni_docker/.env /var/docker-volumes/hsc-dev/hsc-dev.env\n" +
+        scripts.writeProperty(
+          "prop",
+          "value",
+          "/var/docker-volumes/hsc-dev/hsc-dev.env"
+        ) +
+        scripts.writeProperty(
+          "prop2",
+          "value2",
+          "/var/docker-volumes/hsc-dev/hsc-dev.env"
+        )
     );
   });
 

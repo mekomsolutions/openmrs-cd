@@ -155,7 +155,7 @@ describe("Host preparation scripts", function() {
         tests.stubs()
       );
     }).toThrow(
-      new Error("Illegal argument: empty or unexisting instance definition.")
+      new Error("Illegal argument: empty or non-existing instance definition.")
     );
   });
 });
