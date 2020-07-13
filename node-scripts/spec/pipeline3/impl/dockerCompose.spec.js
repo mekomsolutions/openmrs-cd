@@ -163,7 +163,7 @@ describe("Scripts", function() {
       ).toEqual("");
     });
 
-    it("should  generate docker compose restart Instance script", () => {
+    it("should generate Docker Compose 'restart' script", () => {
       expect(dockerCompose.restart(instanceDef, false)).toEqual(
         "cd " +
           instanceDef.deployment.hostDir +
@@ -174,7 +174,7 @@ describe("Scripts", function() {
       );
     });
 
-    it("should generate docker compose exec script", () => {
+    it("should generate Docker Compose 'exec' script", () => {
       expect(
         dockerCompose.exec(instanceDef, "touch file.txt", "openmrs")
       ).toEqual(
@@ -189,15 +189,15 @@ describe("Scripts", function() {
       );
     });
 
-    it("should generate docker-compose script to check if it exists", () => {
+    it("should generate Docker Compose 'ifExists' script", () => {
       expect(dockerCompose.ifExists()).toEqual(undefined);
     });
 
-    it("should generate docker-compose pull script", () => {
+    it("should generate Docker Compose 'pull' script", () => {
       expect(dockerCompose.pull()).toEqual(undefined);
     });
 
-    it("should generate docker-compose remove script", () => {
+    it("should generate Docker Compose 'remove' script", () => {
       expect(dockerCompose.remove(instanceDef, true)).toEqual(
         "cd " +
           instanceDef.deployment.hostDir +
@@ -209,7 +209,7 @@ describe("Scripts", function() {
       );
     });
 
-    it("should generate docker-compose setProperties script", function() {
+    it("should generate Docker Compose 'setProperties' script", function() {
       expect(
         dockerCompose.setProperties(
           instanceDef,
@@ -252,11 +252,11 @@ describe("Scripts", function() {
       );
     });
 
-    it("should generate docker-compose setLinks script", function() {
+    it("should generate Docker Compose 'setLinks' script", function() {
       expect(dockerCompose.setLinks()).toEqual(undefined);
     });
 
-    it("should generate docker-compose getInstanceServices script", function() {
+    it("should generate Docker Compose 'getInstanceServices' script", function() {
       expect(dockerCompose.getInstanceServices(instanceDef)).toEqual(
         " proxy openmrs mysql"
       );

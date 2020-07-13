@@ -105,7 +105,6 @@ if (process.env[config.varDeploymentChanges()] === "true") {
 // 'data'
 
 if (process.env[config.varDataChanges()] === "true") {
-  // shouldn't this be managed by docker/docker-compose?
   instanceDef.data.forEach(function(data) {
     var instanceDataDir = hostDir + "/data";
     var sourceDataDir;
@@ -119,7 +118,7 @@ if (process.env[config.varDataChanges()] === "true") {
             "Source instance definition could not be found. Instance can not use data of non-existing instance."
           );
           throw new Error(
-            "Illegal argument: empty or unexisting instance definition."
+            "Illegal argument: empty or non-existing instance definition."
           );
         }
         sourceDataDir = sourceInstance.deployment.hostDir + "/data/";
