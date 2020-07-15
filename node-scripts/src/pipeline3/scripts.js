@@ -12,7 +12,7 @@ const utils = require("../utils/utils");
 const model = require("../utils/model");
 
 module.exports = {
-  /*
+  /**
    * Trails slashes or not:
    *
    * foo + true ➔  foo/
@@ -38,7 +38,7 @@ module.exports = {
     return dirPath;
   },
 
-  /*
+  /**
    * Turns a path into a remote path based on the SSH information.
    *    Eg. /tmp ➔  cdadgent@10.99.0.4:/tmp
    *
@@ -59,7 +59,7 @@ module.exports = {
     return ppath;
   },
 
-  /*
+  /**
    * 'rsync' source to destination
    *
    * @param {Object} ssh - The SSH parameters, eg:
@@ -76,7 +76,7 @@ module.exports = {
    * @param {String} dstPath - The destination path
    * @param {Boolean} slashSrc - Set to true to add a trailing slash to the source path
    * @param {Boolean} slashDst - Set to true to add a trailing slash to the destination path
-   * @param {String} args - To override the default args: '-avz'
+   * @param {String} args - To override the default args: '-avzz'
    * @param {String} sudo - Apply the command as sudo
    *
    * @return {String} The remote version of the script
@@ -86,7 +86,7 @@ module.exports = {
     dstPath = module.exports.trailSlash(dstPath, slashDst);
 
     if (!args) {
-      args = "-avz";
+      args = "-avzz";
     }
 
     var sshPort = "";
@@ -111,7 +111,7 @@ module.exports = {
     return script;
   },
 
-  /*
+  /**
    * Turns a script into an SSH remote script based on the SSH parameters and using bash's heredoc.
    *
    * @param {Object} ssh - The SSH parameters, eg:
@@ -166,12 +166,22 @@ module.exports = {
 
     return script;
   },
+  gitClone: function(repo, destPath, commitId) {
+    var script = "";
+    script += "git clone " + repo + " " + destPath;
+    script += "\n";
+    if (commitId) {
+      script += "cd " + destPath + " && git checkout " + commitId;
+      script += "\n";
+    }
+    return script;
+  },
 
-  /*
+  /**
    * Generates a script that fetches an instance's artifacts to save them a specified location.
    *
    * @param {Object} artifact - An 'artifact' section of the artifacts part of the instance definition.
-   * @param {String} destPath - The destination part where to save the fecthed artifact.
+   * @param {String} destPath - The destination part where to save the fetched artifact.
    *
    * @return {String} The script as a string.
    */
@@ -210,10 +220,10 @@ module.exports = {
 
     return script;
   },
-  /*
-  * Symlinks a source to a target.
-  *
-  * @param {String} source - The source path to be linked.
+  /**
+   * Symlinks a source to a target.
+   *
+   * @param {String} source - The source path to be linked.
    * @param {String} target - The target to which to link the source.
    * @param {String} user - The owner of the folder to be set.
    * @param {String} group - The owner's group of the folder to be set.
@@ -354,7 +364,7 @@ module.exports = {
       "printf '%b' \"\\\\\\${textToPrint[@]#}\"\n"
     );
   },
-  /*
+  /**
    * Method to return scripts to set the server Timezone.
    *
    */
@@ -364,183 +374,6 @@ module.exports = {
     script += "mv /etc/localtime /etc/localtime.backup\n";
     script += "ln -s /usr/share/zoneinfo/" + timezone + " /etc/localtime\n";
     return script;
-  },
-  /*
-   * Implementation of script utils to specifically manipulate Docker containers.
-   *
-   */
-  docker: {
-    /*
-     * Util function that wraps the passed commands so each is applied either accordingly.
-     *
-     * @param {String} containerName - The name of the container.
-     * @param {String} ifExistsCommand - The command that should run if the container exists.
-     * @param {String} elseCommand - The command that will run if the container does *not* exist.
-     *
-     * @return {String} The script as a string.
-     */
-    ifExists: function(containerName, ifExistsCommand, elseCommand) {
-      var script = "";
-      script += "set -e\n";
-      script +=
-        "container=\\$(docker ps -a --filter name=" +
-        containerName +
-        " --format {{.Names}})\n";
-      script += 'if [ "\\$container" == "' + containerName + '" ]\n';
-      script += "then ";
-      script += !_.isEmpty(ifExistsCommand) ? ifExistsCommand : "echo\n";
-      script += "else ";
-      script += !_.isEmpty(elseCommand) ? elseCommand : "echo\n";
-      script += "fi\n";
-
-      return script;
-    },
-    /*
-     * Generates a script that pulls a Docker image
-     *
-     * @param {String} image - The name of the image to pull
-     * @param {String} tag - The tag of the image to pull
-     *
-     * @return {String} The script as a string.
-     */
-    pull: function(image, tag) {
-      var script = "";
-      script = "docker pull " + image + ":" + tag + "\n";
-      return script;
-    },
-
-    /*
-     * Generates a script that restarts the passed container.
-     *
-     * @param {String} containerName - The name of the container to restart.
-     *
-     * @return {String} The script as a string.
-     */
-    restart: function(containerName) {
-      var script = "";
-      script += "set -e\n";
-      script += "docker restart " + containerName + "\n";
-      return module.exports.docker.ifExists(containerName, script);
-    },
-
-    /*
-     * Generates a script to remove the passed container.
-     *
-     * @param {String} containerName - The name of the container to remove.
-     *
-     * @return {String} The script as a string.
-     */
-    remove: function(containerName) {
-      var script = "";
-      script += "set -e\n";
-      script += "docker stop " + containerName + "\n";
-      script += "docker rm -v " + containerName + "\n";
-      return module.exports.docker.ifExists(containerName, script);
-    },
-
-    /*
-     * Run a new container with the appropriate options.
-     *
-     * @param {String} containerName - The name of the container to run.
-     * @param {Object} instanceDef - The instance definition of the instance to start.
-     *
-     * @return {String} The script as a string.
-     */
-    run: function(containerName, instanceDef, mounts) {
-      const docker = instanceDef.deployment.value;
-
-      var script = "";
-      script += "set -e\n";
-
-      var scriptArgs = [];
-      scriptArgs.push("docker run -dit");
-
-      if (docker.privileged == "true") {
-        scriptArgs.push("--privileged");
-        scriptArgs.push("-v /sys/fs/cgroup:/sys/fs/cgroup:ro");
-      }
-
-      scriptArgs.push("--restart unless-stopped");
-
-      Object.keys(docker.ports).forEach(function(key) {
-        scriptArgs.push("--publish " + docker.ports[key] + ":" + key);
-      });
-
-      var labels = {
-        type: instanceDef.type,
-        group: instanceDef.group
-      };
-      Object.keys(labels).forEach(function(key) {
-        scriptArgs.push("--label " + key + "=" + labels[key]);
-      });
-
-      scriptArgs.push("--name " + containerName);
-      scriptArgs.push("--hostname bahmni");
-
-      docker.networks.forEach(function(network) {
-        scriptArgs.push("--network " + network);
-      });
-
-      Object.keys(mounts).forEach(function(key) {
-        scriptArgs.push(
-          "--mount type=bind,source=" + mounts[key] + ",target=" + key
-        );
-      });
-
-      scriptArgs.push(docker.image + ":" + docker.tag);
-
-      scriptArgs.forEach(function(arg, index) {
-        script += arg;
-        script += !scriptArgs[index + 1] ? "" : " ";
-      });
-
-      return script + "\n";
-    },
-
-    /*
-     * Executes the passed shell command into the container.
-     *
-     * @param {String} containerName - The name of the container on which to execute the command.
-     * @param {String} command - The command to execute.
-     *
-     * @return {String} The script as a string.
-     */
-    exec: function(containerName, command) {
-      var script = "";
-      script += "set -e\n";
-      script +=
-        "docker exec -i " +
-        containerName +
-        " /bin/bash -s <<" +
-        heredoc_2 +
-        "\n";
-      script += "set -e\n";
-      script += command + "\n";
-      script += heredoc_2;
-
-      return script + "\n";
-    },
-
-    /*
-     * Copy 'source' located on the host to the container's 'destination'.
-     *
-     * @param {String} containerName - The name of the container onto which to copy the data.
-     * @param {String} source - The source file to be copied on the container.
-     * @param {String} destination - The destination location for this file.
-     * @param {String} sudo - Apply the command as sudo
-    *
-     * @return {String} The script as a string.
-     */
-    copy: function(containerName, source, destination, sudo) {
-      var script = "";
-
-      if (sudo) {
-        script += "sudo ";
-      }
-      script += "docker cp " + source + " " + containerName + ":" + destination;
-
-      return script + "\n";
-    }
   },
   /**
    * Determines if a script should be run at a given stage and adds it to the final script
@@ -587,12 +420,13 @@ module.exports = {
     var restartNeeded = false;
 
     scriptsToRun.forEach(function(item) {
-      var deploymentTypeScripts = module.exports[instanceDef.deployment.type];
+      var deploymentTypeScripts = require("./impl/" +
+        instanceDef.deployment.type);
       var runScript = "";
       if (item.type === "shell") {
         runScript += module.exports.remote(
           ssh,
-          deploymentTypeScripts.exec(instanceDef.uuid, item.value)
+          deploymentTypeScripts.exec(instanceDef, item.value, item.service)
         );
       } else if (item.type === "python") {
         // TODO: to be implemented
@@ -628,7 +462,7 @@ module.exports = {
           .slice(-5);
         var destFolder = "/tmp/" + randomFolderName + "/";
         script.push(
-          container.exec(instanceDef.uuid, "mkdir -p " + destFolder) +
+          container.exec(instanceDef, "mkdir -p " + destFolder) +
             "\n" +
             container.copy(instanceDef.uuid, sql.sourceFile, destFolder)
         );
@@ -728,10 +562,18 @@ module.exports = {
       );
     },
     reload(proxy) {
-      return module.exports.docker.exec(
-        proxy.containerName,
-        "apachectl graceful"
-      );
+      var script = "";
+      script += "set -e\n";
+      script +=
+        "docker exec -i " +
+        proxy.containerName +
+        " /bin/bash -s <<" +
+        heredoc_2 +
+        "\n";
+      script += "set -e\n";
+      script += "apachectl graceful\n";
+      script += heredoc_2;
+      return script;
     },
     maintenance(mode, proxy) {
       var apacheConfFile = "10-" + proxy.port + ".conf";
@@ -753,5 +595,76 @@ module.exports = {
         module.exports.dockerApacheMacro.reload(proxy)
       );
     }
+  },
+
+  /**
+   * Write a property in a given file, override property if it exists
+   *
+   * @param propertyName the name of the property
+   * @param value the property value
+   * @param filename absolute path to file where to write the property
+   *
+   * @return a script that write the property in the given file
+   */
+  writeProperty(propertyName, value, filename) {
+    var script = "";
+    "string".replace(/\//g, "ForwardSlash");
+    value = value.replace(/\//g, "\\/");
+
+    script += `if ! grep -R "^[#]*\s*${propertyName}.*" ${filename} > /dev/null; then\n`;
+    script += `\techo "'${propertyName}' is not found in file '${filename}'. Appending..."\n`;
+    script += `\techo "${propertyName}=${value}" >> ${filename}\n`;
+    script += "else\n";
+    script += `\techo "'${propertyName}' is found in file '${filename}'. Updating..."\n`;
+    script += `\tsed -i "s/^[#]*\\s*${propertyName}.*/${propertyName}=${value}/" ${filename}\n`;
+    script += "fi\n";
+    return script;
+  },
+
+  createEnvVarFile(instanceDef) {
+    let script = "";
+
+    var distEnvFile = path
+      .resolve(
+        instanceDef.deployment.hostDir,
+        instanceDef.name,
+        instanceDef.name + ".env"
+      )
+      .toString();
+
+    var envFile = path
+      .resolve(
+        instanceDef.deployment.hostDir,
+        instanceDef.name,
+        "bahmni_docker",
+        ".env"
+      )
+      .toString();
+
+    script +=
+      "if [[ ! -e " +
+      distEnvFile +
+      " ]]; then\n" +
+      "    mkdir -p " +
+      path
+        .resolve(instanceDef.deployment.hostDir, instanceDef.name)
+        .toString() +
+      "\n" +
+      "    touch " +
+      distEnvFile +
+      "\n" +
+      "fi\n";
+
+    script += "\ncp " + envFile + " " + distEnvFile + "\n";
+
+    for (let property in instanceDef.envVars) {
+      script += module.exports.writeProperty(
+        property,
+        instanceDef.envVars[property],
+        distEnvFile
+      );
+    }
+
+    return script;
   }
 };

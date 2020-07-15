@@ -9,9 +9,8 @@ describe("Scripts", function() {
   const config = require(path.resolve("src/utils/config"));
   const utils = require(path.resolve("src/utils/utils"));
   const cst = require(path.resolve("src/const"));
+  const dockerContainer = require(path.resolve("src/pipeline3/impl/docker"));
   const heredoc = cst.HEREDOC;
-  const heredoc_2 = cst.HEREDOC_2;
-  const heredoc_3 = cst.HEREDOC_3;
 
   const scripts = require(path.resolve(
     "src/" + config.getJobNameForPipeline3() + "/scripts"
@@ -75,127 +74,26 @@ describe("Scripts", function() {
 
     // verif
     expect(scripts.rsync(null, "/src", "/dst")).toEqual(
-      "rsync -avz /src /dst\n"
+      "rsync -avzz /src /dst\n"
     );
     expect(scripts.rsync(null, "/src", "/dst", true, true)).toEqual(
-      "rsync -avz /src/ /dst/\n"
+      "rsync -avzz /src/ /dst/\n"
     );
     expect(scripts.rsync(null, "/src", "/dst", null, null, "-xyz")).toEqual(
       "rsync -xyz /src /dst\n"
     );
 
     expect(scripts.rsync(ssh, "/src", "/dst")).toEqual(
-      "rsync -avz /src /dst\n"
+      "rsync -avzz /src /dst\n"
     );
     Object.assign(ssh, { remoteDst: true });
     expect(scripts.rsync(ssh, "/src", "/dst")).toEqual(
-      "rsync -avz -e 'ssh -p 22' /src user@host:/dst\n"
+      "rsync -avzz -e 'ssh -p 22' /src user@host:/dst\n"
     );
     delete ssh.remoteDst;
     Object.assign(ssh, { remoteSrc: true });
     expect(scripts.rsync(ssh, "/src", "/dst")).toEqual(
-      "rsync -avz -e 'ssh -p 22' user@host:/src /dst\n"
-    );
-  });
-
-  it("should generate Docker run command", function() {
-    var docker = scripts["docker"];
-
-    var instanceDef = {
-      type: "dev",
-      group: "tlc",
-      deployment: {
-        hostDir: "/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0",
-        type: "docker",
-        value: {
-          image: "mekomsolutions/bahmni",
-          tag: "cambodia-release-0.90",
-          ports: {
-            "443": "8733",
-            "80": "8180"
-          },
-          networks: ["network1", "network2"]
-        }
-      }
-    };
-
-    var mounts = {
-      "/mnt": instanceDef.deployment.hostDir
-    };
-
-    expect(docker.run("cambodia1", instanceDef, mounts)).toEqual(
-      "set -e\n" +
-        "docker run -dit --restart unless-stopped " +
-        "--publish 8180:80 --publish 8733:443 --label type=dev --label group=tlc " +
-        "--name cambodia1 --hostname bahmni --network network1 --network network2 " +
-        "--mount type=bind,source=/var/docker-volumes/cacb5448-46b0-4808-980d-5521775671c0,target=/mnt " +
-        "mekomsolutions/bahmni:cambodia-release-0.90\n"
-    );
-
-    instanceDef.deployment.value.privileged = "true";
-    expect(docker.run("cambodia1", instanceDef, mounts)).toContain(
-      "--privileged"
-    );
-    expect(docker.run("cambodia1", instanceDef, mounts)).toContain(
-      "-v /sys/fs/cgroup:/sys/fs/cgroup:ro"
-    );
-  });
-
-  it("should generate ifExists wrapper", function() {
-    var docker = scripts["docker"];
-    expect(docker.ifExists("cambodia1", "cmd1\n", "cmd2\n")).toEqual(
-      "set -e\n" +
-        "container=\\$(docker ps -a --filter name=cambodia1 --format {{.Names}})\n" +
-        'if [ "\\$container" == "cambodia1" ]\n' +
-        "then cmd1\n" +
-        "else cmd2\n" +
-        "fi\n"
-    );
-    expect(docker.ifExists("cambodia1")).toEqual(
-      "set -e\n" +
-        "container=\\$(docker ps -a --filter name=cambodia1 --format {{.Names}})\n" +
-        'if [ "\\$container" == "cambodia1" ]\n' +
-        "then echo\n" +
-        "else echo\n" +
-        "fi\n"
-    );
-  });
-
-  it("should generate Docker restart command", function() {
-    var docker = scripts["docker"];
-    expect(docker.restart("cambodia1")).toEqual(
-      docker.ifExists("cambodia1", "set -e\n" + "docker restart cambodia1\n")
-    );
-  });
-
-  it("should generate Docker remove command", function() {
-    var docker = scripts["docker"];
-    expect(docker.remove("cambodia1")).toEqual(
-      docker.ifExists(
-        "cambodia1",
-        "set -e\ndocker stop cambodia1\ndocker rm -v cambodia1\n"
-      )
-    );
-  });
-
-  it("should generate Docker exec command", function() {
-    var docker = scripts["docker"];
-    expect(docker.exec("cambodia1", "echo 'test'")).toEqual(
-      "set -e\n" +
-        "docker exec -i cambodia1 /bin/bash -s <<" +
-        heredoc_2 +
-        "\n" +
-        "set -e\n" +
-        "echo 'test'\n" +
-        heredoc_2 +
-        "\n"
-    );
-  });
-
-  it("should generate Docker copy command", function() {
-    var docker = scripts["docker"];
-    expect(docker.copy("cambodia1", "/tmp/test1", "/tmp/test2")).toEqual(
-      "docker cp /tmp/test1 cambodia1:/tmp/test2\n"
+      "rsync -avzz -e 'ssh -p 22' user@host:/src /dst\n"
     );
   });
 
@@ -218,9 +116,9 @@ describe("Scripts", function() {
       true
     );
 
-    expect(expectedScript).toContain("rsync -avz target123/ target123.backup");
+    expect(expectedScript).toContain("rsync -avzz target123/ target123.backup");
     expect(expectedScript).toContain("mkdir -p source123");
-    expect(expectedScript).toContain("rsync -avz target123/ source123");
+    expect(expectedScript).toContain("rsync -avzz target123/ source123");
     expect(expectedScript).toContain("rm -rf target123");
     expect(expectedScript).toContain("ln -s source123 target123");
     expect(expectedScript).toContain("chown -R bahmni:bahmni source123");
@@ -308,7 +206,6 @@ describe("Scripts", function() {
         type: "docker"
       }
     };
-    var docker = scripts[instanceDef.deployment.type];
 
     process.env[config.varDataChanges()] = "true";
     process.env[config.varArtifactsChanges()] = "true";
@@ -330,7 +227,7 @@ describe("Scripts", function() {
       "some commands",
       scripts.remote(
         instanceDef.deployment.host.value,
-        docker.exec(instanceDef.uuid, instanceDef.scripts[0].value)
+        dockerContainer.exec(instanceDef, instanceDef.scripts[0].value)
       )
     ]);
 
@@ -366,7 +263,7 @@ describe("Scripts", function() {
     expect(scriptsToRun.script).toEqual([
       scripts.remote(
         instanceDef.deployment.host.value,
-        docker.exec(instanceDef.uuid, instanceDef.scripts[0].value)
+        dockerContainer.exec(instanceDef, instanceDef.scripts[0].value)
       ),
       "some commands"
     ]);
@@ -411,7 +308,7 @@ describe("Scripts", function() {
       "some commands",
       scripts.remote(
         instanceDef.deployment.host.value,
-        docker.exec(instanceDef.uuid, "/b/script.sh")
+        dockerContainer.exec(instanceDef, "/b/script.sh")
       )
     ]);
     expect(scriptsToRun.restartNeeded).toBeTruthy();
@@ -515,6 +412,80 @@ describe("Scripts", function() {
         "sudo chown -R user:group test_folder\n" +
         "rm -rf test_folder/*" +
         "\n"
+    );
+  });
+
+  it("should generate script to set or replace environment variables", function() {
+    var envVar = "KEY";
+    var value = "env.value";
+    var filename = ".env";
+
+    expect(scripts.writeProperty(envVar, value, filename)).toEqual(
+      'if ! grep -R "^[#]*s*KEY.*" .env > /dev/null; then\n' +
+        "\techo \"'KEY' is not found in file '.env'. Appending...\"\n" +
+        '\techo "KEY=env.value" >> .env\n' +
+        "else\n" +
+        "\techo \"'KEY' is found in file '.env'. Updating...\"\n" +
+        '\tsed -i "s/^[#]*\\s*KEY.*/KEY=env.value/" .env\n' +
+        "fi\n"
+    );
+  });
+
+  it("should generate script to create environment file", function() {
+    var instanceDef = {
+      name: "hsc-dev",
+      uuid: "1-22-333",
+      scripts: [
+        {
+          type: "shell",
+          executionStage: "6",
+          conditions: ["data"],
+          value: "/a/script.sh"
+        }
+      ],
+      deployment: {
+        hostDir: "/var/docker-volumes",
+        host: {
+          type: "ssh",
+          value: {
+            ip: "54.154.133.95",
+            user: "ec2-user",
+            port: "22"
+          }
+        },
+        type: "dockerCompose"
+      },
+      envVars: {
+        prop: "value",
+        prop2: "value2"
+      }
+    };
+    expect(scripts.createEnvVarFile(instanceDef)).toEqual(
+      "if [[ ! -e /var/docker-volumes/hsc-dev/hsc-dev.env ]]; then\n" +
+        "    mkdir -p /var/docker-volumes/hsc-dev\n" +
+        "    touch /var/docker-volumes/hsc-dev/hsc-dev.env\n" +
+        "fi\n" +
+        "\ncp /var/docker-volumes/hsc-dev/bahmni_docker/.env /var/docker-volumes/hsc-dev/hsc-dev.env\n" +
+        scripts.writeProperty(
+          "prop",
+          "value",
+          "/var/docker-volumes/hsc-dev/hsc-dev.env"
+        ) +
+        scripts.writeProperty(
+          "prop2",
+          "value2",
+          "/var/docker-volumes/hsc-dev/hsc-dev.env"
+        )
+    );
+  });
+
+  it("should generate script to clone a Git repo", function() {
+    var gitUrl = "git@github:mekomsolutions/bahmni-docker.git";
+    var commitId = "12b9a94";
+
+    expect(scripts.gitClone(gitUrl, "/path/to/distro", commitId)).toEqual(
+      "git clone git@github:mekomsolutions/bahmni-docker.git /path/to/distro\n" +
+        "cd /path/to/distro && git checkout 12b9a94\n"
     );
   });
 });

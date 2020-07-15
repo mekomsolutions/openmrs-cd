@@ -16,7 +16,7 @@
   ],
   "deployment": {
     "hostDir": "/var/docker-volumes/{{uuid}}",
-    "type": "docker",
+    "type": "dockerMonolith",
     "value": {
       "image": "mekomsolutions/bahmni",
       "tag": "cambodia-release-0.90",
@@ -59,6 +59,7 @@
     {
       "filename": "erp.properties",
       "path": "/opt/openmrs/",
+      "service": "",
       "properties": {
         "erp.database": "odoo",
         "erp.username": "admin"

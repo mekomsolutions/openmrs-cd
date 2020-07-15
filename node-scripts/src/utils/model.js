@@ -33,15 +33,27 @@ class Script {
 }
 
 /**
- * Describes a Docker deployment
+ * Describes a Docker Monolith deployment
  */
-class DockerDeployment {
+class DockerMonolithDeployment {
   constructor(image, tag, ports, networks, privileged) {
     this.image = image;
     this.tag = tag;
     this.ports = ports;
     this.networks = networks;
     this.privileged = privileged;
+  }
+}
+
+/**
+ * Describe a Docker Compose deployment
+ */
+class DockerComposeDeployment {
+  constructor(gitUrl, commitId, networks, services) {
+    this.gitUrl = gitUrl;
+    this.commitId = commitId;
+    this.networks = networks;
+    this.services = services;
   }
 }
 
@@ -200,7 +212,7 @@ class ServerEvent {
 /**
  * Docker deployment scripts
  */
-class DockerDeploymentScripts {
+class DockerMonolithDeploymentScripts {
   constructor(ifExists, restart, remove, run, exec, copy) {
     this.ifExists = ifExists;
     this.restart = restart;
@@ -215,9 +227,10 @@ class DockerDeploymentScripts {
  * Aims at describing an instance property file
  */
 class Property {
-  constructor(filename, path, properties) {
+  constructor(filename, path, properties, service) {
     this.filename = filename;
     this.path = path;
+    this.service = service;
     this.properties = properties;
   }
 }
@@ -228,13 +241,14 @@ module.exports = {
   MavenProject: MavenProject,
   InstanceData: InstanceData,
   SqlData: SqlData,
-  DockerDeployment: DockerDeployment,
+  DockerMonolithDeployment: DockerMonolithDeployment,
+  DockerComposeDeployment: DockerComposeDeployment,
   FileTLSDeployment: FileTLSDeployment,
   VaultTLSDeployment: VaultTLSDeployment,
   Artifact: Artifact,
   ProjectBuild: ProjectBuild,
   Descriptor: Descriptor,
   ServerEvent: ServerEvent,
-  DockerDeploymentScripts: DockerDeploymentScripts,
+  DockerDeploymentScripts: DockerMonolithDeploymentScripts,
   Property: Property
 };

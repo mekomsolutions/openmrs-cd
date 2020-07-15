@@ -101,7 +101,7 @@ module.exports = {
     return pom;
   },
 
-  /*
+  /**
    * Saves an instance event to the database.
    *
    * @param {Object/model.Script} script - The script object.

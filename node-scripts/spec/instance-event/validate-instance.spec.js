@@ -151,7 +151,6 @@ describe("validate-instance", function() {
     // verif that the instances list is updated accordingly
     var savedInstance = db.getInstanceDefinition(null, instanceEvent.name);
     expect(savedInstance.artifacts).toEqual(instanceEvent.artifacts);
-
     // substitute instanceEvent aliases so it can be compared to the expected savedInstance
     instanceEvent.uuid = savedInstance.uuid;
     var aliasesMap = config.getInstanceDefinitionAliasesMap(instanceEvent);
@@ -160,6 +159,7 @@ describe("validate-instance", function() {
     );
 
     var uuid = savedInstance.uuid;
+
     delete savedInstance.created;
     delete savedInstance.updated;
     delete savedInstance.status;

@@ -1,8 +1,8 @@
 <?xml version='1.1' encoding='UTF-8'?>
-<flow-definition plugin="workflow-job@2.33">
+<flow-definition plugin="workflow-job@2.38">
   <actions>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.3.9"/>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.3.9">
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.6.0"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.6.0">
       <jobProperties/>
       <triggers/>
       <parameters/>
@@ -14,6 +14,15 @@ Depending on the context and the instance definition it can setup and run a new 
   <displayName>Run Instance</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.0.15"/>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>5</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -49,28 +58,8 @@ Depending on the context and the instance definition it can setup and run a new 
         </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.StringParameterDefinition reference="../../../hudson.model.ParametersDefinitionProperty/parameterDefinitions/hudson.model.StringParameterDefinition"/>
-        <hudson.model.BooleanParameterDefinition reference="../../../hudson.model.ParametersDefinitionProperty/parameterDefinitions/hudson.model.BooleanParameterDefinition"/>
-        <hudson.model.BooleanParameterDefinition reference="../../../hudson.model.ParametersDefinitionProperty/parameterDefinitions/hudson.model.BooleanParameterDefinition[2]"/>
-        <hudson.model.BooleanParameterDefinition reference="../../../hudson.model.ParametersDefinitionProperty/parameterDefinitions/hudson.model.BooleanParameterDefinition[3]"/>
-        <hudson.model.BooleanParameterDefinition reference="../../../hudson.model.ParametersDefinitionProperty/parameterDefinitions/hudson.model.BooleanParameterDefinition[4]"/>
-        <hudson.model.BooleanParameterDefinition reference="../../../hudson.model.ParametersDefinitionProperty/parameterDefinitions/hudson.model.BooleanParameterDefinition[5]"/>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
-    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.0.8"/>
-    <hudson.plugins.jira.JiraProjectProperty reference="../hudson.plugins.jira.JiraProjectProperty"/>
-    <jenkins.model.BuildDiscarderProperty>
-      <strategy class="hudson.tasks.LogRotator">
-        <daysToKeep>-1</daysToKeep>
-        <numToKeep>5</numToKeep>
-        <artifactDaysToKeep>-1</artifactDaysToKeep>
-        <artifactNumToKeep>-1</artifactNumToKeep>
-      </strategy>
-    </jenkins.model.BuildDiscarderProperty>
   </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.72">
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.80">
     <script>// Name the build out of the parameters
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurperClassic
@@ -99,7 +88,7 @@ pipeline {
    ansiColor(&apos;xterm&apos;)
  }
  tools {
-  maven &apos;Maven 3.5.0&apos;
+  maven &apos;Maven 3.3.9&apos;
   nodejs &apos;NodeJS 8.6.0&apos;
  }
  stages {

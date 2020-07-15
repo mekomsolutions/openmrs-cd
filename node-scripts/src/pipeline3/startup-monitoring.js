@@ -47,7 +47,7 @@ script.body = [];
 script.body.push("set -e\n");
 
 var finalRestart = false;
-var container = scripts[instanceDef.deployment.type];
+var container = require("./impl/" + instanceDef.deployment.type);
 
 var computedScript = scripts.computeAdditionalScripts(
   script.body,
@@ -61,7 +61,7 @@ script.body = computedScript.script;
 finalRestart += computedScript.restartNeeded;
 
 if (finalRestart) {
-  script.body.push(scripts.remote(ssh, container.restart(instanceDef.uuid)));
+  script.body.push(scripts.remote(ssh, container.restart(instanceDef)));
 }
 
 script.body = script.body.join(cst.SCRIPT_SEPARATOR);

@@ -17,9 +17,10 @@ const config = require(cst.CONFIGPATH);
 const db = require(cst.DBPATH);
 
 const scripts = require("./scripts");
-
-const secrets = config.getSecrets();
 const currentStage = config.getHostPrepareStatusCode();
+
+// Fetch secrets:
+// const secrets = config.getSecrets();
 
 //
 //  Fetching the instance definition based on the provided UUID
@@ -35,7 +36,10 @@ if (_.isEmpty(instanceDef)) {
 //  Host metadata
 //
 var ssh = instanceDef.deployment.host.value; // TODO this should be extracted based on the host type
-var hostDir = instanceDef.deployment.hostDir;
+var hostDir = (hostDir = path.resolve(
+  instanceDef.deployment.hostDir,
+  instanceDef.name
+));
 
 //
 //  Building the script
@@ -75,11 +79,10 @@ if (process.env[config.varArtifactsChanges()] === "true") {
 // 'deployment'
 
 if (process.env[config.varDeploymentChanges()] === "true") {
-  var containerScripts = scripts[instanceDef.deployment.type];
-  var container = instanceDef.deployment.value;
+  const deploymentScripts = require("./impl/" + instanceDef.deployment.type);
   // TODO: most likely a `docker login` here
   script.body.push(
-    scripts.remote(ssh, containerScripts.pull(container.image, container.tag))
+    deploymentScripts.hostPreparation.getDeploymentScript(instanceDef)
   );
   // Configure proxy servers
   var proxies = instanceDef.deployment.proxies;
@@ -115,7 +118,7 @@ if (process.env[config.varDataChanges()] === "true") {
             "Source instance definition could not be found. Instance can not use data of non-existing instance."
           );
           throw new Error(
-            "Illegal argument: empty or unexisting instance definition."
+            "Illegal argument: empty or non-existing instance definition."
           );
         }
         sourceDataDir = sourceInstance.deployment.hostDir + "/data/";
