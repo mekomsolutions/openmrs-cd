@@ -31,6 +31,15 @@
     "links": [],
     "timezone": "America/Port-au-Prince"
   },
+  "data": [
+    {
+      "type": "sqlDocker",
+      "value": {
+        "service": "mysql",
+        "sourceFile": "/var/reference-data"
+      }
+    }
+  ],
   "description": "Dev server for agile development for HSC",
   "group": "hsc",
   "type": "dev",
