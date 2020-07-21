@@ -117,6 +117,16 @@ class SqlData {
 }
 
 /**
+ * Describes a Docker SQL Data section
+ */
+class SqlDocker {
+  constructor(service, sourceFile) {
+    this.service = service;
+    this.sourceFile = sourceFile;
+  }
+}
+
+/**
  * Describes a Maven project
  */
 class MavenProject {
@@ -241,6 +251,7 @@ module.exports = {
   MavenProject: MavenProject,
   InstanceData: InstanceData,
   SqlData: SqlData,
+  SqlDocker: SqlDocker,
   DockerMonolithDeployment: DockerMonolithDeployment,
   DockerComposeDeployment: DockerComposeDeployment,
   FileTLSDeployment: FileTLSDeployment,

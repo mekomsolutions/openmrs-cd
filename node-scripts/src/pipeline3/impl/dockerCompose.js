@@ -127,7 +127,31 @@ module.exports = {
       return script;
     },
     getDataScript: function(instanceDef) {
-      return "";
+      if (!instanceDef.data) return "";
+      const scripts = require("../scripts");
+
+      const path = require("path");
+      var script = "";
+      var ssh = instanceDef.deployment.host.value;
+      instanceDef.data.forEach(function(data) {
+        var applyData = {
+          sqlDocker: function() {
+            let sql = data.value;
+            let destFolder = path.resolve(
+              instanceDef.deployment.hostDir,
+              instanceDef.name,
+              "bahmni_docker/sqls",
+              sql.service
+            );
+            script += scripts.remote(
+              ssh,
+              "sudo cp " + sql.sourceFile + " " + destFolder + "\n"
+            );
+          }
+        };
+        applyData[data.type]();
+      });
+      return script;
     },
     getArtifactsScript: function(instanceDef) {
       return "";

@@ -248,6 +248,15 @@ module.exports = {
             "The data.type 'sql' section did not contain enough information to proceed further with the instance, aborting."
           );
         }
+      } else if (element.type === "sqlDocker") {
+        if (
+          JSON.stringify(Object.keys(element.value).sort()) !==
+          JSON.stringify(Object.keys(new model.SqlDocker()).sort())
+        ) {
+          throw new Error(
+            "The data.type 'sqlDocker' section did not contain enough information to proceed further with the instance, aborting."
+          );
+        }
       } else {
         log.error("", "Illegal argument: the data section is malformed.");
         throw new Error();

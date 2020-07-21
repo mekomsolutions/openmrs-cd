@@ -40,7 +40,16 @@ describe("Scripts", function() {
             port: "22"
           }
         }
-      }
+      },
+      data: [
+        {
+          type: "sqlDocker",
+          value: {
+            service: "mysql",
+            sourceFile: "/var/instance-data/sql-script.sql"
+          }
+        }
+      ]
     };
 
     it("should generate docker compose Pre-Host Preparation deployment script", () => {
@@ -119,6 +128,7 @@ describe("Scripts", function() {
     });
 
     it("should generate docker compose Host Preparation data script", () => {
+      let instanceDef = {};
       expect(dockerCompose.hostPreparation.getDataScript(instanceDef)).toEqual(
         ""
       );
@@ -153,7 +163,10 @@ describe("Scripts", function() {
 
     it("should generate docker compose Start Instance data script", () => {
       expect(dockerCompose.startInstance.getDataScript(instanceDef)).toEqual(
-        ""
+        scripts.remote(
+          instanceDef.deployment.host.value,
+          "sudo cp /var/instance-data/sql-script.sql /var/docker-volumes/cambodia1/bahmni_docker/sqls/mysql\n"
+        )
       );
     });
 
