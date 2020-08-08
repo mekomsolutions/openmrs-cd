@@ -5,18 +5,16 @@ describe("Start instance scripts", function() {
   const fs = require("fs");
   const path = require("path");
   const _ = require("lodash");
-
   const proxyquire = require("proxyquire");
+
   const cst = require(path.resolve("src/const"));
   const dockerContainer = require(path.resolve("src/pipeline3/impl/docker"));
-  var tests, stubs, utils, config, scripts, db, dockerImpl;
+  var tests, stubs, utils, config, scripts, db;
   var instanceUuid, testRandomString;
 
   beforeEach(function() {
     utils = require(path.resolve("src/utils/utils"));
-    dockerImpl = require(path.resolve("src/pipeline3/impl/docker"));
     tests = require(path.resolve("spec/utils/testUtils"));
-    // docker = require(path.resolve("src/pipeline3/impl/docker"))
     stubs = tests.stubs();
 
     config = tests.config();
@@ -131,9 +129,10 @@ describe("Start instance scripts", function() {
     mockUtils.random = function() {
       return testRandomString;
     };
-    var startInstanceDataScriptMock = "Get StartInstance Data Script";
+    var startInstanceDataScriptMock =
+      "Data Script mock for the Start Instance stage";
 
-    var mockDocker = Object.assign({}, dockerImpl);
+    var mockDocker = Object.assign({}, dockerContainer);
     mockDocker.startInstance = {
       getDataScript: function() {
         return startInstanceDataScriptMock;
@@ -349,7 +348,6 @@ describe("Start instance scripts", function() {
     var property = instanceDef.properties[0];
 
     // ensure Properties file is correctly created
-    console.log(script);
     expect(script).toContain(
       scripts.remote(
         ssh,

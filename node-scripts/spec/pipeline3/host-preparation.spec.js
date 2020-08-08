@@ -8,7 +8,7 @@ describe("Host preparation scripts", function() {
   const proxyquire = require("proxyquire");
 
   const cst = require(path.resolve("src/const"));
-
+  const dockerContainer = require(path.resolve("src/pipeline3/impl/docker"));
   const heredocDelimiter = cst.HEREDOC;
   var tests, stubs, config, scripts, db;
   var instanceUuid;
@@ -27,6 +27,8 @@ describe("Host preparation scripts", function() {
     process.env[config.varArtifactsChanges()] = "false";
     process.env[config.varDeploymentChanges()] = "false";
     process.env[config.varDataChanges()] = "false";
+    process.env[config.varPropertiesChanges()] = "false";
+    process.env[config.varCreation()] = "false";
 
     instanceUuid = "cacb5448-46b0-4808-980d-5521775671c0";
   });
@@ -104,12 +106,23 @@ describe("Host preparation scripts", function() {
     process.env[config.varDataChanges()] = "true";
     var instanceDef = db.getInstanceDefinition(instanceUuid);
 
+    var hostPrepareDataScriptMock =
+      "Data Script mock for the Host Preparation stage";
+
+    // Mock the implementation of Docker Monolith: hostPreparation: Data Scripts
+    var mockDocker = Object.assign({}, dockerContainer);
+    mockDocker.hostPreparation = {
+      getDataScript: function() {
+        return hostPrepareDataScriptMock;
+      }
+    };
+
     // replay
     proxyquire(
       path.resolve(
         "src/" + config.getJobNameForPipeline3() + "/host-preparation.js"
       ),
-      tests.stubs()
+      tests.stubs({ "./impl/dockerMonolith": mockDocker })
     );
 
     // verif
@@ -117,19 +130,11 @@ describe("Host preparation scripts", function() {
       path.resolve(config.getBuildDirPath(), config.getHostPrepareScriptName()),
       "utf8"
     );
-    var hostDataDir =
-      instanceDef.deployment.hostDir + "/" + instanceDef.name + "/data";
-    var ssh = instanceDef.deployment.host.value;
-    var srcDir =
-      "/var/docker-volumes/50b6cf72-0e80-457d-8141-a0c8c85d4dae/data/";
 
-    expect(script).toContain(
-      scripts.remote(
-        ssh,
-        scripts.rsync(ssh, srcDir, hostDataDir, true, false, "", true)
-      )
-    );
+    // ensure DataScript is called
+    expect(script).toContain(hostPrepareDataScriptMock);
   });
+
   it("should fail when instance to copy is non-existing.", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
     process.env[config.varDataChanges()] = "true";

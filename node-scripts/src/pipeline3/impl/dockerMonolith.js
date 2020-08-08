@@ -116,8 +116,8 @@ module.exports = {
       instanceDef.data.forEach(function(data) {
         var applyData = {
           instance: function() {
-            // Nothing to do when providing an 'instance'. the data folder copy
-            // has already been done at hostPreparation step
+            // 'instance' type must be handled differently as it requires access to the 'db'.
+            // therefore, the script is provided in the 'stage' script (host-prepation.js, start-instance.js...)
           },
           sql: function() {
             var sql = data.value;

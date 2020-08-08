@@ -74,7 +74,9 @@ module.exports = {
             )
             .toString() +
           " build --pull" +
-          require("./dockerCompose").getInstanceServices(instanceDef) +
+          require("./dockerCompose").getInstanceServicesAsStringList(
+            instanceDef
+          ) +
           "\n"
       );
 
@@ -89,7 +91,66 @@ module.exports = {
       return script;
     },
     getDataScript: function(instanceDef) {
-      return "";
+      var script = "";
+      var ssh = instanceDef.deployment.host.value;
+      instanceDef.data.forEach(function(data) {
+        var applyData = {
+          instance: function() {
+            // 'instance' type must be handled differently as it requires access to the 'db'.
+            // therefore, the script is provided in the 'stage' script (host-prepation.js, start-instance.js...)
+          },
+          sqlDocker: function() {
+            let sql = data.value;
+            let destFolder = path.resolve(
+              instanceDef.deployment.hostDir,
+              instanceDef.name,
+              "bahmni_docker/sqls",
+              sql.service
+            );
+            script += scripts.remote(
+              ssh,
+              "sudo cp " + sql.sourceFile + " " + destFolder + "\n"
+            );
+            script += scripts.remote(
+              ssh,
+              "cd " +
+                path
+                  .resolve(
+                    instanceDef.deployment.hostDir,
+                    instanceDef.name,
+                    "bahmni_docker"
+                  )
+                  .toString() +
+                " && docker-compose -p " +
+                instanceDef.name +
+                " --env-file=" +
+                path
+                  .resolve(
+                    instanceDef.deployment.hostDir,
+                    instanceDef.name,
+                    instanceDef.name + ".env"
+                  )
+                  .toString() +
+                " rm -vsf " +
+                sql.service +
+                " && docker-compose -p " +
+                instanceDef.name +
+                " --env-file=" +
+                path
+                  .resolve(
+                    instanceDef.deployment.hostDir,
+                    instanceDef.name,
+                    instanceDef.name + ".env"
+                  )
+                  .toString() +
+                " up -d " +
+                sql.service
+            );
+          }
+        };
+        applyData[data.type]();
+      });
+      return script;
     },
     getArtifactsScript: function(instanceDef) {
       return "";
@@ -98,7 +159,6 @@ module.exports = {
   startInstance: {
     getDeploymentScript: function(instanceDef) {
       let script = "";
-
       script += scripts.remote(
         instanceDef.deployment.host.value,
         "cd " +
@@ -121,37 +181,15 @@ module.exports = {
             )
             .toString() +
           " up -d" +
-          require("./dockerCompose").getInstanceServices(instanceDef) +
+          require("./dockerCompose").getInstanceServicesAsStringList(
+            instanceDef
+          ) +
           "\n"
       );
       return script;
     },
     getDataScript: function(instanceDef) {
-      if (!instanceDef.data) return "";
-      const scripts = require("../scripts");
-
-      const path = require("path");
-      var script = "";
-      var ssh = instanceDef.deployment.host.value;
-      instanceDef.data.forEach(function(data) {
-        var applyData = {
-          sqlDocker: function() {
-            let sql = data.value;
-            let destFolder = path.resolve(
-              instanceDef.deployment.hostDir,
-              instanceDef.name,
-              "bahmni_docker/sqls",
-              sql.service
-            );
-            script += scripts.remote(
-              ssh,
-              "sudo cp " + sql.sourceFile + " " + destFolder + "\n"
-            );
-          }
-        };
-        applyData[data.type]();
-      });
-      return script;
+      return "";
     },
     getArtifactsScript: function(instanceDef) {
       return "";
@@ -199,10 +237,10 @@ module.exports = {
     if (sudo) {
       script += "sudo ";
     }
-    script += "docker-compose -p " + instanceDef.name + " down -v ";
-
+    script += "docker-compose -p " + instanceDef.name + " down -v";
     return script + "\n";
   },
+
   pull: function() {},
   exec: (instanceDef, command, service) => {
     let script = "";
@@ -263,7 +301,7 @@ module.exports = {
     return script;
   },
   setLinks: function() {},
-  getInstanceServices: function(instanceDef) {
+  getInstanceServicesAsStringList: function(instanceDef) {
     let script = "";
     instanceDef.deployment.value.services.forEach(service => {
       script += " " + service.toString();

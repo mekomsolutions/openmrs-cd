@@ -40,6 +40,7 @@ var hostDir = (hostDir = path.resolve(
   instanceDef.deployment.hostDir,
   instanceDef.name
 ));
+const deploymentScripts = require("./impl/" + instanceDef.deployment.type);
 
 //
 //  Building the script
@@ -79,7 +80,6 @@ if (process.env[config.varArtifactsChanges()] === "true") {
 // 'deployment'
 
 if (process.env[config.varDeploymentChanges()] === "true") {
-  const deploymentScripts = require("./impl/" + instanceDef.deployment.type);
   // TODO: most likely a `docker login` here
   script.body.push(
     deploymentScripts.hostPreparation.getDeploymentScript(instanceDef)
@@ -105,6 +105,8 @@ if (process.env[config.varDeploymentChanges()] === "true") {
 // 'data'
 
 if (process.env[config.varDataChanges()] === "true") {
+  // the 'instance' type is a handled differently because it requires the 'db' object
+  // to access to other instances' information
   instanceDef.data.forEach(function(data) {
     var instanceDataDir = hostDir + "/data";
     var sourceDataDir;
@@ -142,6 +144,11 @@ if (process.env[config.varDataChanges()] === "true") {
       );
     }
   });
+
+  // Once all 'instance' types of data are handled, we call the usual Data Script for the stage.
+  script.body.push(
+    deploymentScripts.hostPreparation.getDataScript(instanceDef)
+  );
 }
 
 script.body = scripts.computeAdditionalScripts(
