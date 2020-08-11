@@ -168,6 +168,13 @@ module.exports = {
   },
   gitClone: function(repo, destPath, commitId) {
     var script = "";
+    script +=
+      'if [ "$(ls -A ' +
+      destPath +
+      ')" ]; then\n' +
+      "     rm -rf " +
+      destPath +
+      "\nfi\n";
     script += "git clone " + repo + " " + destPath;
     script += "\n";
     if (commitId) {
