@@ -482,10 +482,25 @@ describe("Scripts", function() {
   it("should generate script to clone a Git repo", function() {
     var gitUrl = "git@github:mekomsolutions/bahmni-docker.git";
     var commitId = "12b9a94";
+    var distroPath = "/path/to/distro";
 
-    expect(scripts.gitClone(gitUrl, "/path/to/distro", commitId)).toEqual(
-      "git clone git@github:mekomsolutions/bahmni-docker.git /path/to/distro\n" +
-        "cd /path/to/distro && git checkout 12b9a94\n"
+    expect(scripts.gitClone(gitUrl, distroPath, commitId)).toEqual(
+      'if [ "$(ls -A ' +
+        distroPath +
+        ')" ]; then\n' +
+        "     rm -rf " +
+        distroPath +
+        "\nfi\n" +
+        "git clone " +
+        gitUrl +
+        " " +
+        distroPath +
+        "\n" +
+        "cd " +
+        distroPath +
+        " && git checkout " +
+        commitId +
+        "\n"
     );
   });
 });
