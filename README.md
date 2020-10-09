@@ -89,7 +89,7 @@ mkdir -p ~/repos && cd ~/repos && \
 ```
 **2** - Build the Node scripts:
 ```bash
-gradle node-scripts:build
+./gradlew node-scripts:build
 ```
 
 **3** - Run the `openmrscd` container based on the `latest` tag:
