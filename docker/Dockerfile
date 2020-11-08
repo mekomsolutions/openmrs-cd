@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.245
+FROM jenkins/jenkins:2.249.3
 MAINTAINER Mekom Solutions <support@mekomsolutions.com>
 
 USER root
@@ -15,7 +15,7 @@ RUN apt -y install nano jq openssh-server rsync libxml2-utils
 RUN apt -y install ruby-full ruby-compass xvfb firefox-esr sudo
 
 # Installing Node.js
-RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+RUN curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
 RUN sudo apt install -y nodejs
 
 # Jenkins needs to be a sudo to execute some build tasks (particularly Bahmni Apps)
