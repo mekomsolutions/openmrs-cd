@@ -4,7 +4,6 @@
 !build.gradle
 
 # Take Jenkins home folder and ignore its content except config.xml
-!jenkins_home
 jenkins_home/*
 !jenkins_home/config.xml
 

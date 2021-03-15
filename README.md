@@ -109,6 +109,10 @@ docker run --name openmrscd  -p 8080:8080 \
   mekomsolutions/openmrscd:latest
 ```
 
+### Using docker-compose
+
+```docker-compose up```
+
 ### The 'node-scripts' component
 Developing on OCD3 means working in here most of the time.
 That is because the bulk of the logic of what OCD3 does lives here. Almost all Jenkins jobs are built on the following pattern:

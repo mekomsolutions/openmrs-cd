@@ -436,6 +436,42 @@ describe("Tests suite for pipeline1", function() {
     );
   });
 
+  it("should getArtifact, getBuildScript and getDeployScript for 'initializer'.", function() {
+    // setup
+    const projectType = "initializer";
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
+
+    // replay
+    var projectBuild = require(folderInTest +
+      "/impl/" +
+      projectType).getInstance();
+    var artifact = projectBuild.getArtifact({ pom: pom });
+    var buildScript = projectBuild.getBuildScript();
+    var deployScript = projectBuild.getDeployScript(artifact);
+
+    // verif
+    expect(artifact.name).toEqual("initializer");
+    expect(artifact.version).toEqual("2.1.0-SNAPSHOT");
+    expect(artifact.extension).toEqual("omod");
+    expect(artifact.filename).toEqual("initializer-2.1.0-SNAPSHOT.omod");
+    expect(artifact.destFilename).toEqual(artifact.filename);
+    expect(artifact.buildPath).toEqual("./omod/target");
+
+    expect(buildScript.type).toEqual("#!/bin/bash");
+    expect(buildScript.body).toEqual("mvn clean package -P validator\n");
+
+    expect(deployScript.type).toEqual("#!/bin/bash");
+    expect(deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1).toBe(
+      true
+    );
+  });
+
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmnicore'.", function() {
     // setup
     const projectType = "bahmnicore";
