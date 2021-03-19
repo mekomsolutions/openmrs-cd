@@ -19,3 +19,5 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 /.settings/
 /.idea/
+/data/
+!data/.gitkeep 

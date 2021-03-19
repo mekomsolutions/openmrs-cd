@@ -92,21 +92,9 @@ mkdir -p ~/repos && cd ~/repos && \
 ./gradlew node-scripts:build
 ```
 
-**3** - Run the `openmrscd` container based on the `latest` tag:
+**3** - Run the `openmrscd` container:
 ```bash
-docker run --name openmrscd  -p 8080:8080 \
-  -v ~/repos/openmrs-cd/node-scripts:/opt/node-scripts \
-  -v ~/repos/openmrs-cd/jenkins/jenkins_home:/var/jenkins_home \
-  -v ~/.m2:/var/jenkins_home/.m2 \
-  -v ~/Documents/openmrs-cd/app_data:/var/lib/openmrs_cd/app_data \
-  mekomsolutions/openmrscd:latest
-```
-The last two mounted volumes are 'nice to have', they ensure that the CD reuses your local .m2 and that the app data are extracted out of the container to some convenient location. In its most minimal form however the above Docker command becomes:
-```bash
-docker run --name openmrscd  -p 8080:8080 \
-  -v ~/repos/openmrs-cd/node-scripts:/opt/node-scripts \
-  -v ~/repos/openmrs-cd/jenkins/jenkins_home:/var/jenkins_home \
-  mekomsolutions/openmrscd:latest
+docker-compose up
 ```
 
 ### The 'node-scripts' component

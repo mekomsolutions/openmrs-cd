@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  openmrscd:
+    image: mekomsolutions/openmrscd:latest
+    container_name: "openmrscd"
+    ports:
+      - "8080:8080"
+    volumes:
+     - ./node-scripts:/opt/node-scripts
+     - ./jenkins/jenkins_home:/var/jenkins_home
+     - ~/.m2:/var/jenkins_home/.m2
+     - ./data/app_data:/var/lib/openmrs_cd/app_data
