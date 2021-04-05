@@ -464,10 +464,10 @@ describe("Tests suite for pipeline1", function() {
     expect(artifact.buildPath).toEqual("./omod/target");
 
     expect(buildScript.type).toEqual("#!/bin/bash");
-    expect(buildScript.body).toEqual("mvn clean package -P validator\n");
+    expect(buildScript.body).toEqual("mvn clean install -P validator\n");
 
     expect(deployScript.type).toEqual("#!/bin/bash");
-    expect(deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1).toBe(
+    expect(deployScript.body.indexOf("mvn clean deploy -DskipTests -P validator") > -1).toBe(
       true
     );
   });

@@ -16,17 +16,15 @@ module.exports = {
     var projectBuild = new model.ProjectBuild();
 
     projectBuild.getBuildScript = function() {
-      var script = cmns.getMavenProjectBuildScript(thisType);
-
-      script.body = "mvn clean package -P validator\n";
-
+      var script = cmns.getMavenProjectBuildScript(thisType, "validator");
       return script;
     };
 
     projectBuild.getDeployScript = function(artifact) {
       return cmns.getMavenProjectDeployScript(
         thisType,
-        "ARTIFACT_UPLOAD_URL_" + nexusType
+        "ARTIFACT_UPLOAD_URL_" + nexusType,
+        "validator"
       );
     };
 
