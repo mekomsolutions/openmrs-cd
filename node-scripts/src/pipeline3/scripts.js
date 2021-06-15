@@ -623,7 +623,7 @@ module.exports = {
     script += `\techo "${propertyName}=${value}" >> ${filename}\n`;
     script += "else\n";
     script += `\techo "'${propertyName}' is found in file '${filename}'. Updating..."\n`;
-    script += `\tsed -i "s/^[#]*\\s*${propertyName}.*/${propertyName}=${value}/" ${filename}\n`;
+    script += `\tsed -i "s/^[#]*\\s*${propertyName}\\b.*/${propertyName}=${value}/" ${filename}\n`;
     script += "fi\n";
     return script;
   },

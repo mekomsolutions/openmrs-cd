@@ -426,7 +426,7 @@ describe("Scripts", function() {
         '\techo "KEY=env.value" >> .env\n' +
         "else\n" +
         "\techo \"'KEY' is found in file '.env'. Updating...\"\n" +
-        '\tsed -i "s/^[#]*\\s*KEY.*/KEY=env.value/" .env\n' +
+        '\tsed -i "s/^[#]*\\s*KEY\\b.*/KEY=env.value/" .env\n' +
         "fi\n"
     );
   });
