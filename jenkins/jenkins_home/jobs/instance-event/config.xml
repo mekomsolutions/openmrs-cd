@@ -88,7 +88,7 @@ exit 0</command>
       <colorMapName>xterm</colorMapName>
     </hudson.plugins.ansicolor.AnsiColorBuildWrapper>
     <jenkins.plugins.nodejs.NodeJSBuildWrapper plugin="nodejs@1.2.6">
-      <nodeJSInstallationName>NodeJS 8.6.0</nodeJSInstallationName>
+      <nodeJSInstallationName>NodeJS 10.11.0</nodeJSInstallationName>
     </jenkins.plugins.nodejs.NodeJSBuildWrapper>
   </buildWrappers>
 </project>
