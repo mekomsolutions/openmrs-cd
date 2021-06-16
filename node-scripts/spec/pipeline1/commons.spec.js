@@ -26,9 +26,11 @@ describe("Commons for project builds", function() {
     expect(script).toContain("mvn clean install\n");
 
     // verify that passing a profile is correctly handled
-    expect(utils.getScriptAsString(
-      cmns.getMavenProjectBuildScript("project_type", "profile1")
-    )).toContain("mvn clean install -P profile1\n")
+    expect(
+      utils.getScriptAsString(
+        cmns.getMavenProjectBuildScript("project_type", "profile1")
+      )
+    ).toContain("mvn clean install -P profile1\n");
   });
 
   it("should generate a typical Maven deploy script.", function() {
@@ -48,9 +50,15 @@ describe("Commons for project builds", function() {
     );
 
     // verify that passing a profile is correctly handled
-    expect(utils.getScriptAsString(
-      cmns.getMavenProjectDeployScript("project_type", "URL_ENVVAR_NAME", "profile1")
-    )).toContain("mvn clean deploy -DskipTests -P profile1")
+    expect(
+      utils.getScriptAsString(
+        cmns.getMavenProjectDeployScript(
+          "project_type",
+          "URL_ENVVAR_NAME",
+          "profile1"
+        )
+      )
+    ).toContain("mvn clean deploy -DskipTests -P profile1");
   });
 
   it("should generate an 'Artifact' for a Maven project.", function() {
@@ -58,10 +66,10 @@ describe("Commons for project builds", function() {
     const projectType = "openmrsmodule";
     var pom = utils.getPom(
       "spec/" +
-      config.getJobNameForPipeline1() +
-      "/resources/" +
-      projectType +
-      "/pom.xml"
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
     );
 
     // replay
@@ -96,10 +104,10 @@ describe("Commons for project builds", function() {
     const projectType = "bahmnicore";
     var pom = utils.getPom(
       "spec/" +
-      config.getJobNameForPipeline1() +
-      "/resources/" +
-      projectType +
-      "/pom.xml"
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
     );
     var artifactsIds = ["bahmnicore-api", "bahmnicore-omod"];
 

@@ -467,9 +467,10 @@ describe("Tests suite for pipeline1", function() {
     expect(buildScript.body).toEqual("mvn clean install -P validator\n");
 
     expect(deployScript.type).toEqual("#!/bin/bash");
-    expect(deployScript.body.indexOf("mvn clean deploy -DskipTests -P validator") > -1).toBe(
-      true
-    );
+    expect(
+      deployScript.body.indexOf("mvn clean deploy -DskipTests -P validator") >
+        -1
+    ).toBe(true);
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmnicore'.", function() {

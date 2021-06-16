@@ -26,7 +26,10 @@ module.exports = {
       projectType +
       "'...";
 
-    script.body = "mvn clean install" + (typeof profile === 'undefined' ? "" : " -P " + profile) + "\n";
+    script.body =
+      "mvn clean install" +
+      (typeof profile === "undefined" ? "" : " -P " + profile) +
+      "\n";
 
     return script;
   },
@@ -39,7 +42,11 @@ module.exports = {
    *
    *  'mvn clean deploy'
    */
-  getMavenProjectDeployScript: function(projectType, uploadUrlEnvvarName, profile) {
+  getMavenProjectDeployScript: function(
+    projectType,
+    uploadUrlEnvvarName,
+    profile
+  ) {
     var script = new model.Script();
 
     script.type = "#!/bin/bash";
@@ -49,7 +56,9 @@ module.exports = {
       "'...";
 
     script.body = "nexus_envvars=$1 ; . $nexus_envvars\n";
-    script.body += "mvn clean deploy -DskipTests" + (typeof profile === 'undefined' ? "" : " -P " + profile);
+    script.body +=
+      "mvn clean deploy -DskipTests" +
+      (typeof profile === "undefined" ? "" : " -P " + profile);
     script.body += " ";
     script.body +=
       "-DaltDeploymentRepository=${NEXUS_REPO_ID}::default::${" +

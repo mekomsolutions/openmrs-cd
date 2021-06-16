@@ -129,6 +129,14 @@ This will package a zip archive of the jenkins folder.
 
 Finally it is possible to build everything at once from the root level:
 ```bash
-gradle build
+./gradlew build
 ```
 This will cascade down to all child builds and run them.
+
+To then deploy:
+
+export mksRepoUrl=...
+export mksRepoUsername=...
+export mksRepoPassword=...
+
+./gradlew deploy
