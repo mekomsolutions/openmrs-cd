@@ -275,7 +275,7 @@ module.exports = {
       .resolve(
         instanceDef.deployment.hostDir,
         instanceDef.name,
-        "bahmni_docker/properties"
+        "bahmni_docker/properties/" + property.service
       )
       .toString();
     let propFilePath = path.resolve(propPath, property.filename).toString();

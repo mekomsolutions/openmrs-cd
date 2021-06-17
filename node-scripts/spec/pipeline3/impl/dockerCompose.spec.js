@@ -287,20 +287,20 @@ describe("Docker Compose implementation", function() {
           instanceDef.deployment.hostDir +
           instanceDef.name +
           "/bahmni_docker" +
-          "/properties/erp.properties ]]; then\n" +
+          "/properties/openmrs/erp.properties ]]; then\n" +
           "sudo mkdir -p " +
           instanceDef.deployment.hostDir +
           instanceDef.name +
-          "/bahmni_docker/properties\n" +
+          "/bahmni_docker/properties/openmrs\n" +
           "sudo touch " +
           instanceDef.deployment.hostDir +
           instanceDef.name +
-          "/bahmni_docker/properties/erp.properties\n" +
+          "/bahmni_docker/properties/openmrs/erp.properties\n" +
           "fi\n" +
           "sudo bash -c 'cat > " +
           instanceDef.deployment.hostDir +
           instanceDef.name +
-          "/bahmni_docker/properties/erp.properties <<EOF \n" +
+          "/bahmni_docker/properties/openmrs/erp.properties <<EOF \n" +
           "erp.database=odoo\nerp.username=admin\n" +
           "EOF'\n"
       )
