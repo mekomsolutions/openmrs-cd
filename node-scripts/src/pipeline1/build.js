@@ -19,7 +19,7 @@ const config = require(cst.CONFIGPATH);
 //
 // The commit metadata whose parts are passed as the build params
 //
-const projectType = process.env[config.varProjectType()];
+const projectType = process.env[config.varProjectType() || "default"];
 const commitMetadata = new model.CommitMetadata(
   projectType,
   process.env[config.varRepoUrl()],

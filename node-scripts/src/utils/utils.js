@@ -5,8 +5,10 @@ const fs = require("fs");
 const log = require("npmlog");
 const _ = require("lodash");
 const XML = require("pixl-xml");
+const YAML = require("js-yaml");
 
 const model = require("../utils/model");
+const config = require("./config");
 
 module.exports = {
   /**
@@ -20,6 +22,49 @@ module.exports = {
     return groupId + "|" + artifactId + "|" + version;
   },
 
+  getProjectConfig: function(path) {
+    try {
+      let doc = YAML.load(fs.readFileSync(path), "utf8");
+      return doc;
+    } catch (e) {
+      return undefined;
+    }
+  },
+  getProjectConfigBuildScript: function(yaml) {
+    let script = null;
+    try {
+      script = yaml.build.script;
+    } catch (e) {
+      return null;
+    }
+    if (script.startsWith("file:")) {
+      let script_path = script.split(": ")[1];
+      return "sh " + script_path;
+    }
+    return script;
+  },
+
+  getProjectConfigDeployScript: function(yaml) {
+    let script = null;
+    try {
+      script = yaml.deploy.script;
+    } catch (e) {
+      return null;
+    }
+    if (script.startsWith("file:")) {
+      let script_path = script.split(": ")[1];
+      return "sh " + script_path;
+    }
+    return script;
+  },
+  getProjectConfigName: function(config) {
+    let name = null;
+    try {
+      return yaml.project.name;
+    } catch (e) {
+      return null;
+    }
+  },
   /**
    * Reverses toArtifactKey, see above.
    */

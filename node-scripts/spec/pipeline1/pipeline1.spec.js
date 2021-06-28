@@ -211,6 +211,52 @@ describe("Tests suite for pipeline1", function() {
     });
   });
 
+  it("should getBuildScript and getDeployScript for 'default'.", function() {
+    // deps
+    const model = require(path.resolve("src/utils/model"));
+
+    // setup
+    const projectType = "default";
+    var projectBuild = require(folderInTest +
+      "/impl/" +
+      projectType).getInstance();
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
+
+    var yamlConfigFile = utils.getProjectConfig(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/.ocd3.yaml"
+    );
+    projectBuild.projectConfigFile = yamlConfigFile;
+
+    var commitMetadata = {
+      branchName: "dev",
+      commitId: "12fe45"
+    };
+
+    var artifact = projectBuild.getArtifact({
+      commitMetadata: commitMetadata,
+      pom: pom
+    });
+
+    // verif
+    var buildScript = projectBuild.getBuildScript();
+    expect(buildScript.type).toEqual("#!/bin/bash");
+    expect(buildScript.body).toEqual("sh ./scripts/build.sh");
+
+    var deployScript = projectBuild.getDeployScript(artifact);
+    expect(deployScript.type).toEqual("#!/bin/bash");
+    expect(deployScript.body).toEqual("./scripts/deploy.sh");
+  });
+
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmniapps'.", function() {
     // deps
     const model = require(path.resolve("src/utils/model"));

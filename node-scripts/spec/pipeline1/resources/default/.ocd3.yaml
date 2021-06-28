@@ -1,0 +1,8 @@
+version: 1
+
+project:
+  name: bahmniapps
+build:
+  script: "file: ./scripts/build.sh"
+deploy:
+  script: ./scripts/deploy.sh
