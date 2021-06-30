@@ -250,7 +250,7 @@ describe("Tests suite for pipeline1", function() {
     // verif
     var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
-    expect(buildScript.body).toEqual("sh ./scripts/build.sh");
+    expect(buildScript.body).toEqual("mvn clean install -B");
 
     var deployScript = projectBuild.getDeployScript(artifact);
     expect(deployScript.type).toEqual("#!/bin/bash");

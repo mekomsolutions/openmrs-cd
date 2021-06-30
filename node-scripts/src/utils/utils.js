@@ -33,13 +33,9 @@ module.exports = {
   getProjectConfigBuildScript: function(yaml) {
     let script = null;
     try {
-      script = yaml.build.script;
+      script = yaml.build.bash_commands;
     } catch (e) {
       return null;
-    }
-    if (script.startsWith("file:")) {
-      let script_path = script.split(": ")[1];
-      return "sh " + script_path;
     }
     return script;
   },
@@ -47,23 +43,20 @@ module.exports = {
   getProjectConfigDeployScript: function(yaml) {
     let script = null;
     try {
-      script = yaml.deploy.script;
+      script = yaml.deploy.bash_commands;
     } catch (e) {
       return null;
-    }
-    if (script.startsWith("file:")) {
-      let script_path = script.split(": ")[1];
-      return "sh " + script_path;
     }
     return script;
   },
-  getProjectConfigName: function(config) {
-    let name = null;
+  getProjectConfigArtifactPath: function(yaml) {
+    let path = null;
     try {
-      return yaml.project.name;
+      path = yaml.deploy.artifacts_path;
     } catch (e) {
       return null;
     }
+    return path;
   },
   /**
    * Reverses toArtifactKey, see above.

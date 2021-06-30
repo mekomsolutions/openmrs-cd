@@ -29,7 +29,11 @@ module.exports = {
     };
 
     projectBuild.getArtifact = function(args) {
-      return cmns.getMavenProjectArtifact(args.pom, "./target", "zip");
+      return cmns.getMavenProjectArtifact(
+        args.pom,
+        utils.getProjectConfigArtifactPath(projectBuild.projectConfigFile),
+        "zip"
+      );
     };
 
     projectBuild.postBuildActions = function(args) {

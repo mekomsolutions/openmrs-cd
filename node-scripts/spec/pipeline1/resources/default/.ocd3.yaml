@@ -1,8 +1,7 @@
 version: 1
 
-project:
-  name: bahmniapps
 build:
-  script: "file: ./scripts/build.sh"
+  bash_commands: "mvn clean install -B"
 deploy:
-  script: ./scripts/deploy.sh
+  bash_commands: "./scripts/deploy.sh"
+  artifacts_path: "./target"
