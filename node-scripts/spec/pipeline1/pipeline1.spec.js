@@ -97,19 +97,6 @@ describe("Tests suite for pipeline1", function() {
         config.getBuildShellScriptName() +
         "'"
     );
-    expect(pipelineScript).toContain(
-      "sh '. $" +
-        config.varEnvvarBuildPath() +
-        "/" +
-        config.getBuildArtifactEnvvarsName() +
-        " ; mv $WORKSPACE/$" +
-        config.varBuildPath() +
-        "/$" +
-        config.varFilename() +
-        " $WORKSPACE/$" +
-        config.varDestFilename() +
-        "'"
-    );
 
     // verif 'deploy' stage
     expect(pipelineScript).toContain(

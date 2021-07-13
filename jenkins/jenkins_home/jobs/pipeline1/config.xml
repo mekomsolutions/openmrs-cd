@@ -22,7 +22,7 @@ It takes as an input a bunch of &apos;commit metadata&apos;, i.e. all the inform
           <name>projectType</name>
           <description>The type of the code project
 
-Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmnicore&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;, &apos;distribution&apos;, &apos;initializer&apos;</description>
+Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmnicore&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;, &apos;distribution&apos;, &apos;initializer&apos;, &apos;maven&apos;</description>
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
@@ -83,7 +83,6 @@ pipeline {
         sh &apos;node /opt/node-scripts/src/$JOB_NAME/build.js&apos;
         sh &apos;cat $BUILD_PATH/build.sh&apos;
         sh &apos;$BUILD_PATH/build.sh&apos;
-        sh &apos;. $BUILD_PATH/artifact.env ; mv $WORKSPACE/$buildPath/$filename $WORKSPACE/$destFilename&apos;
       }
     }
     stage (&apos;Deploy the built artifacts to their repository&apos;) {
