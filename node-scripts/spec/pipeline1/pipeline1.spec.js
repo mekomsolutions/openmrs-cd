@@ -97,19 +97,6 @@ describe("Tests suite for pipeline1", function() {
         config.getBuildShellScriptName() +
         "'"
     );
-    expect(pipelineScript).toContain(
-      "sh '. $" +
-        config.varEnvvarBuildPath() +
-        "/" +
-        config.getBuildArtifactEnvvarsName() +
-        " ; mv $WORKSPACE/$" +
-        config.varBuildPath() +
-        "/$" +
-        config.varFilename() +
-        " $WORKSPACE/$" +
-        config.varDestFilename() +
-        "'"
-    );
 
     // verif 'deploy' stage
     expect(pipelineScript).toContain(
@@ -471,6 +458,39 @@ describe("Tests suite for pipeline1", function() {
       deployScript.body.indexOf("mvn clean deploy -DskipTests -P validator") >
         -1
     ).toBe(true);
+  });
+
+  it("should getArtifact, getBuildScript and getDeployScript for 'maven'.", function() {
+    // setup
+    const projectType = "maven";
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
+
+    // replay
+    var projectBuild = require(folderInTest +
+      "/impl/" +
+      projectType).getInstance();
+    var artifact = projectBuild.getArtifact({ pom: pom });
+    var buildScript = projectBuild.getBuildScript();
+    var deployScript = projectBuild.getDeployScript(artifact);
+
+    // verif
+    expect(artifact.name).toEqual("initializer");
+    expect(artifact.version).toEqual("2.1.0-SNAPSHOT");
+    expect(artifact.destFilename).toEqual(artifact.filename);
+
+    expect(buildScript.type).toEqual("#!/bin/bash");
+    expect(buildScript.body).toEqual("mvn clean install\n");
+
+    expect(deployScript.type).toEqual("#!/bin/bash");
+    expect(deployScript.body.indexOf("mvn clean deploy -DskipTests") > -1).toBe(
+      true
+    );
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmnicore'.", function() {
