@@ -72,6 +72,13 @@ pipeline {
     nodejs &apos;NodeJS 10.11.0&apos;
   }
   stages {
+    stage (&apos;Clean the workspace&apos;) {
+      steps {
+        dir(&quot;$workspace&quot;){
+          deleteDir()
+        }
+      }
+    }
     stage (&apos;Checkout the code and identify all Maven artifacts&apos;) {
       steps {
         checkout scm: [$class: &apos;GitSCM&apos;, userRemoteConfigs: [[url: repoUrl]], branches: [[name: branchName]]], poll: false
