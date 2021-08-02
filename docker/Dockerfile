@@ -7,7 +7,7 @@ USER root
 ARG APP_DATA_DIR="/var/lib/openmrs_cd/app_data"
 RUN mkdir -p $APP_DATA_DIR && chown -R jenkins:jenkins $APP_DATA_DIR
 
-RUN apt update
+RUN apt update --fix-missing
 RUN apt -y install nano jq openssh-server rsync libxml2-utils
 
 # These packages are needed for Jenkins to build some projects.
