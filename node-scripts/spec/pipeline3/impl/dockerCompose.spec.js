@@ -31,6 +31,7 @@ describe("Docker Compose implementation", function() {
         networks: ["network1", "network2"],
         services: ["proxy", "openmrs", "mysql"]
       },
+      timezone: "Europe/Amsterdam",
       host: {
         type: "ssh",
         value: {
@@ -85,6 +86,21 @@ describe("Docker Compose implementation", function() {
           instanceDef.deployment.value.commitId
         )
       ) +
+      scripts.remote(
+        instanceDef.deployment.host.value,
+        scripts.writeProperty(
+          "TZ",
+          instanceDef.deployment.timezone,
+          path
+            .resolve(
+              instanceDef.deployment.hostDir,
+              instanceDef.name,
+              "bahmni_docker",
+              ".env"
+            )
+            .toString()
+        )
+      ) +
       "\n" +
       scripts.remote(
         instanceDef.deployment.host.value,
@@ -127,7 +143,7 @@ describe("Docker Compose implementation", function() {
   });
 
   it("should generate Host Preparation data script", () => {
-    var actualScript = "";
+    var expected = "";
 
     let sqlDocker = instanceDef.data[0].value;
     let destFolder = path.resolve(
@@ -136,11 +152,11 @@ describe("Docker Compose implementation", function() {
       "bahmni_docker/sqls",
       sqlDocker.service
     );
-    actualScript += scripts.remote(
+    expected += scripts.remote(
       instanceDef.deployment.host.value,
       "sudo cp " + sqlDocker.sourceFile + " " + destFolder + "\n"
     );
-    actualScript += scripts.remote(
+    expected += scripts.remote(
       instanceDef.deployment.host.value,
       "cd " +
         path
@@ -177,7 +193,7 @@ describe("Docker Compose implementation", function() {
     );
 
     expect(dockerCompose.hostPreparation.getDataScript(instanceDef)).toEqual(
-      actualScript
+      expected
     );
   });
 

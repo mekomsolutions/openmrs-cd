@@ -135,8 +135,10 @@ This will cascade down to all child builds and run them.
 
 To then deploy:
 
+```
 export mksRepoUrl=...
 export mksRepoUsername=...
 export mksRepoPassword=...
+```
 
 ./gradlew deploy

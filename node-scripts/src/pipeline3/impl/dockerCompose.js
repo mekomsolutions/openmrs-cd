@@ -46,6 +46,25 @@ module.exports = {
         )
       );
 
+      // Set the Timezone via a env var "TZ"
+      if (instanceDef.deployment.timezone) {
+        script += scripts.remote(
+          instanceDef.deployment.host.value,
+          scripts.writeProperty(
+            "TZ",
+            instanceDef.deployment.timezone,
+            path
+              .resolve(
+                instanceDef.deployment.hostDir,
+                instanceDef.name,
+                "bahmni_docker",
+                ".env"
+              )
+              .toString()
+          )
+        );
+      }
+
       script += "\n";
       script += scripts.remote(
         instanceDef.deployment.host.value,
