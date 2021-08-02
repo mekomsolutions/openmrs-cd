@@ -141,4 +141,6 @@ export mksRepoUsername=...
 export mksRepoPassword=...
 ```
 
+```
 ./gradlew deploy
+```
