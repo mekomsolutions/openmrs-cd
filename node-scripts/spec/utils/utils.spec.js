@@ -46,6 +46,12 @@ describe("Utils", function() {
     }).toThrow();
   });
 
+  it("should get config", function() {
+    var file_ = __dirname + "/../pipeline1/resources/default/.ocd3.yaml";
+    var config = utils.getProjectConfig(file_);
+    expect(config).toBeDefined();
+  });
+
   it("should flatten environment variables.", function() {
     var realDeepObject = {
       level1: {

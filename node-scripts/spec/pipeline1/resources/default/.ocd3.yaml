@@ -1,0 +1,7 @@
+version: 1
+
+build:
+  bash_commands: "mvn clean install -B"
+deploy:
+  bash_commands: "./scripts/deploy.sh"
+  artifacts_path: "./target"
