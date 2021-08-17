@@ -46,7 +46,7 @@ describe("Utils", function() {
     }).toThrow();
   });
 
-  it("should support '.yml' and '.yaml' extensions for 'ocd3.yml' file and throw error is file is missing", function() {
+  it("should support '.yml' and '.yaml' extensions and throw error if file is missing", function() {
     var file_ = __dirname + "/../pipeline1/resources/default/extension.yml";
     var ocd3Yaml = utils.convertYaml(file_);
     expect(ocd3Yaml).toBeDefined();

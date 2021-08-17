@@ -15,11 +15,11 @@ const utils = require("../utils/utils");
 const model = require("../utils/model");
 const cst = require("../const");
 const config = require(cst.CONFIGPATH);
-
+const cmns = require("./commons");
 //
 // The commit metadata whose parts are passed as the build params
 //
-const projectType = process.env[config.varProjectType() || "default"];
+const projectType = cmns.getProjectType();
 const commitMetadata = new model.CommitMetadata(
   projectType,
   process.env[config.varRepoUrl()],

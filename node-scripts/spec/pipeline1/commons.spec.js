@@ -91,6 +91,20 @@ describe("Commons for project builds", function() {
     expect(artifact.mavenProject.packaging).toEqual(artifact.extension);
   });
 
+  fit("should default to 'default' project type", function () {
+    var varName = config.varProjectType;
+    var prev = process.env[config.varProjectType()]
+
+    process.env[config.varProjectType()] = "someValue"
+    expect(cmns.getProjectType()).toEqual("someValue");
+
+    process.env[config.varProjectType()] = "";
+    expect(cmns.getProjectType()).toEqual("default");
+
+    // clean up
+    process.env[config.varProjectType()] = prev;
+  });
+
   it("should save a file with all downstream builds parameters to rebuild impacted artifacts.", function() {
     // deps
     const proxyquire = require("proxyquire");

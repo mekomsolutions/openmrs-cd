@@ -200,5 +200,8 @@ module.exports = {
     script.body += "-Purl=${" + uploadUrlEnvvarName + "}\n";
 
     return script;
+  },
+  getProjectType: function() {
+    return _.isEmpty(process.env[config.varProjectType()]) ? "default" : process.env[config.varProjectType()];
   }
 };

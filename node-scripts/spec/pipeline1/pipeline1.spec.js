@@ -3,7 +3,6 @@
 describe("Tests suite for pipeline1", function() {
   const fs = require("fs");
   const path = require("path");
-  const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 
   var tests, utils, model, config, folderInTest;
 
@@ -190,7 +189,7 @@ describe("Tests suite for pipeline1", function() {
         "spec/" +
           config.getJobNameForPipeline1() +
           "/resources/" +
-          'default' +
+          "default" +
           "/.ocd3.yml"
       );
     };
@@ -225,7 +224,7 @@ describe("Tests suite for pipeline1", function() {
     });
   });
 
-  it("'default' type should use the 'pom.xml' file if one is provided.", function() {
+  it("'default' type should use the 'pom.xml' file if there is one.", function() {
     // setup
     const projectType = "default";
 
@@ -271,12 +270,6 @@ describe("Tests suite for pipeline1", function() {
     });
 
     // verif
-    // expect(artifact.name).toEqual("openmrs-db-sync");
-    // expect(artifact.version).toEqual("2.0.0-SNAPSHOT");
-    // expect(artifact.extension).toEqual("jar");
-    // expect(artifact.filename).toEqual("openmrs-db-sync-2.0.0-SNAPSHOT.jar");
-    // expect(artifact.destFilename).toEqual(artifact.filename);
-    // expect(artifact.buildPath).toEqual("./target");
     expect(artifact.mavenProject).toEqual(
       new model.MavenProject(
         "org.openmrs.eip.app.db.sync",
@@ -331,12 +324,6 @@ describe("Tests suite for pipeline1", function() {
       commitMetadata: commitMetadata
     });
 
-    // expect(artifact.name).toEqual("some-name");
-    // expect(artifact.version).toEqual("dev");
-    // expect(artifact.extension).toEqual("jar");
-    // expect(artifact.filename).toEqual("some-name.jar");
-    // expect(artifact.destFilename).toEqual("some-name-dev.jar");
-    // expect(artifact.buildPath).toEqual("./target");
     expect(artifact.mavenProject).toEqual(
       new model.MavenProject("org.openmrs", "dbsync", "dev", "jar")
     );
@@ -374,12 +361,6 @@ describe("Tests suite for pipeline1", function() {
       commitMetadata: commitMetadata
     });
 
-    // expect(artifact.name).toEqual("openmrs-db-sync");
-    // expect(artifact.version).toEqual("dev");
-    // expect(artifact.extension).toEqual("jar");
-    // expect(artifact.filename).toEqual("openmrs-db-sync.jar");
-    // expect(artifact.destFilename).toEqual("openmrs-db-sync-dev.jar");
-    // expect(artifact.buildPath).toEqual("./target");
     expect(artifact.mavenProject).toEqual(
       new model.MavenProject(
         "net.mekomsolutions",
@@ -391,8 +372,6 @@ describe("Tests suite for pipeline1", function() {
   });
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmniapps'.", function() {
-    // deps
-
     // setup
     const projectType = "bahmniapps";
     var projectBuild = require(folderInTest +
