@@ -91,7 +91,7 @@ describe("Commons for project builds", function() {
     expect(artifact.mavenProject.packaging).toEqual(artifact.extension);
   });
 
-  fit("should default to 'default' project type", function () {
+  it("should default to 'default' project type", function () {
     var varName = config.varProjectType;
     var prev = process.env[config.varProjectType()]
 
