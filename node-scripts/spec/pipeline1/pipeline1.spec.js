@@ -5,29 +5,6 @@ describe("Tests suite for pipeline1", function() {
   const path = require("path");
   const { v1: uuidv1, v4: uuidv4 } = require("uuid");
 
-  // Create the directory pointed by the $WORKSPACE variable
-  // TODO: Use proxyquire instead (see common.spec.js)
-  var createWorkspace = function() {
-    fs.mkdirSync(process.env.WORKSPACE, {
-      recursive: true
-    });
-  };
-  var setOCD3Yaml = function(projectType) {
-    fs.copyFileSync(
-      path.resolve(
-        "spec/" +
-          config.getJobNameForPipeline1() +
-          "/resources/" +
-          projectType +
-          "/.ocd3.yml"
-      ),
-      path.resolve(process.env.WORKSPACE, ".ocd3.yml"),
-      err => {
-        if (err) throw err;
-      }
-    );
-  };
-
   var tests, utils, model, config, folderInTest;
 
   beforeEach(function() {
@@ -204,15 +181,28 @@ describe("Tests suite for pipeline1", function() {
     const modelTestUtils = require(path.resolve("spec/models/modelTestUtils"));
 
     // setup
-    createWorkspace();
-    setOCD3Yaml("default");
+    const proxyquire = require("proxyquire");
+    const tests = require(path.resolve("spec/utils/testUtils"));
+
+    var mockConfig = {};
+    mockConfig.getOCD3YamlFilePath = function() {
+      return path.resolve(
+        "spec/" +
+          config.getJobNameForPipeline1() +
+          "/resources/" +
+          'default' +
+          "/.ocd3.yml"
+      );
+    };
+
+    var _default = proxyquire(path.resolve("src/pipeline1/impl/default"), {
+      "../../utils/config": mockConfig
+    });
 
     // Running tests on each file present in the  folderInTest folder and ensure they correctly implement every needed function
     fs.readdirSync(folderInTest + "/impl/").forEach(file => {
       var type = file.split(".")[0];
-      var projectBuild = new require(
-        folderInTest + "/impl/" + type
-      ).getInstance();
+      var projectBuild = _default.getInstance();
 
       modelTestUtils.ensureImplementedFunctions(
         projectBuild,
@@ -364,7 +354,7 @@ describe("Tests suite for pipeline1", function() {
           config.getJobNameForPipeline1() +
           "/resources/" +
           projectType +
-          "/.ocd3-2.yml"
+          "/.ocd3-minimal.yml"
       );
     };
     var commitMetadata = {

@@ -14,7 +14,7 @@ describe("Project build script", function() {
     model = require(path.resolve("src/utils/model"));
     config = require(path.resolve("src/utils/config"));
 
-    process.env[config.varProjectType()] = "default";
+    process.env[config.varProjectType()] = "bahmniconfig";
     process.env[config.varRepoUrl()] =
       "https://github.com/mekomsolutions/bahmni-config-cambodia";
     process.env[config.varBranchName()] = "master";
