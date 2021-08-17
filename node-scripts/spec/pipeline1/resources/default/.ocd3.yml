@@ -1,0 +1,10 @@
+version: 1
+
+build:
+  bash_commands: "mvn clean install -P IT"
+deploy:
+  bash_commands: "mvn clean deploy -DskipTests"
+  artifact:
+    packaging: "jar"
+    groupId: "org.openmrs"
+    artifactId: "dbsync"

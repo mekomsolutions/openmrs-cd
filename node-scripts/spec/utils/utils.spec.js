@@ -46,10 +46,15 @@ describe("Utils", function() {
     }).toThrow();
   });
 
-  it("should get config", function() {
-    var file_ = __dirname + "/../pipeline1/resources/default/.ocd3.yaml";
-    var config = utils.getProjectConfig(file_);
-    expect(config).toBeDefined();
+  it("should support '.yml' and '.yaml' extensions for 'ocd3.yml' file and throw error is file is missing", function() {
+    var file_ = __dirname + "/../pipeline1/resources/default/extension.yml";
+    var ocd3Yaml = utils.convertYaml(file_);
+    expect(ocd3Yaml).toBeDefined();
+
+    var file_ = __dirname + "/../pipeline1/resources/default/no-file.yml";
+    expect(function() {
+      utils.convertYaml(file_);
+    }).toThrow();
   });
 
   it("should flatten environment variables.", function() {

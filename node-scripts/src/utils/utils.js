@@ -22,41 +22,25 @@ module.exports = {
     return groupId + "|" + artifactId + "|" + version;
   },
 
-  getProjectConfig: function(path) {
+  convertYaml: function(path) {
+    var doc;
     try {
-      let doc = YAML.load(fs.readFileSync(path), "utf8");
-      return doc;
+      doc = YAML.load(fs.readFileSync(path), "utf8");
     } catch (e) {
-      return undefined;
-    }
-  },
-  getProjectConfigBuildScript: function(yaml) {
-    let script = null;
-    try {
-      script = yaml.build.bash_commands;
-    } catch (e) {
-      return null;
-    }
-    return script;
-  },
+      log.warn("", "Failed to read file: '" + path + "'");
+      log.warn("", JSON.stringify(e, null, 2));
 
-  getProjectConfigDeployScript: function(yaml) {
-    let script = null;
-    try {
-      script = yaml.deploy.bash_commands;
-    } catch (e) {
-      return null;
+      try {
+        log.info("", "Trying with '.yaml' extension");
+        path = path.replace(".yml", ".yaml");
+        doc = YAML.load(fs.readFileSync(path), "utf8");
+      } catch (e) {
+        log.error("", "Failed to read file: '" + path + "'");
+        log.error("", JSON.stringify(e, null, 2));
+        throw e;
+      }
     }
-    return script;
-  },
-  getProjectConfigArtifactPath: function(yaml) {
-    let path = null;
-    try {
-      path = yaml.deploy.artifacts_path;
-    } catch (e) {
-      return null;
-    }
-    return path;
+    return doc;
   },
   /**
    * Reverses toArtifactKey, see above.

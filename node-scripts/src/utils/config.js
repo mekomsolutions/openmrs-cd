@@ -56,6 +56,9 @@ module.exports = {
   varCommitId: function() {
     return "commitId";
   },
+  varRepoName: function() {
+    return "repoName";
+  },
   varArtifactsDeployment: function() {
     return "artifactsDeployment";
   },
@@ -111,8 +114,8 @@ module.exports = {
       process.env.BUILD_NUMBER
     );
   },
-  getConfigBuildPath: function() {
-    return path.resolve(process.env.WORKSPACE, ".ocd3.yaml");
+  getOCD3YamlFilePath: function() {
+    return path.resolve(process.env.WORKSPACE, ".ocd3.yml");
   },
   getBuildDirPath: function() {
     // https://stackoverflow.com/a/48712627/321797

@@ -24,7 +24,8 @@ const commitMetadata = new model.CommitMetadata(
   projectType,
   process.env[config.varRepoUrl()],
   process.env[config.varBranchName()],
-  process.env[config.varCommitId()]
+  process.env[config.varCommitId()],
+  process.env[config.varRepoName()]
 );
 
 //
