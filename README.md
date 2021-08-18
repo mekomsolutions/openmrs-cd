@@ -41,7 +41,7 @@ See [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/ab
 </details>
 
 
-### `default`:
+#### `default`:
 
 The `default` project type should cover most cases. It assumes that build and deploy instructions are provided in a custom file present at the root of the project and named **.ocd3.yml** (or .ocd3.yaml)
 
@@ -77,7 +77,7 @@ https://<user>:<password>@openmrs-cd.mekomsolutions.net/generic-webhook-trigger/
 </details>
 
 
-### `maven`:
+#### `maven`:
 
 This project type will suit to most Maven projects that simply need to apply standard Maven commands:
 - `mvn clean install`
@@ -93,7 +93,7 @@ https://<user>:<password>@openmrs-cd.mekomsolutions.net/generic-webhook-trigger/
 </details>
 
 
-### `distribution`:
+#### `distribution`:
 
 A special project type to not only build the project using standard Maven commands but also save its Maven dependencies in a way that the distribution is rebuilt anytime one of the dependency has been rebuilt.
 
@@ -105,7 +105,7 @@ https://<user>:<password>@openmrs-cd.mekomsolutions.net/generic-webhook-trigger/
 ```
 </details>
 
-### `openmrsmodule`, `initializer`, `odooaddon`...:
+#### `openmrsmodule`, `initializer`, `odooaddon`...:
 
 There are other types available but most of them are now deprecated, being replaced by the 3 ones described above.
 
