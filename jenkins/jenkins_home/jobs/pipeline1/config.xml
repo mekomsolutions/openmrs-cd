@@ -22,7 +22,7 @@ It takes as an input a bunch of &apos;commit metadata&apos;, i.e. all the inform
           <name>projectType</name>
           <description>The type of the code project
 
-Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmnicore&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;, &apos;distribution&apos;, &apos;initializer&apos;, &apos;maven&apos;</description>
+Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmnicore&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;, &apos;distribution&apos;, &apos;initializer&apos;, &apos;maven&apos;, &apos;default&apos;</description>
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
