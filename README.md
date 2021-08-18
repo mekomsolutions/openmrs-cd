@@ -57,7 +57,7 @@ deploy:
     artifactId: "client-app"
     version: "dev"
 ```
-Note that the `artifact` section is **required if your project is not a Maven project** (doesn't have a pom.xml)
+Note that the `artifact` section is **required only if your project is not a Maven project**.
 
 See an example for a Maven project:
 ```
@@ -68,37 +68,42 @@ deploy:
   bash_commands: "mvn clean deploy -DskipTests -DaltDeploymentRepository=mks-nexus::default::https://nexus.mekomsolutions.net/repository/maven-snapshots"
 ```
 
-*This is the webhook to be configured:*
+<details>
+<summary>Show webhook URL:</summary>
+
 ```
 https://<user>:<password>@openmrs-cd.mekomsolutions.net/generic-webhook-trigger/invoke
 ```
-or
-```
-https://<user>:<password>@openmrs-cd.mekomsolutions.net/generic-webhook-trigger/invoke?projectType=default
-```
+</details>
 
 
 ### `maven`:
 
-This project type we suit to most Maven projects and will simply apply standard Maven commands:
+This project type will suit to most Maven projects that simply need to apply standard Maven commands:
 - `mvn clean install`
 - `mvn clean deploy -DaltDeploymentRepository=...`
 - with some additional nuances
 
-*This is the webhook to be configured:*
+<details>
+<summary>Show webhook URL:</summary>
+
 ```
 https://<user>:<password>@openmrs-cd.mekomsolutions.net/generic-webhook-trigger/invoke?projectType=maven
 ```
+</details>
 
 
 ### `distribution`:
 
-A special project type to not only build the project using standard Maven commands but also saves its Maven dependencies to so that the distribution is rebuild anytime one of the dependency is rebuilt.
+A special project type to not only build the project using standard Maven commands but also save its Maven dependencies in a way that the distribution is rebuilt anytime one of the dependency has been rebuilt.
 
-*This is the webhook to be configured:*
+<details>
+<summary>Show webhook URL:</summary>
+
 ```
 https://<user>:<password>@openmrs-cd.mekomsolutions.net/generic-webhook-trigger/invoke?projectType=distribution
 ```
+</details>
 
 ### `openmrsmodule`, `initializer`, `odooaddon`...:
 
