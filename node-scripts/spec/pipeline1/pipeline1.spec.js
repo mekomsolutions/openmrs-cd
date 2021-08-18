@@ -275,18 +275,18 @@ describe("Tests suite for pipeline1", function() {
         "org.openmrs.eip.app.db.sync",
         "openmrs-db-sync",
         "2.0.0-SNAPSHOT",
-        "jar"
+        null
       )
     );
 
     // verif
     var buildScript = projectBuild.getBuildScript();
     expect(buildScript.type).toEqual("#!/bin/bash");
-    expect(buildScript.body).toEqual("mvn clean install -P IT");
+    expect(buildScript.body).toEqual("mvn clean test -P IT");
 
     var deployScript = projectBuild.getDeployScript(artifact);
     expect(deployScript.type).toEqual("#!/bin/bash");
-    expect(deployScript.body).toEqual("mvn clean deploy -DskipTests");
+    expect(deployScript.body).toEqual("mvn clean deploy -DskipTests -DaltDeploymentRepository=mks-nexus::default::https://nexus.mekomsolutions.net/repository/maven-snapshots");
   });
 
   it("'default' type should use 'ocd3.yml' values if no 'pom.xml' file is provided.", function() {
@@ -325,7 +325,7 @@ describe("Tests suite for pipeline1", function() {
     });
 
     expect(artifact.mavenProject).toEqual(
-      new model.MavenProject("org.openmrs", "dbsync", "dev", "jar")
+      new model.MavenProject("org.openmrs", "dbsync", "dev", null)
     );
   });
 
@@ -366,7 +366,7 @@ describe("Tests suite for pipeline1", function() {
         "net.mekomsolutions",
         "openmrs-db-sync",
         "dev",
-        undefined
+        null
       )
     );
   });

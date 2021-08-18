@@ -1,10 +1,10 @@
 version: 1
 
 build:
-  bash_commands: "mvn clean install -P IT"
+  bash_commands: "mvn clean test -P IT"
 deploy:
-  bash_commands: "mvn clean deploy -DskipTests"
+  bash_commands: "mvn clean deploy -DskipTests -DaltDeploymentRepository=mks-nexus::default::https://nexus.mekomsolutions.net/repository/maven-snapshots"
   artifact:
-    packaging: "jar"
     groupId: "org.openmrs"
     artifactId: "dbsync"
+    version: "dev"
