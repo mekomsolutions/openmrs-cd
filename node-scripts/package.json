@@ -10,7 +10,8 @@
     "pixl-xml": "^1.0.13",
     "request": "^2.83.0",
     "string": "^3.3.3",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {
     "app-root-path": "^2.0.1",

@@ -48,6 +48,14 @@ Certain projects require to pinpoint to an exact commit rather than using the ti
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>repoName</name>
+          <description>The project&apos;s repository name
+
+Eg. &quot;openmrs-core&quot;</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>artifactsDeployment</name>
           <description>Tells whether built artifacts should be deployed to their repository.</description>

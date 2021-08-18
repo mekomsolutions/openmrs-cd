@@ -46,6 +46,17 @@ describe("Utils", function() {
     }).toThrow();
   });
 
+  it("should support '.yml' and '.yaml' extensions and throw error if file is missing", function() {
+    var file_ = __dirname + "/../pipeline1/resources/default/extension.yml";
+    var ocd3Yaml = utils.convertYaml(file_);
+    expect(ocd3Yaml).toBeDefined();
+
+    var file_ = __dirname + "/../pipeline1/resources/default/no-file.yml";
+    expect(function() {
+      utils.convertYaml(file_);
+    }).toThrow();
+  });
+
   it("should flatten environment variables.", function() {
     var realDeepObject = {
       level1: {

@@ -5,8 +5,10 @@ const fs = require("fs");
 const log = require("npmlog");
 const _ = require("lodash");
 const XML = require("pixl-xml");
+const YAML = require("js-yaml");
 
 const model = require("../utils/model");
+const config = require("./config");
 
 module.exports = {
   /**
@@ -20,6 +22,26 @@ module.exports = {
     return groupId + "|" + artifactId + "|" + version;
   },
 
+  convertYaml: function(path) {
+    var doc;
+    try {
+      doc = YAML.load(fs.readFileSync(path), "utf8");
+    } catch (e) {
+      log.warn("", "Failed to read file: '" + path + "'");
+      log.warn("", JSON.stringify(e, null, 2));
+
+      try {
+        log.info("", "Trying with '.yaml' extension");
+        path = path.replace(".yml", ".yaml");
+        doc = YAML.load(fs.readFileSync(path), "utf8");
+      } catch (e) {
+        log.error("", "Failed to read file: '" + path + "'");
+        log.error("", JSON.stringify(e, null, 2));
+        throw e;
+      }
+    }
+    return doc;
+  },
   /**
    * Reverses toArtifactKey, see above.
    */

@@ -4,10 +4,20 @@ describe("Tests suite for pipeline1", function() {
   const fs = require("fs");
   const path = require("path");
 
-  const utils = require(path.resolve("src/utils/utils"));
-  const config = require(path.resolve("src/utils/config"));
+  var tests, utils, model, config, folderInTest;
 
-  const folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
+  beforeEach(function() {
+    tests = require(path.resolve("spec/utils/testUtils"));
+    utils = require(path.resolve("src/utils/utils"));
+    config = require(path.resolve("src/utils/config"));
+    model = require(path.resolve("src/utils/model"));
+
+    folderInTest = path.resolve("src/" + config.getJobNameForPipeline1());
+  });
+
+  afterEach(function() {
+    tests.cleanup();
+  });
 
   it("should verify job parameters.", function() {
     // deps
@@ -167,15 +177,31 @@ describe("Tests suite for pipeline1", function() {
 
   it("should implement all required functions from data model.", function() {
     // deps
-    const model = require(path.resolve("src/utils/model"));
     const modelTestUtils = require(path.resolve("spec/models/modelTestUtils"));
+
+    // setup
+    const proxyquire = require("proxyquire");
+    const tests = require(path.resolve("spec/utils/testUtils"));
+
+    var mockConfig = {};
+    mockConfig.getOCD3YamlFilePath = function() {
+      return path.resolve(
+        "spec/" +
+          config.getJobNameForPipeline1() +
+          "/resources/" +
+          "default" +
+          "/.ocd3.yml"
+      );
+    };
+
+    var _default = proxyquire(path.resolve("src/pipeline1/impl/default"), {
+      "../../utils/config": mockConfig
+    });
 
     // Running tests on each file present in the  folderInTest folder and ensure they correctly implement every needed function
     fs.readdirSync(folderInTest + "/impl/").forEach(file => {
       var type = file.split(".")[0];
-      var projectBuild = new require(
-        folderInTest + "/impl/" + type
-      ).getInstance();
+      var projectBuild = _default.getInstance();
 
       modelTestUtils.ensureImplementedFunctions(
         projectBuild,
@@ -198,10 +224,156 @@ describe("Tests suite for pipeline1", function() {
     });
   });
 
-  it("should getArtifact, getBuildScript and getDeployScript for 'bahmniapps'.", function() {
-    // deps
-    const model = require(path.resolve("src/utils/model"));
+  it("'default' type should use the 'pom.xml' file if there is one.", function() {
+    // setup
+    const projectType = "default";
 
+    const proxyquire = require("proxyquire");
+    const tests = require(path.resolve("spec/utils/testUtils"));
+
+    var mockConfig = {};
+    mockConfig.getOCD3YamlFilePath = function() {
+      return path.resolve(
+        "spec/" +
+          config.getJobNameForPipeline1() +
+          "/resources/" +
+          projectType +
+          "/.ocd3.yml"
+      );
+    };
+
+    // replay
+    var _default = proxyquire(path.resolve("src/pipeline1/impl/default"), {
+      "../../utils/config": mockConfig
+    });
+
+    var projectBuild = _default.getInstance();
+
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom.xml"
+    );
+
+    var commitMetadata = {
+      branchName: "dev",
+      commitId: "12fe45",
+      repoName: "openmrs-db-sync"
+    };
+
+    // Pass the real pom
+    var artifact = projectBuild.getArtifact({
+      pom: pom,
+      commitMetadata: commitMetadata
+    });
+
+    // verif
+    expect(artifact.mavenProject).toEqual(
+      new model.MavenProject(
+        "org.openmrs.eip.app.db.sync",
+        "openmrs-db-sync",
+        "2.0.0-SNAPSHOT",
+        null
+      )
+    );
+
+    // verif
+    var buildScript = projectBuild.getBuildScript();
+    expect(buildScript.type).toEqual("#!/bin/bash");
+    expect(buildScript.body).toEqual("mvn clean test -P IT");
+
+    var deployScript = projectBuild.getDeployScript(artifact);
+    expect(deployScript.type).toEqual("#!/bin/bash");
+    expect(deployScript.body).toEqual(
+      "mvn clean deploy -DskipTests -DaltDeploymentRepository=mks-nexus::default::https://nexus.mekomsolutions.net/repository/maven-snapshots"
+    );
+  });
+
+  it("'default' type should use 'ocd3.yml' values if no 'pom.xml' file is provided.", function() {
+    // setup
+    const projectType = "default";
+    const proxyquire = require("proxyquire");
+    const tests = require(path.resolve("spec/utils/testUtils"));
+
+    // mock
+    var mockConfig = {};
+    mockConfig.getOCD3YamlFilePath = function() {
+      return path.resolve(
+        "spec/" +
+          config.getJobNameForPipeline1() +
+          "/resources/" +
+          projectType +
+          "/.ocd3.yml"
+      );
+    };
+
+    // replay
+    var _default = proxyquire(path.resolve("src/pipeline1/impl/default"), {
+      "../../utils/config": mockConfig
+    });
+
+    var commitMetadata = {
+      branchName: "dev",
+      commitId: "12fe45",
+      repoName: "openmrs-db-sync"
+    };
+
+    // Do not provide a POM file
+    var artifact = _default.getInstance().getArtifact({
+      pom: utils.getPom("non-existing-file"),
+      commitMetadata: commitMetadata
+    });
+
+    expect(artifact.mavenProject).toEqual(
+      new model.MavenProject("org.openmrs", "dbsync", "dev", null)
+    );
+  });
+
+  it("'default' type should infer default values if '.ocd3.yml' is incomplete.", function() {
+    // setup
+    const projectType = "default";
+    const proxyquire = require("proxyquire");
+    const tests = require(path.resolve("spec/utils/testUtils"));
+    var mockConfig = {};
+    mockConfig.getOCD3YamlFilePath = function() {
+      return path.resolve(
+        "spec/" +
+          config.getJobNameForPipeline1() +
+          "/resources/" +
+          projectType +
+          "/.ocd3-minimal.yml"
+      );
+    };
+    var commitMetadata = {
+      branchName: "dev",
+      commitId: "12fe45",
+      repoName: "openmrs-db-sync"
+    };
+
+    // replay
+    var _default = proxyquire(path.resolve("src/pipeline1/impl/default"), {
+      "../../utils/config": mockConfig
+    });
+
+    // Do not provide a POM file
+    var artifact = _default.getInstance().getArtifact({
+      pom: utils.getPom("non-existing-file"),
+      commitMetadata: commitMetadata
+    });
+
+    expect(artifact.mavenProject).toEqual(
+      new model.MavenProject(
+        "net.mekomsolutions",
+        "openmrs-db-sync",
+        "dev",
+        null
+      )
+    );
+  });
+
+  it("should getArtifact, getBuildScript and getDeployScript for 'bahmniapps'.", function() {
     // setup
     const projectType = "bahmniapps";
     var projectBuild = require(folderInTest +
@@ -213,7 +385,9 @@ describe("Tests suite for pipeline1", function() {
       commitId: "12fe45"
     };
 
-    var artifact = projectBuild.getArtifact({ commitMetadata: commitMetadata });
+    var artifact = projectBuild.getArtifact({
+      commitMetadata: commitMetadata
+    });
 
     // replay with branch specified
     expect(artifact.name).toEqual("bahmniapps");
@@ -228,7 +402,9 @@ describe("Tests suite for pipeline1", function() {
 
     // replay with no branch specified
     commitMetadata.branchName = "";
-    artifact = projectBuild.getArtifact({ commitMetadata: commitMetadata });
+    artifact = projectBuild.getArtifact({
+      commitMetadata: commitMetadata
+    });
     expect(artifact.destFilename).toEqual("bahmniapps-12fe45.zip");
     expect(artifact.mavenProject).toEqual(
       new model.MavenProject("net.mekomsolutions", "bahmniapps", "12fe45")
@@ -246,7 +422,6 @@ describe("Tests suite for pipeline1", function() {
 
   it("should getArtifact, getBuildScript and getDeployScript for 'bahmniconfig'.", function() {
     // deps
-    const model = require(path.resolve("src/utils/model"));
     const projectType = "bahmniconfig";
 
     // setup
@@ -263,7 +438,9 @@ describe("Tests suite for pipeline1", function() {
       "/impl/" +
       projectType).getInstance();
 
-    var artifact = projectBuild.getArtifact({ pom: pom });
+    var artifact = projectBuild.getArtifact({
+      pom: pom
+    });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -297,7 +474,6 @@ describe("Tests suite for pipeline1", function() {
 
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrsconfig'.", function() {
     // deps
-    const model = require(path.resolve("src/utils/model"));
     const projectType = "openmrsconfig";
 
     // setup
@@ -313,7 +489,9 @@ describe("Tests suite for pipeline1", function() {
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
-    var artifact = projectBuild.getArtifact({ pom: pom });
+    var artifact = projectBuild.getArtifact({
+      pom: pom
+    });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -346,7 +524,6 @@ describe("Tests suite for pipeline1", function() {
 
   it("should getArtifact, getBuildScript and getDeployScript for 'openmrscore'.", function() {
     // deps
-    const model = require(path.resolve("src/utils/model"));
     const projectType = "openmrscore";
 
     // setup
@@ -363,7 +540,9 @@ describe("Tests suite for pipeline1", function() {
       "/impl/" +
       projectType).getInstance();
 
-    var artifact = projectBuild.getArtifact({ pom: pom });
+    var artifact = projectBuild.getArtifact({
+      pom: pom
+    });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -402,7 +581,9 @@ describe("Tests suite for pipeline1", function() {
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
-    var artifact = projectBuild.getArtifact({ pom: pom });
+    var artifact = projectBuild.getArtifact({
+      pom: pom
+    });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -438,7 +619,9 @@ describe("Tests suite for pipeline1", function() {
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
-    var artifact = projectBuild.getArtifact({ pom: pom });
+    var artifact = projectBuild.getArtifact({
+      pom: pom
+    });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -475,7 +658,9 @@ describe("Tests suite for pipeline1", function() {
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
-    var artifact = projectBuild.getArtifact({ pom: pom });
+    var artifact = projectBuild.getArtifact({
+      pom: pom
+    });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -508,7 +693,9 @@ describe("Tests suite for pipeline1", function() {
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
-    var artifact = projectBuild.getArtifact({ pom: pom });
+    var artifact = projectBuild.getArtifact({
+      pom: pom
+    });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -544,7 +731,9 @@ describe("Tests suite for pipeline1", function() {
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
-    var artifact = projectBuild.getArtifact({ pom: pom });
+    var artifact = projectBuild.getArtifact({
+      pom: pom
+    });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 
@@ -582,7 +771,9 @@ describe("Tests suite for pipeline1", function() {
     var projectBuild = require(folderInTest +
       "/impl/" +
       projectType).getInstance();
-    var artifact = projectBuild.getArtifact({ pom: pom });
+    var artifact = projectBuild.getArtifact({
+      pom: pom
+    });
     var buildScript = projectBuild.getBuildScript();
     var deployScript = projectBuild.getDeployScript(artifact);
 

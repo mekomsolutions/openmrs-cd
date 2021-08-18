@@ -21,8 +21,7 @@ const log = require("npmlog");
 //
 //  Running the post build routine specific to the current project type
 //
-var projectBuild = require("./impl/" +
-  process.env[config.varProjectType()]).getInstance();
+var projectBuild = require("./impl/" + cmns.getProjectType()).getInstance();
 
 //
 //  Reading the list of artifact IDs extracted from the POMs in Groovy (see .jenkinsfile)

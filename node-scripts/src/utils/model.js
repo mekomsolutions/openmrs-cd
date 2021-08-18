@@ -12,11 +12,12 @@ const config = require(cst.CONFIGPATH);
  * The commit metadata as passed along from webhook jobs.
  */
 class CommitMetadata {
-  constructor(projectType, repoUrl, branchName, commitId) {
+  constructor(projectType, repoUrl, branchName, commitId, repoName) {
     this[config.varProjectType()] = projectType;
     this[config.varRepoUrl()] = repoUrl;
     this[config.varBranchName()] = branchName;
     this[config.varCommitId()] = commitId;
+    this[config.varRepoName()] = repoName;
   }
 }
 
