@@ -202,6 +202,8 @@ module.exports = {
     return script;
   },
   getProjectType: function() {
-    return _.isEmpty(process.env[config.varProjectType()]) ? "default" : process.env[config.varProjectType()];
+    return _.isEmpty(process.env[config.varProjectType()])
+      ? "default"
+      : process.env[config.varProjectType()];
   }
 };

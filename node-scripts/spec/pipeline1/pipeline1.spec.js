@@ -286,7 +286,9 @@ describe("Tests suite for pipeline1", function() {
 
     var deployScript = projectBuild.getDeployScript(artifact);
     expect(deployScript.type).toEqual("#!/bin/bash");
-    expect(deployScript.body).toEqual("mvn clean deploy -DskipTests -DaltDeploymentRepository=mks-nexus::default::https://nexus.mekomsolutions.net/repository/maven-snapshots");
+    expect(deployScript.body).toEqual(
+      "mvn clean deploy -DskipTests -DaltDeploymentRepository=mks-nexus::default::https://nexus.mekomsolutions.net/repository/maven-snapshots"
+    );
   });
 
   it("'default' type should use 'ocd3.yml' values if no 'pom.xml' file is provided.", function() {

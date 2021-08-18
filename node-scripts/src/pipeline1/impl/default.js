@@ -28,11 +28,7 @@ module.exports = {
 
     projectBuild.getArtifact = function(args) {
       if (!_.isEmpty(args.pom)) {
-        var artifact = cmns.getMavenProjectArtifact(
-          args.pom,
-          null,
-          null
-        );
+        var artifact = cmns.getMavenProjectArtifact(args.pom, null, null);
         return artifact;
       } else {
         var artifact = ocd3Yaml.deploy.artifact;
@@ -66,7 +62,7 @@ module.exports = {
           args.pom.groupId,
           args.artifactsIds,
           args.pom.version
-        )
+        );
       } else {
         return cmns.mavenPostBuildActions(
           args.pseudoPom.groupId,
