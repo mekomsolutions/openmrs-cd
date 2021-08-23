@@ -132,6 +132,29 @@ describe("Docker Compose implementation", function() {
       ) +
       scripts.remote(
         instanceDef.deployment.host.value,
+        "cd " +
+          path
+            .resolve(
+              instanceDef.deployment.hostDir,
+              instanceDef.name,
+              "bahmni_docker"
+            )
+            .toString() +
+          " && docker-compose -p " +
+          instanceDef.name +
+          " --env-file=" +
+          path
+            .resolve(
+              instanceDef.deployment.hostDir,
+              instanceDef.name,
+              instanceDef.name + ".env"
+            )
+            .toString() +
+          " pull proxy openmrs mysql" +
+          "\n"
+      ) +
+      scripts.remote(
+        instanceDef.deployment.host.value,
         "sudo chown -R root:root " +
           path
             .resolve(instanceDef.deployment.hostDir, instanceDef.name)

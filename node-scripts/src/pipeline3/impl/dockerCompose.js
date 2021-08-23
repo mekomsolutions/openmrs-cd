@@ -29,8 +29,8 @@ module.exports = {
       const scripts = require("../scripts");
       let script = "";
 
+      // git clone https://.../bahmni-docker
       const gitRepo = instanceDef.deployment.value.gitUrl;
-
       script += scripts.remote(
         instanceDef.deployment.host.value,
         scripts.gitClone(
@@ -72,6 +72,7 @@ module.exports = {
       );
       script += "\n";
 
+      // docker-compose build
       script += scripts.remote(
         instanceDef.deployment.host.value,
         "cd " +
@@ -93,6 +94,34 @@ module.exports = {
             )
             .toString() +
           " build --pull" +
+          require("./dockerCompose").getInstanceServicesAsStringList(
+            instanceDef
+          ) +
+          "\n"
+      );
+
+      // docker-compose pull
+      script += scripts.remote(
+        instanceDef.deployment.host.value,
+        "cd " +
+          path
+            .resolve(
+              instanceDef.deployment.hostDir,
+              instanceDef.name,
+              "bahmni_docker"
+            )
+            .toString() +
+          " && docker-compose -p " +
+          instanceDef.name +
+          " --env-file=" +
+          path
+            .resolve(
+              instanceDef.deployment.hostDir,
+              instanceDef.name,
+              instanceDef.name + ".env"
+            )
+            .toString() +
+          " pull" +
           require("./dockerCompose").getInstanceServicesAsStringList(
             instanceDef
           ) +
