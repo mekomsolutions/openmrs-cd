@@ -75,7 +75,9 @@ describe("Docker Compose Maven implementation", function() {
         instanceDef.name,
         "bahmni_docker"
       ),
-      true
+      true,
+      null,
+      "-avzzd"
     );
 
     expected +=

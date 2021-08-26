@@ -33,14 +33,8 @@ module.exports = {
       );
       return script;
     },
-    getDataScript: function(instanceDef) {
-      let script = "";
-
-      return script;
-    },
-    getArtifactsScript: function(instanceDef) {
-      return "";
-    }
+    getDataScript: dockerComposeGit.preHostPreparation.getDataScript,
+    getArtifactsScript: dockerComposeGit.preHostPreparation.getArtifactsScript
   },
   hostPreparation: {
     getDeploymentScript: function(instanceDef) {
@@ -54,12 +48,13 @@ module.exports = {
       );
       const ssh = instanceDef.deployment.host.value;
       const hostArtifactsDir = hostDir + "/bahmni_docker";
-
       script += scripts.rsync(
         { ...ssh, ...{ remoteDst: true } },
         config.getCDDockerDirPath(instanceDef.uuid),
         hostArtifactsDir,
-        true
+        true,
+        null,
+        "-avzzd"
       );
 
       // Set the Timezone via a env var "TZ"
