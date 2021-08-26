@@ -47,9 +47,9 @@ class DockerMonolithDeployment {
 }
 
 /**
- * Describe a Docker Compose deployment
+ * Describe a Docker Compose Git deployment
  */
-class DockerComposeDeployment {
+class DockerComposeGitDeployment {
   constructor(gitUrl, commitId, networks, services) {
     this.gitUrl = gitUrl;
     this.commitId = commitId;
@@ -58,6 +58,15 @@ class DockerComposeDeployment {
   }
 }
 
+/**
+ * Describe a Docker Compose Maven deployment
+ */
+class DockerComposeMavenDeployment {
+  constructor(mavenProject, services) {
+    this.mavenProject = mavenProject;
+    this.services = services;
+  }
+}
 /**
  * Describes a File TLS deployment section
  */
@@ -254,7 +263,8 @@ module.exports = {
   SqlData: SqlData,
   SqlDocker: SqlDocker,
   DockerMonolithDeployment: DockerMonolithDeployment,
-  DockerComposeDeployment: DockerComposeDeployment,
+  DockerComposeGitDeployment: DockerComposeGitDeployment,
+  DockerComposeMavenDeployment: DockerComposeMavenDeployment,
   FileTLSDeployment: FileTLSDeployment,
   VaultTLSDeployment: VaultTLSDeployment,
   Artifact: Artifact,

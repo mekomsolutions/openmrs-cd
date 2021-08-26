@@ -368,7 +368,13 @@ module.exports = {
     return ["debug", "dev", "staging", cst.INSTANCETYPE_PROD];
   },
   getInstanceDeploymentTypes: function() {
-    return ["docker", "dockerMonolith", "dockerCompose"];
+    return [
+      "docker",
+      "dockerMonolith",
+      "dockerCompose",
+      "dockerComposeGit",
+      "dockerComposeMaven"
+    ];
   },
   getInstanceArtifactsTypes: function() {
     return ["maven"];

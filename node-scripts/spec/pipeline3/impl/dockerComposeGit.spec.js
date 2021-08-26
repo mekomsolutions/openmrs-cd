@@ -164,32 +164,6 @@ describe("Docker Compose implementation", function() {
     expect(
       dockerCompose.hostPreparation.getDeploymentScript(instanceDef)
     ).toEqual(expected);
-
-    instanceDef.deployment.value.gitUrl = undefined;
-    instanceDef.deployment.value.mavenProject = {
-      version: "1.0.0-SNAPSHOT",
-      artifactId: "bahmni-docker-compose",
-      groupId: "net.mekomsolutions",
-      packaging: "zip"
-    };
-    expected = scripts.remote(
-      instanceDef.deployment.host.value,
-      scripts.fetchArtifact(
-        instanceDef.deployment.value.mavenProject,
-        "maven",
-        path
-          .resolve(
-            instanceDef.deployment.hostDir,
-            instanceDef.name,
-            "bahmni_docker"
-          )
-          .toString()
-      )
-    );
-
-    expect(
-      dockerCompose.hostPreparation.getDeploymentScript(instanceDef)
-    ).toContain(expected);
   });
 
   it("should generate Host Preparation data script", () => {

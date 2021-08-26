@@ -183,14 +183,35 @@ module.exports = {
   validateDockerComposeDeploymentConfigValue: function(value) {
     if (
       JSON.stringify(Object.keys(value).sort()) !==
-      JSON.stringify(Object.keys(new model.DockerComposeDeployment()).sort())
+      JSON.stringify(Object.keys(new model.DockerComposeGitDeployment()).sort())
     ) {
       throw new Error(
-        "The Docker compose deployment value should be provided as an instance of 'DockerDeployment'."
+        "The Docker compose deployment value should be provided as an instance of 'DockerComposeGitDeployment'."
       );
     }
   },
-
+  validateDockerComposeGitDeploymentConfigValue: function(value) {
+    if (
+      JSON.stringify(Object.keys(value).sort()) !==
+      JSON.stringify(Object.keys(new model.DockerComposeGitDeployment()).sort())
+    ) {
+      throw new Error(
+        "The Docker compose deployment value should be provided as an instance of 'DockerComposeGitDeployment'."
+      );
+    }
+  },
+  validateDockerComposeMavenDeploymentConfigValue: function(value) {
+    if (
+      JSON.stringify(Object.keys(value).sort()) !==
+      JSON.stringify(
+        Object.keys(new model.DockerComposeMavenDeployment()).sort()
+      )
+    ) {
+      throw new Error(
+        "The Docker compose deployment value should be provided as an instance of 'DockerComposeMavenDeployment'."
+      );
+    }
+  },
   validateFileTLSDeploymentConfigValue: function(value) {
     if (
       JSON.stringify(Object.keys(value).sort()) !==
@@ -305,7 +326,12 @@ module.exports = {
       file: module.exports.validateFileTLSDeploymentConfigValue,
       vault: module.exports.validateVaultTLSDeploymentConfigValue,
       docker: module.exports.validateDockerMonolithDeploymentConfigValue,
-      dockerCompose: module.exports.validateDockerComposeDeploymentConfigValue
+      dockerCompose:
+        module.exports.validateDockerComposeGitDeploymentConfigValue,
+      dockerComposeGit:
+        module.exports.validateDockerComposeGitDeploymentConfigValue,
+      dockerComposeMaven:
+        module.exports.validateDockerComposeMavenDeploymentConfigValue
     };
   }
 };

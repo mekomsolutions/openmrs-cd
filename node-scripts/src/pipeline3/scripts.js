@@ -202,7 +202,7 @@ module.exports = {
       script +=
         "mvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get" +
         " " +
-        "-DremoteRepositories= " +
+        "-DremoteRepositories=" +
         url +
         " " +
         "-Dartifact=" +
@@ -240,7 +240,6 @@ module.exports = {
       script += "\n";
       script += "rm " + destPath + "/" + fileName;
       script += "\n";
-
     }
 
     return script;
