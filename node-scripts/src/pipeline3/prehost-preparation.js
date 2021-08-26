@@ -61,7 +61,11 @@ if (process.env[config.varArtifactsChanges()] === "true") {
   );
 
   instanceDef.artifacts.forEach(function(artifact) {
-    script.body += scripts.fetchArtifact(artifact, artifactsDirPath);
+    script.body += scripts.fetchArtifact(
+      artifact.value,
+      artifact.type,
+      artifactsDirPath
+    );
   });
 }
 

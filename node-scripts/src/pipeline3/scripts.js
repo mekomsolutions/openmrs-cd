@@ -185,44 +185,62 @@ module.exports = {
   },
 
   /**
-   * Generates a script that fetches an instance's artifacts to save them a specified location.
+   * Generates a script that fetches an instance's artifacts to save them at a specified location.
    *
    * @param {Object} artifact - An 'artifact' section of the artifacts part of the instance definition.
    * @param {String} destPath - The destination part where to save the fetched artifact.
    *
    * @return {String} The script as a string.
    */
-  fetchArtifact: function(artifact, destPath) {
+  fetchArtifact: function(artifact, type, destPath, url) {
     var script = "";
 
-    if (artifact.type === "maven") {
+    if (type === "maven") {
+      if (_.isEmpty(url)) {
+        url = "https://nexus.mekomsolutions.net/repository/maven-public";
+      }
       script +=
-        "mvn dependency:copy" +
+        "mvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get" +
+        " " +
+        "-DremoteRepositories= " +
+        url +
         " " +
         "-Dartifact=" +
-        artifact.value.groupId +
+        artifact.groupId +
         ":" +
-        artifact.value.artifactId +
+        artifact.artifactId +
         ":" +
-        artifact.value.version +
+        artifact.version +
         ":" +
-        artifact.value.packaging +
+        artifact.packaging +
+        " " +
+        "-Dtransitive=false" +
+        "\n";
+
+      script +=
+        "mvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:copy" +
+        " " +
+        "-Dartifact=" +
+        artifact.groupId +
+        ":" +
+        artifact.artifactId +
+        ":" +
+        artifact.version +
+        ":" +
+        artifact.packaging +
         " " +
         "-DoutputDirectory=" +
         destPath +
         "\n";
 
       var fileName =
-        artifact.value.artifactId +
-        "-" +
-        artifact.value.version +
-        "." +
-        artifact.value.packaging;
+        artifact.artifactId + "-" + artifact.version + "." + artifact.packaging;
 
       script += "unzip " + destPath + "/" + fileName + " -d " + destPath + "/";
       script += "\n";
       script += "rm " + destPath + "/" + fileName;
       script += "\n";
+
     }
 
     return script;

@@ -1,6 +1,7 @@
 "use strict";
 
 const path = require("path");
+const _ = require("lodash");
 
 const cst = require("../../const");
 const scripts = require("../scripts");
@@ -31,20 +32,40 @@ module.exports = {
 
       // git clone https://.../bahmni-docker
       const gitRepo = instanceDef.deployment.value.gitUrl;
-      script += scripts.remote(
-        instanceDef.deployment.host.value,
-        scripts.gitClone(
-          gitRepo,
-          path
-            .resolve(
-              instanceDef.deployment.hostDir,
-              instanceDef.name,
-              "bahmni_docker"
-            )
-            .toString(),
-          instanceDef.deployment.value.commitId
-        )
-      );
+      if (gitRepo) {
+        script += scripts.remote(
+          instanceDef.deployment.host.value,
+          scripts.gitClone(
+            gitRepo,
+            path
+              .resolve(
+                instanceDef.deployment.hostDir,
+                instanceDef.name,
+                "bahmni_docker"
+              )
+              .toString(),
+            instanceDef.deployment.value.commitId
+          )
+        );
+      } else if (instanceDef.deployment.value.mavenProject) {
+        // mvn dependency:get and copy
+        const mavenProject = instanceDef.deployment.value.mavenProject;
+        script += scripts.remote(
+          instanceDef.deployment.host.value,
+          scripts.fetchArtifact(
+            mavenProject,
+            "maven",
+            path
+              .resolve(
+                instanceDef.deployment.hostDir,
+                instanceDef.name,
+                "bahmni_docker"
+              )
+              .toString(),
+            instanceDef.deployment.value.mavenUrl
+          )
+        );
+      }
 
       // Set the Timezone via a env var "TZ"
       if (instanceDef.deployment.timezone) {

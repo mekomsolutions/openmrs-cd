@@ -503,4 +503,26 @@ describe("Scripts", function() {
         "\n"
     );
   });
+
+  it("should generate fetchArtifact() commands", function() {
+    var actual = scripts.fetchArtifact(
+      {
+        groupId: "net.mekomsolutions",
+        artifactId: "openmrs-distro-cambodia",
+        version: "1.1.0-SNAPSHOT",
+        packaging: "zip"
+      },
+      "maven",
+      "a_path"
+    );
+
+    var expected =
+      "mvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories= https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=net.mekomsolutions:openmrs-distro-cambodia:1.1.0-SNAPSHOT:zip -Dtransitive=false" +
+      "\nmvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:copy -Dartifact=net.mekomsolutions:openmrs-distro-cambodia:1.1.0-SNAPSHOT:zip -DoutputDirectory=a_path" +
+      "\nunzip a_path/openmrs-distro-cambodia-1.1.0-SNAPSHOT.zip -d a_path/" +
+      "\nrm a_path/openmrs-distro-cambodia-1.1.0-SNAPSHOT.zip" +
+      "\n";
+
+    expect(actual).toEqual(expected);
+  });
 });

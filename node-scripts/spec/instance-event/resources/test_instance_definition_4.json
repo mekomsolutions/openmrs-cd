@@ -18,6 +18,13 @@
       "networks": ["network1"],
       "commitId": "master",
       "gitUrl": "https://github.com/mekomsolutions/bahmni-docker.git",
+      "mavenUrl": "https://nexus.mekomsolutions.net/repository/maven-public",
+      "mavenProject": {
+        "version": "1.0.0-SNAPSHOT",
+        "artifactId:": "bahmni-docker-compose",
+        "groupId:": "net.mekomsolutions",
+        "packaging:": "zip"
+      },
       "services": ["proxy", "openmrs", "bahmniapps", "bahmni-config", "mysql"]
     },
     "host": {

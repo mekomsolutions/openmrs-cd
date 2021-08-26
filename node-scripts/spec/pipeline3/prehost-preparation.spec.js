@@ -14,6 +14,10 @@ describe("Pre-host preparation scripts", function() {
     const stubs = tests.stubs();
     const config = tests.config();
 
+    const scripts = require(path.resolve(
+      "src/" + config.getJobNameForPipeline3() + "/scripts"
+    ));
+
     // setup
     const instanceUuid = "cacb5448-46b0-4808-980d-5521775671c0";
     process.env[config.varInstanceUuid()] = instanceUuid;
@@ -48,17 +52,16 @@ describe("Pre-host preparation scripts", function() {
       "rm -rf " +
       artifactsPath +
       "/*\n" +
-      "mvn dependency:copy -Dartifact=net.mekomsolutions:openmrs-distro-cambodia:1.1.0-SNAPSHOT:zip " +
-      "-DoutputDirectory=" +
-      artifactsPath +
-      "\n" +
-      "unzip " +
-      artifactsPath +
-      "/" +
-      "openmrs-distro-cambodia-1.1.0-SNAPSHOT.zip" +
-      " -d " +
-      artifactsPath +
-      "/";
+      scripts.fetchArtifact(
+        {
+          groupId: "net.mekomsolutions",
+          artifactId: "openmrs-distro-cambodia",
+          version: "1.1.0-SNAPSHOT",
+          packaging: "zip"
+        },
+        "maven",
+        artifactsPath
+      );
 
     expect(script).toContain(expectedScript);
 
