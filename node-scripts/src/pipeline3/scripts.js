@@ -88,7 +88,6 @@ module.exports = {
     if (!args) {
       args = "-avzz";
     }
-
     var sshPort = "";
     if (!_.isEmpty(ssh)) {
       if (ssh.remoteSrc && ssh.remoteSrc === true) {
@@ -100,7 +99,6 @@ module.exports = {
         sshPort = " -e 'ssh -p " + ssh.port + "'";
       }
     }
-
     var script = "";
     if (sudo) {
       script += "sudo ";

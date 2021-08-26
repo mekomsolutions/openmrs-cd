@@ -75,6 +75,9 @@ if (process.env[config.varArtifactsChanges()] === "true") {
       true
     )
   );
+  script.body.push(
+    deploymentScripts.hostPreparation.getArtifactsScript(instanceDef)
+  );
 }
 
 // 'deployment'

@@ -5,6 +5,7 @@ const _ = require("lodash");
 
 const cst = require("../../const");
 const scripts = require("../scripts");
+const config = require(cst.CONFIGPATH);
 const heredoc_2 = cst.HEREDOC_2;
 
 const dockerComposeGit = require("./dockerComposeGit");
@@ -13,28 +14,52 @@ const dockerComposeGit = require("./dockerComposeGit");
  *
  */
 module.exports = {
-  preHostPreparation: dockerComposeGit.preHostPreparation,
+  preHostPreparation: {
+    getDeploymentScript: function(instanceDef) {
+      // Retrieve the Bahmni Docker Compose project
+      const mavenProject = instanceDef.deployment.value.mavenProject;
+      var script = "";
+      script += scripts.fetchArtifact(
+        mavenProject,
+        "maven",
+        path
+          .resolve(
+            instanceDef.deployment.hostDir,
+            instanceDef.name,
+            config.getCDDockerDirPath(instanceDef.uuid)
+          )
+          .toString(),
+        instanceDef.deployment.value.mavenUrl
+      );
+      return script;
+    },
+    getDataScript: function(instanceDef) {
+      let script = "";
+
+      return script;
+    },
+    getArtifactsScript: function(instanceDef) {
+      return "";
+    }
+  },
   hostPreparation: {
     getDeploymentScript: function(instanceDef) {
       const scripts = require("../scripts");
       let script = "";
 
-      // mvn dependency:get and copy
-      const mavenProject = instanceDef.deployment.value.mavenProject;
-      script += scripts.remote(
-        instanceDef.deployment.host.value,
-        scripts.fetchArtifact(
-          mavenProject,
-          "maven",
-          path
-            .resolve(
-              instanceDef.deployment.hostDir,
-              instanceDef.name,
-              "bahmni_docker"
-            )
-            .toString(),
-          instanceDef.deployment.value.mavenUrl
-        )
+      // Rsync the Bahmni Docker Compose project files to the target machine
+      const hostDir = path.resolve(
+        instanceDef.deployment.hostDir,
+        instanceDef.name
+      );
+      const ssh = instanceDef.deployment.host.value;
+      const hostArtifactsDir = hostDir + "/bahmni_docker";
+
+      script += scripts.rsync(
+        { ...ssh, ...{ remoteDst: true } },
+        config.getCDDockerDirPath(instanceDef.uuid),
+        hostArtifactsDir,
+        true
       );
 
       // Set the Timezone via a env var "TZ"

@@ -1,6 +1,6 @@
 "use strict";
 
-describe("Docker Compose implementation", function() {
+describe("Docker Compose Maven implementation", function() {
   // deps
   const path = require("path");
   const config = require(path.resolve("src/utils/config"));
@@ -14,7 +14,7 @@ describe("Docker Compose implementation", function() {
   ));
 
   var instanceDef = {
-    uuid: "cacb5448-46b0-4808-980d-5521775671c0",
+    uuid: "336af1ee-90a1-4d1b-baaf-db12c84deec0",
     name: "cambodia1",
     type: "dev",
     group: "tlc",
@@ -22,7 +22,12 @@ describe("Docker Compose implementation", function() {
       hostDir: "/var/docker-volumes/",
       type: "dockerComposeMaven",
       value: {
-        mavenProject: "http://someUrl",
+        mavenProject: {
+          version: "1.0.0-SNAPSHOT",
+          artifactId: "bahmni-docker-compose",
+          groupId: "net.mekomsolutions",
+          packaging: "zip"
+        },
         services: ["proxy", "openmrs", "mysql"]
       },
       timezone: "Europe/Amsterdam",
@@ -46,29 +51,34 @@ describe("Docker Compose implementation", function() {
     ]
   };
 
-  it("should generate Host Preparation deployment script", () => {
-    instanceDef.deployment.value.mavenProject = {
-      version: "1.0.0-SNAPSHOT",
-      artifactId: "bahmni-docker-compose",
-      groupId: "net.mekomsolutions",
-      packaging: "zip"
-    };
+  it("should generate Pre-Host Preparation deployment script", () => {
+    var expected = "";
+    expected += scripts.fetchArtifact(
+      instanceDef.deployment.value.mavenProject,
+      "maven",
+      config.getCDDockerDirPath(instanceDef.uuid),
+      null
+    );
 
-    let expected =
-      scripts.remote(
-        instanceDef.deployment.host.value,
-        scripts.fetchArtifact(
-          instanceDef.deployment.value.mavenProject,
-          "maven",
-          path
-            .resolve(
-              instanceDef.deployment.hostDir,
-              instanceDef.name,
-              "bahmni_docker"
-            )
-            .toString()
-        )
-      ) +
+    expect(
+      dockerCompose.preHostPreparation.getDeploymentScript(instanceDef)
+    ).toEqual(expected);
+  });
+
+  it("should generate Host Preparation deployment script", () => {
+    var expected = "";
+    expected += scripts.rsync(
+      { ...instanceDef.deployment.host.value, ...{ remoteDst: true } },
+      config.getCDDockerDirPath(instanceDef.uuid),
+      path.resolve(
+        instanceDef.deployment.hostDir,
+        instanceDef.name,
+        "bahmni_docker"
+      ),
+      true
+    );
+
+    expected +=
       scripts.remote(
         instanceDef.deployment.host.value,
         scripts.writeProperty(
@@ -83,8 +93,9 @@ describe("Docker Compose implementation", function() {
             )
             .toString()
         )
-      ) +
-      "\n" +
+      ) + "\n";
+
+    expected +=
       scripts.remote(
         instanceDef.deployment.host.value,
         scripts.createEnvVarFile(instanceDef)
