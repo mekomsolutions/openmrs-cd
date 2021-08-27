@@ -397,21 +397,19 @@ describe("Scripts", function() {
     var group = "group";
 
     expect(scripts.initFolder(folderPath, user)).toEqual(
-      "sudo mkdir -p test_folder\n" + "sudo chown -R user:user test_folder\n\n"
+      "sudo mkdir -p test_folder\n" + "sudo chown -R user:user test_folder\n"
     );
 
     expect(scripts.initFolder(folderPath, user, null, true)).toEqual(
-      "sudo mkdir -p test_folder\n" +
-        "sudo chown -R user:user test_folder\n" +
-        "rm -rf test_folder/*" +
-        "\n"
+      "rm -rf test_folder\n" +
+        "sudo mkdir -p test_folder\n" +
+        "sudo chown -R user:user test_folder\n"
     );
 
     expect(scripts.initFolder(folderPath, user, group, true)).toEqual(
-      "sudo mkdir -p test_folder\n" +
-        "sudo chown -R user:group test_folder\n" +
-        "rm -rf test_folder/*" +
-        "\n"
+      "rm -rf test_folder\n" +
+        "sudo mkdir -p test_folder\n" +
+        "sudo chown -R user:group test_folder\n"
     );
   });
 

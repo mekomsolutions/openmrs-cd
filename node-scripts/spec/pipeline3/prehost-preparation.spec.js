@@ -43,15 +43,15 @@ describe("Pre-host preparation scripts", function() {
 
     var expectedScript =
       "set -xe\n" +
+      "rm -rf " +
+      artifactsPath +
+      "\n" +
       "sudo mkdir -p " +
       artifactsPath +
       "\n" +
       "sudo chown -R jenkins:jenkins " +
       artifactsPath +
       "\n" +
-      "rm -rf " +
-      artifactsPath +
-      "/*\n" +
       scripts.fetchArtifact(
         {
           groupId: "net.mekomsolutions",
