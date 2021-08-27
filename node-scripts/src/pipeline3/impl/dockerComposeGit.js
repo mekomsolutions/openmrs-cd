@@ -47,12 +47,12 @@ module.exports = {
         )
       );
 
-      // Set the Timezone via a env var "TZ"
+      // Set the Timezone via a env var "TIMEZONE"
       if (instanceDef.deployment.timezone) {
         script += scripts.remote(
           instanceDef.deployment.host.value,
           scripts.writeProperty(
-            "TZ",
+            "TIMEZONE",
             instanceDef.deployment.timezone,
             path
               .resolve(

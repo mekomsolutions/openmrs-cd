@@ -90,7 +90,7 @@ describe("Docker Compose Maven implementation", function() {
       scripts.remote(
         instanceDef.deployment.host.value,
         scripts.writeProperty(
-          "TZ",
+          "TIMEZONE",
           instanceDef.deployment.timezone,
           path
             .resolve(
