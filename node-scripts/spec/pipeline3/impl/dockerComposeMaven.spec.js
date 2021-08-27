@@ -53,6 +53,12 @@ describe("Docker Compose Maven implementation", function() {
 
   it("should generate Pre-Host Preparation deployment script", () => {
     var expected = "";
+    expected += scripts.initFolder(
+      config.getCDDockerDirPath(instanceDef.uuid),
+      "jenkins",
+      "jenkins",
+      true
+    );
     expected += scripts.fetchArtifact(
       instanceDef.deployment.value.mavenProject,
       "maven",

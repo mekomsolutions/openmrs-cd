@@ -18,17 +18,15 @@ module.exports = {
     getDeploymentScript: function(instanceDef) {
       // Retrieve the Bahmni Docker Compose project
       const mavenProject = instanceDef.deployment.value.mavenProject;
+      const dockerDirPath = path.resolve(
+        config.getCDDockerDirPath(instanceDef.uuid)
+      );
       var script = "";
+      script += scripts.initFolder(dockerDirPath, "jenkins", "jenkins", true);
       script += scripts.fetchArtifact(
         mavenProject,
         "maven",
-        path
-          .resolve(
-            instanceDef.deployment.hostDir,
-            instanceDef.name,
-            config.getCDDockerDirPath(instanceDef.uuid)
-          )
-          .toString(),
+        dockerDirPath,
         instanceDef.deployment.value.mavenUrl
       );
       return script;
