@@ -212,6 +212,8 @@ module.exports = {
         artifact.packaging +
         " " +
         "-Dtransitive=false" +
+        " " +
+        "--legacy-local-repository" +
         "\n";
 
       script +=

@@ -515,7 +515,7 @@ describe("Scripts", function() {
     );
 
     var expected =
-      "mvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=net.mekomsolutions:openmrs-distro-cambodia:1.1.0-SNAPSHOT:zip -Dtransitive=false" +
+      "mvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:get -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public -Dartifact=net.mekomsolutions:openmrs-distro-cambodia:1.1.0-SNAPSHOT:zip -Dtransitive=false --legacy-local-repository" +
       "\nmvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:copy -Dartifact=net.mekomsolutions:openmrs-distro-cambodia:1.1.0-SNAPSHOT:zip -DoutputDirectory=a_path" +
       "\nunzip a_path/openmrs-distro-cambodia-1.1.0-SNAPSHOT.zip -d a_path/" +
       "\nrm a_path/openmrs-distro-cambodia-1.1.0-SNAPSHOT.zip" +
