@@ -394,7 +394,7 @@ describe("Tests suite for pipeline1", function() {
     expect(artifact.version).toEqual("dev");
     expect(artifact.extension).toEqual("zip");
     expect(artifact.filename).toEqual("bahmniapps.zip");
-    expect(artifact.destFilename).toEqual("bahmniapps-dev.zip");
+    expect(artifact.destFilename).toEqual("bahmniapps.zip");
     expect(artifact.buildPath).toEqual("./ui/target");
     expect(artifact.mavenProject).toEqual(
       new model.MavenProject("net.mekomsolutions", "bahmniapps", "dev")
@@ -405,7 +405,7 @@ describe("Tests suite for pipeline1", function() {
     artifact = projectBuild.getArtifact({
       commitMetadata: commitMetadata
     });
-    expect(artifact.destFilename).toEqual("bahmniapps-12fe45.zip");
+    expect(artifact.destFilename).toEqual("bahmniapps.zip");
     expect(artifact.mavenProject).toEqual(
       new model.MavenProject("net.mekomsolutions", "bahmniapps", "12fe45")
     );

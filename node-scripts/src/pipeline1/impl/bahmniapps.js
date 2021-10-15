@@ -52,8 +52,7 @@ var getArtifact = function(commitMetadata) {
   artifact.buildPath = "./ui/target";
   artifact.extension = "zip";
   artifact.filename = artifact.name + "." + artifact.extension;
-  artifact.destFilename =
-    artifact.name + "-" + artifact.version + "." + artifact.extension;
+  artifact.destFilename = "bahmniapps.zip";
 
   // encapsulating the Maven project
   var mavenProject = new model.MavenProject();
@@ -106,7 +105,7 @@ var getDeployScript = function(artifact) {
     " -DrepositoryId=${NEXUS_REPO_ID} -Durl=${ARTIFACT_UPLOAD_URL_" +
     thisType +
     "} -Dfile=" +
-    artifact.destFilename +
+    path.join(artifact.buildPath, artifact.destFilename) +
     "\n";
 
   return script;
