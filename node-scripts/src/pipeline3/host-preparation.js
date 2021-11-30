@@ -126,7 +126,11 @@ if (process.env[config.varDataChanges()] === "true") {
             "Illegal argument: empty or non-existing instance definition."
           );
         }
-        sourceDataDir = sourceInstance.deployment.hostDir + "/data/";
+        sourceDataDir = path.resolve(
+          sourceInstance.deployment.hostDir,
+          sourceInstance.name,
+          "data"
+        );
       }
       if (!_.isEmpty(data.value.dataDir)) {
         sourceDataDir = data.value.dataDir;
