@@ -72,7 +72,9 @@ if (process.env[config.varArtifactsChanges()] === "true") {
       ssh,
       config.getCDArtifactsDirPath(instanceDef.uuid),
       hostArtifactsDir,
-      true
+      true,
+      false,
+      "-avzz --delete"
     )
   );
   script.body.push(
