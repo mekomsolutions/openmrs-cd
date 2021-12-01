@@ -52,7 +52,7 @@ module.exports = {
         hostArtifactsDir,
         true,
         null,
-        "-avzzd"
+        "-avzz --delete"
       );
 
       // Set the Timezone via a env var "TIMEZONE"

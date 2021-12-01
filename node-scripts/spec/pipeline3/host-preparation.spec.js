@@ -65,7 +65,16 @@ describe("Host preparation scripts", function() {
 
     ssh.remoteDst = true;
 
-    expect(script).toContain(scripts.rsync(ssh, srcDir, hostArtifactsDir, true, false, "-avzz --delete"));
+    expect(script).toContain(
+      scripts.rsync(
+        ssh,
+        srcDir,
+        hostArtifactsDir,
+        true,
+        false,
+        "-avzz --delete"
+      )
+    );
   });
 
   it("should generate bash script upon deployment changes.", function() {

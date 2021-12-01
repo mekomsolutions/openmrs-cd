@@ -83,7 +83,7 @@ describe("Docker Compose Maven implementation", function() {
       ),
       true,
       null,
-      "-avzzd"
+      "-avzz --delete"
     );
 
     expected +=
