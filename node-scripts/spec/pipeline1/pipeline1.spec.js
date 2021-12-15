@@ -80,7 +80,7 @@ describe("Tests suite for pipeline1", function() {
 
     // verif 'checkout' stage
     expect(pipelineScript).toContain(
-      "checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: " +
+      "checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[credentialsId: 'gitHubCredentials', url: " +
         config.varRepoUrl() +
         "]], branches: [[name: " +
         config.varBranchName() +
