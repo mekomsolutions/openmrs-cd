@@ -265,6 +265,14 @@ describe("Docker Compose implementation", function() {
         instanceDef.name +
         "/bahmni_docker && docker-compose -p " +
         instanceDef.name +
+        " --env-file=" +
+        path
+          .resolve(
+            instanceDef.deployment.hostDir,
+            instanceDef.name,
+            instanceDef.name + ".env"
+          )
+          .toString() +
         " restart \n"
     );
   });

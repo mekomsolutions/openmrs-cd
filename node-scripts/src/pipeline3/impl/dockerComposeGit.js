@@ -268,7 +268,18 @@ module.exports = {
     if (sudo) {
       script += "sudo ";
     }
-    script += "docker-compose -p " + instanceDef.name + " restart ";
+    script +=
+      "docker-compose -p " +
+      instanceDef.name +
+      " --env-file=" +
+      path
+        .resolve(
+          instanceDef.deployment.hostDir,
+          instanceDef.name,
+          instanceDef.name + ".env"
+        )
+        .toString() +
+      " restart ";
 
     return script + "\n";
   },
