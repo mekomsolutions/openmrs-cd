@@ -51,8 +51,8 @@ For example by appending the expected parameters to a configurable URL, such as 
           <defaultValue></defaultValue>
         </org.jenkinsci.plugins.gwt.GenericVariable>
       </genericVariables>
-      <regexpFilterText>$repoUrl</regexpFilterText>
-      <regexpFilterExpression>^https?:\/\/([a-zA-Z\d-]+\.){0,}github\.com</regexpFilterExpression>
+      <regexpFilterText>$repoUrl $scmRef</regexpFilterText>
+      <regexpFilterExpression>^https?:\/\/([a-zA-Z\d-]+\.){0,}github\.com (refs/heads/master|refs/heads/main)</regexpFilterExpression>
       <genericRequestVariables>
         <org.jenkinsci.plugins.gwt.GenericRequestVariable>
           <key>projectType</key>
