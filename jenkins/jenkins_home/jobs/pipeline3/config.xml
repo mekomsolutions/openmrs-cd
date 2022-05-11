@@ -56,6 +56,11 @@ Depending on the context and the instance definition it can setup and run a new 
           <description>Tells whether there has been properties changes and hence whether the properties section should be (re)processed.</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>instanceActive</name>
+          <description>Tells whether the instance is supposed to be active or not.</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -131,6 +136,7 @@ pipeline {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
    }
+   
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/prehost-preparation.js&apos;
     sh &apos;cat $BUILD_PATH/prehost-prepare.sh&apos;
@@ -138,10 +144,31 @@ pipeline {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/update-status.js $BUILD_PATH/status.json&apos;
    }
   }
+  stage(&apos;Instance status&apos;) {
+    steps{
+      script {
+      sh &apos;node /opt/node-scripts/src/$JOB_NAME/fetch-instance-def.js&apos;
+      def instanceDefJSON = sh (
+      script: &apos;$BUILD_PATH/fetch-instance-def.sh&apos;,
+      returnStdout: true
+      )
+     def instanceDef = new JsonSlurperClassic().parseText(instanceDefJSON)
+     env.ACTIVE_STATUS = instanceDef.active
+      if (!instanceDef.active) {
+      currentBuild.build().getExecutor().interrupt(Result.SUCCESS)
+      currentBuild.result = &apos;SUCCESS&apos;
+      return
+        }
+      }
+    }
+  }
   stage(&apos;Host preparation&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
    }
+   when {
+        environment name: &apos;ACTIVE_STATUS&apos;, value: &apos;true&apos;
+    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/host-preparation.js&apos;
     sh &apos;cat $BUILD_PATH/host-prepare.sh&apos;
@@ -174,6 +201,8 @@ pipeline {
    }
   }
   stage(&apos;Start or restart the instance&apos;) {
+   <!-- if () -->
+   
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
    }

@@ -39,6 +39,12 @@ describe("The instances config validator", function() {
     expect(function() {
       _script_.validateBaseConfig({ version: "_0.9999.abs_" }, true);
     }).toThrow();
+    expect(function() {
+      _script_.validateBaseConfig({ active: false }, false);
+    }).toThrow();
+    expect(function() {
+      _script_.validateBaseConfig({ active: true, type: "prod" }, true);
+    }).toThrow();
   });
 
   it("should validate instances deployment section.", function() {

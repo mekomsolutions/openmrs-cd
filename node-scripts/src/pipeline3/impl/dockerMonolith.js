@@ -365,5 +365,6 @@ module.exports = {
         require("../scripts").linkComponents(instanceDef.deployment.links)
       )
     );
-  }
+  },
+  stop: function(instanceDef) {}
 };

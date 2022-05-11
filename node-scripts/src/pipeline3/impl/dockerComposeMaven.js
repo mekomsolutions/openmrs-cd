@@ -159,5 +159,6 @@ module.exports = {
   setProperties: dockerComposeGit.setProperties,
   setLinks: dockerComposeGit.setLinks,
   getInstanceServicesAsStringList:
-    dockerComposeGit.getInstanceServicesAsStringList
+    dockerComposeGit.getInstanceServicesAsStringList,
+  stop: dockerComposeGit.stop
 };
