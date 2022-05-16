@@ -73,6 +73,7 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 def jenkinsCredentials = &quot;&quot;
 
 node {
+ def skipRemainingStages = true
  def buildName = &quot;${instanceUuid}&quot;
  def cause = &quot;&quot;
  def sep = &quot; + &quot;
@@ -153,7 +154,7 @@ pipeline {
       returnStdout: true
       )
      def instanceDef = new JsonSlurperClassic().parseText(instanceDefJSON)
-     env.ACTIVE_STATUS = instanceDef.active
+     skipRemainingStages = instanceDef.active
       if (!instanceDef.active) {
       currentBuild.build().getExecutor().interrupt(Result.SUCCESS)
       currentBuild.result = &apos;SUCCESS&apos;
@@ -167,7 +168,9 @@ pipeline {
     SECRETS = &quot;${jenkinsCredentials}&quot;
    }
    when {
-        environment name: &apos;ACTIVE_STATUS&apos;, value: &apos;true&apos;
+      expression {
+        skipRemainingStages
+      }
     }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/host-preparation.js&apos;
@@ -195,17 +198,23 @@ pipeline {
     expression {
      return false
     }
+    expression {
+      skipRemainingStages
+    }
    }
    steps {
     sh &apos;echo &quot;Stage/steps awaiting implementation... Skipping.&quot;&apos;
    }
   }
   stage(&apos;Start or restart the instance&apos;) {
-   <!-- if () -->
-   
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
    }
+   when {
+      expression {
+        skipRemainingStages
+      }
+    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/start-instance.js&apos;
     sh &apos;cat $BUILD_PATH/start-instance.sh&apos;
@@ -217,6 +226,11 @@ pipeline {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
    }
+   when {
+      expression {
+        skipRemainingStages
+      }
+    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/startup-monitoring.js&apos;
     sh &apos;cat $BUILD_PATH/startup-monitoring.sh&apos;
@@ -228,6 +242,11 @@ pipeline {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
    }
+   when {
+      expression {
+        skipRemainingStages
+      }
+    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/post-start.js&apos;
     sh &apos;cat $BUILD_PATH/post-start.sh&apos;
@@ -239,6 +258,11 @@ pipeline {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
    }
+   when {
+      expression {
+        skipRemainingStages
+      }
+    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/maintenance-off.js&apos;
     sh &apos;cat $BUILD_PATH/set-maintenance-off.sh&apos;

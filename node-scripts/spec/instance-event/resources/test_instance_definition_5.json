@@ -40,7 +40,7 @@
     "host": {
       "type": "ssh",
       "value": {
-        "ip": "172.20.0.1",
+        "ip": "172.18.0.1",
         "user": "zou",
         "port": "22"
       }
@@ -72,25 +72,6 @@
     "PROXY_PUBLIC_PORT_TLS": "443",
     "PROXY_TLS_CERTS_PATH": "/etc/ssl/hsc-cd.mekomsolutions.net",
     "PROXY_TLS": "-DenableTLS",
-    "OPENMRS_OWAS_PATH":
-      "/var/docker-volumes/bahmni/hsc-dev/artifacts/openmrs_core",
-    "OPENMRS_MODULES_PATH":
-      "/var/docker-volumes/bahmni/hsc-dev/artifacts/openmrs_modules",
-    "OPENMRS_CONFIG_PATH":
-      "/var/docker-volumes/bahmni/hsc-dev/artifacts/openmrs_config",
-    "BAHMNI_CONFIG_PATH":
-      "/var/docker-volumes/bahmni/hsc-dev/artifacts/bahmni_config",
-    "BAHMNI_APPS_PATH":
-      "/var/docker-volumes/bahmni/hsc-dev/artifacts/bahmni_emr/bahmniapps",
-    "BAHMNI_OBSCALCULATOR_PATH":
-      "/var/docker-volumes/bahmni/hsc-dev/artifacts/bahmni_config/openmrs/obscalculator/",
-    "ODOO_EXTRA_ADDONS":
-      "/var/docker-volumes/bahmni/hsc-dev/artifacts/odoo_addons",
-    "ODOO_CONFIG_PATH":
-      "/var/docker-volumes/bahmni/hsc-dev/artifacts/odoo_config",
-    "ODOO_PUBLIC_PORT": "8069",
-    "EIP_CONFIG_PATH":
-      "/var/docker-volumes/bahmni/hsc-dev/artifacts/eip_config",
     "DISTRO_PATH": "/var/docker-volumes/bahmni/hsc-dev/artifacts"
   },
   "scripts": [

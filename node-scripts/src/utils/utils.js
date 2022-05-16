@@ -252,5 +252,8 @@ module.exports = {
    */
   random: function() {
     return Math.random();
+  },
+  exit: function() {
+    return "\nexit\n";
   }
 };
