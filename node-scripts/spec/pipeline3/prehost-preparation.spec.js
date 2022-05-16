@@ -41,9 +41,8 @@ describe("Pre-host preparation scripts", function() {
     );
     var artifactsPath = config.getCDArtifactsDirPath(instanceUuid);
 
-    var expectedScript =
-      "set -xe\n" +
-      "rm -rf " +
+    var expectedScript = "set -xe\n" + "\n";
+    "rm -rf " +
       artifactsPath +
       "\n" +
       "sudo mkdir -p " +
@@ -51,6 +50,7 @@ describe("Pre-host preparation scripts", function() {
       "\n" +
       "sudo chown -R jenkins:jenkins " +
       artifactsPath +
+      "\n" +
       "\n" +
       scripts.fetchArtifact(
         {
@@ -64,6 +64,9 @@ describe("Pre-host preparation scripts", function() {
       );
 
     expect(script).toContain(expectedScript);
+    console.log("MY SCRIPT...!!!");
+    console.log(expectedScript);
+    console.log(script);
 
     // after
     tests.cleanup();
