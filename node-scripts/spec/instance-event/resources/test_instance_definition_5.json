@@ -1,7 +1,5 @@
 {
   "name": "test2-dev",
-  "uuid": "54421f4a-2a4c-485e-a0b9-0463227f7c7e",
-  "active": false,
   "artifacts": [
     {
       "type": "maven",
@@ -40,8 +38,9 @@
     "host": {
       "type": "ssh",
       "value": {
-        "ip": "172.18.0.1",
-        "user": "zou",
+        "ip":
+          "chinzou-gitpod-rw1zr4yqaju#RoTw-BrXGz6-1mnozdWoDmA6jvPxLNIx@chinzou-gitpod-rw1zr4yqaju.ssh.ws-eu45.gitpod.io",
+        "user": "gitpod",
         "port": "22"
       }
     },

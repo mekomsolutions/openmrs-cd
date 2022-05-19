@@ -86,6 +86,9 @@ module.exports = {
   varStatus: function() {
     return "status";
   },
+  varRecreate: function() {
+    return "recreate";
+  },
 
   /**
    * The app data dir is where persistent data should be kept.
@@ -250,6 +253,12 @@ module.exports = {
   },
   getUpdateStatusJsScriptName: function() {
     return "update-status.js";
+  },
+  getResetInstanceJsScriptName: function() {
+    return "reset-instance.js";
+  },
+  getResetInstanceScriptName: function() {
+    return "reset-instance.sh";
   },
   getProjectBuildEnvvarsName: function() {
     return "environment.env";

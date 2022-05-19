@@ -9,5 +9,5 @@ services:
     volumes:
      - ./node-scripts:/opt/node-scripts
      - ./jenkins/jenkins_home:/var/jenkins_home
-     - ~/.m2:/var/jenkins_home/.m2
+     - /workspace/m2-repository:/var/jenkins_home/.m2
      - ./data/app_data:/var/lib/openmrs_cd/app_data
