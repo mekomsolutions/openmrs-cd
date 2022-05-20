@@ -251,6 +251,12 @@ module.exports = {
   getUpdateStatusJsScriptName: function() {
     return "update-status.js";
   },
+  getResetInstanceJsScriptName: function() {
+    return "reset-instance.js";
+  },
+  getResetInstanceScriptName: function() {
+    return "reset-instance.sh";
+  },
   getProjectBuildEnvvarsName: function() {
     return "environment.env";
   },
@@ -360,7 +366,9 @@ module.exports = {
   getJobNameForPipeline3: function() {
     return "pipeline3";
   },
-
+  getVarRecreate: function() {
+    return "recreate";
+  },
   getInstanceVersions: function() {
     return ["1.0.0"];
   },

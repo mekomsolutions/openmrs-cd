@@ -366,5 +366,7 @@ module.exports = {
       )
     );
   },
-  stop: function(instanceDef) {}
+  stop: function(instanceDef) {
+    return "";
+  }
 };
