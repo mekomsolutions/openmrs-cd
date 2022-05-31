@@ -8,7 +8,6 @@
 const fs = require("fs");
 const path = require("path");
 const _ = require("lodash");
-const log = require("npmlog");
 
 const utils = require("../utils/utils");
 const model = require("../utils/model");

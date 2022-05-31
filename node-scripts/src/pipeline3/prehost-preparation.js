@@ -65,7 +65,7 @@ if (instanceDef.active == false) {
       )
     )
   );
-  script.body.push(utils.exit());
+  script.body.push(scripts.exit());
 }
 
 // Deployment
