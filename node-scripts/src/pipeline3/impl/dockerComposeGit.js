@@ -383,6 +383,15 @@ module.exports = {
       script += "sudo ";
     }
     script += "docker-compose -p " + instanceDef.name;
+    script +=
+      " --env-file=" +
+      path
+        .resolve(
+          instanceDef.deployment.hostDir,
+          instanceDef.name,
+          instanceDef.name + ".env"
+        )
+        .toString();
     script += down ? " down" : " stop";
     return script + "\n";
   }

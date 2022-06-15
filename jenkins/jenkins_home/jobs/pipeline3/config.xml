@@ -73,9 +73,8 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 def jenkinsCredentials = &quot;&quot;
 
 node {
- def skipRemainingStages = true
  def buildName = &quot;${instanceUuid}&quot;
- def cause = &quot;&quot;
+ def cause = &quot;mekom&quot;
  def sep = &quot; + &quot;
  if (artifactsChanges == &quot;true&quot;) { cause += &quot;artifacts&quot; + sep }
  if (dataChanges == &quot;true&quot;) { cause += &quot;data&quot; + sep }
@@ -148,13 +147,20 @@ pipeline {
   stage(&apos;Instance status&apos;) {
     steps{
       script {
+      env.SKIP_REMAINING_STEPS = false
       sh &apos;node /opt/node-scripts/src/$JOB_NAME/fetch-instance-def.js&apos;
       def instanceDefJSON = sh (
       script: &apos;$BUILD_PATH/fetch-instance-def.sh&apos;,
       returnStdout: true
       )
-     def instanceDef = new JsonSlurperClassic().parseText(instanceDefJSON)
-     skipRemainingStages = instanceDef.active
+      def instanceDef = new JsonSlurperClassic().parseText(instanceDefJSON)
+      if (instanceDef.active != null) {
+        if (instanceDef.active == "true") {
+          env.SKIP_REMAINING_STEPS = false
+        } else {
+          env.SKIP_REMAINING_STEPS = true
+        }
+      }
       if (!instanceDef.active) {
       currentBuild.build().getExecutor().interrupt(Result.SUCCESS)
       currentBuild.result = &apos;SUCCESS&apos;
@@ -169,7 +175,7 @@ pipeline {
    }
    when {
       expression {
-        skipRemainingStages
+        env.SKIP_REMAINING_STEPS.toBoolean() == false
       }
     }
    steps {
@@ -199,7 +205,7 @@ pipeline {
      return false
     }
     expression {
-      skipRemainingStages
+      env.SKIP_REMAINING_STEPS.toBoolean() == false
     }
    }
    steps {
@@ -212,7 +218,7 @@ pipeline {
    }
    when {
       expression {
-        skipRemainingStages
+        env.SKIP_REMAINING_STEPS.toBoolean() == false
       }
     }
    steps {
@@ -228,7 +234,7 @@ pipeline {
    }
    when {
       expression {
-        skipRemainingStages
+        env.SKIP_REMAINING_STEPS.toBoolean() == false
       }
     }
    steps {
@@ -244,7 +250,7 @@ pipeline {
    }
    when {
       expression {
-        skipRemainingStages
+        env.SKIP_REMAINING_STEPS.toBoolean() == false
       }
     }
    steps {
@@ -260,7 +266,7 @@ pipeline {
    }
    when {
       expression {
-        skipRemainingStages
+        env.SKIP_REMAINING_STEPS.toBoolean() == false
       }
     }
    steps {

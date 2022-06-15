@@ -11,6 +11,7 @@
 const fs = require("fs");
 const path = require("path");
 const _ = require("lodash");
+const log = require("npmlog");
 
 const utils = require("../utils/utils");
 const model = require("../utils/model");
@@ -54,48 +55,48 @@ var hostDir = (hostDir = path.resolve(
 ));
 
 // Status
-if (instanceDef.active == false) {
+log.info("Instance active: " + instanceDef.active);
+if (instanceDef.active == false || instanceDef.active == "false") {
   script.body.push(
     scripts.remote(
       ssh,
       container.stop(
         instanceDef,
         false,
-        instanceDef.type == cst.INSTANCETYPE_PROD ? true : false
+        instanceDef.type == cst.INSTANCETYPE_PROD ? false : true
       )
     )
   );
-  script.body.push(scripts.exit());
-}
-
-// Deployment
-const containerScripts = require("./impl/" + instanceDef.deployment.type);
-script.body.push(
-  containerScripts.preHostPreparation.getDeploymentScript(instanceDef)
-);
-// 'artifacts'
-
-if (process.env[config.varArtifactsChanges()] === "true") {
-  var artifactsDirPath = config.getCDArtifactsDirPath(instanceDef.uuid);
+} else {
+  // Deployment
+  const containerScripts = require("./impl/" + instanceDef.deployment.type);
   script.body.push(
-    scripts.initFolder(artifactsDirPath, "jenkins", "jenkins", true)
+    containerScripts.preHostPreparation.getDeploymentScript(instanceDef)
   );
+  // 'artifacts'
 
-  instanceDef.artifacts.forEach(function(artifact) {
+  if (process.env[config.varArtifactsChanges()] === "true") {
+    var artifactsDirPath = config.getCDArtifactsDirPath(instanceDef.uuid);
     script.body.push(
-      scripts.fetchArtifact(artifact.value, artifact.type, artifactsDirPath)
+      scripts.initFolder(artifactsDirPath, "jenkins", "jenkins", true)
     );
-  });
+
+    instanceDef.artifacts.forEach(function(artifact) {
+      script.body.push(
+        scripts.fetchArtifact(artifact.value, artifact.type, artifactsDirPath)
+      );
+    });
+  }
+
+  // 'data'
+
+  script.body.push(
+    scripts.remote(
+      instanceDef.deployment.host.value,
+      containerScripts.preHostPreparation.getDataScript(instanceDef)
+    )
+  );
 }
-
-// 'data'
-
-script.body.push(
-  scripts.remote(
-    instanceDef.deployment.host.value,
-    containerScripts.preHostPreparation.getDataScript(instanceDef)
-  )
-);
 
 script.body = script.body.join(cst.SCRIPT_SEPARATOR);
 
