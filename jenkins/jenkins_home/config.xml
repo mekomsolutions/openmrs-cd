@@ -87,7 +87,7 @@
         <string>instance-event</string>
         <string>instance-events-cron</string>
         <string>pipeline3</string>
-        <string>reset-instance</string>
+        <string>destroy-instance</string>
       </jobNames>
       <jobFilters/>
       <columns>

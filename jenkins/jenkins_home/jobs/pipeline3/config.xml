@@ -74,8 +74,9 @@ def jenkinsCredentials = &quot;&quot;
 
 node {
  def buildName = &quot;${instanceUuid}&quot;
- def cause = &quot;mekom&quot;
+ def cause = &quot;&quot;
  def sep = &quot; + &quot;
+ if (instanceActive == &quot;false&quot;) { cause += &quot;inactive&quot; + sep }
  if (artifactsChanges == &quot;true&quot;) { cause += &quot;artifacts&quot; + sep }
  if (dataChanges == &quot;true&quot;) { cause += &quot;data&quot; + sep }
  if (deploymentChanges == &quot;true&quot;) { cause += &quot;deployment&quot; + sep }

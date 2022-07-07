@@ -46,7 +46,7 @@ describe("Reset instance scripts", function() {
 
     // replay
     proxyquire(
-      path.resolve("src/reset-instance/remove-instance-from-db.js"),
+      path.resolve("src/destroy-instance/remove-instance-from-db.js"),
       tests.stubs()
     );
 

@@ -46,13 +46,13 @@ describe("Reset instance scripts", function() {
 
     // replay
     proxyquire(
-      path.resolve("src/reset-instance/reset-instance.js"),
+      path.resolve("src/destroy-instance/destroy-instance.js"),
       tests.stubs()
     );
 
     // verif
     var script = fs.readFileSync(
-      path.resolve(config.getBuildDirPath(), "reset-instance.sh"),
+      path.resolve(config.getBuildDirPath(), "destroy-instance.sh"),
       "utf8"
     );
     expect(script).toContain(dockerContainer.stop(instanceDef, true, true));

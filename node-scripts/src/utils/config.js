@@ -252,10 +252,10 @@ module.exports = {
     return "update-status.js";
   },
   getResetInstanceJsScriptName: function() {
-    return "reset-instance.js";
+    return "destroy-instance.js";
   },
   getResetInstanceScriptName: function() {
-    return "reset-instance.sh";
+    return "destroy-instance.sh";
   },
   getProjectBuildEnvvarsName: function() {
     return "environment.env";
