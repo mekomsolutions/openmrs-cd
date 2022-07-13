@@ -1,6 +1,6 @@
 "use strict";
 
-describe("Reset instance scripts", function() {
+describe("Destroy instance scripts", function() {
   // deps
   const fs = require("fs");
   const path = require("path");
