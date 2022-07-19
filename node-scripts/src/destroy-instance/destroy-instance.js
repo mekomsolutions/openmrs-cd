@@ -53,7 +53,7 @@ script.body = [];
 script.body.push("set -xe\n");
 
 script.body.push(
-  scripts.remote(ssh, deploymentScripts.stop(instanceDef, true, true))
+  scripts.remote(ssh, deploymentScripts.stop(instanceDef, true))
 );
 
 script.body.push(

@@ -297,7 +297,17 @@ module.exports = {
     if (sudo) {
       script += "sudo ";
     }
-    script += "docker-compose -p " + instanceDef.name + " down -v";
+    script += "docker-compose -p " + instanceDef.name;
+    script +=
+      " --env-file=" +
+      path
+        .resolve(
+          instanceDef.deployment.hostDir,
+          instanceDef.name,
+          instanceDef.name + ".env"
+        )
+        .toString();
+    script += " down -v";
     return script + "\n";
   },
 
