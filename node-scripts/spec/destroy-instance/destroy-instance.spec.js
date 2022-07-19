@@ -36,7 +36,7 @@ describe("Destroy instance scripts", function() {
     tests.cleanup();
   });
 
-  it("should generate bash script to reset instance.", function() {
+  it("should generate bash script to destroy instance.", function() {
     process.env[config.varInstanceUuid()] = instanceUuid;
     process.env[config.varArtifactsChanges()] = "true";
     var instanceDef = db.getInstanceDefinition(instanceUuid);
