@@ -307,7 +307,9 @@ module.exports = {
           instanceDef.name + ".env"
         )
         .toString();
-    script += " down -v";
+    var rmVolumes =
+      instanceDef.type.toString() != cst.INSTANCETYPE_PROD ? " -v" : "";
+    script += " down" + rmVolumes;
     return script + "\n";
   },
 
@@ -378,7 +380,7 @@ module.exports = {
     });
     return script;
   },
-  stop: function(instanceDef, sudo, down = false) {
+  stop: function(instanceDef, sudo) {
     let script = "";
     let path = require("path");
     let distPath = path
@@ -402,7 +404,7 @@ module.exports = {
           instanceDef.name + ".env"
         )
         .toString();
-    script += down ? " down" : " stop";
+    script += " stop";
     return script + "\n";
   }
 };

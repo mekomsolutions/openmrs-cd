@@ -28,7 +28,7 @@ describe("Destroy instance scripts", function() {
     process.env[config.varPropertiesChanges()] = "false";
     process.env[config.varCreation()] = "false";
 
-    instanceUuid = "cacb5448-46b0-4808-980d-5521775671c0";
+    instanceUuid = "557d0edb-2029-4da5-b1a1-5c9dae983327";
     testRandomString = "0.7p3z2u8fbvi76n32bg";
   });
 
@@ -55,7 +55,7 @@ describe("Destroy instance scripts", function() {
       path.resolve(config.getBuildDirPath(), "destroy-instance.sh"),
       "utf8"
     );
-    expect(script).toContain(dockerContainer.stop(instanceDef, true, true));
+    expect(script).toContain(dockerContainer.stop(instanceDef, true));
     expect(script).toContain(dockerContainer.remove(instanceDef, true));
   });
 });

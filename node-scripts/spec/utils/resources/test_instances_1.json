@@ -325,5 +325,51 @@
         }
       }
     }
+  },
+  {
+    "name": "hsc-prod-1",
+    "type": "prod",
+    "artifacts": [
+      {
+        "type": "maven",
+        "value": {
+          "groupId": "org.crudem",
+          "artifactId": "bahmni-distro-hsc",
+          "version": "1.1.0-SNAPSHOT",
+          "packaging": "zip"
+        }
+      }
+    ],
+    "deployment": {
+      "hostDir": "/var/volumes/bahmni",
+      "type": "dockerCompose",
+      "value": {
+        "networks": ["network1"],
+        "commitId": "master",
+        "gitUrl": "https://github.com/mekomsolutions/bahmni-docker.git",
+        "mavenUrl": "https://nexus.mekomsolutions.net/repository/maven-public",
+        "mavenProject": {
+          "version": "1.0.0-SNAPSHOT",
+          "artifactId:": "bahmni-docker-compose",
+          "groupId:": "net.mekomsolutions",
+          "packaging:": "zip"
+        },
+        "services": ["proxy", "openmrs", "bahmniapps", "bahmni-config", "mysql"]
+      },
+      "host": {
+        "type": "ssh",
+        "value": {
+          "ip": "172.17.0.1",
+          "user": "centos",
+          "port": "22"
+        }
+      },
+      "links": [],
+      "timezone": "America/Port-au-Prince"
+    },
+    "description": "Prod test server for agile development for HSC",
+    "group": "hsc",
+    "version": "1.0.0",
+    "uuid": "557d0edb-2029-4da5-b1a1-5c9dae983327"
   }
 ]
