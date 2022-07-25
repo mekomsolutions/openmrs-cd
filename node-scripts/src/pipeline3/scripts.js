@@ -689,5 +689,8 @@ module.exports = {
     }
 
     return script;
+  },
+  exit: function() {
+    return "exit";
   }
 };

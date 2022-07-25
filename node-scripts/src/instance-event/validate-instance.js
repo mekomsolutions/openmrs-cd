@@ -39,24 +39,27 @@ log.info("", "Instance Event being processed:\n" + instanceEvent);
 validator.validateInstanceDefinition(instanceEvent, isNewInstance);
 
 var downstreamJobParams = {};
-if (!isNewInstance && _.isEqual(existingInstance.type, cst.INSTANCETYPE_PROD)) {
-  //
-  // A 'prod' type existing instance should not trigger any downstream job (https://mekomsolutions.atlassian.net/browse/INFRA-201)
-  //
-  log.warn(
-    "",
-    "Existing instance '" +
-      instanceEvent.name +
-      "' is of type 'prod' or is set to 'active:false'. No modification will be applied. Aborting.\n"
-  );
-  // Setting downstream job to empty
-  downstreamJobParams[config.varDownstreamJob()] = "";
+
+if (instanceEvent.active == "false") {
+  db.saveInstanceDefinition({
+    uuid: existingInstance.uuid,
+    name: existingInstance.name,
+    active: "false"
+  });
+  downstreamJobParams[
+    config.varDownstreamJob()
+  ] = config.getJobNameForPipeline3();
+  downstreamJobParams[config.varInstanceUuid()] = instanceEvent.uuid;
+  var displayName = instanceEvent.name ? instanceEvent.name : "no-name-set";
+  downstreamJobParams[config.varInstanceName()] = displayName;
+  downstreamJobParams[config.varArtifactsChanges()] = JSON.stringify(false);
+  downstreamJobParams[config.varDeploymentChanges()] = JSON.stringify(false);
+  downstreamJobParams[config.varDataChanges()] = JSON.stringify(false);
+  downstreamJobParams[config.varPropertiesChanges()] = JSON.stringify(false);
+  downstreamJobParams[config.varCreation()] = JSON.stringify(false);
 } else if (
-  //
-  // Handle 'active' flag
-  //
-  instanceEvent.active == "false" ||
-  (_.isEmpty(instanceEvent.active) && existingInstance.active == "false")
+  _.isEmpty(instanceEvent.active) &&
+  existingInstance.active == "false"
 ) {
   db.saveInstanceDefinition({
     uuid: existingInstance.uuid,
@@ -72,36 +75,38 @@ if (!isNewInstance && _.isEqual(existingInstance.type, cst.INSTANCETYPE_PROD)) {
   // Setting downstream job to empty
   downstreamJobParams[config.varDownstreamJob()] = "";
 } else {
-  // Adding/merging the instance definition event (in)to the list of managed instances
   db.saveInstanceDefinition(instanceEvent);
 
   // Setting downstream job to Pipeline3
   downstreamJobParams[
     config.varDownstreamJob()
   ] = config.getJobNameForPipeline3();
-}
 
-downstreamJobParams[config.varInstanceUuid()] = instanceEvent.uuid;
-var displayName = instanceEvent.name ? instanceEvent.name : "no-name-set";
-downstreamJobParams[config.varInstanceName()] = displayName;
-downstreamJobParams[config.varArtifactsChanges()] = JSON.stringify(
-  !_.isEmpty(instanceEvent.artifacts)
-);
-downstreamJobParams[config.varDeploymentChanges()] = JSON.stringify(
-  !_.isEmpty(instanceEvent.deployment)
-);
-downstreamJobParams[config.varDataChanges()] = JSON.stringify(
-  !_.isEmpty(instanceEvent.data)
-);
-downstreamJobParams[config.varPropertiesChanges()] = JSON.stringify(
-  !_.isEmpty(instanceEvent.properties)
-);
-downstreamJobParams[config.varCreation()] = JSON.stringify(isNewInstance);
+  downstreamJobParams[config.varInstanceUuid()] = instanceEvent.uuid;
+  var displayName = instanceEvent.name ? instanceEvent.name : "no-name-set";
+  downstreamJobParams[config.varInstanceName()] = displayName;
+  downstreamJobParams[config.varArtifactsChanges()] = JSON.stringify(
+    !_.isEmpty(instanceEvent.artifacts)
+  );
+  downstreamJobParams[config.varDeploymentChanges()] = JSON.stringify(
+    !_.isEmpty(instanceEvent.deployment)
+  );
+  downstreamJobParams[config.varDataChanges()] = JSON.stringify(
+    !_.isEmpty(instanceEvent.data)
+  );
+  downstreamJobParams[config.varPropertiesChanges()] = JSON.stringify(
+    !_.isEmpty(instanceEvent.properties)
+  );
+  downstreamJobParams[config.varCreation()] = JSON.stringify(isNewInstance);
+}
 
 // Set the build name
 var buildName = [];
 buildName[config.varBuildName()] =
   existingInstance.name + " - " + existingInstance.uuid;
+downstreamJobParams["instanceActive"] = JSON.stringify(
+  _.isEmpty(instanceEvent.active) ? true : instanceEvent.active
+);
 
 //
 // Export the downstream job parameters as a 'environment' properties file

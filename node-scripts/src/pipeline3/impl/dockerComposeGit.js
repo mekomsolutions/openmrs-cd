@@ -297,7 +297,19 @@ module.exports = {
     if (sudo) {
       script += "sudo ";
     }
-    script += "docker-compose -p " + instanceDef.name + " down -v";
+    script += "docker-compose -p " + instanceDef.name;
+    script +=
+      " --env-file=" +
+      path
+        .resolve(
+          instanceDef.deployment.hostDir,
+          instanceDef.name,
+          instanceDef.name + ".env"
+        )
+        .toString();
+    var rmVolumes =
+      instanceDef.type.toString() != cst.INSTANCETYPE_PROD ? " -v" : "";
+    script += " down" + rmVolumes;
     return script + "\n";
   },
 
@@ -367,5 +379,32 @@ module.exports = {
       script += " " + service.toString();
     });
     return script;
+  },
+  stop: function(instanceDef, sudo) {
+    let script = "";
+    let path = require("path");
+    let distPath = path
+      .resolve(
+        instanceDef.deployment.hostDir,
+        instanceDef.name,
+        "bahmni_docker"
+      )
+      .toString();
+    script += "cd " + distPath + " && ";
+    if (sudo) {
+      script += "sudo ";
+    }
+    script += "docker-compose -p " + instanceDef.name;
+    script +=
+      " --env-file=" +
+      path
+        .resolve(
+          instanceDef.deployment.hostDir,
+          instanceDef.name,
+          instanceDef.name + ".env"
+        )
+        .toString();
+    script += " stop";
+    return script + "\n";
   }
 };

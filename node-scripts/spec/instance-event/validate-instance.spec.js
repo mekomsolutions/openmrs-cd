@@ -190,44 +190,7 @@ describe("validate-instance", function() {
     // after
     tests.cleanup();
   });
-  it("should abort when processing a 'prod' type existing instance.", function() {
-    process.env[config.varInstanceEvent()] = fs.readFileSync(
-      path.resolve(
-        "spec/instance-event/resources/test_instance_definition_3.json"
-      ),
-      "utf8"
-    );
 
-    // pre-verif
-    var instanceEvent = JSON.parse(process.env[config.varInstanceEvent()]);
-    var beforeInstance = db.getInstanceDefinition(instanceEvent.uuid);
-    expect(beforeInstance).not.toEqual({});
-
-    // replay
-    proxyquire(fileInTest, stubs);
-
-    // verif that the instances list is **not** updated
-    var updatedInstance = db.getInstanceDefinition(instanceEvent.uuid);
-    expect(updatedInstance.artifacts).not.toEqual(instanceEvent.artifacts);
-
-    // verif that the 'trigger' properties file is correctly generated
-    var environment = {};
-    // Downstream job should be empty
-    environment[config.varDownstreamJob()] = "";
-
-    expect(
-      fs.readFileSync(
-        path.resolve(
-          config.getBuildDirPath(),
-          config.getProjectBuildEnvvarsName()
-        ),
-        "utf8"
-      )
-    ).toContain(utils.convertToProperties(environment));
-
-    // after
-    tests.cleanup();
-  });
   it("should abort when instance is inactive.", function() {
     process.env[config.varInstanceEvent()] = fs.readFileSync(
       path.resolve(
@@ -253,7 +216,7 @@ describe("validate-instance", function() {
     expect(updatedInstance.active).toEqual("false");
 
     // and that the instance def is not updated
-    expect(updatedInstance.active).not.toEqual("a_new_deployment_section");
+    expect(updatedInstance.deployment).not.toEqual("a_new_deployment_section");
 
     // do it again now that the instance def is saved as inactive
     // and the instance event does not contain 'active: false' anymore

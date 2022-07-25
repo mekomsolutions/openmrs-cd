@@ -63,6 +63,18 @@ module.exports = {
           "'"
       );
     }
+    if (isNew && _.isEqual(instanceDef.active, false)) {
+      throw new Error("A new Instance definition cannot be set to inactive");
+    }
+    if (
+      !isNew &&
+      _.isEqual(instanceDef.type, cst.INSTANCETYPE_PROD) &&
+      instanceDef.active
+    ) {
+      throw new Error(
+        "The instance type is '" + instanceDef.type + "' cannot be edited."
+      );
+    }
   },
 
   validateDeploymentConfig: function(deployment, isNew) {
