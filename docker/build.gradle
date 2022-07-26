@@ -1,13 +1,15 @@
 buildscript {
   repositories {
-    jcenter()
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
   }
   dependencies {
-    classpath 'com.bmuschko:gradle-docker-plugin:3.2.0'
+    classpath "com.bmuschko:gradle-docker-plugin:7.4.0"
   }
 }
 
-apply plugin: 'com.bmuschko.docker-remote-api'
+apply plugin: "com.bmuschko.docker-remote-api"
 
 // import task classes
 import com.bmuschko.gradle.docker.tasks.image.*
@@ -23,27 +25,19 @@ def getShortCommit() {
 
 task buildDockerImage(type: DockerBuildImage) {
   inputDir = file('.')
-  tags = [dockerHubRepo + ':' + version, dockerHubRepo + ':' + 'latest', dockerHubRepo + ':' + getShortCommit()]
+  images = [dockerHubRepo + ':' + version, dockerHubRepo + ':' + 'latest', dockerHubRepo + ':' + getShortCommit()]
 }
 
 task build() {
   dependsOn buildDockerImage
 }
 
-// one push per tag:
+//one push per tag:
 
-task pushDockerImageForVersion(type: DockerPushImage) {
-  imageName = dockerHubRepo + ':' + version
-}
-
-task pushDockerImageForLatest(type: DockerPushImage) {
-  imageName = dockerHubRepo + ':' + 'latest'
-}
-
-task pushDockerImageForCommitId(type: DockerPushImage) {
-  imageName = dockerHubRepo + ':' + getShortCommit()
+task pushDockerImages(type: DockerPushImage) {
+  images = [dockerHubRepo + ':' + version, dockerHubRepo + ':' + 'latest', dockerHubRepo + ':' + getShortCommit()]
 }
 
 task deploy() {
-  dependsOn buildDockerImage, pushDockerImageForVersion, pushDockerImageForLatest, pushDockerImageForCommitId
+  dependsOn buildDockerImage, pushDockerImages
 }

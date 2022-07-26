@@ -17,12 +17,12 @@
       </properties>
     </jenkins.plugins.nodejs.tools.NodeJSInstallation>
     <jenkins.plugins.nodejs.tools.NodeJSInstallation>
-      <name>NodeJS 10.11.0</name>
+      <name>NodeJS 14.20.0</name>
       <properties>
         <hudson.tools.InstallSourceProperty>
           <installers>
             <jenkins.plugins.nodejs.tools.NodeJSInstaller>
-              <id>10.11.0</id>
+              <id>14.20.0</id>
               <npmPackages>yarn</npmPackages>
               <npmPackagesRefreshHours>72</npmPackagesRefreshHours>
               <force32Bit>false</force32Bit>

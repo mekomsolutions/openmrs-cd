@@ -1,8 +1,8 @@
 <?xml version='1.1' encoding='UTF-8'?>
-<flow-definition plugin="workflow-job@2.33">
+<flow-definition plugin="workflow-job@1207.ve6191ff089f8">
   <actions>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.3.9"/>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.3.9">
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2114.v2654ca_721309"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2114.v2654ca_721309">
       <jobProperties/>
       <triggers/>
       <parameters/>
@@ -16,6 +16,7 @@ It takes as an input a bunch of &apos;commit metadata&apos;, i.e. all the inform
   <displayName>Project Build</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.7.1"/>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -23,7 +24,6 @@ It takes as an input a bunch of &apos;commit metadata&apos;, i.e. all the inform
           <description>The type of the code project
 
 Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmnicore&apos;, &apos;bahmniconfig&apos;, &apos;openmrsconfig&apos;, &apos;openmrscore&apos;, &apos;distribution&apos;, &apos;initializer&apos;, &apos;maven&apos;, &apos;default&apos;</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -31,13 +31,11 @@ Supported values: &apos;openmrsmodule&apos;, &apos;bahmniapps&apos;, &apos;bahmn
           <description>The code project&apos;s repository URL
 
 Eg. &quot;https://github.com/openmrs/openmrs-core&quot;</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>branchName</name>
           <description>The branch that should be built.</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -45,7 +43,6 @@ Eg. &quot;https://github.com/openmrs/openmrs-core&quot;</description>
           <description>The commit that should be built.
 
 Certain projects require to pinpoint to an exact commit rather than using the tip of a branch.</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -53,7 +50,6 @@ Certain projects require to pinpoint to an exact commit rather than using the ti
           <description>The project&apos;s repository name
 
 Eg. &quot;openmrs-core&quot;</description>
-          <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
@@ -64,7 +60,7 @@ Eg. &quot;openmrs-core&quot;</description>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.72">
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2759.v87459c4eea_ca_">
     <script>// Name the build out of the parameters
 node {
   currentBuild.displayName = &quot;${repoUrl}&quot;.substring(&quot;${repoUrl}&quot;.lastIndexOf(&quot;/&quot;) + 1) + &quot; - &quot; + &quot;${branchName}&quot;
@@ -77,7 +73,7 @@ pipeline {
   }
   tools {
     maven &apos;Maven 3.5.0&apos;
-    nodejs &apos;NodeJS 10.11.0&apos;
+    nodejs &apos;NodeJS 14.20.0&apos;
   }
   stages {
     stage (&apos;Clean the workspace&apos;) {

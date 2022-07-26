@@ -1,5 +1,5 @@
 <?xml version='1.1' encoding='UTF-8'?>
-<io.jenkins.plugins.logintheme.LoginTheme plugin="login-theme@1.0">
+<io.jenkins.plugins.logintheme.LoginTheme plugin="login-theme@1.1">
   <head>&lt;style&gt;
 html {
   font: Helvetica;
@@ -31,14 +31,6 @@ div .simple-page {
   color: #3f3f40 !important;
   border: solid 1px #ee9b00; /*var(--main-bg-color-focus);*/
   background-color: #ee9b00 !important;
-}
-
-.simple-page #loginIntroDefault h1 {
-  display:none;
-}
-
-.simple-page .login {
-  width: 100%;
 }
 
 .Checkbox input[type=&quot;checkbox&quot;]:checked + .Checkbox-indicator {

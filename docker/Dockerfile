@@ -1,4 +1,5 @@
-FROM jenkins/jenkins:2.249.3
+ARG VERSION=2.346.2
+FROM jenkins/jenkins:$VERSION
 MAINTAINER Mekom Solutions <support@mekomsolutions.com>
 
 USER root
@@ -12,10 +13,10 @@ RUN apt -y install nano jq openssh-server rsync libxml2-utils
 
 # These packages are needed for Jenkins to build some projects.
 # This is because the Jenkins server is used as its own agent. Build tasks are running directly on it.
-RUN apt -y install ruby-full ruby-compass xvfb firefox-esr sudo libaio1
+RUN apt -y install ruby-full ruby-dev xvfb firefox-esr sudo libaio1
 
 # Installing Node.js
-RUN curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
+RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 RUN sudo apt install -y nodejs
 
 # Jenkins needs to be a sudo to execute some build tasks (particularly Bahmni Apps)
@@ -29,7 +30,7 @@ USER jenkins
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dpermissive-script-security.enabled=true"
 
 COPY ./config/plugins.txt /usr/share/jenkins/plugins.txt
-RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/plugins.txt
+RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/plugins.txt
 
 COPY ./resources/artifact_repo.js /usr/share/jenkins/artifact_repo.js
 COPY ./config/artifact_repo_default.json /usr/share/jenkins/artifact_repo_default.json
