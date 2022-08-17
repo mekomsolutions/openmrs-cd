@@ -13,7 +13,7 @@ RUN apt -y install nano jq openssh-server rsync libxml2-utils
 
 # These packages are needed for Jenkins to build some projects.
 # This is because the Jenkins server is used as its own agent. Build tasks are running directly on it.
-RUN apt -y install ruby-full ruby-dev xvfb firefox-esr sudo libaio1
+RUN apt -y install ruby-full ruby-dev ruby-ffi xvfb firefox-esr sudo libaio1
 
 # Installing Node.js
 RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
