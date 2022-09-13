@@ -55,7 +55,7 @@ describe("Destroy instance scripts", function() {
       path.resolve(config.getBuildDirPath(), "destroy-instance.sh"),
       "utf8"
     );
-    expect(script).toContain(dockerContainer.stop(instanceDef, true));
-    expect(script).toContain(dockerContainer.remove(instanceDef, true));
+    expect(script).toContain(dockerContainer.stop(instanceDef));
+    expect(script).toContain(dockerContainer.remove(instanceDef));
   });
 });
