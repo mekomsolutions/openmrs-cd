@@ -756,6 +756,48 @@ describe("Tests suite for pipeline1", function() {
     );
   });
 
+  it("should run support single-dependency pom.xml for 'distribution' type", function() {
+    const projectType = "distribution";
+    // Mock commons.js
+    const proxyquire = require("proxyquire");
+    var mockCommons = require(path.resolve(
+      "src/" + config.getJobNameForPipeline1() + "/commons.js"
+    ));
+    mockCommons.mavenPostBuildActions = function(a, b, c) {
+      return true;
+    };
+    proxyquire(
+      path.resolve("src/" + config.getJobNameForPipeline1() + "/commons.js"),
+      {
+        mockCommons
+      }
+    );
+
+    // Load a single-dependency pom
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom-with-single-dependency.xml"
+    );
+
+    // replay
+    var projectBuild = require(folderInTest +
+      "/impl/" +
+      projectType).getInstance();
+    var artifact = projectBuild.getArtifact({
+      pom: pom
+    });
+
+    var postBuildActions = projectBuild.postBuildActions({
+      pom: pom
+    });
+
+    // Verify.
+    // No verify, just making sure it did not fail.
+  });
+
   it("should getArtifact, getBuildScript and getDeployScript for 'odooaddon'.", function() {
     // setup
     const projectType = "odooaddon";

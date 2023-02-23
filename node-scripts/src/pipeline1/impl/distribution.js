@@ -65,6 +65,11 @@ var postBuildActions = function(pom) {
     );
   }
 
+  // If the pom file has only one dependency, the XML parser will not return an array. Fix that.
+  if (!Array.isArray(pom.dependencies.dependency)) {
+    var dependencyAsArray = [pom.dependencies.dependency];
+    pom.dependencies.dependency = dependencyAsArray;
+  }
   pom.dependencies.dependency.forEach(function(dep) {
     var propKey = dep.version.substring(2).slice(0, -1); // "${foo.version}" -> "foo.version"
 
