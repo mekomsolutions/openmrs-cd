@@ -413,18 +413,18 @@ describe("Scripts", function() {
     );
   });
 
-  it("should generate script to set or replace environment variables", function() {
+  it("should generate script to set or replace environment variables, and escape unsupported chars", function() {
     var envVar = "KEY";
-    var value = "env.value";
+    var value = "a/path/on/the/disk";
     var filename = ".env";
 
     expect(scripts.writeProperty(envVar, value, filename)).toEqual(
       'if ! grep -R "^[#]*s*KEY.*" .env > /dev/null; then\n' +
         "\techo \"'KEY' is not found in file '.env'. Appending...\"\n" +
-        '\techo "KEY=env.value" >> .env\n' +
+        '\techo "KEY=a/path/on/the/disk" >> .env\n' +
         "else\n" +
         "\techo \"'KEY' is found in file '.env'. Updating...\"\n" +
-        '\tsed -i "s/^[#]*\\s*KEY\\b.*/KEY=env.value/" .env\n' +
+        '\tsed -i "s/^[#]*\\s*KEY\\b.*/KEY=a\\/path\\/on\\/the\\/disk/" .env\n' +
         "fi\n"
     );
   });

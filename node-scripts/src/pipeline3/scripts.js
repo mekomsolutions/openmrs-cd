@@ -631,15 +631,16 @@ module.exports = {
    */
   writeProperty(propertyName, value, filename) {
     var script = "";
-    "string".replace(/\//g, "ForwardSlash");
-    value = value.replace(/\//g, "\\/");
 
     script += `if ! grep -R "^[#]*\s*${propertyName}.*" ${filename} > /dev/null; then\n`;
     script += `\techo "'${propertyName}' is not found in file '${filename}'. Appending..."\n`;
     script += `\techo "${propertyName}=${value}" >> ${filename}\n`;
     script += "else\n";
     script += `\techo "'${propertyName}' is found in file '${filename}'. Updating..."\n`;
-    script += `\tsed -i "s/^[#]*\\s*${propertyName}\\b.*/${propertyName}=${value}/" ${filename}\n`;
+
+    // 'sed' will need an escaped string at runtime. Escaping.
+    var valueEscaped = value.replace(/\//g, "\\/");
+    script += `\tsed -i "s/^[#]*\\s*${propertyName}\\b.*/${propertyName}=${valueEscaped}/" ${filename}\n`;
     script += "fi\n";
     return script;
   },
