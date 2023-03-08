@@ -156,7 +156,7 @@ module.exports = {
     if (group == null) group = user;
     var script = "";
 
-    script += wipe == true ? "rm -rf " + folderPath + "\n" : "";
+    script += wipe == true ? "sudo rm -rf " + folderPath + "\n" : "";
     script += "sudo mkdir -p " + folderPath;
     script += "\n";
     script += "sudo chown -R " + user + ":" + group + " " + folderPath + "\n";
