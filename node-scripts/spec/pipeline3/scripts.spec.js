@@ -401,13 +401,13 @@ describe("Scripts", function() {
     );
 
     expect(scripts.initFolder(folderPath, user, null, true)).toEqual(
-      "rm -rf test_folder\n" +
+      "sudo rm -rf test_folder\n" +
         "sudo mkdir -p test_folder\n" +
         "sudo chown -R user:user test_folder\n"
     );
 
     expect(scripts.initFolder(folderPath, user, group, true)).toEqual(
-      "rm -rf test_folder\n" +
+      "sudo rm -rf test_folder\n" +
         "sudo mkdir -p test_folder\n" +
         "sudo chown -R user:group test_folder\n"
     );
