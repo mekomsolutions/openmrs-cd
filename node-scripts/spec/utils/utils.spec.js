@@ -7,6 +7,7 @@ describe("Utils", function() {
 
   const utils = require(folderInTest + "utils");
   const model = require(folderInTest + "model");
+  const config = require(folderInTest + "config");
 
   it("should extract POM-like information out of an artifact key.", function() {
     // replay
@@ -216,5 +217,83 @@ describe("Utils", function() {
     expect(function() {
       utils.findObject(keyPairs, objects);
     }).toThrow(expectedError2);
+  });
+
+  it("should get secrets from environment.", function() {
+    const envJSON = [
+      {
+        password: "p@ssword",
+        username: "root"
+      },
+      {
+        password: "8HNVdvdgh765"
+      }
+    ];
+    const envJSONAsString = JSON.stringify(envJSON);
+
+    process.env[config.getSecretsEnvVar()] = envJSONAsString;
+
+    var expectedSecrets = {
+      username: "root",
+      password: "8HNVdvdgh765"
+    };
+
+    expect(
+      utils.mergeObjects(process.env[config.getSecretsEnvVar()]).password
+    ).toEqual(expectedSecrets.password);
+    expect(
+      utils.mergeObjects(process.env[config.getSecretsEnvVar()]).password
+    ).not.toEqual(envJSON.username);
+
+    process.env[config.getSecretsEnvVar()] = "";
+    expect(utils.mergeObjects(process.env[config.getSecretsEnvVar()])).toEqual(
+      {}
+    );
+  });
+
+  it("should substitute secrets.", function() {
+    const secrets = {
+      openmrs: {
+        username: "admin",
+        password: "password123"
+      }
+    };
+
+    var obj = {
+      aStringToBeKeptSecret: "jenkinsCredentials(openmrs.password)"
+    };
+
+    var expectedObj = {
+      aStringToBeKeptSecret: "password123"
+    };
+
+    expect(utils.substituteSecrets(obj, secrets)).toEqual(expectedObj);
+
+    obj = {
+      aStringToBeKeptSecret: "jenkinsCredentials(unexistingPath)"
+    };
+    expect(function() {
+      utils.substituteSecrets(obj, secrets);
+    }).toThrow();
+  });
+
+  it("should find value in object based on path", function() {
+    var jsonData = {
+      level1: {
+        key1: "value1",
+        key2: "value2",
+        key3: null,
+        level2: {
+          key1: "value1"
+        }
+      }
+    };
+
+    expect(utils.jsonPathToValue(jsonData, "level1.key1")).toEqual("value1");
+    expect(utils.jsonPathToValue(jsonData, "level1.key3")).toEqual(null);
+    expect(utils.jsonPathToValue(jsonData, "level1.key17")).toEqual(null);
+    expect(utils.jsonPathToValue(jsonData, "level1.level2.key1")).toEqual(
+      "value1"
+    );
   });
 });

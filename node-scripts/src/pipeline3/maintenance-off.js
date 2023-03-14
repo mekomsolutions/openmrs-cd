@@ -18,7 +18,6 @@ const db = require(cst.DBPATH);
 
 const scripts = require("./scripts");
 
-const secrets = config.getSecrets();
 const currentStage = config.getMaintenanceOffStatusCode();
 
 //
@@ -30,6 +29,12 @@ var instanceDef = db.getInstanceDefinition(
 if (_.isEmpty(instanceDef)) {
   throw new Error("Illegal argument: empty or unexisting instance definition.");
 }
+
+// Substitute secrets in the instance definiton with Jenkins credentials
+instanceDef = utils.substituteSecrets(
+  instanceDef,
+  utils.mergeObjects(process.env[config.getSecretsEnvVar()])
+);
 
 //
 //  Host metadata

@@ -111,6 +111,55 @@ There are other types available but most of them are now deprecated, being repla
 
 The full list can be found in the [src/pipeline1/impl/](node-scripts/src/pipeline1/impl) folder.
 
+*How to deploy a server?*
+
+**(WIP)**
+
+
+#### Providing secrets in the Instance Definition/Instance Event:
+
+To avoid entering clear text secrets in an instance event, one can configure Jenkins Credentials functionality and then use the special syntax `jenkinsCredentials(<path>)` anywhere in the instance.
+For example:
+
+```
+group: hsc
+type: dev
+envVars:
+  "OPENMRS_USERNAME": "jenkinsCredentials(openmrs.password)",
+  "PROXY_PORT": "80",
+  ...
+
+```
+
+This will allow to substitute the placeholder with the matching Jenkins Credentials secret value.
+
+However, Jenkins needs to be configured in a specific way for the secrets to be picked up.
+
+- Credentials must be of type "Secret text".
+- The name of the Credentials must either be a `group` or a pair `group_type`
+- The "Secret" (text) should be an arbitrary JSON object.
+The secret object will then be accessible and can be navigated using **dot notation.**
+Any amount of depth is allowed.
+
+In the example above, the secret would look like:
+
+```
+{
+  "openmrs": {
+    "password": "password123",
+    ...
+  },
+  ...
+}
+
+```
+
+To be made available in an instance definition, the Jenkins Credential should either be named after the instance group (eg, `hsc`) or the pair group_type (eg, `hsc_dev`).
+All instances matching the group or group/type pair will be able to use the secret.
+
+If providing conflicting secret keys, a merge strategy is applied and the group/type credentials will take precedence over the group.
+
+
 ## Developer Guide
 
 >OCD3 is a Dockerized Jenkins with preconfigured jobs. Those jobs run Node JS scripts or Node-generated Bash scripts.
