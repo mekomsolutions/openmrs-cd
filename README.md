@@ -139,8 +139,8 @@ However, Jenkins needs to be configured in a specific way for the secrets to be 
 
 - Credentials must be of type "Secret text".
 - The name of the Credentials must either be a `group` or a pair `group_type`
-- The "Secret" (text) should be an arbitrary JSON object.
-The secret object will then be accessible and can be navigated using **dot notation.**
+- The "Secret" (text) should be a JSON object.
+The secret object will then be accessible in the instance event and can be navigated through using **dot notation.**
 Any amount of depth is allowed.
 
 In the example above, the secret would look like:
