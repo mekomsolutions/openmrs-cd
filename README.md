@@ -116,9 +116,9 @@ The full list can be found in the [src/pipeline1/impl/](node-scripts/src/pipelin
 **(WIP)**
 
 
-#### Providing secrets in the Instance Definition/Instance Event:
+#### Using secrets in the Instance Event:
 
-To avoid entering clear text secrets in an instance event, one can configure Jenkins Credentials functionality and then use the special syntax `jenkinsCredentials(<path>)` anywhere in the instance.
+To avoid entering clear text secrets in an instance event, one can configure Jenkins Credentials functionality and use the special syntax `jenkinsCredentials(<path>)` anywhere in the instance.
 For example:
 
 ```
