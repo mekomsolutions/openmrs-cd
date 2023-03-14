@@ -122,13 +122,15 @@ To avoid entering clear text secrets in an instance event, one can configure Jen
 For example:
 
 ```
-group: hsc
-type: dev
-envVars:
-  "OPENMRS_USERNAME": "jenkinsCredentials(openmrs.password)",
-  "PROXY_PORT": "80",
-  ...
-
+{
+  group: hsc
+  type: dev
+  envVars:{
+    "OPENMRS_USERNAME": "jenkinsCredentials(openmrs.password)",
+    "PROXY_PORT": "80",
+    ...
+  }
+}
 ```
 
 This will allow to substitute the placeholder with the matching Jenkins Credentials secret value.
