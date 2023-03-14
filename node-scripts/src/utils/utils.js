@@ -285,7 +285,7 @@ module.exports = {
 
   /**
    *
-   * Searches for jenkinsCredentails() string and replaces it by the value of the secret found at the provided path
+   * Searches for the 'jenkinsCredentials()' string and replaces it by the value of the secret found at the provided path
    *
    * @param {Object} Object to parse through
    * @param {string} A JSON representation of secret object
