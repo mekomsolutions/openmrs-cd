@@ -252,5 +252,106 @@ module.exports = {
    */
   random: function() {
     return Math.random();
+  },
+
+  /**
+   * Merges an array of objects into a single object.
+   * The merge strategy is that the 'n' index element of the array will be replaced by 'n+1'
+   *
+   *
+   *  Eg: [ {"username": "root", "password": "default"} , { "password": "765EGrgfv65" } ]
+   *     returns:
+   *      [ {"username": "root", "password": "765EGrgfv65" } ]
+   *
+   * @param {Object[]} Objects to be merged together.
+   * @return {Object} The merged object.
+   *
+   */
+  mergeObjects: function(arrayOfObjects) {
+    var consolidatedObject = {};
+    if (_.isEmpty(arrayOfObjects)) {
+      log.error(
+        "",
+        "Trying to retrieve secrets from an 'undefined' raw secrets array. Did you correctly inject the environment at the pipeline 'stage' level?"
+      );
+    } else {
+      var secrets = JSON.parse(arrayOfObjects);
+      secrets.forEach(function(item) {
+        consolidatedObject = Object.assign(consolidatedObject, item);
+      });
+    }
+    return consolidatedObject;
+  },
+
+  /**
+   *
+   * Searches for the 'jenkinsCredentials()' string and replaces it by the value of the secret found at the provided path
+   *
+   * @param {Object} Object to parse through
+   * @param {string} A JSON representation of secret object
+   * @returns {Object} The initial passed object, but with matching secrets substituted.
+   *
+   */
+  substituteSecrets: function(obj, secrets) {
+    var jsonDataAsString = JSON.stringify(obj);
+
+    // Match the pattern 'jenkinsCredentials()'
+    var regExp = "jenkinsCredentials\\(.*?\\)";
+    var matches = jsonDataAsString.matchAll(regExp);
+
+    for (const match of matches) {
+      // Return what inside the brackets
+      var path = match[0]
+        .match("\\(.*\\)")
+        .toString()
+        .replace("(", "")
+        .replace(")", "");
+
+      // Iterate through the secret object to find the value located at the given 'path'
+      var secret = module.exports.jsonPathToValue(secrets, path);
+      if (secret === null) {
+        throw new Error(
+          "Illegal state: Jenkins credentials path '" +
+            path +
+            "' could not be found in the secrets file."
+        );
+      }
+
+      // Finally replace the first matching jsonDataAsString with the value
+      jsonDataAsString = jsonDataAsString.replace(match[0], secret);
+    }
+
+    return JSON.parse(jsonDataAsString);
+  },
+
+  /**
+   * Converts a string path to a value that is existing in a json object.
+   *
+   * @param {Object} jsonData Json data to use for searching the value.
+   * @param {Object} path the path to use to find the value.
+   * @returns {valueOfThePath|null}
+   *
+   * https://stackoverflow.com/a/34797931/11387004
+   */
+  jsonPathToValue: function(jsonData, path) {
+    if (!(jsonData instanceof Object) || typeof path === "undefined") {
+      throw "Not valid argument:jsonData:" + jsonData + ", path:" + path;
+    }
+    path = path.replace(/\[(\w+)\]/g, ".$1"); // convert indexes to properties
+    path = path.replace(/^\./, ""); // strip a leading dot
+    var pathArray = path.split(".");
+    for (var i = 0, n = pathArray.length; i < n; ++i) {
+      var key = pathArray[i];
+      if (key in jsonData) {
+        if (jsonData[key] !== null) {
+          jsonData = jsonData[key];
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
+    return jsonData;
   }
 };

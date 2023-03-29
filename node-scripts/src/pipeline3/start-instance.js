@@ -19,9 +19,6 @@ const scripts = require("./scripts");
 
 const currentStage = config.getStartInstanceStatusCode();
 
-// Fetch secrets:
-// const secrets = config.getSecrets();
-
 //
 //  Fetching the instance definition based on the provided UUID
 //
@@ -31,6 +28,12 @@ var instanceDef = db.getInstanceDefinition(
 if (_.isEmpty(instanceDef)) {
   throw new Error("Illegal argument: empty or unexisting instance definition.");
 }
+
+// Substitute secrets in the instance definiton with Jenkins credentials
+instanceDef = utils.substituteSecrets(
+  instanceDef,
+  utils.mergeObjects(process.env[config.getSecretsEnvVar()])
+);
 
 //
 //  Host metadata

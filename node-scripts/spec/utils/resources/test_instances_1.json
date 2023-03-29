@@ -51,8 +51,8 @@
         "image": "mekomsolutions/bahmni",
         "tag": "cambodia-release-0.90",
         "ports": {
-          "443": "8733",
-          "80": "8180"
+          "80": "8180",
+          "443": "8733"
         },
         "networks": ["network1"],
         "privileged": "false"
