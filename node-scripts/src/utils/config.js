@@ -381,7 +381,8 @@ module.exports = {
       "dockerMonolith",
       "dockerCompose",
       "dockerComposeGit",
-      "dockerComposeMaven"
+      "dockerComposeMaven",
+      "dockerComposeGenericMaven"
     ];
   },
   getInstanceArtifactsTypes: function() {
