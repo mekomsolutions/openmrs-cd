@@ -353,5 +353,70 @@ module.exports = {
       }
     }
     return jsonData;
+  },
+
+  /**
+   *
+   * Retrieves the build parameters from the environment.
+   *
+   * @param {Object} The environment.
+   * @param {Object} The config - used to obtain the variable names to look for in the environment.
+   *
+   * @returns {Object} The build parameters
+   *
+   */
+  getBuildParams: function(env, config) {
+    var buildJobParams = _.pick(env, [
+      config.varProjectType(),
+      config.varRepoUrl(),
+      config.varBranchName(),
+      config.varArtifactsDeployment()
+    ]);
+
+    return buildJobParams;
+  },
+
+  /**
+   *
+   * Parses the pom object to identify dependencies. Proceeds with properties substitution too.
+   *
+   * @param {Object} The pom object.
+   * @returns {Array} The dependencies as an array of artifact keys.
+   *
+   */
+  parseDependencies: function(pom) {
+    //  Building the list of dependencies (as artifact keys).
+    var deps = [];
+
+    if (!_.isEmpty(pom.parent)) {
+      deps.push(
+        module.exports.toArtifactKey(
+          pom.parent.groupId,
+          pom.parent.artifactId,
+          pom.parent.version
+        )
+      );
+    }
+
+    // If the pom file has only one dependency, the XML parser will not return an array. Fix that.
+    if (!Array.isArray(pom.dependencies.dependency)) {
+      var dependencyAsArray = [pom.dependencies.dependency];
+      pom.dependencies.dependency = dependencyAsArray;
+    }
+    pom.dependencies.dependency.forEach(function(dep) {
+      var propKey = dep.version.substring(2).slice(0, -1); // "${foo.version}" -> "foo.version"
+
+      var propVal = pom.properties[propKey];
+      if (!_.isUndefined(propVal)) {
+        // substituting the version alias, if any
+        dep.version = propVal;
+      }
+
+      deps.push(
+        module.exports.toArtifactKey(dep.groupId, dep.artifactId, dep.version)
+      );
+    });
+
+    return deps;
   }
 };

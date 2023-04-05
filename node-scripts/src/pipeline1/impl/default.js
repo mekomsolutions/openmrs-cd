@@ -57,20 +57,37 @@ module.exports = {
     };
 
     projectBuild.postBuildActions = function(args) {
+      // Verify if a pom is provided (ie, is a Maven project)
       if (!_.isEmpty(args.pom)) {
-        return cmns.mavenPostBuildActions(
+        // Verify if "readMavenDependencies" is set or not. If so, will treat as a 'distribution', which means parse and save dependencies to later rebuild, when neeeded.
+        if (!_.isEmpty(ocd3Yaml.readMavenDependencies) && ocd3Yaml.readMavenDependencies) {
+          //  Saving/updating the list of dependencies in the database.
+          db.saveArtifactDependencies(
+            artifactKey,
+            utils.parseDependencies(args.pom)
+          );
+
+          //  Keeping track of the params of the latest built job (so, the current one).
+          db.saveArtifactBuildParams(
+            artifactKey,
+            utils.getBuildParams(process.env, config)
+          );
+        }
+
+        cmns.mavenPostBuildActions(
           args.pom.groupId,
           args.artifactsIds,
           args.pom.version
         );
       } else {
-        return cmns.mavenPostBuildActions(
+        cmns.mavenPostBuildActions(
           args.pseudoPom.groupId,
           [args.pseudoPom.artifactId],
           args.pseudoPom.version
         );
       }
     };
+
     return projectBuild;
   }
 };

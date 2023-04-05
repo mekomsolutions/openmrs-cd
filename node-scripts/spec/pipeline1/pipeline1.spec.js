@@ -198,7 +198,7 @@ describe("Tests suite for pipeline1", function() {
       "../../utils/config": mockConfig
     });
 
-    // Running tests on each file present in the  folderInTest folder and ensure they correctly implement every needed function
+    // Running tests on each file present in the folderInTest folder and ensure they correctly implement every needed function
     fs.readdirSync(folderInTest + "/impl/").forEach(file => {
       var type = file.split(".")[0];
       var projectBuild = _default.getInstance();
