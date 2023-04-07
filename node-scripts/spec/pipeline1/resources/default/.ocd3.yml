@@ -8,4 +8,4 @@ deploy:
     groupId: "org.openmrs"
     artifactId: "dbsync"
     version: "dev"
-readMavenDependencies: "true"
+rebuildOnDependencyChange: "true"

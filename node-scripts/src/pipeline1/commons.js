@@ -128,6 +128,7 @@ module.exports = {
       var buildParams = db.getArtifactBuildParams(artifactKey);
       params.push(buildParams["buildParams"]);
     });
+
     fs.writeFileSync(
       // saving them to a file specific to the current build
       config.getDownstreamBuildParamsJsonPath(),

@@ -5,11 +5,13 @@ const path = require("path");
 const _ = require("lodash");
 const log = require("npmlog");
 
+const cst = require("../../const");
 const model = require("../../utils/model");
 const utils = require("../../utils/utils");
 
 const cmns = require("../commons");
 const config = require("../../utils/config");
+const db = require(cst.DBPATH);
 
 const thisType = "default";
 module.exports = {
@@ -59,8 +61,16 @@ module.exports = {
     projectBuild.postBuildActions = function(args) {
       // Verify if a pom is provided (ie, is a Maven project)
       if (!_.isEmpty(args.pom)) {
-        // Verify if "readMavenDependencies" is set or not. If so, will treat as a 'distribution', which means parse and save dependencies to later rebuild, when neeeded.
-        if (!_.isEmpty(ocd3Yaml.readMavenDependencies) && ocd3Yaml.readMavenDependencies) {
+        // Verify if "rebuildOnDependencyChanges" is set or not. If so, parse and save dependencies to later rebuild, when neeeded.
+        if (
+          !_.isEmpty(ocd3Yaml.rebuildOnDependencyChanges) &&
+          ocd3Yaml.rebuildOnDependencyChanges
+        ) {
+          var artifactKey = utils.toArtifactKey(
+            args.pom.groupId,
+            args.pom.artifactId,
+            args.pom.version
+          );
           //  Saving/updating the list of dependencies in the database.
           db.saveArtifactDependencies(
             artifactKey,

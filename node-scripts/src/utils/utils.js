@@ -399,6 +399,7 @@ module.exports = {
     }
 
     // If the pom file has only one dependency, the XML parser will not return an array. Fix that.
+
     if (!Array.isArray(pom.dependencies.dependency)) {
       var dependencyAsArray = [pom.dependencies.dependency];
       pom.dependencies.dependency = dependencyAsArray;

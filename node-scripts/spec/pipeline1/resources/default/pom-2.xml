@@ -1,0 +1,476 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.mekomsolutions</groupId>
+    <artifactId>openmrs-distro-cambodia</artifactId>
+    <name>OpenMRS distribution for Cambodia</name>
+    <version>1.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+  
+    <developers>
+      <developer>
+        <name>Mekom Solutions</name>
+      </developer>
+    </developers>
+    <organization>
+      <name>Mekom Solutions</name>
+      <url>http://www.mekomsolutions.com</url>
+    </organization>
+  
+    <parent>
+      <groupId>net.mekomsolutions</groupId>
+      <artifactId>bahmni-distro-haiti</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </parent>
+  
+    <properties>
+  
+      <distro.baseDir>${project.build.directory}/${project.artifactId}-${project.version}</distro.baseDir>
+      <distro.modulesDir>${distro.baseDir}/modules</distro.modulesDir>
+      <distro.bahmniappsDir>${distro.baseDir}/bahmniapps</distro.bahmniappsDir>
+      <distro.openmrsconfigDir>${distro.baseDir}/openmrs_config</distro.openmrsconfigDir>
+      <distro.bahmniconfigDir>${distro.baseDir}/bahmni_config</distro.bahmniconfigDir>
+      <distro.warDir>${distro.baseDir}/war</distro.warDir>
+      <distro.modulesDir>${distro.baseDir}/modules</distro.modulesDir>
+  
+      <!-- Core -->
+      <openMRSVersion>2.1.1</openMRSVersion>
+  
+      <!-- Configs -->
+      <openmrsconfigVersion>1.0.2</openmrsconfigVersion>
+      <bahmniconfigVersion>1.0.2</bahmniconfigVersion>
+  
+      <!-- Bahmni Apps -->
+      <bahmniappsRevision>a63f511</bahmniappsRevision>
+  
+      <!-- In dev -->
+  
+      <!-- Bahmni modules -->
+      <bahmnicoreVersion>0.90.1</bahmnicoreVersion>
+      <bahmniieomodVersion>0.90-SNAPSHOT</bahmniieomodVersion>
+      <rulesengineVersion>0.90-SNAPSHOT</rulesengineVersion>
+      <idgenwebservicesVersion>1.2-SNAPSHOT</idgenwebservicesVersion>
+      <episodesVersion>1.0-SNAPSHOT</episodesVersion>
+      <atomfeedVersion>2.5.6</atomfeedVersion>
+      <bacteriologyVersion>1.1-SNAPSHOT</bacteriologyVersion>
+      <bedmanagementVersion>5.6.0</bedmanagementVersion>
+      <mailappenderVersion>0.90-SNAPSHOT</mailappenderVersion>
+      <appointmentsVersion>1.0-SNAPSHOT</appointmentsVersion>
+  
+      <!-- OpenMRS modules -->
+      <addresshierarchyVersion>2.11.0</addresshierarchyVersion>
+      <exti18nVersion>1.0.0</exti18nVersion>
+      <appframeworkVersion>2.10.0</appframeworkVersion>
+      <calculationVersion>1.2</calculationVersion>
+      <emrapiVersion>1.23.0</emrapiVersion>
+      <eventVersion>2.5</eventVersion>
+      <htmlwidgetsVersion>1.8.0</htmlwidgetsVersion>
+      <idgenVersion>4.4.1</idgenVersion>
+      <initializerVersion>1.0.1</initializerVersion>
+      <legacyuiVersion>1.3.3</legacyuiVersion>
+      <metadatamappingVersion>1.3.1</metadatamappingVersion>
+      <metadatasharingVersion>1.2.2</metadatasharingVersion>
+      <mksreportsVersion>1.1.1</mksreportsVersion>
+      <providermanagementVersion>2.5.0</providermanagementVersion>
+      <reportingVersion>1.15.0</reportingVersion>
+      <serializationVersion>0.2.12</serializationVersion>
+      <uicommonsVersion>2.3.0</uicommonsVersion>
+      <uiframeworkVersion>3.8</uiframeworkVersion>
+      <uilibraryVersion>2.0.5</uilibraryVersion>
+      <webservices.restVersion>2.20.0</webservices.restVersion>
+      <auditLogVersion>1.0-SNAPSHOT</auditLogVersion>
+  
+    </properties>
+  
+    <dependencies>
+      <dependency>
+        <groupId>net.mekomsolutions</groupId>
+        <artifactId>openmrs-config-cambodia</artifactId>
+        <type>zip</type>
+        <version>${openmrsconfigVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.mekomsolutions</groupId>
+        <artifactId>bahmni-config-cambodia</artifactId>
+        <type>zip</type>
+        <version>${bahmniconfigVersion}</version>
+      </dependency>
+       <dependency>
+        <groupId>net.mekomsolutions</groupId>
+        <artifactId>bahmniapps</artifactId>
+        <type>zip</type>
+        <version>${bahmniappsRevision}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.web</groupId>
+        <artifactId>openmrs-webapp</artifactId>
+        <version>${openMRSVersion}</version>
+        <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>rulesengine-omod</artifactId>
+        <version>${rulesengineVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bahmni.module</groupId>
+        <artifactId>bahmnicore-omod</artifactId>
+        <version>${bahmnicoreVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bahmni.module</groupId>
+        <artifactId>reference-data-omod</artifactId>
+        <version>${bahmnicoreVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>episodes-omod</artifactId>
+        <version>${episodesVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bahmni.module</groupId>
+        <artifactId>bahmni.ie.apps-omod</artifactId>
+        <version>${bahmniieomodVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bahmni.module</groupId>
+        <artifactId>mail-appender</artifactId>
+        <version>${mailappenderVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>appointments-omod</artifactId>
+        <version>${appointmentsVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>bedmanagement-omod</artifactId>
+        <version>${bedmanagementVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>appframework-omod</artifactId>
+        <version>${appframeworkVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>legacyui-omod</artifactId>
+        <version>${legacyuiVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>uiframework-omod</artifactId>
+        <version>${uiframeworkVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>uicommons-omod</artifactId>
+        <version>${uicommonsVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>emrapi-omod</artifactId>
+        <version>${emrapiVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>providermanagement-omod</artifactId>
+        <version>${providermanagementVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>reporting-omod</artifactId>
+        <version>${reportingVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>mksreports-omod</artifactId>
+        <version>${mksreportsVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>metadatasharing-omod</artifactId>
+        <version>${metadatasharingVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>uilibrary-omod</artifactId>
+        <version>${uilibraryVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>htmlwidgets-omod</artifactId>
+        <version>${htmlwidgetsVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>calculation-omod</artifactId>
+        <version>${calculationVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>metadatamapping-omod</artifactId>
+        <version>${metadatamappingVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>serialization.xstream-omod</artifactId>
+        <version>${serializationVersion}</version>
+        <type>omod</type>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs</groupId>
+        <artifactId>event-omod</artifactId>
+        <version>${eventVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>idgen-omod</artifactId>
+        <version>${idgenVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>idgen-webservices-omod</artifactId>
+        <version>${idgenwebservicesVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>addresshierarchy-omod</artifactId>
+        <version>${addresshierarchyVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>webservices.rest-omod</artifactId>
+        <version>${webservices.restVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>bacteriology-omod</artifactId>
+        <version>${bacteriologyVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>auditlog-omod</artifactId>
+        <version>${auditLogVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ict4h.openmrs</groupId>
+        <artifactId>openmrs-atomfeed-omod</artifactId>
+        <version>${atomfeedVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>initializer-omod</artifactId>
+        <version>${initializerVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>exti18n-omod</artifactId>
+        <version>${exti18nVersion}</version>
+      </dependency>
+    </dependencies>
+  
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.8</version>
+          <executions>
+            <!-- OpenMRS Core -->
+            <execution>
+              <id>copy-war</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+              <configuration>
+                <excludeTransitive>true</excludeTransitive>
+                <useBaseVersion>true</useBaseVersion>
+                <outputDirectory>${distro.warDir}</outputDirectory>
+                <includeTypes>war</includeTypes>
+              </configuration>
+            </execution>
+            <!-- OpenMRS modules -->
+            <execution>
+              <id>copy-jars</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+              <configuration>
+                <excludeTransitive>true</excludeTransitive>
+                <useBaseVersion>true</useBaseVersion>
+                <outputDirectory>${distro.modulesDir}</outputDirectory>
+                <includeTypes>jar, omod</includeTypes> <!-- copying jars and omods only -->
+              </configuration>
+            </execution>
+            <!-- OpenMRS config -->
+            <execution>
+              <id>copy-openmrs-config</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+              <configuration>
+                <excludeTransitive>true</excludeTransitive>
+                <useBaseVersion>true</useBaseVersion>
+                <outputDirectory>${distro.openmrsconfigDir}</outputDirectory>
+                <includeArtifactIds>openmrs-config-cambodia</includeArtifactIds>
+              </configuration>
+            </execution>
+            <!-- Bahmni config -->
+            <execution>
+              <id>copy-bahmni-config</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+              <configuration>
+                <excludeTransitive>true</excludeTransitive>
+                <useBaseVersion>true</useBaseVersion>
+                <outputDirectory>${distro.bahmniconfigDir}</outputDirectory>
+                <includeArtifactIds>bahmni-config-cambodia</includeArtifactIds>
+              </configuration>
+            </execution>
+            <!-- Bahmni Apps -->
+            <execution>
+              <id>copy-bahmniapps</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+              <configuration>
+                <excludeTransitive>true</excludeTransitive>
+                <useBaseVersion>true</useBaseVersion>
+                <outputDirectory>${distro.bahmniappsDir}</outputDirectory>
+                <includeArtifactIds>bahmniapps</includeArtifactIds>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.7</version>
+          <executions>
+            <execution>
+              <id>rename-jars-to-omod</id>
+              <phase>package</phase>
+              <configuration>
+                <target>
+                  <move todir="${distro.modulesDir}">
+                    <fileset dir="${distro.modulesDir}" />
+                    <mapper type="regexp" from="^(.+)-omod-(.+)\.jar" to="\1-\2.omod" />
+                  </move>
+                </target>
+              </configuration>
+              <goals>
+                <goal>run</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>rename-openmrs-config</id>
+              <phase>package</phase>
+              <configuration>
+                <target>
+                  <move todir="${distro.openmrsconfigDir}">
+                    <fileset dir="${distro.openmrsconfigDir}" />
+                    <mapper type="regexp" from="^openmrs-config-cambodia(.+)\.zip" to="config.zip" />
+                  </move>
+                </target>
+              </configuration>
+              <goals>
+                <goal>run</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>rename-bahmni-config</id>
+              <phase>package</phase>
+              <configuration>
+                <target>
+                  <move todir="${distro.bahmniconfigDir}">
+                    <fileset dir="${distro.bahmniconfigDir}" />
+                    <mapper type="regexp" from="^bahmni-config-cambodia(.+)\.zip" to="config.zip" />
+                  </move>
+                </target>
+              </configuration>
+              <goals>
+                <goal>run</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+  
+        <!-- packaging the distro as a installable/deployable file -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>package-distro-artifact</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+              <configuration>
+                <appendAssemblyId>false</appendAssemblyId>
+                <descriptors>
+                  <descriptor>src/main/assembly/assembly.xml</descriptor>
+                </descriptors>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+  
+      </plugins>
+    </build>
+  
+    <repositories>
+      <repository>
+        <id>mks-nexus-public</id>
+        <url>https://nexus.mekomsolutions.net/repository/maven-public/</url>
+        <snapshots>
+          <updatePolicy>always</updatePolicy>
+        </snapshots>
+      </repository>
+      <repository>
+        <id>openmrs-repo</id>
+        <name>OpenMRS Nexus Repository</name>
+        <url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+      </repository>
+      <repository>
+        <id>repo.mybahmni.org</id>
+        <name>bahmni-artifactory-snapshots</name>
+        <url>http://repo.mybahmni.org.s3.amazonaws.com/artifactory/snapshot</url>
+      </repository>
+      <repository>
+        <id>repo.mybahmni.org-release</id>
+        <name>bahmni-artifactory-release</name>
+        <url>http://repo.mybahmni.org.s3.amazonaws.com/artifactory/release</url>
+      </repository>
+      <repository>
+        <id>sonatype-nexus-snapshots</id>
+        <name>Sonatype Nexus Snapshots</name>
+        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        <releases>
+          <enabled>false</enabled>
+        </releases>
+        <snapshots>
+          <enabled>true</enabled>
+          <updatePolicy>interval:10080</updatePolicy>
+        </snapshots>
+      </repository>
+    </repositories>
+  
+    <pluginRepositories>
+      <pluginRepository>
+        <id>openmrs-repo</id>
+        <name>OpenMRS Nexus Repository</name>
+        <url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+      </pluginRepository>
+    </pluginRepositories>
+  
+  </project>
+  
