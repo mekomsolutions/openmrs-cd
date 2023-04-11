@@ -21,6 +21,8 @@ describe("Docker Compose Maven implementation", function() {
     deployment: {
       hostDir: "/var/docker-volumes/",
       type: "dockerComposeGenericMaven",
+      composePlugin: true,
+      dockerComposeFiles: ["docker-compose.yml"],
       value: {
         mavenProject: {
           version: "1.0.0-SNAPSHOT",
@@ -119,8 +121,9 @@ describe("Docker Compose Maven implementation", function() {
               "docker_compose"
             )
             .toString() +
-          " && docker-compose -p " +
+          " && docker compose -p " +
           instanceDef.name +
+          " -f docker-compose.yml " +
           " --env-file=" +
           path
             .resolve(
@@ -142,8 +145,9 @@ describe("Docker Compose Maven implementation", function() {
               "docker_compose"
             )
             .toString() +
-          " && docker-compose -p " +
+          " && docker compose -p " +
           instanceDef.name +
+          " -f docker-compose.yml " +
           " --env-file=" +
           path
             .resolve(

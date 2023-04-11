@@ -146,8 +146,8 @@ module.exports = {
           " && " +
           composeExec(instanceDef.deployment.composePlugin) +
           " -p " +
-          combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
           instanceDef.name +
+          combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
           " --env-file=" +
           path
             .resolve(
@@ -207,8 +207,8 @@ module.exports = {
                 " && " +
                 composeExec(instanceDef.deployment.composePlugin) +
                 " -p " +
-                combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
                 instanceDef.name +
+                combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
                 " --env-file=" +
                 path
                   .resolve(
@@ -222,8 +222,8 @@ module.exports = {
                 " && " +
                 composeExec(instanceDef.deployment.composePlugin) +
                 " -p " +
-                combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
                 instanceDef.name +
+                combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
                 " --env-file=" +
                 path
                   .resolve(
@@ -261,8 +261,8 @@ module.exports = {
           " && " +
           composeExec(instanceDef.deployment.composePlugin) +
           " -p " +
-          combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
           instanceDef.name +
+          combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
           " --env-file=" +
           path
             .resolve(
@@ -304,8 +304,8 @@ module.exports = {
     script +=
       composeExec(instanceDef.deployment.composePlugin) +
       " -p " +
-      combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
       instanceDef.name +
+      combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
       " --env-file=" +
       path
         .resolve(
@@ -335,7 +335,6 @@ module.exports = {
     script +=
       composeExec(instanceDef.deployment.composePlugin) +
       " -p " +
-      combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
       instanceDef.name;
     script +=
       " --env-file=" +
@@ -368,8 +367,8 @@ module.exports = {
     script +=
       composeExec(instanceDef.deployment.composePlugin) +
       " -p " +
-      combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
       instanceDef.name +
+      combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
       " exec -T " +
       service +
       " /bin/bash -s <<" +
@@ -438,8 +437,8 @@ module.exports = {
     script +=
       composeExec(instanceDef.deployment.composePlugin) +
       " -p " +
-      combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-      instanceDef.name;
+      instanceDef.name +
+      combineComposeFiles(instanceDef.deployment.dockerComposeFiles);
     script +=
       " --env-file=" +
       path
