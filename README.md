@@ -59,7 +59,7 @@ deploy:
 rebuildOnDependencyChange: true|false
 ```
 Note that the `artifact` section is **required only if your project is not a Maven project**.
-Note that the `rebuildOnDependencyChange`if set to `true` will parse the project's POM file and save its dependencies so to later rebuild when any dependending artifact has changed.
+Note that the `rebuildOnDependencyChange`, if set to `true`, will parse the project's POM file and save its dependencies so to later rebuild when any dependending artifact has changed.
 
 See an example for a Maven project:
 ```
