@@ -22,7 +22,7 @@ describe("Docker Compose Maven implementation", function() {
       hostDir: "/var/docker-volumes/",
       type: "dockerComposeGenericMaven",
       composePlugin: true,
-      dockerComposeFiles: ["docker-compose.yml"],
+      dockerComposeFiles: ["docker-compose.yml", "docker-compose-2.yml"],
       value: {
         mavenProject: {
           version: "1.0.0-SNAPSHOT",
@@ -52,7 +52,24 @@ describe("Docker Compose Maven implementation", function() {
       }
     ]
   };
+  it("should use the correct compose command if composePlugin is set to true", () => {
+    var expected = "docker compose";
+    expect(dockerCompose.composeExec(true)).toEqual(expected);
+  });
 
+  it("should use the correct compose command if composePlugin is set to false", () => {
+    var expected = "docker-compose";
+    expect(dockerCompose.composeExec(false)).toEqual(expected);
+  });
+
+  it("should generate the correct compose command given multiple docker compose files", () => {
+    var expected = " -f docker-compose.yml -f docker-compose-2.yml ";
+    expect(
+      dockerCompose.combineComposeFiles(
+        instanceDef.deployment.dockerComposeFiles
+      )
+    ).toEqual(expected);
+  });
   it("should generate Pre-Host Preparation deployment script", () => {
     var expected = "";
     expected += scripts.initFolder(
@@ -123,7 +140,7 @@ describe("Docker Compose Maven implementation", function() {
             .toString() +
           " && docker compose -p " +
           instanceDef.name +
-          " -f docker-compose.yml " +
+          " -f docker-compose.yml -f docker-compose-2.yml " +
           " --env-file=" +
           path
             .resolve(
@@ -147,7 +164,7 @@ describe("Docker Compose Maven implementation", function() {
             .toString() +
           " && docker compose -p " +
           instanceDef.name +
-          " -f docker-compose.yml " +
+          " -f docker-compose.yml -f docker-compose-2.yml " +
           " --env-file=" +
           path
             .resolve(

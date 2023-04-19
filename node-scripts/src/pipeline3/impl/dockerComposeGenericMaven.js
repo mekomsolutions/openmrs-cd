@@ -17,9 +17,9 @@ const composeExec = function(composePlugin) {
 };
 
 const combineComposeFiles = function(composeFiles = []) {
-  let dockerComposeFiles = "";
+  let dockerComposeFiles = " ";
   for (const composeFile of composeFiles) {
-    dockerComposeFiles = dockerComposeFiles + ` -f ${composeFiles} `;
+    dockerComposeFiles = dockerComposeFiles + `-f ${composeFile} `;
   }
   return dockerComposeFiles;
 };
@@ -450,5 +450,7 @@ module.exports = {
         .toString();
     script += " stop";
     return script + "\n";
-  }
+  },
+  combineComposeFiles: combineComposeFiles,
+  composeExec: composeExec
 };
