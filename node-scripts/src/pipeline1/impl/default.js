@@ -5,11 +5,13 @@ const path = require("path");
 const _ = require("lodash");
 const log = require("npmlog");
 
+const cst = require("../../const");
 const model = require("../../utils/model");
 const utils = require("../../utils/utils");
 
 const cmns = require("../commons");
 const config = require("../../utils/config");
+const db = require(cst.DBPATH);
 
 const thisType = "default";
 module.exports = {
@@ -57,20 +59,45 @@ module.exports = {
     };
 
     projectBuild.postBuildActions = function(args) {
+      // Verify if a pom is provided (ie, is a Maven project)
       if (!_.isEmpty(args.pom)) {
-        return cmns.mavenPostBuildActions(
+        // Verify if "rebuildOnDependencyChanges" is set or not. If so, parse and save dependencies to later rebuild, when neeeded.
+        if (
+          !_.isEmpty(ocd3Yaml.rebuildOnDependencyChanges) &&
+          ocd3Yaml.rebuildOnDependencyChanges
+        ) {
+          var artifactKey = utils.toArtifactKey(
+            args.pom.groupId,
+            args.pom.artifactId,
+            args.pom.version
+          );
+          //  Saving/updating the list of dependencies in the database.
+          db.saveArtifactDependencies(
+            artifactKey,
+            utils.parseDependencies(args.pom)
+          );
+
+          //  Keeping track of the params of the latest built job (so, the current one).
+          db.saveArtifactBuildParams(
+            artifactKey,
+            utils.getBuildParams(process.env, config)
+          );
+        }
+
+        cmns.mavenPostBuildActions(
           args.pom.groupId,
           args.artifactsIds,
           args.pom.version
         );
       } else {
-        return cmns.mavenPostBuildActions(
+        cmns.mavenPostBuildActions(
           args.pseudoPom.groupId,
           [args.pseudoPom.artifactId],
           args.pseudoPom.version
         );
       }
     };
+
     return projectBuild;
   }
 };

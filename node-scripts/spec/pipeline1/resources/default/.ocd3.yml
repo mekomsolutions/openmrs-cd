@@ -8,3 +8,4 @@ deploy:
     groupId: "org.openmrs"
     artifactId: "dbsync"
     version: "dev"
+rebuildOnDependencyChange: "true"

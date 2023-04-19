@@ -198,7 +198,7 @@ describe("Tests suite for pipeline1", function() {
       "../../utils/config": mockConfig
     });
 
-    // Running tests on each file present in the  folderInTest folder and ensure they correctly implement every needed function
+    // Running tests on each file present in the folderInTest folder and ensure they correctly implement every needed function
     fs.readdirSync(folderInTest + "/impl/").forEach(file => {
       var type = file.split(".")[0];
       var projectBuild = _default.getInstance();
@@ -289,6 +289,63 @@ describe("Tests suite for pipeline1", function() {
     expect(deployScript.body).toEqual(
       "mvn clean deploy -DskipTests -DaltDeploymentRepository=mks-nexus::default::https://nexus.mekomsolutions.net/repository/maven-snapshots"
     );
+  });
+
+  it("'default' type should run postBuildActions without errors", function() {
+    // setup
+    const projectType = "default";
+
+    const proxyquire = require("proxyquire");
+    // const tests = require(path.resolve("spec/utils/testUtils"));
+
+    var mockConfig = {};
+    mockConfig.getOCD3YamlFilePath = function() {
+      return path.resolve(
+        "spec/" +
+          config.getJobNameForPipeline1() +
+          "/resources/" +
+          projectType +
+          "/.ocd3.yml"
+      );
+    };
+
+    // Mocking the mavenPostBuildActions() in Commons to avoid writing to filesystem
+    // (which creates inconsistencies in the tests)
+    var mockCommons = require(path.resolve(
+      "src/" + config.getJobNameForPipeline1() + "/commons.js"
+    ));
+    mockCommons.mavenPostBuildActions = function(a, b, c) {
+      return true;
+    };
+    proxyquire(
+      path.resolve("src/" + config.getJobNameForPipeline1() + "/commons.js"),
+      {
+        mockCommons
+      }
+    );
+
+    // replay
+    var _default = proxyquire(path.resolve("src/pipeline1/impl/default"), {
+      "../../utils/config": mockConfig
+    });
+
+    var projectBuild = _default.getInstance();
+
+    var pom = utils.getPom(
+      "spec/" +
+        config.getJobNameForPipeline1() +
+        "/resources/" +
+        projectType +
+        "/pom-2.xml"
+    );
+
+    projectBuild.postBuildActions({
+      pom: pom,
+      artifactsIds: []
+    });
+
+    // verif
+    // No verify, just making sure it did not fail.
   });
 
   it("'default' type should use 'ocd3.yml' values if no 'pom.xml' file is provided.", function() {
@@ -756,7 +813,7 @@ describe("Tests suite for pipeline1", function() {
     );
   });
 
-  it("should run support single-dependency pom.xml for 'distribution' type", function() {
+  it("should support single-dependency pom.xml for 'distribution' type", function() {
     const projectType = "distribution";
     // Mock commons.js
     const proxyquire = require("proxyquire");

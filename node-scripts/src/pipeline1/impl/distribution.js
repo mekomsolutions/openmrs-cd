@@ -36,7 +36,23 @@ module.exports = {
     };
 
     projectBuild.postBuildActions = function(args) {
-      postBuildActions(args.pom);
+      var artifactKey = utils.toArtifactKey(
+        args.pom.groupId,
+        args.pom.artifactId,
+        args.pom.version
+      );
+
+      //  Saving/updating the list of dependencies in the database.
+      db.saveArtifactDependencies(
+        artifactKey,
+        utils.parseDependencies(args.pom)
+      );
+
+      //  Keeping track of the params of the latest built job (so, the current one).
+      db.saveArtifactBuildParams(
+        artifactKey,
+        utils.getBuildParams(process.env, config)
+      );
 
       cmns.mavenPostBuildActions(
         args.pom.groupId,
@@ -47,60 +63,4 @@ module.exports = {
 
     return projectBuild;
   }
-};
-
-var postBuildActions = function(pom) {
-  //
-  //  Building the list of dependencies (as artifact keys).
-  //
-  var deps = [];
-
-  if (!_.isEmpty(pom.parent)) {
-    deps.push(
-      utils.toArtifactKey(
-        pom.parent.groupId,
-        pom.parent.artifactId,
-        pom.parent.version
-      )
-    );
-  }
-
-  // If the pom file has only one dependency, the XML parser will not return an array. Fix that.
-  if (!Array.isArray(pom.dependencies.dependency)) {
-    var dependencyAsArray = [pom.dependencies.dependency];
-    pom.dependencies.dependency = dependencyAsArray;
-  }
-  pom.dependencies.dependency.forEach(function(dep) {
-    var propKey = dep.version.substring(2).slice(0, -1); // "${foo.version}" -> "foo.version"
-
-    var propVal = pom.properties[propKey];
-    if (!_.isUndefined(propVal)) {
-      // substituting the version alias, if any
-      dep.version = propVal;
-    }
-
-    deps.push(utils.toArtifactKey(dep.groupId, dep.artifactId, dep.version));
-  });
-
-  var artifactKey = utils.toArtifactKey(
-    pom.groupId,
-    pom.artifactId,
-    pom.version
-  );
-
-  //
-  //  Saving/updating the list of dependencies in database.
-  //
-  db.saveArtifactDependencies(artifactKey, deps);
-
-  //
-  //  Keeping track of the params of the latest built job (so, the current one).
-  //
-  var buildJobParams = _.pick(process.env, [
-    config.varProjectType(),
-    config.varRepoUrl(),
-    config.varBranchName(),
-    config.varArtifactsDeployment()
-  ]);
-  db.saveArtifactBuildParams(artifactKey, buildJobParams);
 };
