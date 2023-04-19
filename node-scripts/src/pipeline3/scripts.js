@@ -10,6 +10,50 @@ const heredoc_2 = cst.HEREDOC_2;
 const heredoc_3 = cst.HEREDOC_3;
 const utils = require("../utils/utils");
 const model = require("../utils/model");
+const createEnvVarFile = function(instanceDef, dockerComposePath) {
+  let script = "";
+
+  var distEnvFile = path
+    .resolve(
+      instanceDef.deployment.hostDir,
+      instanceDef.name,
+      instanceDef.name + ".env"
+    )
+    .toString();
+
+  var envFile = path
+    .resolve(
+      instanceDef.deployment.hostDir,
+      instanceDef.name,
+      dockerComposePath,
+      ".env"
+    )
+    .toString();
+
+  script +=
+    "if [[ ! -e " +
+    distEnvFile +
+    " ]]; then\n" +
+    "    mkdir -p " +
+    path.resolve(instanceDef.deployment.hostDir, instanceDef.name).toString() +
+    "\n" +
+    "    touch " +
+    distEnvFile +
+    "\n" +
+    "fi\n";
+
+  script += "\ncp " + envFile + " " + distEnvFile + "\n";
+
+  for (let property in instanceDef.envVars) {
+    script += module.exports.writeProperty(
+      property,
+      instanceDef.envVars[property],
+      distEnvFile
+    );
+  }
+
+  return script;
+};
 
 module.exports = {
   /**
@@ -217,7 +261,7 @@ module.exports = {
         "\n";
 
       script +=
-        "mvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:copy" +
+        "mvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:copy -Dmdep.useBaseVersion" +
         " " +
         "-Dartifact=" +
         artifact.groupId +
@@ -644,52 +688,11 @@ module.exports = {
     script += "fi\n";
     return script;
   },
-
   createEnvVarFile(instanceDef) {
-    let script = "";
-
-    var distEnvFile = path
-      .resolve(
-        instanceDef.deployment.hostDir,
-        instanceDef.name,
-        instanceDef.name + ".env"
-      )
-      .toString();
-
-    var envFile = path
-      .resolve(
-        instanceDef.deployment.hostDir,
-        instanceDef.name,
-        "bahmni_docker",
-        ".env"
-      )
-      .toString();
-
-    script +=
-      "if [[ ! -e " +
-      distEnvFile +
-      " ]]; then\n" +
-      "    mkdir -p " +
-      path
-        .resolve(instanceDef.deployment.hostDir, instanceDef.name)
-        .toString() +
-      "\n" +
-      "    touch " +
-      distEnvFile +
-      "\n" +
-      "fi\n";
-
-    script += "\ncp " + envFile + " " + distEnvFile + "\n";
-
-    for (let property in instanceDef.envVars) {
-      script += module.exports.writeProperty(
-        property,
-        instanceDef.envVars[property],
-        distEnvFile
-      );
-    }
-
-    return script;
+    return createEnvVarFile(instanceDef, "bahmni_docker");
+  },
+  createEnvVarFileDockerGeneric(instanceDef) {
+    return createEnvVarFile(instanceDef, "docker_compose");
   },
   exit: function() {
     return "exit";

@@ -224,6 +224,30 @@ module.exports = {
       );
     }
   },
+  validateDockerComposeMavenDeploymentConfigValue: function(value) {
+    if (
+      JSON.stringify(Object.keys(value).sort()) !==
+      JSON.stringify(
+        Object.keys(new model.DockerComposeMavenDeployment()).sort()
+      )
+    ) {
+      throw new Error(
+        "The Docker compose deployment value should be provided as an instance of 'DockerComposeMavenDeployment'."
+      );
+    }
+  },
+  validateDockerComposeGenericMavenDeploymentConfigValue: function(value) {
+    if (
+      JSON.stringify(Object.keys(value).sort()) !==
+      JSON.stringify(
+        Object.keys(new model.DockerComposeGenericMavenDeployment()).sort()
+      )
+    ) {
+      throw new Error(
+        "The Docker compose deployment value should be provided as an instance of 'DockerComposeGenericMavenDeployment'."
+      );
+    }
+  },
   validateFileTLSDeploymentConfigValue: function(value) {
     if (
       JSON.stringify(Object.keys(value).sort()) !==
@@ -343,7 +367,9 @@ module.exports = {
       dockerComposeGit:
         module.exports.validateDockerComposeGitDeploymentConfigValue,
       dockerComposeMaven:
-        module.exports.validateDockerComposeMavenDeploymentConfigValue
+        module.exports.validateDockerComposeMavenDeploymentConfigValue,
+      dockerComposeGenericMaven:
+        module.exports.validateDockerComposeGenericMavenDeploymentConfigValue
     };
   }
 };

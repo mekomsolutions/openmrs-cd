@@ -11,3 +11,4 @@ services:
      - ./jenkins/jenkins_home:/var/jenkins_home
      - ~/.m2:/var/jenkins_home/.m2
      - ./data/app_data:/var/lib/openmrs_cd/app_data
+     - ~/.ssh:/var/jenkins_home/.ssh

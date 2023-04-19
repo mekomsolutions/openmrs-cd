@@ -1,4 +1,4 @@
-git:4.11.5
+git:4.12.1
 ansicolor:1.0.2
 workflow-aggregator:590.v6a_d052e5a_a_b_5
 nodejs:1.5.1
