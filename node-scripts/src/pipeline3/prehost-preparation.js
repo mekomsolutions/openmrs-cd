@@ -89,7 +89,12 @@ if (instanceDef.active == false || instanceDef.active == "false") {
 
     instanceDef.artifacts.forEach(function(artifact) {
       script.body.push(
-        scripts.fetchArtifact(artifact.value, artifact.type, artifactsDirPath)
+        scripts.fetchArtifact(
+          artifact.value,
+          artifact.type,
+          artifactsDirPath,
+          artifact.mavenUrl
+        )
       );
     });
   }
