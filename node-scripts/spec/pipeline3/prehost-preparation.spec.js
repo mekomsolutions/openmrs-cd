@@ -41,8 +41,10 @@ describe("Pre-host preparation scripts", function() {
     );
     var artifactsPath = config.getCDArtifactsDirPath(instanceUuid);
 
-    var expectedScript = "set -xe\n" + "\n";
-    "rm -rf " +
+    var expectedScript =
+      "set -xe\n" +
+      "\n" +
+      "sudo rm -rf " +
       artifactsPath +
       "\n" +
       "sudo mkdir -p " +
@@ -60,7 +62,8 @@ describe("Pre-host preparation scripts", function() {
           packaging: "zip"
         },
         "maven",
-        artifactsPath
+        artifactsPath,
+        "https://maven.repo.com"
       );
 
     expect(script).toContain(expectedScript);
