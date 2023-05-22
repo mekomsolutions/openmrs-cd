@@ -71,6 +71,7 @@ class DockerComposeGenericMavenDeployment {
   constructor(mavenProject, services) {
     this.mavenProject = mavenProject;
     this.services = services;
+    this.mavenUrl = this.mavenUrl;
   }
 }
 /**
