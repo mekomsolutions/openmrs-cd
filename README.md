@@ -19,6 +19,13 @@ There are multiple options depending of the type of project you are deploying, b
 - distribution
 
 The build is triggered by a Webhook that must be added to your hosting SCM service (GitHub, GitLab...).
+The Webhook expects 2 query parameters:
+
+* `[projectType=default|maven|distribution ...]`. Defaults to default. See list of all supported project types here
+
+* `[credentialsId=<arbitrary_name_of_the_credentials_entry_in_Jenkins_to_clone_the_repo>]` . Defaults to gitHubCredentials.
+Eg:
+https://username:password@localhost:8080/generic-webhook-trigger/invoke?projectType=default&credentialsId=myGitLabRepoCredentials
 
 <details>
 

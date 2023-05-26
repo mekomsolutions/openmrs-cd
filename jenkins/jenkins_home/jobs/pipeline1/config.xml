@@ -89,7 +89,6 @@ pipeline {
     }
     stage (&apos;Checkout the code and identify all Maven artifacts&apos;) {
       steps {
-        echo &quot;Creds=====&gt;${credentialsId} ${repoUrl} ${projectType}&quot;
         checkout scm: [$class: &apos;GitSCM&apos;, userRemoteConfigs: [[credentialsId: &quot;$credentialsId&quot;, url: repoUrl]], branches: [[name: branchName]]], poll: false
         sh &apos;find . -mindepth 1 -maxdepth 2 -name pom.xml -exec xmllint --xpath &quot;//*[local-name()=\&apos;project\&apos;]/*[local-name()=\&apos;artifactId\&apos;]/text()&quot; {} \\; -exec echo \\; &gt; $BUILD_PATH/artifacts_ids.txt&apos;
       }
