@@ -1,8 +1,8 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <flow-definition plugin="workflow-job@1207.ve6191ff089f8">
   <actions>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2114.v2654ca_721309"/>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2114.v2654ca_721309">
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2118.v31fd5b_9944b_5"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2118.v31fd5b_9944b_5">
       <jobProperties/>
       <triggers/>
       <parameters/>
@@ -16,7 +16,6 @@ It takes as an input a bunch of &apos;commit metadata&apos;, i.e. all the inform
   <displayName>Project Build</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.7.1"/>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -57,10 +56,15 @@ Eg. &quot;openmrs-core&quot;</description>
           <description>Tells whether built artifacts should be deployed to their repository.</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>credentialsId</name>
+          <defaultValue>gitHubCredentials</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2759.v87459c4eea_ca_">
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2803.v1a_f77ffcc773">
     <script>// Name the build out of the parameters
 node {
   currentBuild.displayName = &quot;${repoUrl}&quot;.substring(&quot;${repoUrl}&quot;.lastIndexOf(&quot;/&quot;) + 1) + &quot; - &quot; + &quot;${branchName}&quot;
@@ -85,7 +89,8 @@ pipeline {
     }
     stage (&apos;Checkout the code and identify all Maven artifacts&apos;) {
       steps {
-        checkout scm: [$class: &apos;GitSCM&apos;, userRemoteConfigs: [[credentialsId: &apos;gitHubCredentials&apos;, url: repoUrl]], branches: [[name: branchName]]], poll: false
+        echo &quot;Creds=====&gt;${credentialsId} ${repoUrl} ${projectType}&quot;
+        checkout scm: [$class: &apos;GitSCM&apos;, userRemoteConfigs: [[credentialsId: &quot;$credentialsId&quot;, url: repoUrl]], branches: [[name: branchName]]], poll: false
         sh &apos;find . -mindepth 1 -maxdepth 2 -name pom.xml -exec xmllint --xpath &quot;//*[local-name()=\&apos;project\&apos;]/*[local-name()=\&apos;artifactId\&apos;]/text()&quot; {} \\; -exec echo \\; &gt; $BUILD_PATH/artifacts_ids.txt&apos;
       }
     }
