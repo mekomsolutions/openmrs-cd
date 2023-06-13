@@ -1,11 +1,11 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Parses HTTP POST payloads posted by GitHub.&#xd;
+  <description>Parses HTTP POST payloads posted by SCM.&#xd;
 &#xd;
 IMPORTANT: We expect all SCM services to allow the configuration of its webhooks URLs in such a way that custom parameters can be posted alongside the HTTP POST body.&#xd;
 For example by appending the expected parameters to a configurable URL, such as &apos;?projectType=openmrsmodule&apos;</description>
-  <displayName>GitHub Webhook</displayName>
+  <displayName>SCM Webhook</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.security.AuthorizationMatrixProperty>
