@@ -1,14 +1,13 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Parses HTTP POST payloads posted by GitHub.&#xd;
+  <description>Parses HTTP POST payloads posted by SCM.&#xd;
 &#xd;
 IMPORTANT: We expect all SCM services to allow the configuration of its webhooks URLs in such a way that custom parameters can be posted alongside the HTTP POST body.&#xd;
 For example by appending the expected parameters to a configurable URL, such as &apos;?projectType=openmrsmodule&apos;</description>
-  <displayName>GitHub Webhook</displayName>
+  <displayName>SCM Webhook</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.1.3"/>
     <hudson.security.AuthorizationMatrixProperty>
       <inheritanceStrategy class="org.jenkinsci.plugins.matrixauth.inheritance.InheritGlobalStrategy"/>
       <permission>hudson.model.Item.Read:github</permission>
@@ -20,7 +19,7 @@ For example by appending the expected parameters to a configurable URL, such as 
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers>
-    <org.jenkinsci.plugins.gwt.GenericTrigger plugin="generic-webhook-trigger@1.71">
+    <org.jenkinsci.plugins.gwt.GenericTrigger plugin="generic-webhook-trigger@1.84">
       <spec></spec>
       <genericVariables>
         <org.jenkinsci.plugins.gwt.GenericVariable>
@@ -53,10 +52,14 @@ For example by appending the expected parameters to a configurable URL, such as 
         </org.jenkinsci.plugins.gwt.GenericVariable>
       </genericVariables>
       <regexpFilterText>$repoUrl $scmRef</regexpFilterText>
-      <regexpFilterExpression>^https?:\/\/([a-zA-Z\d-]+\.){0,}github\.com\/([\w,\-,\_]+)\/([\w,\-,\_]+) (refs/heads/master|refs/heads/main|refs/heads/[0-9]+\.[0-9]+\.x)</regexpFilterExpression>
+      <regexpFilterExpression>(refs/heads/master|refs/heads/main|refs/heads/[0-9]+\.[0-9]+\.x)</regexpFilterExpression>
       <genericRequestVariables>
         <org.jenkinsci.plugins.gwt.GenericRequestVariable>
           <key>projectType</key>
+          <regexpFilter></regexpFilter>
+        </org.jenkinsci.plugins.gwt.GenericRequestVariable>
+        <org.jenkinsci.plugins.gwt.GenericRequestVariable>
+          <key>credentialsId</key>
           <regexpFilter></regexpFilter>
         </org.jenkinsci.plugins.gwt.GenericRequestVariable>
       </genericRequestVariables>
@@ -86,15 +89,16 @@ projectType=$projectType
 repoUrl=$repoUrl
 branchName=$branchName
 commitId=$commitId
+credentialsId=${credentialsId-gitHubCredentials}
 77051b05-4abb-4915-9177-10b0a5b7bca5</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
-    <EnvInjectBuilder plugin="envinject@2.3.0">
+    <EnvInjectBuilder plugin="envinject@2.866.v5c0403e3d4df">
       <info>
         <propertiesFilePath>$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/commit_metadata.env</propertiesFilePath>
       </info>
     </EnvInjectBuilder>
-    <org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater plugin="build-name-setter@2.1.0">
+    <org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater plugin="build-name-setter@2.2.0">
       <buildName>version.txt</buildName>
       <macroTemplate>${ENV,var=&quot;repoName&quot;} - ${ENV,var=&quot;branchName&quot;} (${ENV,var=&quot;commitId&quot;})</macroTemplate>
       <fromFile>false</fromFile>
@@ -103,7 +107,7 @@ commitId=$commitId
     </org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater>
   </builders>
   <publishers>
-    <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.39">
+    <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.45">
       <configs>
         <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
           <configs>
