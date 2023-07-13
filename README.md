@@ -63,10 +63,10 @@ deploy:
     groupId: <a group ID>
     artifactId: <a artifact ID>
     version: <a version>
-rebuildOnDependencyChange: true|false
+rebuildOnDependencyChanges: true|false
 ```
 Note that the `artifact` section is **required only if your project is not a Maven project**.
-Note that the `rebuildOnDependencyChange`, if set to `true`, will parse the project's POM file and save its dependencies so to later rebuild when any dependending artifact has changed.
+Note that the `rebuildOnDependencyChanges`, if set to `true`, will parse the project's POM file and save its dependencies so to later rebuild when any dependending artifact has changed.
 
 See an example for a Maven project:
 ```
@@ -75,7 +75,7 @@ build:
   bash_commands: "mvn clean test"
 deploy:
   bash_commands: "mvn clean deploy -DskipTests -DaltDeploymentRepository=mks-nexus::default::https://nexus.mekomsolutions.net/repository/maven-snapshots"
-rebuildOnDependencyChange: "true"
+rebuildOnDependencyChanges: "true"
 ```
 
 <details>

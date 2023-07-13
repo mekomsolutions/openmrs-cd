@@ -43,6 +43,7 @@ module.exports = {
       );
 
       //  Saving/updating the list of dependencies in the database.
+      log.info("Saving/updating the list of dependencies in the database.")
       db.saveArtifactDependencies(
         artifactKey,
         utils.parseDependencies(args.pom)
