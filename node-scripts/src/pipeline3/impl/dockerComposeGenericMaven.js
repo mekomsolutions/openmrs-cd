@@ -350,7 +350,36 @@ module.exports = {
     script += " down" + rmVolumes;
     return script + "\n";
   },
-
+  down: function(instanceDef, sudo) {
+    let script = "";
+    let path = require("path");
+    let distPath = path
+      .resolve(
+        instanceDef.deployment.hostDir,
+        instanceDef.name,
+        "docker_compose"
+      )
+      .toString();
+    script += "cd " + distPath + " && ";
+    if (sudo) {
+      script += "sudo ";
+    }
+    script +=
+      composeExec(instanceDef.deployment.composePlugin) +
+      " -p " +
+      instanceDef.name;
+    script +=
+      " --env-file=" +
+      path
+        .resolve(
+          instanceDef.deployment.hostDir,
+          instanceDef.name,
+          instanceDef.name + ".env"
+        )
+        .toString();
+    script += " down";
+    return script + "\n";
+  },
   pull: function() {},
   exec: (instanceDef, command, service) => {
     let script = "";

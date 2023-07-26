@@ -58,6 +58,7 @@ if (process.env[config.varArtifactsChanges()] === "true") {
 var container = require("./impl/" + instanceDef.deployment.type);
 
 if (process.env[config.varDeploymentChanges()] === "true") {
+  script.body.push(scripts.remote(ssh, container.down(instanceDef)));
   script.body.push(container.startInstance.getDeploymentScript(instanceDef));
 }
 
@@ -105,8 +106,6 @@ var computedScript = scripts.computeAdditionalScripts(
 );
 script.body = computedScript.script;
 
-// Final restart
-script.body.push(scripts.remote(ssh, container.restart(instanceDef)));
 
 script.body = script.body.join(cst.SCRIPT_SEPARATOR);
 
