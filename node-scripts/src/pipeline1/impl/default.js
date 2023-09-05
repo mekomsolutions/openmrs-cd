@@ -66,7 +66,9 @@ module.exports = {
           !_.isEmpty(ocd3Yaml.rebuildOnDependencyChanges) &&
           ocd3Yaml.rebuildOnDependencyChanges
         ) {
-          log.info("'rebuildOnDependencyChanges' is set to 'true'. Saving/updating the list of dependencies in the database.")
+          log.info(
+            "'rebuildOnDependencyChanges' is set to 'true'. Saving/updating the list of dependencies in the database."
+          );
           var artifactKey = utils.toArtifactKey(
             args.pom.groupId,
             args.pom.artifactId,

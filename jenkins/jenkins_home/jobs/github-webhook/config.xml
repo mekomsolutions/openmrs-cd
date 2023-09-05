@@ -25,7 +25,7 @@ For example by appending the expected parameters to a configurable URL, such as 
         <org.jenkinsci.plugins.gwt.GenericVariable>
           <expressionType>JSONPath</expressionType>
           <key>repoUrl</key>
-          <value>$.repository.url</value>
+          <value>$.repository.clone_url</value>
           <regexpFilter></regexpFilter>
           <defaultValue></defaultValue>
         </org.jenkinsci.plugins.gwt.GenericVariable>
