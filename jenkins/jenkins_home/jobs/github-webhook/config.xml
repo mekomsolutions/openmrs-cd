@@ -50,8 +50,15 @@ For example by appending the expected parameters to a configurable URL, such as 
           <regexpFilter></regexpFilter>
           <defaultValue></defaultValue>
         </org.jenkinsci.plugins.gwt.GenericVariable>
+        <org.jenkinsci.plugins.gwt.GenericVariable>
+          <expressionType>JSONPath</expressionType>
+          <key>scmRefForScheduledJobs</key>
+          <value>$.data.ref</value>
+          <regexpFilter></regexpFilter>
+          <defaultValue></defaultValue>
+        </org.jenkinsci.plugins.gwt.GenericVariable>
       </genericVariables>
-      <regexpFilterText>$repoUrl $scmRef</regexpFilterText>
+      <regexpFilterText>$repoUrl $scmRef $scmRefForScheduledJobs</regexpFilterText>
       <regexpFilterExpression>(refs/heads/master|refs/heads/main|refs/heads/develop|refs/heads/[0-9]+\.[0-9]+\.x)</regexpFilterExpression>
       <genericRequestVariables>
         <org.jenkinsci.plugins.gwt.GenericRequestVariable>
@@ -78,7 +85,12 @@ For example by appending the expected parameters to a configurable URL, such as 
       <command>#!/bin/bash&quot;
 
 # The branch name is behind the last slash of the &apos;ref&apos;
+if [ -z &quot;$scmRef&quot; ]; then
+echo &quot;&apos;scmRef&apos; is empty. Falling back to &apos;scmRefForScheduledJobs&apos;. Its value is: &apos;$scmRefForScheduledJobs&apos;&quot;
+branchName=${scmRefForScheduledJobs##*/}
+else
 branchName=${scmRef##*/}
+fi
 
 # Truncating the commit ID to 7 chars
 commitId=$(echo $commitId | cut -c1-7)
@@ -90,7 +102,10 @@ repoUrl=$repoUrl
 branchName=$branchName
 commitId=$commitId
 credentialsId=${credentialsId-gitHubCredentials}
-77051b05-4abb-4915-9177-10b0a5b7bca5</command>
+77051b05-4abb-4915-9177-10b0a5b7bca5
+
+echo &quot;Parsed event variables:&quot;
+cat $BUILD_PATH/commit_metadata.env</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
     <EnvInjectBuilder plugin="envinject@2.866.v5c0403e3d4df">
