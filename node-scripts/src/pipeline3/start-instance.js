@@ -106,7 +106,6 @@ var computedScript = scripts.computeAdditionalScripts(
 );
 script.body = computedScript.script;
 
-
 script.body = script.body.join(cst.SCRIPT_SEPARATOR);
 
 //
