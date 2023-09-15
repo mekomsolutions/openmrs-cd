@@ -154,6 +154,7 @@ module.exports = {
   ifExists: dockerComposeGit.ifExists,
   restart: dockerComposeGit.restart,
   remove: dockerComposeGit.remove,
+  down: dockerComposeGit.down,
   pull: dockerComposeGit.pull,
   exec: dockerComposeGit.exec,
   setProperties: dockerComposeGit.setProperties,

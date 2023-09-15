@@ -312,6 +312,33 @@ module.exports = {
     script += " down" + rmVolumes;
     return script + "\n";
   },
+  down: function(instanceDef, sudo) {
+    let script = "";
+    let path = require("path");
+    let distPath = path
+      .resolve(
+        instanceDef.deployment.hostDir,
+        instanceDef.name,
+        "bahmni_docker"
+      )
+      .toString();
+    script += "cd " + distPath + " && ";
+    if (sudo) {
+      script += "sudo ";
+    }
+    script += "docker-compose -p " + instanceDef.name;
+    script +=
+      " --env-file=" +
+      path
+        .resolve(
+          instanceDef.deployment.hostDir,
+          instanceDef.name,
+          instanceDef.name + ".env"
+        )
+        .toString();
+    script += " down";
+    return script + "\n";
+  },
 
   pull: function() {},
   exec: (instanceDef, command, service) => {

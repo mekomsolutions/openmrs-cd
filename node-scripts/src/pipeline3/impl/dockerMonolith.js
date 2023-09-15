@@ -243,6 +243,11 @@ module.exports = {
     return module.exports.ifExists(instanceDef.uuid, script);
   },
 
+  /* Stub functions for backward compatibility */
+  down: function(instanceDef) {
+    return "";
+  },
+
   /**
    * Run a new container with the appropriate options.
    *

@@ -318,6 +318,24 @@ describe("Docker Compose implementation", function() {
     );
   });
 
+  it("should generate 'down' script", () => {
+    expect(dockerCompose.down(instanceDef, true)).toEqual(
+      "cd " +
+        instanceDef.deployment.hostDir +
+        instanceDef.name +
+        "/bahmni_docker && " +
+        "sudo docker-compose -p " +
+        instanceDef.name +
+        " --env-file=" +
+        path.resolve(
+          instanceDef.deployment.hostDir,
+          instanceDef.name,
+          instanceDef.name + ".env"
+        ) +
+        " down\n"
+    );
+  });
+
   it("should generate 'setProperties' script", function() {
     expect(
       dockerCompose.setProperties(
