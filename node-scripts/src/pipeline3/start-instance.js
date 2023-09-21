@@ -106,6 +106,9 @@ var computedScript = scripts.computeAdditionalScripts(
 );
 script.body = computedScript.script;
 
+// Final restart
+script.body.push(scripts.remote(ssh, container.restart(instanceDef)));
+
 script.body = script.body.join(cst.SCRIPT_SEPARATOR);
 
 //
