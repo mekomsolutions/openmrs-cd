@@ -96,7 +96,6 @@ if (process.env[config.varPropertiesChanges()] === "true") {
 }
 
 // Set the Timezone if provided
-
 var computedScript = scripts.computeAdditionalScripts(
   script.body,
   instanceDef,
@@ -107,8 +106,9 @@ var computedScript = scripts.computeAdditionalScripts(
 script.body = computedScript.script;
 
 // Final restart
-script.body.push(scripts.remote(ssh, container.restart(instanceDef)));
-
+if (!(process.env[config.varDeploymentChanges()] === "true")) {
+  script.body.push(scripts.remote(ssh, container.restart(instanceDef)));
+}
 script.body = script.body.join(cst.SCRIPT_SEPARATOR);
 
 //
