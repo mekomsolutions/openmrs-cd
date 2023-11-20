@@ -25,7 +25,7 @@ def getShortCommit() {
 
 task buildDockerImage(type: DockerBuildImage) {
   inputDir = file('.')
-  images = [dockerHubRepo + ':' + version, dockerHubRepo + ':' + 'latest']
+  images = [dockerHubRepo + ':' + version, dockerHubRepo + ':' + 'latest', dockerHubRepo + ':' + getShortCommit()]
 }
 
 task build() {
