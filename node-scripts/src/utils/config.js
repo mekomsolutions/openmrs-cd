@@ -382,7 +382,8 @@ module.exports = {
       "dockerCompose",
       "dockerComposeGit",
       "dockerComposeMaven",
-      "dockerComposeGenericMaven"
+      "dockerComposeGenericMaven",
+      "dockerComposeGeneric"
     ];
   },
   getInstanceArtifactsTypes: function() {

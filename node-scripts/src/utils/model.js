@@ -74,6 +74,13 @@ class DockerComposeGenericMavenDeployment {
     this.mavenUrl = this.mavenUrl;
   }
 }
+
+class DockerComposeGenericDeployment {
+  constructor(services) {
+    this.services = services;
+  }
+}
+
 /**
  * Describes a File TLS deployment section
  */
@@ -273,6 +280,7 @@ module.exports = {
   DockerComposeGitDeployment: DockerComposeGitDeployment,
   DockerComposeMavenDeployment: DockerComposeMavenDeployment,
   DockerComposeGenericMavenDeployment: DockerComposeGenericMavenDeployment,
+  DockerComposeGenericDeployment: DockerComposeGenericDeployment,
   FileTLSDeployment: FileTLSDeployment,
   VaultTLSDeployment: VaultTLSDeployment,
   Artifact: Artifact,
