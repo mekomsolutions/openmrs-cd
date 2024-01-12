@@ -8,7 +8,7 @@ const scripts = require("../scripts");
 const config = require(cst.CONFIGPATH);
 const heredoc_2 = cst.HEREDOC_2;
 
-const cdScript = function(instanceDef, sudo) {
+const cdScript = function (instanceDef, sudo) {
   let path = require("path");
   let workDir = path
     .resolve(instanceDef.deployment.hostDir, instanceDef.name, "docker_compose")
@@ -25,7 +25,7 @@ const cdScript = function(instanceDef, sudo) {
   return script;
 };
 
-const composeExec = function(composePlugin) {
+const composeExec = function (composePlugin) {
   let exec = "docker-compose";
   if (composePlugin) {
     exec = "docker compose";
@@ -33,7 +33,7 @@ const composeExec = function(composePlugin) {
   return exec;
 };
 
-const combineComposeFiles = function(composeFiles = []) {
+const combineComposeFiles = function (composeFiles = []) {
   let dockerComposeFiles = " ";
   for (const composeFile of composeFiles) {
     dockerComposeFiles = dockerComposeFiles + `-f ${composeFile} `;
@@ -41,7 +41,7 @@ const combineComposeFiles = function(composeFiles = []) {
   return dockerComposeFiles;
 };
 
-const combineEnvFiles = function(instanceDef = {}) {
+const combineEnvFiles = function (instanceDef = {}) {
   let files = " ";
   if (
     instanceDef &&
@@ -70,7 +70,7 @@ const combineEnvFiles = function(instanceDef = {}) {
  */
 module.exports = {
   preHostPreparation: {
-    getDeploymentScript: function(instanceDef) {
+    getDeploymentScript: function (instanceDef) {
       // Retrieve the  Docker Compose project
       const mavenProject = instanceDef.deployment.value.mavenProject;
       const dockerDirPath = path.resolve(
@@ -88,17 +88,17 @@ module.exports = {
       }
       return script;
     },
-    getDataScript: function(instanceDef) {
+    getDataScript: function (instanceDef) {
       let script = "";
 
       return script;
     },
-    getArtifactsScript: function(instanceDef) {
+    getArtifactsScript: function (instanceDef) {
       return "";
     }
   },
   hostPreparation: {
-    getDeploymentScript: function(instanceDef) {
+    getDeploymentScript: function (instanceDef) {
       const scripts = require("../scripts");
       let script = "";
 
@@ -119,15 +119,17 @@ module.exports = {
       if (instanceDef.deployment.workDir) {
         workDir = instanceDef.deployment.workDir;
       }
-      // script += scripts.rsync(
-      //   { ...ssh, ...{ remoteDst: true } },
-      //   config.getCDDockerDirPath(instanceDef.uuid),
-      //   hostArtifactsDir,
-      //   true,
-      //   null,
-      //   "-avzz --delete"
-      // );
 
+      if (instanceDef.deployment.mavenProject) {
+        script += scripts.rsync(
+          { ...ssh, ...{ remoteDst: true } },
+          config.getCDDockerDirPath(instanceDef.uuid),
+          hostArtifactsDir,
+          true,
+          null,
+          "-avzz --delete"
+        );
+      }
       // Set the Timezone via a env var "TIMEZONE"
       if (instanceDef.deployment.timezone) {
         script += scripts.remote(
@@ -151,49 +153,49 @@ module.exports = {
       script += scripts.remote(
         instanceDef.deployment.host.value,
         "cd " +
-          workDir +
-          " && " +
-          composeExec(instanceDef.deployment.composePlugin) +
-          " -p " +
-          instanceDef.name +
-          combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-          combineEnvFiles(instanceDef) +
-          " build --pull" +
-          require("./dockerCompose").getInstanceServicesAsStringList(
-            instanceDef
-          ) +
-          "\n"
+        workDir +
+        " && " +
+        composeExec(instanceDef.deployment.composePlugin) +
+        " -p " +
+        instanceDef.name +
+        combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
+        combineEnvFiles(instanceDef) +
+        " build --pull" +
+        require("./dockerCompose").getInstanceServicesAsStringList(
+          instanceDef
+        ) +
+        "\n"
       );
 
       // docker-compose pull
       script += scripts.remote(
         instanceDef.deployment.host.value,
         "cd " +
-          workDir +
-          " && " +
-          composeExec(instanceDef.deployment.composePlugin) +
-          " -p " +
-          instanceDef.name +
-          combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-          combineEnvFiles(instanceDef) +
-          " pull" +
-          require("./dockerCompose").getInstanceServicesAsStringList(
-            instanceDef
-          ) +
-          "\n"
+        workDir +
+        " && " +
+        composeExec(instanceDef.deployment.composePlugin) +
+        " -p " +
+        instanceDef.name +
+        combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
+        combineEnvFiles(instanceDef) +
+        " pull" +
+        require("./dockerCompose").getInstanceServicesAsStringList(
+          instanceDef
+        ) +
+        "\n"
       );
 
       script += scripts.remote(
         instanceDef.deployment.host.value,
         "sudo chown -R root:root " +
-          path
-            .resolve(instanceDef.deployment.hostDir, instanceDef.name)
-            .toString()
+        path
+          .resolve(instanceDef.deployment.hostDir, instanceDef.name)
+          .toString()
       );
 
       return script;
     },
-    getDataScript: function(instanceDef) {
+    getDataScript: function (instanceDef) {
       var script = "";
       var ssh = instanceDef.deployment.host.value;
       let workDir = path
@@ -206,13 +208,13 @@ module.exports = {
       if (instanceDef.deployment.workDir) {
         workDir = instanceDef.deployment.workDir;
       }
-      instanceDef.data.forEach(function(data) {
+      instanceDef.data.forEach(function (data) {
         var applyData = {
-          instance: function() {
+          instance: function () {
             // 'instance' type must be handled differently as it requires access to the 'db'.
             // therefore, the script is provided in the 'stage' script (host-prepation.js, start-instance.js...)
           },
-          sqlDocker: function() {
+          sqlDocker: function () {
             let sql = data.value;
             let destFolder = path.resolve(
               instanceDef.deployment.hostDir,
@@ -230,23 +232,23 @@ module.exports = {
             script += scripts.remote(
               ssh,
               "cd " +
-                workDir +
-                " && " +
-                composeExec(instanceDef.deployment.composePlugin) +
-                " -p " +
-                instanceDef.name +
-                combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-                combineEnvFiles(instanceDef) +
-                " rm -vsf " +
-                sql.service +
-                " && " +
-                composeExec(instanceDef.deployment.composePlugin) +
-                " -p " +
-                instanceDef.name +
-                combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-                combineEnvFiles(instanceDef) +
-                " up -d " +
-                sql.service
+              workDir +
+              " && " +
+              composeExec(instanceDef.deployment.composePlugin) +
+              " -p " +
+              instanceDef.name +
+              combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
+              combineEnvFiles(instanceDef) +
+              " rm -vsf " +
+              sql.service +
+              " && " +
+              composeExec(instanceDef.deployment.composePlugin) +
+              " -p " +
+              instanceDef.name +
+              combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
+              combineEnvFiles(instanceDef) +
+              " up -d " +
+              sql.service
             );
           }
         };
@@ -254,12 +256,12 @@ module.exports = {
       });
       return script;
     },
-    getArtifactsScript: function(instanceDef) {
+    getArtifactsScript: function (instanceDef) {
       return "";
     }
   },
   startInstance: {
-    getDeploymentScript: function(instanceDef) {
+    getDeploymentScript: function (instanceDef) {
       let script = "";
       let workDir = path
         .resolve(
@@ -274,30 +276,30 @@ module.exports = {
       script += scripts.remote(
         instanceDef.deployment.host.value,
         "cd " +
-          workDir +
-          " && " +
-          composeExec(instanceDef.deployment.composePlugin) +
-          " -p " +
-          instanceDef.name +
-          combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-          combineEnvFiles(instanceDef) +
-          " up -d" +
-          require("./dockerCompose").getInstanceServicesAsStringList(
-            instanceDef
-          ) +
-          "\n"
+        workDir +
+        " && " +
+        composeExec(instanceDef.deployment.composePlugin) +
+        " -p " +
+        instanceDef.name +
+        combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
+        combineEnvFiles(instanceDef) +
+        " up -d" +
+        require("./dockerCompose").getInstanceServicesAsStringList(
+          instanceDef
+        ) +
+        "\n"
       );
       return script;
     },
-    getDataScript: function(instanceDef) {
+    getDataScript: function (instanceDef) {
       return "";
     },
-    getArtifactsScript: function(instanceDef) {
+    getArtifactsScript: function (instanceDef) {
       return "";
     }
   },
-  ifExists: function() {},
-  restart: function(instanceDef, sudo) {
+  ifExists: function () { },
+  restart: function (instanceDef, sudo) {
     let script = "";
     script += cdScript(instanceDef);
     script +=
@@ -310,7 +312,7 @@ module.exports = {
 
     return script + "\n";
   },
-  remove: function(instanceDef, sudo) {
+  remove: function (instanceDef, sudo) {
     let script = "";
     script += cdScript(instanceDef);
     script +=
@@ -323,7 +325,7 @@ module.exports = {
     script += " down" + rmVolumes;
     return script + "\n";
   },
-  down: function(instanceDef, sudo) {
+  down: function (instanceDef, sudo) {
     let script = "";
     script += cdScript(instanceDef, sudo);
     script +=
@@ -334,7 +336,7 @@ module.exports = {
     script += " down";
     return script + "\n";
   },
-  pull: function() {},
+  pull: function () { },
   exec: (instanceDef, command, service) => {
     let script = "";
     script += cdScript(instanceDef);
@@ -354,7 +356,7 @@ module.exports = {
 
     return script + "\n";
   },
-  setProperties: function(instanceDef, property, output) {
+  setProperties: function (instanceDef, property, output) {
     let script = "";
     let path = require("path");
     let propPath = path
@@ -369,33 +371,33 @@ module.exports = {
     script += require("../scripts").remote(
       instanceDef.deployment.host.value,
       "\n" +
-        "if [[ ! -e " +
-        propFilePath +
-        " ]]; then\n" +
-        "sudo mkdir -p " +
-        propPath +
-        "\n" +
-        "sudo touch " +
-        propFilePath +
-        "\n" +
-        "fi\n" +
-        "sudo bash -c 'cat > " +
-        propFilePath +
-        " <<EOF \n" +
-        output +
-        "\nEOF'\n"
+      "if [[ ! -e " +
+      propFilePath +
+      " ]]; then\n" +
+      "sudo mkdir -p " +
+      propPath +
+      "\n" +
+      "sudo touch " +
+      propFilePath +
+      "\n" +
+      "fi\n" +
+      "sudo bash -c 'cat > " +
+      propFilePath +
+      " <<EOF \n" +
+      output +
+      "\nEOF'\n"
     );
     return script;
   },
-  setLinks: function() {},
-  getInstanceServicesAsStringList: function(instanceDef) {
+  setLinks: function () { },
+  getInstanceServicesAsStringList: function (instanceDef) {
     let script = "";
     instanceDef.deployment.value.services.forEach(service => {
       script += " " + service.toString();
     });
     return script;
   },
-  stop: function(instanceDef, sudo) {
+  stop: function (instanceDef, sudo) {
     let script = "";
     script += cdScript(instanceDef);
     script +=
