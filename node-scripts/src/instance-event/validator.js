@@ -250,7 +250,7 @@ module.exports = {
   },
   validateDockerComposeGenericDeploymentConfigValue: function(value) {
     if (
-      JSON.stringify(Object.keys(value).sort()) !==
+      JSON.stringify(Object.keys(value).sort()) >=
       JSON.stringify(
         Object.keys(new model.DockerComposeGenericDeployment()).sort()
       )
