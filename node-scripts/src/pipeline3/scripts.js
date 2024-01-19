@@ -18,7 +18,6 @@ const createEnvVarFile = function(instanceDef, deploymentBasePath) {
       deploymentBasePath
     )
     .toString();
-  console.info(instanceDef.deployment);
   if (
     instanceDef.deployment &&
     instanceDef.deployment.value &&
