@@ -112,7 +112,6 @@ module.exports = {
       } else if (deployment.hostDir === "") {
         throw new Error("The 'host dir' is not specified.");
       }
-      console.log(JSON.stringify(deployment));
       // validating the actual config based on its type
       module.exports
         .getConfigValidatorsMap()
@@ -248,7 +247,7 @@ module.exports = {
       );
     }
   },
-  validateDockerComposeGenericDeploymentConfigValue: function(value) {
+  validateDockerComposeProjectDirDeploymentConfigValue: function(value) {
     if (
       JSON.stringify(Object.keys(value).sort()) >=
       JSON.stringify(
@@ -256,7 +255,7 @@ module.exports = {
       )
     ) {
       throw new Error(
-        "The Docker compose deployment value should be provided as an instance of 'DockerComposeGenericDeployment'."
+        "The Docker compose deployment value should be provided as an instance of 'DockerComposeProjectDirDeployment'."
       );
     }
   },
@@ -383,8 +382,8 @@ module.exports = {
         module.exports.validateDockerComposeMavenDeploymentConfigValue,
       dockerComposeGenericMaven:
         module.exports.validateDockerComposeGenericMavenDeploymentConfigValue,
-      dockerComposeGeneric:
-        module.exports.validateDockerComposeGenericDeploymentConfigValue
+      dockerComposeProjectDir:
+        module.exports.validateDockerComposeProjectDirDeploymentConfigValue
     };
   }
 };

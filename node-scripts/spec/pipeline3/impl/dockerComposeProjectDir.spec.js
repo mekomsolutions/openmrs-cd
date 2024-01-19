@@ -6,7 +6,7 @@ describe("Docker Compose Generic Deployment implementation", function() {
   const config = require(path.resolve("src/utils/config"));
   const cst = require(path.resolve("src/const"));
   const dockerCompose = require(path.resolve(
-    "src/pipeline3/impl/dockerComposeGeneric"
+    "src/pipeline3/impl/dockerComposeProjectDir"
   ));
 
   const scripts = require(path.resolve(
@@ -20,17 +20,12 @@ describe("Docker Compose Generic Deployment implementation", function() {
     group: "tlc",
     deployment: {
       hostDir: "/var/docker-volumes/",
-      type: "dockerComposeGenericMaven",
+      type: "dockerComposeProjectDir",
       composePlugin: true,
       dockerComposeFiles: ["docker-compose.yml", "docker-compose-2.yml"],
       envFiles: ["env-file-1", "env-file-2"],
       value: {
-        mavenProject: {
-          version: "1.0.0-SNAPSHOT",
-          artifactId: "bahmni-docker-compose",
-          groupId: "net.mekomsolutions",
-          packaging: "zip"
-        },
+        projectPath: "/var/docker-volumes/artifacts/run/docker",
         services: ["proxy", "openmrs", "mysql"]
       },
       timezone: "Europe/Amsterdam",
@@ -79,32 +74,14 @@ describe("Docker Compose Generic Deployment implementation", function() {
       "jenkins",
       true
     );
-    expected += scripts.fetchArtifact(
-      instanceDef.deployment.value.mavenProject,
-      "maven",
-      config.getCDDockerDirPath(instanceDef.uuid),
-      null
-    );
-    let generated = dockerCompose.preHostPreparation.getDeploymentScript(
-      instanceDef
-    );
-    expect(generated).toEqual(expected);
+
+    expect(
+      dockerCompose.preHostPreparation.getDeploymentScript(instanceDef)
+    ).toEqual(expected);
   });
 
   it("should generate Host Preparation deployment script", () => {
     var expected = "";
-    expected += scripts.rsync(
-      { ...instanceDef.deployment.host.value, ...{ remoteDst: true } },
-      config.getCDDockerDirPath(instanceDef.uuid),
-      path.resolve(
-        instanceDef.deployment.hostDir,
-        instanceDef.name,
-        "docker_compose"
-      ),
-      true,
-      null,
-      "-avzz --delete"
-    );
 
     expected +=
       scripts.remote(
@@ -113,12 +90,7 @@ describe("Docker Compose Generic Deployment implementation", function() {
           "TIMEZONE",
           instanceDef.deployment.timezone,
           path
-            .resolve(
-              instanceDef.deployment.hostDir,
-              instanceDef.name,
-              "docker_compose",
-              ".env"
-            )
+            .resolve(instanceDef.deployment.value.projectPath, ".env")
             .toString()
         )
       ) + "\n";
@@ -132,48 +104,22 @@ describe("Docker Compose Generic Deployment implementation", function() {
       scripts.remote(
         instanceDef.deployment.host.value,
         "cd " +
-          path
-            .resolve(
-              instanceDef.deployment.hostDir,
-              instanceDef.name,
-              "docker_compose"
-            )
-            .toString() +
+          path.resolve(instanceDef.deployment.value.projectPath).toString() +
           " && docker compose -p " +
           instanceDef.name +
-          " -f docker-compose.yml -f docker-compose-2.yml  --env-file=env-file-1 --env-file=env-file-2" +
-          " --env-file=" +
-          path
-            .resolve(
-              instanceDef.deployment.hostDir,
-              instanceDef.name,
-              instanceDef.name + ".env"
-            )
-            .toString() +
+          " -f docker-compose.yml -f docker-compose-2.yml " +
+          " --env-file=env-file-1 --env-file=env-file-2 --env-file=/var/docker-volumes/artifacts/run/docker/cambodia1.env" +
           " build --pull proxy openmrs mysql" +
           "\n"
       ) +
       scripts.remote(
         instanceDef.deployment.host.value,
         "cd " +
-          path
-            .resolve(
-              instanceDef.deployment.hostDir,
-              instanceDef.name,
-              "docker_compose"
-            )
-            .toString() +
+          path.resolve(instanceDef.deployment.value.projectPath).toString() +
           " && docker compose -p " +
           instanceDef.name +
-          " -f docker-compose.yml -f docker-compose-2.yml  --env-file=env-file-1 --env-file=env-file-2" +
-          " --env-file=" +
-          path
-            .resolve(
-              instanceDef.deployment.hostDir,
-              instanceDef.name,
-              instanceDef.name + ".env"
-            )
-            .toString() +
+          " -f docker-compose.yml -f docker-compose-2.yml " +
+          " --env-file=env-file-1 --env-file=env-file-2 --env-file=/var/docker-volumes/artifacts/run/docker/cambodia1.env" +
           " pull proxy openmrs mysql" +
           "\n"
       ) +

@@ -10,15 +10,10 @@ const heredoc_2 = cst.HEREDOC_2;
 
 const cdScript = function(instanceDef, sudo) {
   let path = require("path");
-  let workDir = path
-    .resolve(instanceDef.deployment.hostDir, instanceDef.name, "docker_compose")
-    .toString();
-  if (instanceDef.deployment.workDir) {
-    workDir = instanceDef.deployment.workDir;
-  }
+  let projectPath = instanceDef.deployment.value.projectPath;
   let script = "";
   script += "set -e\n";
-  script += "cd " + workDir + " && ";
+  script += "cd " + projectPath + " && ";
   if (sudo) {
     script += "sudo ";
   }
@@ -44,16 +39,10 @@ const combineComposeFiles = function(composeFiles = []) {
 const combineEnvFiles = function(instanceDef = {}) {
   let defaultEnvDir = path
     .resolve(
-      instanceDef.deployment.hostDir,
-      instanceDef.name,
+      instanceDef.deployment.value.projectPath,
       instanceDef.name + ".env"
     )
     .toString();
-  if (instanceDef.deployment.workDir) {
-    defaultEnvDir = path
-      .resolve(instanceDef.deployment.workDir, instanceDef.name + ".env")
-      .toString();
-  }
   let files = " ";
   if (
     instanceDef &&
@@ -112,30 +101,7 @@ module.exports = {
         instanceDef.name
       );
       const ssh = instanceDef.deployment.host.value;
-      const hostArtifactsDir = hostDir + "/docker_compose";
-      let workDir = path
-        .resolve(
-          instanceDef.deployment.hostDir,
-          instanceDef.name,
-          "docker_compose"
-        )
-        .toString();
-      if (instanceDef.deployment.workDir) {
-        workDir = instanceDef.deployment.workDir;
-      }
-      if (
-        instanceDef.deployment.value &&
-        instanceDef.deployment.value.mavenProject
-      ) {
-        script += scripts.rsync(
-          { ...ssh, ...{ remoteDst: true } },
-          config.getCDDockerDirPath(instanceDef.uuid),
-          hostArtifactsDir,
-          true,
-          null,
-          "-avzz --delete"
-        );
-      }
+      let projectPath = instanceDef.deployment.value.projectPath;
       // Set the Timezone via a env var "TIMEZONE"
       if (instanceDef.deployment.timezone) {
         script += scripts.remote(
@@ -143,7 +109,7 @@ module.exports = {
           scripts.writeProperty(
             "TIMEZONE",
             instanceDef.deployment.timezone,
-            path.resolve(workDir, ".env").toString()
+            path.resolve(projectPath, ".env").toString()
           )
         );
       }
@@ -159,7 +125,7 @@ module.exports = {
       script += scripts.remote(
         instanceDef.deployment.host.value,
         "cd " +
-          workDir +
+          projectPath +
           " && " +
           composeExec(instanceDef.deployment.composePlugin) +
           " -p " +
@@ -177,7 +143,7 @@ module.exports = {
       script += scripts.remote(
         instanceDef.deployment.host.value,
         "cd " +
-          workDir +
+          projectPath +
           " && " +
           composeExec(instanceDef.deployment.composePlugin) +
           " -p " +
@@ -204,16 +170,7 @@ module.exports = {
     getDataScript: function(instanceDef) {
       var script = "";
       var ssh = instanceDef.deployment.host.value;
-      let workDir = path
-        .resolve(
-          instanceDef.deployment.hostDir,
-          instanceDef.name,
-          "docker_compose"
-        )
-        .toString();
-      if (instanceDef.deployment.workDir) {
-        workDir = instanceDef.deployment.workDir;
-      }
+      let projectPath = instanceDef.deployment.value.projectPath;
       instanceDef.data.forEach(function(data) {
         var applyData = {
           instance: function() {
@@ -238,7 +195,7 @@ module.exports = {
             script += scripts.remote(
               ssh,
               "cd " +
-                workDir +
+                projectPath +
                 " && " +
                 composeExec(instanceDef.deployment.composePlugin) +
                 " -p " +
@@ -269,20 +226,11 @@ module.exports = {
   startInstance: {
     getDeploymentScript: function(instanceDef) {
       let script = "";
-      let workDir = path
-        .resolve(
-          instanceDef.deployment.hostDir,
-          instanceDef.name,
-          "docker_compose"
-        )
-        .toString();
-      if (instanceDef.deployment.workDir) {
-        workDir = instanceDef.deployment.workDir;
-      }
+      let projectPath = instanceDef.deployment.value.projectPath;
       script += scripts.remote(
         instanceDef.deployment.host.value,
         "cd " +
-          workDir +
+          projectPath +
           " && " +
           composeExec(instanceDef.deployment.composePlugin) +
           " -p " +

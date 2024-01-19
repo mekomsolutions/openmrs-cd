@@ -10,16 +10,21 @@ const heredoc_2 = cst.HEREDOC_2;
 const heredoc_3 = cst.HEREDOC_3;
 const utils = require("../utils/utils");
 const model = require("../utils/model");
-const createEnvVarFile = function(instanceDef, dockerComposePath) {
-  let workDir = path
+const createEnvVarFile = function(instanceDef, deploymentBasePath) {
+  let projectPath = path
     .resolve(
       instanceDef.deployment.hostDir,
       instanceDef.name,
-      dockerComposePath
+      deploymentBasePath
     )
     .toString();
-  if (instanceDef.deployment.workDir) {
-    workDir = instanceDef.deployment.workDir;
+  console.info(instanceDef.deployment);
+  if (
+    instanceDef.deployment &&
+    instanceDef.deployment.value &&
+    instanceDef.deployment.value.projectPath
+  ) {
+    projectPath = instanceDef.deployment.value.projectPath;
   }
 
   let script = "";
@@ -32,13 +37,20 @@ const createEnvVarFile = function(instanceDef, dockerComposePath) {
     )
     .toString();
 
-  if (instanceDef.deployment.workDir) {
+  if (
+    instanceDef.deployment &&
+    instanceDef.deployment.value &&
+    instanceDef.deployment.value.projectPath
+  ) {
     distEnvFile = path
-      .resolve(instanceDef.deployment.workDir, instanceDef.name + ".env")
+      .resolve(
+        instanceDef.deployment.value.projectPath,
+        instanceDef.name + ".env"
+      )
       .toString();
   }
 
-  var envFile = path.resolve(workDir, ".env").toString();
+  var envFile = path.resolve(projectPath, ".env").toString();
 
   script +=
     "if [[ ! -e " +
