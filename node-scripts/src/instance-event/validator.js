@@ -247,15 +247,15 @@ module.exports = {
       );
     }
   },
-  validateDockerComposeProjectDirDeploymentConfigValue: function(value) {
+  validateDockerComposeFromArtifactDeploymentConfigValue: function(value) {
     if (
       JSON.stringify(Object.keys(value).sort()) >=
       JSON.stringify(
-        Object.keys(new model.DockerComposeGenericDeployment()).sort()
+        Object.keys(new model.DockerComposeFromArtifactDeployment()).sort()
       )
     ) {
       throw new Error(
-        "The Docker compose deployment value should be provided as an instance of 'DockerComposeProjectDirDeployment'."
+        "The Docker compose deployment value should be provided as an instance of 'DockerComposeFromArtifactDeployment'."
       );
     }
   },
@@ -382,8 +382,8 @@ module.exports = {
         module.exports.validateDockerComposeMavenDeploymentConfigValue,
       dockerComposeGenericMaven:
         module.exports.validateDockerComposeGenericMavenDeploymentConfigValue,
-      dockerComposeProjectDir:
-        module.exports.validateDockerComposeProjectDirDeploymentConfigValue
+      dockerComposeFromArtifact:
+        module.exports.validateDockerComposeFromArtifactDeploymentConfigValue
     };
   }
 };

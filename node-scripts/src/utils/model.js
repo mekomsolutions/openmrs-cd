@@ -75,7 +75,7 @@ class DockerComposeGenericMavenDeployment {
   }
 }
 
-class DockerComposeGenericDeployment {
+class DockerComposeFromArtifactDeployment {
   constructor(services) {
     this.services = services;
   }
@@ -280,7 +280,7 @@ module.exports = {
   DockerComposeGitDeployment: DockerComposeGitDeployment,
   DockerComposeMavenDeployment: DockerComposeMavenDeployment,
   DockerComposeGenericMavenDeployment: DockerComposeGenericMavenDeployment,
-  DockerComposeGenericDeployment: DockerComposeGenericDeployment,
+  DockerComposeFromArtifactDeployment: DockerComposeFromArtifactDeployment,
   FileTLSDeployment: FileTLSDeployment,
   VaultTLSDeployment: VaultTLSDeployment,
   Artifact: Artifact,

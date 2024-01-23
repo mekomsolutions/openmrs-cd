@@ -6,7 +6,7 @@ describe("Docker Compose Generic Deployment implementation", function() {
   const config = require(path.resolve("src/utils/config"));
   const cst = require(path.resolve("src/const"));
   const dockerCompose = require(path.resolve(
-    "src/pipeline3/impl/dockerComposeProjectDir"
+    "src/pipeline3/impl/dockerComposeFromArtifact"
   ));
 
   const scripts = require(path.resolve(
@@ -20,7 +20,7 @@ describe("Docker Compose Generic Deployment implementation", function() {
     group: "tlc",
     deployment: {
       hostDir: "/var/docker-volumes/",
-      type: "dockerComposeProjectDir",
+      type: "dockerComposeFromArtifact",
       composePlugin: true,
       dockerComposeFiles: ["docker-compose.yml", "docker-compose-2.yml"],
       envFiles: ["env-file-1", "env-file-2"],
