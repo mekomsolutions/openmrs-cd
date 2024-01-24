@@ -76,7 +76,7 @@ class DockerComposeGenericMavenDeployment {
 }
 
 /**
- * A type which assumes that the Docker Compose project will be installed through the processing of the artifacts section.
+ * A type which assumes that the Docker Compose project will be installed through the processing of the 'artifacts' section.
  */
 class DockerComposeFromArtifactDeployment {
   constructor(services) {
