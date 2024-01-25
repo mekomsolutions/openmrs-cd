@@ -112,7 +112,6 @@ module.exports = {
       } else if (deployment.hostDir === "") {
         throw new Error("The 'host dir' is not specified.");
       }
-
       // validating the actual config based on its type
       module.exports
         .getConfigValidatorsMap()
@@ -248,6 +247,18 @@ module.exports = {
       );
     }
   },
+  validateDockerComposeFromArtifactDeploymentConfigValue: function(value) {
+    if (
+      JSON.stringify(Object.keys(value).sort()) >=
+      JSON.stringify(
+        Object.keys(new model.DockerComposeFromArtifactDeployment()).sort()
+      )
+    ) {
+      throw new Error(
+        "The Docker compose deployment value should be provided as an instance of 'DockerComposeFromArtifactDeployment'."
+      );
+    }
+  },
   validateFileTLSDeploymentConfigValue: function(value) {
     if (
       JSON.stringify(Object.keys(value).sort()) !==
@@ -306,8 +317,9 @@ module.exports = {
           );
         }
       } else if (element.type === "sqlDocker") {
+        // Since we just check the number of keys we can loosen the check to just if the keys are more than the model
         if (
-          JSON.stringify(Object.keys(element.value).sort()) !==
+          JSON.stringify(Object.keys(element.value).sort()) >=
           JSON.stringify(Object.keys(new model.SqlDocker()).sort())
         ) {
           throw new Error(
@@ -369,7 +381,9 @@ module.exports = {
       dockerComposeMaven:
         module.exports.validateDockerComposeMavenDeploymentConfigValue,
       dockerComposeGenericMaven:
-        module.exports.validateDockerComposeGenericMavenDeploymentConfigValue
+        module.exports.validateDockerComposeGenericMavenDeploymentConfigValue,
+      dockerComposeFromArtifact:
+        module.exports.validateDockerComposeFromArtifactDeploymentConfigValue
     };
   }
 };

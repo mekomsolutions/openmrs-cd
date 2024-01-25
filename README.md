@@ -216,7 +216,7 @@ That is because the bulk of the logic of what OCD3 does lives here. Almost all J
 
 This is how one would build the underlying Node JS scripts:
 ```bash
-gradle node-scripts:build
+./gradlew node-scripts:build
 ```
 And this must be done before submitting code commits.
 However note that the code base is not really built into anything since the container links directly to **/node-scripts**, but this formats the code and runs the test suite.
@@ -231,7 +231,7 @@ See [here](readme/docker/README.md).
 OCD3 not only needs a Docker image for its binaries but also requires a 'Jenkins home' folder that provides a pre-configured Jenkins setup:
 
 ```bash
-gradle jenkins:build
+./gradlew jenkins:build
 ```
 This will package a zip archive of the jenkins folder.
 

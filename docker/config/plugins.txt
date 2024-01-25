@@ -1,4 +1,4 @@
-git:4.12.1
+git:5.2.0
 ansicolor:1.0.2
 workflow-aggregator:590.v6a_d052e5a_a_b_5
 nodejs:1.5.1
@@ -6,7 +6,7 @@ envinject:2.866.v5c0403e3d4df
 conditional-buildstep:1.4.2
 parameterized-trigger:2.45
 build-name-setter:2.2.0
-pipeline-build-step:2.18
+pipeline-build-step:496.v2449a_9a_221f2
 generic-webhook-trigger:1.84
 matrix-auth:3.1.5
 pipeline-utility-steps:2.13.0

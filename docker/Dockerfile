@@ -1,12 +1,8 @@
-ARG VERSION=2.346.3
+ARG VERSION=2.387.3
 FROM jenkins/jenkins:$VERSION
 MAINTAINER Mekom Solutions <support@mekomsolutions.com>
 
 USER root
-
-# Add the APP_DATA_DIR volume to keep OpenMRS CD data out of the Jenkins Home
-ARG APP_DATA_DIR="/var/lib/openmrs_cd/app_data"
-RUN mkdir -p $APP_DATA_DIR && chown -R jenkins:jenkins $APP_DATA_DIR
 
 RUN apt update --fix-missing
 RUN apt -y install nano jq openssh-server rsync libxml2-utils
@@ -21,6 +17,10 @@ RUN sudo apt install -y nodejs
 
 # Jenkins needs to be a sudo to execute some build tasks (particularly Bahmni Apps)
 RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Add the APP_DATA_DIR volume to keep OpenMRS CD data out of the Jenkins Home
+ARG APP_DATA_DIR="/var/lib/openmrs_cd/app_data"
+RUN mkdir -p $APP_DATA_DIR && chown -R jenkins:jenkins $APP_DATA_DIR
 
 # Provide access to the /usr/share/jenkins directory
 RUN chown -R jenkins /usr/share/jenkins

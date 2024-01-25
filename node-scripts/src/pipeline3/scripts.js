@@ -10,10 +10,25 @@ const heredoc_2 = cst.HEREDOC_2;
 const heredoc_3 = cst.HEREDOC_3;
 const utils = require("../utils/utils");
 const model = require("../utils/model");
-const createEnvVarFile = function(instanceDef, dockerComposePath) {
+const createEnvVarFile = function(instanceDef, deploymentBasePath) {
+  let projectPath = path
+    .resolve(
+      instanceDef.deployment.hostDir,
+      instanceDef.name,
+      deploymentBasePath
+    )
+    .toString();
+  if (
+    instanceDef.deployment &&
+    instanceDef.deployment.value &&
+    instanceDef.deployment.value.projectPath
+  ) {
+    projectPath = instanceDef.deployment.value.projectPath;
+  }
+
   let script = "";
 
-  var distEnvFile = path
+  let distEnvFile = path
     .resolve(
       instanceDef.deployment.hostDir,
       instanceDef.name,
@@ -21,14 +36,20 @@ const createEnvVarFile = function(instanceDef, dockerComposePath) {
     )
     .toString();
 
-  var envFile = path
-    .resolve(
-      instanceDef.deployment.hostDir,
-      instanceDef.name,
-      dockerComposePath,
-      ".env"
-    )
-    .toString();
+  if (
+    instanceDef.deployment &&
+    instanceDef.deployment.value &&
+    instanceDef.deployment.value.projectPath
+  ) {
+    distEnvFile = path
+      .resolve(
+        instanceDef.deployment.value.projectPath,
+        instanceDef.name + ".env"
+      )
+      .toString();
+  }
+
+  var envFile = path.resolve(projectPath, ".env").toString();
 
   script +=
     "if [[ ! -e " +

@@ -68,12 +68,22 @@ class DockerComposeMavenDeployment {
   }
 }
 class DockerComposeGenericMavenDeployment {
-  constructor(mavenProject, services) {
+  constructor(mavenProject, services, mavenUrl) {
     this.mavenProject = mavenProject;
     this.services = services;
     this.mavenUrl = this.mavenUrl;
   }
 }
+
+/**
+ * A type which assumes that the Docker Compose project will be installed through the processing of the 'artifacts' section.
+ */
+class DockerComposeFromArtifactDeployment {
+  constructor(services) {
+    this.services = services;
+  }
+}
+
 /**
  * Describes a File TLS deployment section
  */
@@ -273,6 +283,7 @@ module.exports = {
   DockerComposeGitDeployment: DockerComposeGitDeployment,
   DockerComposeMavenDeployment: DockerComposeMavenDeployment,
   DockerComposeGenericMavenDeployment: DockerComposeGenericMavenDeployment,
+  DockerComposeFromArtifactDeployment: DockerComposeFromArtifactDeployment,
   FileTLSDeployment: FileTLSDeployment,
   VaultTLSDeployment: VaultTLSDeployment,
   Artifact: Artifact,

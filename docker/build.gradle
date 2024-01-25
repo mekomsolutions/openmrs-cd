@@ -20,7 +20,13 @@ repositories {
 
 def dockerHubRepo = "mekomsolutions/openmrscd"
 def getShortCommit() {
-  return ['sh', '-c', 'git log -1 --format=%h'].execute().text.trim()
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+
 }
 
 task buildDockerImage(type: DockerBuildImage) {
