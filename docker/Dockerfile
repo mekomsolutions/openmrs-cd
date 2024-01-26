@@ -1,4 +1,4 @@
-ARG VERSION=2.387.3
+ARG VERSION=2.426.3
 FROM jenkins/jenkins:$VERSION
 MAINTAINER Mekom Solutions <support@mekomsolutions.com>
 
