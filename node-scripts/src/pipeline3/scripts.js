@@ -697,7 +697,7 @@ module.exports = {
   writeProperty(propertyName, value, filename) {
     var script = "";
 
-    script += `if ! grep -R "^[#]*\s*${propertyName}.*" ${filename} > /dev/null; then\n`;
+    script += `if ! grep -w "${propertyName}" ${filename} > /dev/null; then\n`;
     script += `\techo "'${propertyName}' is not found in file '${filename}'. Appending..."\n`;
     script += `\techo "${propertyName}=${value}" >> ${filename}\n`;
     script += "else\n";
