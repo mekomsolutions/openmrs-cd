@@ -419,7 +419,7 @@ describe("Scripts", function() {
     var filename = ".env";
 
     expect(scripts.writeProperty(envVar, value, filename)).toEqual(
-      'if ! grep -R "^[#]*s*KEY.*" .env > /dev/null; then\n' +
+      'if ! grep -w "KEY" .env > /dev/null; then\n' +
         "\techo \"'KEY' is not found in file '.env'. Appending...\"\n" +
         '\techo "KEY=a/path/on/the/disk" >> .env\n' +
         "else\n" +
