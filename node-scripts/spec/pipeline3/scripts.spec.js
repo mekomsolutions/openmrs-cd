@@ -310,7 +310,6 @@ describe("Scripts", function() {
       config,
       process.env
     );
-    console.info("scripts==", scriptsToRun.script);
     expect(scriptsToRun.script).toEqual([
       "some commands",
       scripts.remote(
