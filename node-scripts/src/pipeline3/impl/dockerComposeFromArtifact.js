@@ -310,6 +310,11 @@ module.exports = {
 
     return script + "\n";
   },
+  hostExec: command => {
+    let script = "";
+    script += command + "\n";
+    return script + "\n";
+  },
   setProperties: function(instanceDef, property, output) {
     let script = "";
     let path = require("path");

@@ -188,10 +188,17 @@ describe("Scripts", function() {
       uuid: "1-22-333",
       scripts: [
         {
-          type: "shell",
+          type: "dockerExecBash",
           executionStage: "6",
           conditions: ["data"],
           value: "/a/script.sh"
+        },
+        {
+          type: "hostExecBash",
+          executionStage: "5",
+          conditions: ["data", "artifacts", "deployment"],
+          value:
+            "sudo chmod 777 -R /var/docker-volumes/ozone/ozone-dev/artifacts"
         }
       ],
       deployment: {
@@ -289,7 +296,7 @@ describe("Scripts", function() {
     script = [];
     script.push("some commands");
     instanceDef.scripts.push({
-      type: "shell",
+      type: "dockerExecBash",
       executionStage: "6",
       conditions: ["artifacts"],
       restart: "true",
@@ -303,7 +310,7 @@ describe("Scripts", function() {
       config,
       process.env
     );
-
+    console.info("scripts==", scriptsToRun.script);
     expect(scriptsToRun.script).toEqual([
       "some commands",
       scripts.remote(
@@ -435,7 +442,7 @@ describe("Scripts", function() {
       uuid: "1-22-333",
       scripts: [
         {
-          type: "shell",
+          type: "dockerExecBash",
           executionStage: "6",
           conditions: ["data"],
           value: "/a/script.sh"

@@ -331,6 +331,12 @@ module.exports = {
     return script + "\n";
   },
 
+  hostExec: command => {
+    let script = "";
+    script += command + "\n";
+    return script + "\n";
+  },
+
   /**
    * Copy 'source' located on the host to the container's 'destination'.
    *
