@@ -188,13 +188,13 @@ describe("Scripts", function() {
       uuid: "1-22-333",
       scripts: [
         {
-          type: "dockerExecBash",
+          type: "dockerExecShell",
           executionStage: "6",
           conditions: ["data"],
           value: "/a/script.sh"
         },
         {
-          type: "hostExecBash",
+          type: "hostExecShell",
           executionStage: "5",
           conditions: ["data", "artifacts", "deployment"],
           value:
@@ -296,7 +296,7 @@ describe("Scripts", function() {
     script = [];
     script.push("some commands");
     instanceDef.scripts.push({
-      type: "dockerExecBash",
+      type: "dockerExecShell",
       executionStage: "6",
       conditions: ["artifacts"],
       restart: "true",
@@ -441,7 +441,7 @@ describe("Scripts", function() {
       uuid: "1-22-333",
       scripts: [
         {
-          type: "dockerExecBash",
+          type: "dockerExecShell",
           executionStage: "6",
           conditions: ["data"],
           value: "/a/script.sh"

@@ -512,12 +512,12 @@ module.exports = {
       var deploymentTypeScripts = require("./impl/" +
         instanceDef.deployment.type);
       var runScript = "";
-      if (item.type === "dockerExecBash" && postStart) {
+      if (item.type === "dockerExecShell" && postStart) {
         runScript += module.exports.remote(
           ssh,
           deploymentTypeScripts.exec(instanceDef, item.value, item.service)
         );
-      } else if (item.type === "hostExecBash" && !postStart) {
+      } else if (item.type === "hostExecShell" && !postStart) {
         runScript += module.exports.remote(
           ssh,
           deploymentTypeScripts.hostExec(item.value)

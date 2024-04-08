@@ -212,33 +212,33 @@
     ],
     "scripts": [
       {
-        "type": "dockerExecBash",
+        "type": "dockerExecShell",
         "executionStage": "5",
         "conditions": ["data"],
         "value": "/stage/5/script.sh"
       },
       {
-        "type": "dockerExecBash",
+        "type": "dockerExecShell",
         "executionStage": "5",
         "conditions": ["data", "artifacts"],
         "value": "/usr/bin/bahmni -i local.inventory concat-configs"
       },
       {
-        "type": "dockerExecBash",
+        "type": "dockerExecShell",
         "executionStage": "7",
         "conditions": ["data", "deployment"],
         "restart": "false",
         "value": "/some/script.sh"
       },
       {
-        "type": "dockerExecBash",
+        "type": "dockerExecShell",
         "executionStage": "7",
         "conditions": ["data", "deployment"],
         "restart": "true",
         "value": "/some/script.sh"
       },
       {
-        "type": "dockerExecBash",
+        "type": "dockerExecShell",
         "executionStage": "6",
         "conditions": ["data", "deployment"],
         "value": "/another/script.sh"
