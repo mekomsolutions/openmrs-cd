@@ -479,7 +479,8 @@ module.exports = {
     instanceDef,
     currentStage,
     config,
-    processEnv
+    processEnv,
+    postStart = true
   ) {
     var changes = [];
     if (processEnv[config.varArtifactsChanges()] === "true") {
@@ -511,10 +512,15 @@ module.exports = {
       var deploymentTypeScripts = require("./impl/" +
         instanceDef.deployment.type);
       var runScript = "";
-      if (item.type === "shell") {
+      if (item.type === "dockerExecShell" && postStart) {
         runScript += module.exports.remote(
           ssh,
           deploymentTypeScripts.exec(instanceDef, item.value, item.service)
+        );
+      } else if (item.type === "hostExecShell" && !postStart) {
+        runScript += module.exports.remote(
+          ssh,
+          deploymentTypeScripts.hostExec(item.value)
         );
       } else if (item.type === "python") {
         // TODO: to be implemented

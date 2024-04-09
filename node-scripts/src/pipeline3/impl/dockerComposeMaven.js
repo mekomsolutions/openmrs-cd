@@ -157,6 +157,7 @@ module.exports = {
   down: dockerComposeGit.down,
   pull: dockerComposeGit.pull,
   exec: dockerComposeGit.exec,
+  hostExec: dockerComposeGit.hostExec,
   setProperties: dockerComposeGit.setProperties,
   setLinks: dockerComposeGit.setLinks,
   getInstanceServicesAsStringList:
