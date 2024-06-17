@@ -220,6 +220,7 @@ module.exports = {
       return script;
     },
     getArtifactsScript: function(instanceDef) {
+      // `dockerComposeFromArtifact` deployment type requires to apply deployment scripts changes even upon artifact changes.
       return this.getDeploymentScript(instanceDef);
     }
   },
