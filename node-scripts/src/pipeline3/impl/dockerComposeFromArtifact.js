@@ -76,7 +76,7 @@ module.exports = {
           mavenProject,
           "maven",
           dockerDirPath,
-          null
+          instanceDef.deployment.value.mavenUrl
         );
       }
       return script;
@@ -220,7 +220,7 @@ module.exports = {
       return script;
     },
     getArtifactsScript: function(instanceDef) {
-      return "";
+      return this.getDeploymentScript(instanceDef);
     }
   },
   startInstance: {
