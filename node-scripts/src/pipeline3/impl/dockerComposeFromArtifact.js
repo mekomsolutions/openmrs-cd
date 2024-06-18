@@ -76,7 +76,7 @@ module.exports = {
           mavenProject,
           "maven",
           dockerDirPath,
-          null
+          instanceDef.deployment.value.mavenUrl
         );
       }
       return script;
@@ -220,7 +220,8 @@ module.exports = {
       return script;
     },
     getArtifactsScript: function(instanceDef) {
-      return "";
+      // `dockerComposeFromArtifact` deployment type requires to apply deployment scripts changes even upon artifact changes.
+      return this.getDeploymentScript(instanceDef);
     }
   },
   startInstance: {
