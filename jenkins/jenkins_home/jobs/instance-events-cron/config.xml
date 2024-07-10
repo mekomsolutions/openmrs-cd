@@ -5,9 +5,7 @@
 Then triggers the start/restart of instances by passing those events to the appropriate downstream job.</description>
   <displayName>Instance Events Scheduler</displayName>
   <keepDependencies>false</keepDependencies>
-  <properties>
-    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.7.1"/>
-  </properties>
+  <properties/>
   <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
@@ -28,7 +26,7 @@ Then triggers the start/restart of instances by passing those events to the appr
     </hudson.tasks.Shell>
     <hudson.plugins.groovy.SystemGroovy plugin="groovy@442.v817e6d937d6c">
       <source class="hudson.plugins.groovy.StringSystemScriptSource">
-        <script plugin="script-security@1175.v4b_d517d6db_f0">
+        <script plugin="script-security@1326.vdb_c154de8669">
           <script>import hudson.model.*
 import groovy.json.JsonSlurper
 import groovy.json.JsonOutput

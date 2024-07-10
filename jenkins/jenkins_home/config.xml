@@ -1,7 +1,9 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <hudson>
-  <disabledAdministrativeMonitors/>
-  <version>2.426.3</version>
+  <disabledAdministrativeMonitors>
+    <string>org.jenkinsci.plugins.matrixauth.AmbiguityMonitor</string>
+  </disabledAdministrativeMonitors>
+  <version>2.452.2</version>
   <numExecutors>2</numExecutors>
   <mode>NORMAL</mode>
   <useSecurity>true</useSecurity>
@@ -124,5 +126,5 @@
       </envVars>
     </hudson.slaves.EnvironmentVariablesNodeProperty>
   </globalNodeProperties>
-  <nodeRenameMigrationNeeded>true</nodeRenameMigrationNeeded>
+  <nodeRenameMigrationNeeded>false</nodeRenameMigrationNeeded>
 </hudson>
