@@ -17,3 +17,8 @@ login-theme:1.1
 blueocean:1.27.13
 maven-plugin:3.16
 google-login:109.v022b_cf87b_e5b_
+workflow-cps-global-lib:612.v55f2f80781ef
+docker-commons:439.va_3cb_0a_6a_fb_29
+git-server:126.v0d945d8d2b_39
+pipeline-stage-view:2.34
+jira:3.13
