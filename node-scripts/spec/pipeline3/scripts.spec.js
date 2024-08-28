@@ -430,7 +430,7 @@ describe("Scripts", function() {
         '\techo "KEY=a/path/on/the/disk" >> .env\n' +
         "else\n" +
         "\techo \"'KEY' is found in file '.env'. Updating...\"\n" +
-        '\tsed -i "s/^[#]*\\s*KEY\\b.*/KEY=a\\/path\\/on\\/the\\/disk/" .env\n' +
+        '\tsudo sed -i "s/^[#]*\\s*KEY\\b.*/KEY=a\\/path\\/on\\/the\\/disk/" .env\n' +
         "fi\n"
     );
   });

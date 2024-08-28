@@ -711,7 +711,7 @@ module.exports = {
 
     // 'sed' will need an escaped string at runtime. Escaping.
     var valueEscaped = value.replace(/\//g, "\\/");
-    script += `\tsed -i "s/^[#]*\\s*${propertyName}\\b.*/${propertyName}=${valueEscaped}/" ${filename}\n`;
+    script += `\tsudo sed -i "s/^[#]*\\s*${propertyName}\\b.*/${propertyName}=${valueEscaped}/" ${filename}\n`;
     script += "fi\n";
     return script;
   },
