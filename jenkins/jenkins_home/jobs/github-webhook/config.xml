@@ -8,6 +8,7 @@ For example by appending the expected parameters to a configurable URL, such as 
   <displayName>SCM Webhook</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.13"/>
     <hudson.security.AuthorizationMatrixProperty>
       <inheritanceStrategy class="org.jenkinsci.plugins.matrixauth.inheritance.InheritGlobalStrategy"/>
       <permission>hudson.model.Item.Read:github</permission>
@@ -19,7 +20,7 @@ For example by appending the expected parameters to a configurable URL, such as 
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers>
-    <org.jenkinsci.plugins.gwt.GenericTrigger plugin="generic-webhook-trigger@1.84">
+    <org.jenkinsci.plugins.gwt.GenericTrigger plugin="generic-webhook-trigger@2.2.2">
       <spec></spec>
       <genericVariables>
         <org.jenkinsci.plugins.gwt.GenericVariable>
@@ -59,7 +60,7 @@ For example by appending the expected parameters to a configurable URL, such as 
         </org.jenkinsci.plugins.gwt.GenericVariable>
       </genericVariables>
       <regexpFilterText>$repoUrl $scmRef $scmRefForScheduledJobs</regexpFilterText>
-      <regexpFilterExpression>(refs/heads/master|refs/heads/main|refs/heads/develop|refs/heads/[0-9]+\.[0-9]+\.x)</regexpFilterExpression>
+      <regexpFilterExpression>(refs/heads/master|refs/heads/main|refs/heads/develop|refs/heads/[0-9]+\.[0-9]+\.x|main)</regexpFilterExpression>
       <genericRequestVariables>
         <org.jenkinsci.plugins.gwt.GenericRequestVariable>
           <key>projectType</key>
@@ -77,6 +78,8 @@ For example by appending the expected parameters to a configurable URL, such as 
       <tokenCredentialId></tokenCredentialId>
       <silentResponse>false</silentResponse>
       <overrideQuietPeriod>false</overrideQuietPeriod>
+      <shouldNotFlattern>false</shouldNotFlattern>
+      <allowSeveralTriggersPerBuild>false</allowSeveralTriggersPerBuild>
     </org.jenkinsci.plugins.gwt.GenericTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
@@ -108,12 +111,12 @@ echo &quot;Parsed event variables:&quot;
 cat $BUILD_PATH/commit_metadata.env</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
-    <EnvInjectBuilder plugin="envinject@2.866.v5c0403e3d4df">
+    <EnvInjectBuilder plugin="envinject@2.908.v66a_774b_31d93">
       <info>
         <propertiesFilePath>$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/commit_metadata.env</propertiesFilePath>
       </info>
     </EnvInjectBuilder>
-    <org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater plugin="build-name-setter@2.2.0">
+    <org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater plugin="build-name-setter@2.4.2">
       <buildName>version.txt</buildName>
       <macroTemplate>${ENV,var=&quot;repoName&quot;} - ${ENV,var=&quot;branchName&quot;} (${ENV,var=&quot;commitId&quot;})</macroTemplate>
       <fromFile>false</fromFile>
@@ -122,7 +125,7 @@ cat $BUILD_PATH/commit_metadata.env</command>
     </org.jenkinsci.plugins.buildnameupdater.BuildNameUpdater>
   </builders>
   <publishers>
-    <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.45">
+    <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@806.vf6fff3e28c3e">
       <configs>
         <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
           <configs>
