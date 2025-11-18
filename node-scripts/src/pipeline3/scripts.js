@@ -181,7 +181,8 @@ module.exports = {
    *    {
    *      user: "cdagent",
    *      ip: "10.99.0.4",
-   *      port: "22"
+   *      port: "22",
+   *      sudo: true
    *    }
    *
    * @param {String} script - The script to become a remote script.
@@ -197,6 +198,9 @@ module.exports = {
       ssh.shell = "/bin/bash";
     }
 
+    if (ssh.sudo === true) {
+      remoteScript += "sudo ";
+    }
     remoteScript +=
       "ssh -T " +
       ssh.user +

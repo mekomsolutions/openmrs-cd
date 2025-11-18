@@ -42,6 +42,80 @@ describe("Scripts", function() {
     );
   });
 
+  it("should generate remote commands with sudo when sudo is true.", function() {
+    // setup
+    var ssh = {
+      user: "user",
+      ip: "host",
+      port: "22",
+      sudo: true
+    };
+
+    // verif
+    expect(scripts.remote(ssh, "echo test")).toEqual(
+      "sudo ssh -T " +
+        ssh.user +
+        "@" +
+        ssh.ip +
+        " -p " +
+        ssh.port +
+        " /bin/bash" +
+        " --login <<" +
+        heredoc +
+        "\n" +
+        "echo test\n" +
+        heredoc +
+        "\n"
+    );
+  });
+
+  it("should not generate remote commands with sudo when sudo is false or undefined.", function() {
+    // setup
+    var ssh1 = {
+      user: "user",
+      ip: "host",
+      port: "22",
+      sudo: false
+    };
+    var ssh2 = {
+      user: "user",
+      ip: "host",
+      port: "22"
+    };
+
+    // verif
+    expect(scripts.remote(ssh1, "echo test")).toEqual(
+      "ssh -T " +
+        ssh1.user +
+        "@" +
+        ssh1.ip +
+        " -p " +
+        ssh1.port +
+        " /bin/bash" +
+        " --login <<" +
+        heredoc +
+        "\n" +
+        "echo test\n" +
+        heredoc +
+        "\n"
+    );
+    expect(scripts.remote(ssh2, "echo test")).toEqual(
+      "ssh -T " +
+        ssh2.user +
+        "@" +
+        ssh2.ip +
+        " -p " +
+        ssh2.port +
+        " /bin/bash" +
+        " --login <<" +
+        heredoc +
+        "\n" +
+        "echo test\n" +
+        heredoc +
+        "\n"
+    );
+  });
+
   it("should add or remove trailing slashes to directory paths.", function() {
     expect(scripts.trailSlash("foo", true)).toEqual("foo/");
     expect(scripts.trailSlash("foo/", true)).toEqual("foo/");
