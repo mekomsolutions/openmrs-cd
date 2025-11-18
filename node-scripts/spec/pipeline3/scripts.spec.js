@@ -11,20 +11,19 @@ describe("Scripts", function() {
   const cst = require(path.resolve("src/const"));
   const dockerContainer = require(path.resolve("src/pipeline3/impl/docker"));
   const heredoc = cst.HEREDOC;
+  const heredoc_2 = cst.HEREDOC_2;
 
   const scripts = require(path.resolve(
     "src/" + config.getJobNameForPipeline3() + "/scripts"
   ));
 
   it("should generate remote commands.", function() {
-    // setup
     var ssh = {
       user: "user",
       ip: "host",
       port: "22"
     };
 
-    // verif
     expect(scripts.remote(ssh, "echo test")).toEqual(
       "ssh -T " +
         ssh.user +
@@ -32,6 +31,82 @@ describe("Scripts", function() {
         ssh.ip +
         " -p " +
         ssh.port +
+        " /bin/bash" +
+        " --login <<" +
+        heredoc +
+        "\n" +
+        "echo test\n" +
+        heredoc +
+        "\n"
+    );
+  });
+
+  it("should generate remote commands with sudo when sudo is true.", function() {
+    var ssh = {
+      user: "user",
+      ip: "host",
+      port: "22",
+      sudo: true
+    };
+
+    expect(scripts.remote(ssh, "echo test")).toEqual(
+      "ssh -T " +
+        ssh.user +
+        "@" +
+        ssh.ip +
+        " -p " +
+        ssh.port +
+        " /bin/bash" +
+        " --login <<" +
+        heredoc +
+        "\n" +
+        "sudo /bin/bash --login <<" +
+        heredoc_2 +
+        "\n" +
+        "echo test\n" +
+        heredoc_2 +
+        "\n" +
+        heredoc +
+        "\n"
+    );
+  });
+
+  it("should not generate remote commands with sudo when sudo is false or undefined.", function() {
+    var ssh1 = {
+      user: "user",
+      ip: "host",
+      port: "22",
+      sudo: false
+    };
+    var ssh2 = {
+      user: "user",
+      ip: "host",
+      port: "22"
+    };
+
+    // verif
+    expect(scripts.remote(ssh1, "echo test")).toEqual(
+      "ssh -T " +
+        ssh1.user +
+        "@" +
+        ssh1.ip +
+        " -p " +
+        ssh1.port +
+        " /bin/bash" +
+        " --login <<" +
+        heredoc +
+        "\n" +
+        "echo test\n" +
+        heredoc +
+        "\n"
+    );
+    expect(scripts.remote(ssh2, "echo test")).toEqual(
+      "ssh -T " +
+        ssh2.user +
+        "@" +
+        ssh2.ip +
+        " -p " +
+        ssh2.port +
         " /bin/bash" +
         " --login <<" +
         heredoc +
@@ -65,7 +140,6 @@ describe("Scripts", function() {
   });
 
   it("should generate rsync commands.", function() {
-    // setup
     var ssh = {
       user: "user",
       ip: "host",

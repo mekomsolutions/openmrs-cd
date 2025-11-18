@@ -181,7 +181,8 @@ module.exports = {
    *    {
    *      user: "cdagent",
    *      ip: "10.99.0.4",
-   *      port: "22"
+   *      port: "22",
+   *      sudo: true
    *    }
    *
    * @param {String} script - The script to become a remote script.
@@ -209,7 +210,14 @@ module.exports = {
       " --login <<" +
       heredoc +
       "\n";
+    if (ssh.sudo === true) {
+      remoteScript += "sudo " + ssh.shell + " --login <<" + heredoc_2 + "\n";
+    }
     remoteScript += script;
+    if (ssh.sudo === true) {
+      remoteScript += heredoc_2;
+      remoteScript += "\n";
+    }
     remoteScript += heredoc;
 
     script = remoteScript + "\n";
