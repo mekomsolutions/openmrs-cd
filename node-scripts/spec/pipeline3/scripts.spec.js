@@ -17,14 +17,12 @@ describe("Scripts", function() {
   ));
 
   it("should generate remote commands.", function() {
-    // setup
     var ssh = {
       user: "user",
       ip: "host",
       port: "22"
     };
 
-    // verif
     expect(scripts.remote(ssh, "echo test")).toEqual(
       "ssh -T " +
         ssh.user +
@@ -43,7 +41,6 @@ describe("Scripts", function() {
   });
 
   it("should generate remote commands with sudo when sudo is true.", function() {
-    // setup
     var ssh = {
       user: "user",
       ip: "host",
@@ -51,7 +48,6 @@ describe("Scripts", function() {
       sudo: true
     };
 
-    // verif
     expect(scripts.remote(ssh, "echo test")).toEqual(
       "sudo ssh -T " +
         ssh.user +
@@ -70,7 +66,6 @@ describe("Scripts", function() {
   });
 
   it("should not generate remote commands with sudo when sudo is false or undefined.", function() {
-    // setup
     var ssh1 = {
       user: "user",
       ip: "host",
@@ -139,7 +134,6 @@ describe("Scripts", function() {
   });
 
   it("should generate rsync commands.", function() {
-    // setup
     var ssh = {
       user: "user",
       ip: "host",
