@@ -198,9 +198,6 @@ module.exports = {
       ssh.shell = "/bin/bash";
     }
 
-    if (ssh.sudo === true) {
-      remoteScript += "sudo ";
-    }
     remoteScript +=
       "ssh -T " +
       ssh.user +
@@ -213,7 +210,14 @@ module.exports = {
       " --login <<" +
       heredoc +
       "\n";
+    if (ssh.sudo === true) {
+      remoteScript += "sudo " + ssh.shell + " --login <<" + heredoc_2 + "\n";
+    }
     remoteScript += script;
+    if (ssh.sudo === true) {
+      remoteScript += heredoc_2;
+      remoteScript += "\n";
+    }
     remoteScript += heredoc;
 
     script = remoteScript + "\n";

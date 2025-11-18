@@ -11,6 +11,7 @@ describe("Scripts", function() {
   const cst = require(path.resolve("src/const"));
   const dockerContainer = require(path.resolve("src/pipeline3/impl/docker"));
   const heredoc = cst.HEREDOC;
+  const heredoc_2 = cst.HEREDOC_2;
 
   const scripts = require(path.resolve(
     "src/" + config.getJobNameForPipeline3() + "/scripts"
@@ -49,7 +50,7 @@ describe("Scripts", function() {
     };
 
     expect(scripts.remote(ssh, "echo test")).toEqual(
-      "sudo ssh -T " +
+      "ssh -T " +
         ssh.user +
         "@" +
         ssh.ip +
@@ -59,7 +60,12 @@ describe("Scripts", function() {
         " --login <<" +
         heredoc +
         "\n" +
+        "sudo /bin/bash --login <<" +
+        heredoc_2 +
+        "\n" +
         "echo test\n" +
+        heredoc_2 +
+        "\n" +
         heredoc +
         "\n"
     );
