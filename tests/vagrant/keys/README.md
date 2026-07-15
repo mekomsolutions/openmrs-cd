@@ -10,5 +10,5 @@
 ```bash
 # regenerate authorized_keys only
 ../prepare-authorized-keys.sh   # from keys/, or:
-bash prepare-authorized-keys.sh # from vagrant/
+bash prepare-authorized-keys.sh # from tests/vagrant/
 ```

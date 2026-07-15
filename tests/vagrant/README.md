@@ -13,7 +13,7 @@ Host ports use `23022` / `23023` (not `2222`) to avoid clashing with Vagrant’s
 ## Start
 
 ```bash
-cd vagrant
+cd tests/vagrant
 vagrant up
 ```
 
@@ -37,7 +37,7 @@ vagrant destroy -f && vagrant up
 
 ## Smoke tests
 
-From the `vagrant/` directory (uses the baked-in test key via `ssh_config`):
+From the `tests/vagrant/` directory (uses the baked-in test key via `ssh_config`):
 
 ```bash
 # Direct to target (no jump):
@@ -103,6 +103,6 @@ With ProxyJump, Jenkins only needs to reach the jump; hostname `target` is resol
 ## Tear down
 
 ```bash
-cd vagrant && vagrant destroy -f
+cd tests/vagrant && vagrant destroy -f
 docker network rm openmrs-cd-jump   # optional
 ```

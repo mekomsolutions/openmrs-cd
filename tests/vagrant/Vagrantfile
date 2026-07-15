@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Local jump + target SSH hosts (Docker provider) for testing openmrs-cd deployments.
-# Usage: cd vagrant && vagrant up
+# Usage: cd tests/vagrant && vagrant up
 
 NETWORK = "openmrs-cd-jump"
 ROOT = __dir__
