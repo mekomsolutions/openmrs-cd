@@ -1,0 +1,56 @@
+# frozen_string_literal: true
+
+# Local jump + target SSH hosts (Docker provider) for testing openmrs-cd deployments.
+# Usage: cd vagrant && vagrant up
+
+NETWORK = "openmrs-cd-jump"
+ROOT = __dir__
+
+def ensure_network!
+  system("docker network inspect #{NETWORK} >/dev/null 2>&1") ||
+    system("docker network create #{NETWORK}") ||
+    abort("Failed to create Docker network #{NETWORK}")
+end
+
+def prepare_authorized_keys!
+  script = File.join(ROOT, "prepare-authorized-keys.sh")
+  system("bash", script) || abort("Failed to prepare authorized_keys")
+end
+
+prepare_authorized_keys!
+ensure_network!
+
+Vagrant.configure("2") do |config|
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.ssh.insert_key = false
+  config.ssh.username = "cdagent"
+  config.ssh.private_key_path = File.join(ROOT, "keys", "id_ed25519")
+
+  config.vm.define "jump" do |jump|
+    jump.vm.provider "docker" do |d|
+      d.build_dir = "."
+      d.name = "jump"
+      d.remains_running = true
+      d.has_ssh = false
+      d.ports = ["127.0.0.1:23022:22"]
+      d.create_args = [
+        "--hostname", "jump",
+        "--network", NETWORK
+      ]
+    end
+  end
+
+  config.vm.define "target" do |target|
+    target.vm.provider "docker" do |d|
+      d.build_dir = "."
+      d.name = "target"
+      d.remains_running = true
+      d.has_ssh = false
+      d.ports = ["127.0.0.1:23023:22"]
+      d.create_args = [
+        "--hostname", "target",
+        "--network", NETWORK
+      ]
+    end
+  end
+end

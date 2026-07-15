@@ -1,0 +1,29 @@
+# Usage: ssh -F ssh_config target-direct 'hostname'
+#         ssh -F ssh_config target-via-jump 'hostname'
+
+Host jump
+  HostName 127.0.0.1
+  Port 23022
+  User cdagent
+  IdentityFile keys/id_ed25519
+  IdentitiesOnly yes
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+
+Host target-direct
+  HostName 127.0.0.1
+  Port 23023
+  User cdagent
+  IdentityFile keys/id_ed25519
+  IdentitiesOnly yes
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+
+Host target-via-jump
+  HostName target
+  User cdagent
+  ProxyJump jump
+  IdentityFile keys/id_ed25519
+  IdentitiesOnly yes
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
