@@ -125,6 +125,23 @@ module.exports = {
   },
 
   /**
+   * Optional OpenSSH ProxyJump (-J) args from ssh.jumpHost.
+   * When jumpHost is absent/empty, returns "" (direct SSH unchanged).
+   *
+   * @param {Object} ssh - SSH parameters; may include jumpHost: { ip, user, port }
+   * @return {String} e.g. " -J jumpUser@jumpIp:22" or ""
+   */
+  sshProxyJumpArgs: function(ssh) {
+    if (_.isEmpty(ssh) || _.isEmpty(ssh.jumpHost) || _.isEmpty(ssh.jumpHost.ip)) {
+      return "";
+    }
+    var jump = ssh.jumpHost;
+    var user = jump.user || ssh.user;
+    var port = jump.port != null && jump.port !== "" ? jump.port : "22";
+    return " -J " + user + "@" + jump.ip + ":" + port;
+  },
+
+  /**
    * 'rsync' source to destination
    *
    * @param {Object} ssh - The SSH parameters, eg:
@@ -133,9 +150,11 @@ module.exports = {
    *      ip: "10.99.0.4",
    *      port: "22",
    *      remoteSrc: "false",
-   *      remoteDst: "true"
+   *      remoteDst: "true",
+   *      jumpHost: { ip: "bastion", user: "ec2-user", port: "22" }
    *    }
    *    Note: 'remoteSrc' and 'remoteDst' are set to true or false to indicate whether they are local or remote dirs
+   *    Note: optional jumpHost enables OpenSSH ProxyJump (-J) for the rsync -e ssh command
    *
    * @param {String} srcPath - The source path
    * @param {String} dstPath - The destination path
@@ -155,13 +174,18 @@ module.exports = {
     }
     var sshPort = "";
     if (!_.isEmpty(ssh)) {
+      var sshRemoteArgs =
+        " -e 'ssh -p " +
+        ssh.port +
+        module.exports.sshProxyJumpArgs(ssh) +
+        "'";
       if (ssh.remoteSrc && ssh.remoteSrc === true) {
         srcPath = module.exports.remotePath(ssh, srcPath);
-        sshPort = " -e 'ssh -p " + ssh.port + "'";
+        sshPort = sshRemoteArgs;
       }
       if (ssh.remoteDst && ssh.remoteDst === true) {
         dstPath = module.exports.remotePath(ssh, dstPath);
-        sshPort = " -e 'ssh -p " + ssh.port + "'";
+        sshPort = sshRemoteArgs;
       }
     }
     var script = "";
@@ -182,7 +206,8 @@ module.exports = {
    *      user: "cdagent",
    *      ip: "10.99.0.4",
    *      port: "22",
-   *      sudo: true
+   *      sudo: true,
+   *      jumpHost: { ip: "bastion", user: "ec2-user", port: "22" }
    *    }
    *
    * @param {String} script - The script to become a remote script.
@@ -205,6 +230,7 @@ module.exports = {
       ssh.ip +
       " -p " +
       ssh.port +
+      module.exports.sshProxyJumpArgs(ssh) +
       " " +
       ssh.shell +
       " --login <<" +

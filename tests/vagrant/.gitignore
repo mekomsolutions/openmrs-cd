@@ -1,0 +1,5 @@
+# Keep the public key; do not commit the private key or machine-local authorized_keys.
+keys/id_ed25519
+keys/id_ed25519.pub.bak
+keys/authorized_keys
+.vagrant/

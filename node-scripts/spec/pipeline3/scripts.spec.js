@@ -171,6 +171,87 @@ describe("Scripts", function() {
     );
   });
 
+  it("should add ProxyJump when jumpHost is set on remote commands.", function() {
+    var ssh = {
+      user: "user",
+      ip: "host",
+      port: "22",
+      jumpHost: {
+        ip: "bastion.example.com",
+        user: "jumpuser",
+        port: "2222"
+      }
+    };
+
+    expect(scripts.remote(ssh, "echo test")).toEqual(
+      "ssh -T " +
+        ssh.user +
+        "@" +
+        ssh.ip +
+        " -p " +
+        ssh.port +
+        " -J jumpuser@bastion.example.com:2222" +
+        " /bin/bash" +
+        " --login <<" +
+        heredoc +
+        "\n" +
+        "echo test\n" +
+        heredoc +
+        "\n"
+    );
+  });
+
+  it("should default jumpHost user to target user and port to 22.", function() {
+    var ssh = {
+      user: "user",
+      ip: "host",
+      port: "22",
+      jumpHost: {
+        ip: "bastion.example.com"
+      }
+    };
+
+    expect(scripts.sshProxyJumpArgs(ssh)).toEqual(
+      " -J user@bastion.example.com:22"
+    );
+    expect(scripts.remote(ssh, "echo test")).toContain(
+      " -J user@bastion.example.com:22 "
+    );
+  });
+
+  it("should not add ProxyJump when jumpHost is absent or empty.", function() {
+    expect(scripts.sshProxyJumpArgs({ user: "u", ip: "h", port: "22" })).toEqual(
+      ""
+    );
+    expect(
+      scripts.sshProxyJumpArgs({
+        user: "u",
+        ip: "h",
+        port: "22",
+        jumpHost: {}
+      })
+    ).toEqual("");
+    expect(scripts.sshProxyJumpArgs(null)).toEqual("");
+  });
+
+  it("should include ProxyJump in rsync ssh -e when jumpHost is set.", function() {
+    var ssh = {
+      user: "user",
+      ip: "host",
+      port: "22",
+      remoteDst: true,
+      jumpHost: {
+        ip: "bastion.example.com",
+        user: "jumpuser",
+        port: "2222"
+      }
+    };
+
+    expect(scripts.rsync(ssh, "/src", "/dst")).toEqual(
+      "rsync -avzz -e 'ssh -p 22 -J jumpuser@bastion.example.com:2222' /src user@host:/dst\n"
+    );
+  });
+
   it("should linkFolder", function() {
     var mockUtils = Object.assign({}, utils);
     mockUtils.random = function() {

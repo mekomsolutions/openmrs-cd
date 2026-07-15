@@ -11,9 +11,10 @@ RUN apt -y install nano jq openssh-server rsync libxml2-utils
 # This is because the Jenkins server is used as its own agent. Build tasks are running directly on it.
 RUN apt -y install ruby-full ruby-dev ruby-ffi xvfb firefox-esr sudo libaio1
 
-# Installing Node.js
-RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-RUN sudo apt install -y nodejs
+# Installing Node.js (Debian package — NodeSource 14.x setup is EOL and fails GPG
+# verification on Jenkins/Bookworm images)
+RUN apt-get update && apt-get install -y --no-install-recommends nodejs npm \
+  && node --version && npm --version
 
 # Jenkins needs to be a sudo to execute some build tasks (particularly Bahmni Apps)
 RUN echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
@@ -30,7 +31,7 @@ USER jenkins
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dpermissive-script-security.enabled=true"
 
 COPY ./config/plugins.txt /usr/share/jenkins/plugins.txt
-RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/plugins.txt
+RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/plugins.txt --latest false
 
 COPY ./resources/artifact_repo.js /usr/share/jenkins/artifact_repo.js
 COPY ./config/artifact_repo_default.json /usr/share/jenkins/artifact_repo_default.json
