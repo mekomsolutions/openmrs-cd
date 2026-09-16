@@ -366,6 +366,12 @@ module.exports = {
   getJobNameForPipeline3: function() {
     return "pipeline3";
   },
+  getJobNameForDestroyInstance: function() {
+    return "destroy-instance";
+  },
+  getJobNameForGitInstanceEvents: function() {
+    return "git-instance-events";
+  },
   getVarRecreate: function() {
     return "recreate";
   },

@@ -102,6 +102,31 @@
       </columns>
       <recurse>false</recurse>
     </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>GitOps</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="java.lang.String$CaseInsensitiveComparator"/>
+        <string>git-instance-events</string>
+        <string>Git-Test</string>
+        <string>GitOps-Test</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.plugins.favorite.column.FavoriteColumn plugin="favorite@2.225.v68765b_b_a_1fa_3"/>
+      </columns>
+      <recurse>false</recurse>
+    </listView>
   </views>
   <primaryView>Instance Management (CD)</primaryView>
   <slaveAgentPort>50000</slaveAgentPort>
@@ -116,7 +141,7 @@
         <unserializable-parents/>
         <tree-map>
           <default>
-            <comparator class="java.lang.String$CaseInsensitiveComparator"/>
+            <comparator class="java.lang.String$CaseInsensitiveComparator" reference="../../../../../../views/listView[3]/jobNames/comparator"/>
           </default>
           <int>2</int>
           <string>APP_DATA_DIR_PATH</string>

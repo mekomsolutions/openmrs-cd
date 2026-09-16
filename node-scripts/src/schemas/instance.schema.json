@@ -200,6 +200,13 @@
         ]
       }
     },
+    "active": {
+      "description": "Whether the instance should be running. Accepts boolean or string forms used by OCD3.",
+      "oneOf": [
+        { "type": "boolean" },
+        { "type": "string", "enum": ["true", "false"] }
+      ]
+    },
     "uuid": {
       "type": "string",
       "pattern":
