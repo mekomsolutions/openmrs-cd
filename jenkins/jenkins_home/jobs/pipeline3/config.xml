@@ -69,6 +69,18 @@ import groovy.json.JsonSlurperClassic
 import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 
 def jenkinsCredentials = &quot;&quot;
+def vaultSecrets = &quot;{}&quot;
+
+// Must stay in sync with the vault() pattern in node-scripts/src/utils/utils.js
+@NonCPS
+def findVaultReferences(String text) {
+ def refs = [] as LinkedHashSet
+ def matcher = text =~ /vault\(([^)#]+)#([^)]+)\)/
+ while (matcher.find()) {
+  refs.add([path: matcher.group(1), key: matcher.group(2)])
+ }
+ return refs as List
+}
 
 node {
  def buildName = &quot;${instanceUuid}&quot;
@@ -128,6 +140,24 @@ pipeline {
 
      // Save the Jenkins Credentials as JSON
      jenkinsCredentials = new JsonBuilder(credentials).toPrettyString()
+
+     // Fetch the Vault secrets referenced as &apos;vault(path#key)&apos; in the instance definition
+     def vaultRefs = findVaultReferences(instanceDefJSON)
+     if (vaultRefs.size() &gt; 0) {
+      def vaultSecretsConfig = []
+      for (int i = 0; i &lt; vaultRefs.size(); i++) {
+       vaultSecretsConfig.add([path: vaultRefs[i].path, secretValues: [[envVar: &quot;VAULT_SECRET_&quot; + i, vaultKey: vaultRefs[i].key]]])
+      }
+      println &quot;\033[1m\033[34m[INFO]\033[0m Fetching ${vaultRefs.size()} Vault secret(s).&quot;
+      def resolved = [:]
+      withVault([vaultSecrets: vaultSecretsConfig]) {
+       for (int i = 0; i &lt; vaultRefs.size(); i++) {
+        resolved[vaultRefs[i].path + &quot;#&quot; + vaultRefs[i].key] = env.getProperty(&quot;VAULT_SECRET_&quot; + i)
+       }
+      }
+      vaultSecrets = new JsonBuilder(resolved).toString()
+      println &quot;\033[1m\033[34m[INFO]\033[0m Sucessfully fetched ${resolved.size()} Vault secret(s).&quot;
+     }
     }
    }
   }

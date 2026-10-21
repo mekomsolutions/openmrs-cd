@@ -375,6 +375,12 @@ module.exports = {
   getVarRecreate: function() {
     return "recreate";
   },
+  /**
+   * GitOps environment folders (instances/<env>/...) where destroy/recreate are refused.
+   */
+  getGitOpsProtectedEnvironments: function() {
+    return ["prod"];
+  },
   getInstanceVersions: function() {
     return ["1.0.0"];
   },
@@ -415,5 +421,11 @@ module.exports = {
    */
   getSecretsEnvVar: function() {
     return "SECRETS";
+  },
+  /**
+   * The environment variable that stores the secrets fetched from Vault, keyed by 'path#key'
+   */
+  getVaultSecretsEnvVar: function() {
+    return "VAULT_SECRETS";
   }
 };

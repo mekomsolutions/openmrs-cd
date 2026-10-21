@@ -2,8 +2,9 @@
 
 /**
  * Processes instance definition changes from the GitOps repository.
- * Saves definitions/events for deploy, and flags inactive/deleted instances
- * for destroy-instance (triggered by a following SystemGroovy step).
+ * Saves definitions and reports one action per file (create, update, redeploy,
+ * recreate, destroy) that a following SystemGroovy step turns into Jenkins jobs.
+ * The environment is the folder under instances/, never the 'type' field.
  */
 
 const simpleGit = require("simple-git");
@@ -17,6 +18,7 @@ const log = require("npmlog");
 
 const cst = require("../const");
 const db = require(cst.DBPATH);
+const config = require(cst.CONFIGPATH);
 const validator = require("../instance-event/validator");
 
 const readFile = util.promisify(fs.readFile);
@@ -39,8 +41,186 @@ const INSTANCE_EVENT_SECTIONS = [
   "labels"
 ];
 
+const ACTION_CREATE = "create";
+const ACTION_UPDATE = "update";
+const ACTION_DESTROY = "destroy";
+const ACTION_RECREATE = "recreate";
+const ACTION_REDEPLOY = "redeploy";
+const DESTRUCTIVE_ACTIONS = [ACTION_DESTROY, ACTION_RECREATE];
+
 function isInactive(active) {
   return active === false || active === "false";
+}
+
+/**
+ * The environment of an instance file is its folder: instances/<env>/...
+ */
+function getEnvironment(filePath) {
+  var parts = (filePath || "").split("/");
+  return parts[0] === "instances" && parts.length > 2 ? parts[1] : null;
+}
+
+function isProtectedPath(filePath) {
+  return (
+    config.getGitOpsProtectedEnvironments().indexOf(getEnvironment(filePath)) >
+    -1
+  );
+}
+
+function assertActionAllowed(action, filePath) {
+  if (DESTRUCTIVE_ACTIONS.indexOf(action) > -1 && isProtectedPath(filePath)) {
+    throw new Error(
+      "Destructive action '" + action + "' is not allowed for " + filePath +
+        " (environment '" + getEnvironment(filePath) + "')"
+    );
+  }
+}
+
+/**
+ * pipeline3 change flags for the sections that changed. Scripts, env vars and
+ * reactivation only take effect through the deployment step.
+ */
+function changeFlags(changedSections) {
+  var changed = function(section) {
+    return !_.isUndefined(changedSections[section]);
+  };
+  return {
+    artifactsChanges: changed("artifacts"),
+    deploymentChanges:
+      changed("deployment") ||
+      changed("envVars") ||
+      changed("scripts") ||
+      changed("active"),
+    dataChanges: changed("data"),
+    propertiesChanges: changed("properties")
+  };
+}
+
+function hasDeployableChanges(flags) {
+  return _.some(_.values(flags));
+}
+
+function timestampChanged(existingInstance, instanceDefinition, field) {
+  return (
+    !_.isEmpty(instanceDefinition[field]) &&
+    instanceDefinition[field] !== existingInstance[field]
+  );
+}
+
+/**
+ * Determines which lifecycle action an instance file requests.
+ * Precedence: inactive (destroy) > new instance (create) > recreateAt > redeployAt
+ * > changed deployable sections (update).
+ * Timestamps are ignored for new instances since creation deploys them anyway.
+ */
+function resolveAction(existingInstance, instanceDefinition) {
+  if (isInactive(instanceDefinition.active)) {
+    return ACTION_DESTROY;
+  }
+  if (_.isEmpty(existingInstance)) {
+    return ACTION_CREATE;
+  }
+  if (timestampChanged(existingInstance, instanceDefinition, "recreateAt")) {
+    return ACTION_RECREATE;
+  }
+  if (timestampChanged(existingInstance, instanceDefinition, "redeployAt")) {
+    return ACTION_REDEPLOY;
+  }
+  var flags = changeFlags(
+    buildInstanceEvent(existingInstance, instanceDefinition)
+  );
+  return hasDeployableChanges(flags) ? ACTION_UPDATE : null;
+}
+
+/**
+ * Looks up the stored instance for a GitOps file, preferring its UUID.
+ * Fails clearly on name clashes and renames, which the DB keys cannot represent.
+ */
+function findExistingInstance(instanceDefinition) {
+  var uuid = instanceDefinition.uuid;
+  var name = instanceDefinition.name;
+
+  if (_.isEmpty(uuid)) {
+    return db.getInstanceDefinition(null, name);
+  }
+
+  var byUuid = db.getInstanceDefinition(uuid);
+  if (!_.isEmpty(byUuid)) {
+    if (!_.isEmpty(name) && byUuid.name !== name) {
+      throw new Error(
+        "Renaming instance " + uuid + " from '" + byUuid.name + "' to '" +
+          name + "' is not supported"
+      );
+    }
+    return byUuid;
+  }
+
+  var byName = _.isEmpty(name) ? {} : db.getInstanceDefinition(null, name);
+  if (!_.isEmpty(byName)) {
+    throw new Error(
+      "Instance name '" + name + "' is already used by instance " + byName.uuid
+    );
+  }
+  return {};
+}
+
+/**
+ * Maps each UUID found in the instance files of the working tree to the files declaring it.
+ */
+function collectUuidPaths(filePaths) {
+  var uuidPaths = {};
+  filePaths.forEach(function(filePath) {
+    try {
+      var uuid = JSON.parse(fs.readFileSync(filePath, "utf8")).uuid;
+      if (!_.isEmpty(uuid)) {
+        uuidPaths[uuid] = (uuidPaths[uuid] || []).concat(filePath);
+      }
+    } catch (error) {
+      // Unparsable files are reported when they are processed
+    }
+  });
+  return uuidPaths;
+}
+
+/**
+ * Returns any stored instance definition sharing the UUID or name of a file.
+ */
+function findStoredInstance(instanceDefinition) {
+  var byUuid = _.isEmpty(instanceDefinition.uuid)
+    ? {}
+    : db.getInstanceDefinition(instanceDefinition.uuid);
+  if (!_.isEmpty(byUuid) || _.isEmpty(instanceDefinition.name)) {
+    return byUuid;
+  }
+  return db.getInstanceDefinition(null, instanceDefinition.name);
+}
+
+/**
+ * Rejects UUIDs that clash with another instance file or, for a newly added
+ * file, with an instance definition already stored in the OCD3 database.
+ *
+ * @param {Object} storedInstance - The stored instance matching a newly added file, {} otherwise.
+ */
+function checkUuidConflicts(
+  instanceDefinition,
+  filePath,
+  storedInstance,
+  uuidPaths
+) {
+  var uuid = instanceDefinition.uuid;
+  var otherPaths = _.without(_.get(uuidPaths, uuid, []), filePath);
+  if (!_.isEmpty(uuid) && !_.isEmpty(otherPaths)) {
+    throw new Error(
+      "UUID " + uuid + " in " + filePath + " is also used by: " +
+        otherPaths.join(", ")
+    );
+  }
+  if (!_.isEmpty(storedInstance)) {
+    throw new Error(
+      "New file " + filePath + " conflicts with existing instance '" +
+        storedInstance.name + "' (" + storedInstance.uuid + ")"
+    );
+  }
 }
 
 async function validateInstanceSchema(instanceContent) {
@@ -112,23 +292,30 @@ function parseNameStatusLine(line) {
   };
 }
 
-async function triggerDestroyForInstance(instanceDefinition, filePath) {
-  log.info(
-    "",
-    "Instance " +
-      instanceDefinition.uuid +
-      " marked inactive; destroy-instance will be scheduled"
+function actionResult(instanceDefinition, filePath, action, extra) {
+  if (action) {
+    log.info(
+      "",
+      "Instance " + instanceDefinition.uuid + ": '" + action + "' requested"
+    );
+  }
+  return Object.assign(
+    {
+      path: filePath,
+      processed: true,
+      instanceUuid: instanceDefinition.uuid,
+      instanceName: instanceDefinition.name,
+      action: action
+    },
+    extra
   );
-
-  return {
-    path: filePath,
-    processed: true,
-    instanceUuid: instanceDefinition.uuid,
-    needsDestroy: true
-  };
 }
 
-async function processInstanceFile(fileContent, filePath) {
+/**
+ * @param {Object} context - isAddedFile: the file was added since the last build;
+ *    uuidPaths: UUID to file paths map of the whole working tree.
+ */
+async function processInstanceFile(fileContent, filePath, context) {
   try {
     var instanceDefinition = JSON.parse(fileContent);
 
@@ -140,48 +327,84 @@ async function processInstanceFile(fileContent, filePath) {
       );
     }
 
-    var existingInstance = db.getInstanceDefinition(
-      instanceDefinition.uuid,
-      instanceDefinition.name
+    var isAddedFile = _.get(context, "isAddedFile", false);
+    checkUuidConflicts(
+      instanceDefinition,
+      filePath,
+      isAddedFile ? findStoredInstance(instanceDefinition) : {},
+      _.get(context, "uuidPaths", {})
     );
+
+    var existingInstance = findExistingInstance(instanceDefinition);
     var isNewInstance = _.isEmpty(existingInstance);
 
-    validator.validateInstanceDefinition(instanceDefinition, isNewInstance);
+    validator.validateInstanceDefinition(instanceDefinition, isNewInstance, {
+      allowUuidOnCreate: true,
+      skipProdTypeRule: true
+    });
 
-    if (isInactive(instanceDefinition.active)) {
-      // Ensure uuid is available for destroy (new inactive instances are rejected by validator)
-      if (_.isEmpty(instanceDefinition.uuid) && !_.isEmpty(existingInstance)) {
-        instanceDefinition.uuid = existingInstance.uuid;
-      }
+    var action = resolveAction(existingInstance, instanceDefinition);
+    assertActionAllowed(action, filePath);
+
+    var changedSections = buildInstanceEvent(
+      existingInstance,
+      instanceDefinition
+    );
+
+    if (_.isEmpty(instanceDefinition.uuid) && !isNewInstance) {
+      instanceDefinition.uuid = existingInstance.uuid;
+    }
+    if (action === ACTION_DESTROY) {
       instanceDefinition.active = "false";
-      var savedInactive = db.saveInstanceDefinition(instanceDefinition);
-      if (savedInactive && savedInactive.uuid) {
-        instanceDefinition.uuid = savedInactive.uuid;
-      }
-      return await triggerDestroyForInstance(instanceDefinition, filePath);
     }
 
     var savedDefinition = db.saveInstanceDefinition(instanceDefinition);
     log.info("", "Saved instance definition from " + filePath);
-
-    // Prefer uuid assigned/confirmed by the DB layer
     if (savedDefinition && savedDefinition.uuid) {
       instanceDefinition.uuid = savedDefinition.uuid;
     }
 
-    var instanceEvent = buildInstanceEvent(
-      existingInstance,
-      instanceDefinition
-    );
-    db.saveInstanceEvent(instanceEvent);
-    log.info("", "Saved instance event for " + filePath);
+    var environment = { environment: getEnvironment(filePath) };
 
-    return {
-      path: filePath,
-      processed: true,
-      instanceUuid: instanceDefinition.uuid,
-      needsDestroy: false
-    };
+    if (action === ACTION_CREATE) {
+      return actionResult(
+        instanceDefinition,
+        filePath,
+        action,
+        Object.assign(environment, {
+          artifactsChanges: !_.isEmpty(instanceDefinition.artifacts),
+          deploymentChanges: !_.isEmpty(instanceDefinition.deployment),
+          dataChanges: !_.isEmpty(instanceDefinition.data),
+          propertiesChanges: !_.isEmpty(instanceDefinition.properties)
+        })
+      );
+    }
+    if (action === ACTION_REDEPLOY) {
+      return actionResult(
+        instanceDefinition,
+        filePath,
+        action,
+        Object.assign(environment, {
+          artifactsChanges: true,
+          deploymentChanges: true,
+          dataChanges: !_.isUndefined(changedSections.data),
+          propertiesChanges: true
+        })
+      );
+    }
+    if (action === ACTION_UPDATE) {
+      return actionResult(
+        instanceDefinition,
+        filePath,
+        action,
+        Object.assign(environment, changeFlags(changedSections))
+      );
+    }
+    if (action) {
+      return actionResult(instanceDefinition, filePath, action, environment);
+    }
+    log.info("", "No deployable changes in " + filePath);
+    return actionResult(instanceDefinition, filePath, null, environment);
   } catch (error) {
     log.error("", "Error processing instance file " + filePath + ": " + error);
     return {
@@ -194,31 +417,34 @@ async function processInstanceFile(fileContent, filePath) {
 
 async function processDeletedInstanceFile(filePath, previousCommit) {
   try {
+    assertActionAllowed(ACTION_DESTROY, filePath);
+
     var oldContent = await git.show([previousCommit + ":" + filePath]);
-    var instanceDefinition = JSON.parse(oldContent);
+    var deletedDefinition = JSON.parse(oldContent);
 
-    if (_.isEmpty(instanceDefinition.uuid) && !_.isEmpty(instanceDefinition.name)) {
-      var existing = db.getInstanceDefinition(null, instanceDefinition.name);
-      if (!_.isEmpty(existing)) {
-        instanceDefinition.uuid = existing.uuid;
-        instanceDefinition.name = existing.name;
-      }
+    var existing = _.isEmpty(deletedDefinition.uuid)
+      ? db.getInstanceDefinition(null, deletedDefinition.name)
+      : db.getInstanceDefinition(deletedDefinition.uuid);
+
+    if (_.isEmpty(existing)) {
+      log.info("", "Deleted file " + filePath + " was never deployed; skipping");
+      return {
+        path: filePath,
+        status: "deleted",
+        processed: false,
+        reason: "Instance not found in the OCD3 database"
+      };
     }
 
-    if (_.isEmpty(instanceDefinition.uuid)) {
-      throw new Error(
-        "Cannot destroy deleted instance file without a uuid: " + filePath
-      );
-    }
-
-    instanceDefinition.active = "false";
     db.saveInstanceDefinition({
-      uuid: instanceDefinition.uuid,
-      name: instanceDefinition.name,
+      uuid: existing.uuid,
+      name: existing.name,
       active: "false"
     });
 
-    return await triggerDestroyForInstance(instanceDefinition, filePath);
+    return actionResult(existing, filePath, ACTION_DESTROY, {
+      environment: getEnvironment(filePath)
+    });
   } catch (error) {
     log.error(
       "",
@@ -232,6 +458,9 @@ async function processDeletedInstanceFile(filePath, previousCommit) {
     };
   }
 }
+
+// Bootstrap files are not "added": the DB may already know them from a previous OCD3 setup
+const STATUS_BOOTSTRAP = "B";
 
 async function listAllInstanceFiles() {
   var instancesDir = "instances";
@@ -255,7 +484,7 @@ async function listAllInstanceFiles() {
   }
 
   return walk(instancesDir).map(function(filePath) {
-    return { status: "A", path: filePath };
+    return { status: STATUS_BOOTSTRAP, path: filePath };
   });
 }
 
@@ -325,6 +554,12 @@ async function getChangedFilesContent() {
 
     log.info("", "Instance files changed: " + JSON.stringify(instanceFiles));
 
+    var uuidPaths = collectUuidPaths(
+      (await listAllInstanceFiles()).map(function(f) {
+        return f.path;
+      })
+    );
+
     var results = [];
     for (var i = 0; i < instanceFiles.length; i++) {
       var file = instanceFiles[i];
@@ -336,8 +571,25 @@ async function getChangedFilesContent() {
           continue;
         }
 
+        if (
+          file.oldPath &&
+          isProtectedPath(file.oldPath) &&
+          getEnvironment(file.oldPath) !== getEnvironment(file.path)
+        ) {
+          throw new Error(
+            "Moving " + file.oldPath + " to " + file.path +
+              " is not allowed: instances cannot leave environment '" +
+              getEnvironment(file.oldPath) + "'"
+          );
+        }
+
         var content = await readFile(file.path, "utf8");
-        results.push(await processInstanceFile(content, file.path));
+        results.push(
+          await processInstanceFile(content, file.path, {
+            isAddedFile: file.status === "A",
+            uuidPaths: uuidPaths
+          })
+        );
       } catch (error) {
         log.error("", "Error processing file " + file.path + ": " + error);
         results.push({
@@ -355,8 +607,8 @@ async function getChangedFilesContent() {
       if (result.processed) {
         log.info("", "Successfully processed instance definition");
         log.info("", "Instance UUID: " + result.instanceUuid);
-        if (result.needsDestroy) {
-          log.info("", "Destroy requested for instance");
+        if (result.action) {
+          log.info("", "Action requested: " + result.action);
         }
       } else if (result.error) {
         log.error("", "Error: " + result.error);
@@ -383,4 +635,15 @@ async function getChangedFilesContent() {
   }
 }
 
-getChangedFilesContent();
+module.exports = {
+  resolveAction: resolveAction,
+  buildInstanceEvent: buildInstanceEvent,
+  checkUuidConflicts: checkUuidConflicts,
+  getEnvironment: getEnvironment,
+  assertActionAllowed: assertActionAllowed,
+  changeFlags: changeFlags
+};
+
+if (require.main === module) {
+  getChangedFilesContent();
+}

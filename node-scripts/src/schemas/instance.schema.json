@@ -207,6 +207,16 @@
         { "type": "string", "enum": ["true", "false"] }
       ]
     },
+    "redeployAt": {
+      "description": "Changing this timestamp redeploys the instance (artifacts, deployment, properties).",
+      "type": "string",
+      "format": "date-time"
+    },
+    "recreateAt": {
+      "description": "Changing this timestamp destroys the instance and recreates it.",
+      "type": "string",
+      "format": "date-time"
+    },
     "uuid": {
       "type": "string",
       "pattern":

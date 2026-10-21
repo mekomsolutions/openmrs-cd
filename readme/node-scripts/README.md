@@ -60,6 +60,95 @@ stage ('Pre-host connection preparation') {
 
 To understand how the Bash script is generated one needs to study the logic of **prehost-preparation.js**. There is a systematic method though to approach any job and its Node scripts: 1) look at a job configuration (either config.xml or Jenkinsfile) to understand which Node scripts are used and 2) study those scripts to understand the underlying logic leading to the Bash scripts performing the core CD tasks.
 
+#### GitOps (`git-instance-events` job)
+The **git-instance-events** job polls the GitOps repository and runs **gitops/gitops.js** on every instance definition changed under `instances/**/*.json`. The script writes `instance-processing-report.json`, and a SystemGroovy step then schedules a downstream job for each file that requests an action:
+
+| Trigger in the instance file | Action | Downstream job |
+|---|---|---|
+| New file (instance not in the OCD3 database) | `create` | `pipeline3` with `creation=true`, and change flags set for each non-empty section |
+| `"active": false` or file deleted | `destroy` | `destroy-instance` with `recreate=false` |
+| `recreateAt` changed | `recreate` | `destroy-instance` with `recreate=true`, which then runs `pipeline3` |
+| `redeployAt` changed | `redeploy` | `pipeline3` with artifacts, deployment and properties changes (data only if the `data` section also changed) |
+| `artifacts`, `deployment`, `data`, `properties`, `envVars`, `scripts` or `active` changed | `update` | `pipeline3` with the matching change flags (`envVars`, `scripts` and `active` map to deployment) |
+
+```json
+{
+  "name": "c2c-dev",
+  "uuid": "8812bace-07b6-4900-86b1-8911e7f64b7d",
+  "redeployAt": "2026-10-02T09:00:00Z",
+  "recreateAt": "2026-10-02T09:00:00Z"
+}
+```
+
+`redeployAt` and `recreateAt` are ISO 8601 timestamps. An action fires only when the value differs from the one stored in the OCD3 database, so re-running the job on the same commit does nothing. Adding one of these fields for the first time to an existing instance also counts as a change. Precedence is destroy, then create, then recreate, then redeploy, then update. Timestamps are ignored on a new instance because creating it already deploys it. Changes limited to metadata (such as `description`, `group` or `labels`) are saved without deploying anything. GitOps never queues instance events, so `instance-events-cron` and its type-based filtering are not involved.
+
+**Environments come from folders.** The environment of a file is the folder right under `instances/` (for example `instances/prod/foo.json` is in `prod`). The `type` field is not used to decide the environment. In protected environments (`prod`, see `getGitOpsProtectedEnvironments()` in `config.js`), destructive actions are refused and nothing is saved:
+- `"active": false` and deleting the file (destroy).
+- Changing `recreateAt` (recreate).
+- Moving the file to another environment folder.
+
+Create, update and redeploy are allowed in protected environments. The SystemGroovy step also refuses to schedule `destroy-instance` for a protected environment, as a second safeguard.
+
+GitOps files own their `uuid`: a new file may already carry one, and it is kept as is. Existing instances are matched by `uuid` first. These files are rejected:
+- A newly added file whose `uuid` or `name` matches an instance definition already stored in the OCD3 database.
+- Any file whose `uuid` is also declared by another instance file in the repository.
+- A rename of an instance (same `uuid`, new `name`).
+
+The first run (no previous successful commit) is not treated as adding files, so an already populated database does not cause conflicts. Moving a file within `instances/` is also not treated as adding a file. Deleting a file whose instance was never deployed does nothing.
+
+#### Secrets: Jenkins credentials and Vault
+pipeline3 substitutes two kinds of references anywhere in an instance definition (through `utils.resolveSecrets()`):
+
+| Reference | Source |
+|---|---|
+| `jenkinsCredentials(openmrs.password)` | JSON path in the Jenkins "secret text" credentials named `<group>` and `<group>_<type>` |
+| `vault(secret/c2c/prod#db_password)` | Key `db_password` of the HashiCorp Vault secret at path `secret/c2c/prod` |
+
+```json
+"envVars": {
+  "DB_PASSWORD": "vault(secret/c2c/prod#db_password)",
+  "DB_URL": "mysql://root:vault(secret/c2c/prod#db_password)@mysql:3306/openmrs"
+}
+```
+
+The path is the one used by `vault kv get`: for KV v2 the `data/` segment is not written. In the "Load Jenkins Credentials" stage, pipeline3 collects every `vault(...)` reference, fetches the values with the Jenkins HashiCorp Vault plugin (`withVault`), and passes them to the Node scripts in the `VAULT_SECRETS` env var. A reference that cannot be resolved fails the build.
+
+Vault is configured from environment variables on the `openmrscd` container by `docker/resources/init.groovy.d/vault.groovy`, which runs on every Jenkins start. It creates the `ocd3-vault` credential and sets the global Vault configuration. Vault is disabled when `VAULT_ADDR` is empty.
+
+| Variable | Description |
+|---|---|
+| `VAULT_ADDR` | Vault URL, for example `http://vault:8200` or `https://vault.example.com` |
+| `VAULT_AUTH_METHOD` | `token` (default), `approle` or `kubernetes` |
+| `VAULT_TOKEN` | Token, for `token` auth |
+| `VAULT_ROLE_ID`, `VAULT_SECRET_ID`, `VAULT_APPROLE_PATH` | AppRole credentials and mount (default `approle`) |
+| `VAULT_K8S_ROLE`, `VAULT_K8S_MOUNT` | Kubernetes auth role and mount (default `kubernetes`) |
+| `VAULT_KV_VERSION` | KV engine version, `2` (default) or `1` |
+| `VAULT_NAMESPACE` | Vault Enterprise namespace (optional) |
+| `VAULT_SKIP_VERIFY` | `true` to skip TLS verification |
+
+Copy `.env.example` to `.env` (ignored by git) and keep the block you need.
+
+**Bundled dev Vault.** The `vault` service in `docker-compose.yaml` runs Vault in dev mode (in-memory, unsealed, root token `root`). It is for local testing only, and its secrets are lost when it stops.
+```bash
+docker compose --profile vault up -d
+docker exec -e VAULT_TOKEN=root vault vault kv put secret/c2c/prod db_password=changeme
+```
+
+**External Vault.** Set `VAULT_ADDR` and AppRole (or Kubernetes) credentials in `.env`, and start without the `vault` profile. Give the role read access only to the paths OCD3 needs:
+```hcl
+path "secret/data/c2c/*" {
+  capabilities = ["read"]
+}
+```
+```bash
+vault policy write ocd3 ocd3.hcl
+vault write auth/approle/role/ocd3 token_policies=ocd3 token_ttl=1h
+vault read auth/approle/role/ocd3/role-id
+vault write -f auth/approle/role/ocd3/secret-id
+```
+
+The Vault plugin is pinned in `docker/config/plugins.txt`, so the `openmrscd` image must be rebuilt after changing it.
+
 #### 'utils'
 ##### config.js
 This module exports `config` that provides an API to anything that is configurable: variables names, file paths, jobs names... etc. It is important to leverage config to avoid the pitfalls of any kind of hardcoding. `config` is used to parameterize pretty much everything. See also below the section 'Parameterize with `config`'.

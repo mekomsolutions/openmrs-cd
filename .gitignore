@@ -21,3 +21,5 @@ gradle-app.setting
 /.idea/
 /data/
 !data/.gitkeep 
+# Local Vault and other environment settings
+.env
