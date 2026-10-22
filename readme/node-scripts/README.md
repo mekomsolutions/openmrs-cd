@@ -113,14 +113,14 @@ pipeline3 substitutes two kinds of references anywhere in an instance definition
 
 The path is the one used by `vault kv get`: for KV v2 the `data/` segment is not written. In the "Load Jenkins Credentials" stage, pipeline3 collects every `vault(...)` reference, fetches the values with the Jenkins HashiCorp Vault plugin (`withVault`), and passes them to the Node scripts in the `VAULT_SECRETS` env var. A reference that cannot be resolved fails the build.
 
-Vault is configured from environment variables on the `openmrscd` container by `docker/resources/init.groovy.d/vault.groovy`, which runs on every Jenkins start. It creates the `ocd3-vault` credential and sets the global Vault configuration. Vault is disabled when `VAULT_ADDR` is empty.
+Vault is configured from environment variables on the `openmrscd` container by `docker/resources/init.groovy.d/vault.groovy`, which runs on every Jenkins start. It creates the `ocd3-vault` credential and sets the global Vault configuration. Vault is disabled when `VAULT_ADDR` is empty. **AppRole is the default login.** Token is used only when `VAULT_AUTH_METHOD=token`, or as a local-dev fallback when `VAULT_ROLE_ID` / `VAULT_SECRET_ID` are missing but `VAULT_TOKEN` is set.
 
 | Variable | Description |
 |---|---|
 | `VAULT_ADDR` | Vault URL, for example `http://vault:8200` or `https://vault.example.com` |
-| `VAULT_AUTH_METHOD` | `token` (default), `approle` or `kubernetes` |
-| `VAULT_TOKEN` | Token, for `token` auth |
+| `VAULT_AUTH_METHOD` | `approle` (default), `token` or `kubernetes` |
 | `VAULT_ROLE_ID`, `VAULT_SECRET_ID`, `VAULT_APPROLE_PATH` | AppRole credentials and mount (default `approle`) |
+| `VAULT_TOKEN` | Token, for `token` auth or the local-dev fallback |
 | `VAULT_K8S_ROLE`, `VAULT_K8S_MOUNT` | Kubernetes auth role and mount (default `kubernetes`) |
 | `VAULT_KV_VERSION` | KV engine version, `2` (default) or `1` |
 | `VAULT_NAMESPACE` | Vault Enterprise namespace (optional) |
@@ -128,13 +128,13 @@ Vault is configured from environment variables on the `openmrscd` container by `
 
 Copy `.env.example` to `.env` (ignored by git) and keep the block you need.
 
-**Bundled dev Vault.** The `vault` service in `docker-compose.yaml` runs Vault in dev mode (in-memory, unsealed, root token `root`). It is for local testing only, and its secrets are lost when it stops.
+**Bundled dev Vault.** The `vault` service in `docker-compose.yaml` runs Vault in dev mode (in-memory, unsealed, root token `root`). It is for local testing only, and its secrets are lost when it stops. Set `VAULT_AUTH_METHOD=token` (or omit role id / secret id and keep `VAULT_TOKEN`).
 ```bash
 docker compose --profile vault up -d
 docker exec -e VAULT_TOKEN=root vault vault kv put secret/c2c/prod db_password=changeme
 ```
 
-**External Vault.** Set `VAULT_ADDR` and AppRole (or Kubernetes) credentials in `.env`, and start without the `vault` profile. Give the role read access only to the paths OCD3 needs:
+**External Vault.** AppRole is the default. Set `VAULT_ADDR`, `VAULT_ROLE_ID` and `VAULT_SECRET_ID` in `.env`, and start without the `vault` profile. Give the role read access only to the paths OCD3 needs:
 ```hcl
 path "secret/data/c2c/*" {
   capabilities = ["read"]

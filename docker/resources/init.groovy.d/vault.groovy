@@ -2,6 +2,7 @@
 
 // Configures the HashiCorp Vault plugin from environment variables.
 // Vault stays disabled when VAULT_ADDR is not set.
+// AppRole is the default login. Token is a fallback when ROLE_ID/SECRET_ID are missing.
 
 import com.cloudbees.plugins.credentials.CredentialsScope
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider
@@ -15,14 +16,6 @@ import hudson.util.Secret
 
 def env = System.getenv()
 def log = { msg -> println "[vault.groovy] ${msg}" }
-def required = { name ->
-  def value = env[name]
-  if (!value) {
-    throw new IllegalArgumentException("${name} must be set when VAULT_AUTH_METHOD is '${env.VAULT_AUTH_METHOD ?: 'token'}'")
-  }
-  return value
-}
-
 def credentialId = "ocd3-vault"
 def vaultAddr = env.VAULT_ADDR
 
@@ -31,7 +24,24 @@ if (!vaultAddr) {
   return
 }
 
-def authMethod = (env.VAULT_AUTH_METHOD ?: "token").toLowerCase()
+def authMethod = (env.VAULT_AUTH_METHOD ?: "approle").toLowerCase()
+if (authMethod == "approle" && !(env.VAULT_ROLE_ID && env.VAULT_SECRET_ID)) {
+  if (env.VAULT_TOKEN) {
+    log "VAULT_ROLE_ID/VAULT_SECRET_ID are not set; falling back to token auth for local development."
+    authMethod = "token"
+  } else {
+    throw new IllegalArgumentException("VAULT_ROLE_ID and VAULT_SECRET_ID must be set when VAULT_AUTH_METHOD is 'approle' (or unset). Set VAULT_TOKEN to use token auth instead.")
+  }
+}
+
+def required = { name ->
+  def value = env[name]
+  if (!value) {
+    throw new IllegalArgumentException("${name} must be set when VAULT_AUTH_METHOD is '${authMethod}'")
+  }
+  return value
+}
+
 def description = "OCD3 Vault (${authMethod}) - managed by init.groovy.d/vault.groovy"
 def credential
 
@@ -54,7 +64,12 @@ switch (authMethod) {
 def store = SystemCredentialsProvider.getInstance().getStore()
 def existing = SystemCredentialsProvider.getInstance().getCredentials().find { it.id == credentialId }
 if (existing) {
-  store.updateCredentials(Domain.global(), existing, credential)
+  if (existing.class != credential.class) {
+    store.removeCredentials(Domain.global(), existing)
+    store.addCredentials(Domain.global(), credential)
+  } else {
+    store.updateCredentials(Domain.global(), existing, credential)
+  }
 } else {
   store.addCredentials(Domain.global(), credential)
 }
