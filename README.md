@@ -54,9 +54,7 @@ See [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/ab
 
 #### `default`:
 
-The `default` project type should cover most cases. It assumes that build and deploy instructions are provided in a custom file present at the root of the project and named **.ocd3.yml** (or .ocd3.yaml)
-
-The **.ocd3.yml** file should display as below:
+The `default` project type should cover most cases. Put a **`.ocd3.yml`** file at the **root of the project repository**. If `.ocd3.yml` is missing, OCD3 tries `.ocd3.yaml`.
 
 ```
 version: 1
@@ -71,8 +69,19 @@ deploy:
 rebuildOnDependencyChanges: true|false
 ```
 
-Note that the `artifact` section is **required only if your project is not a Maven project**.
-Note that the `rebuildOnDependencyChanges`, if set to `true`, will parse the project's POM file and save its dependencies so to later rebuild when any dependending artifact has changed.
+| Field | Purpose |
+|---|---|
+| `version` | File format. Currently `1`. |
+| `build.bash_commands` | Shell run during the build stage. |
+| `deploy.bash_commands` | Shell run during the deploy stage. |
+| `deploy.artifact` | Maven coordinates (`groupId`, `artifactId`, `version`). **Required only if the project has no `pom.xml`.** With a POM, coordinates come from the POM. |
+| `rebuildOnDependencyChanges` | If `true` (boolean or `"true"`) **and** a POM exists, OCD3 stores the POM dependencies and rebuilds this project when one of them is rebuilt. Ignored when there is no POM. `"false"` or omitted does nothing. |
+
+When there is no POM, missing `deploy.artifact` fields default to:
+
+- `groupId`: `net.mekomsolutions`
+- `artifactId`: the Git repository name
+- `version`: the branch name, or the commit id if there is no branch name
 
 See an example for a Maven project:
 
@@ -266,12 +275,14 @@ And answer the prompted questions.
 
 ```
 .
-├── docker
-├── jenkins
-└── node-scripts
+├── docker            # image: Dockerfile, plugins.txt, vault.groovy, artifact-repo helpers
+├── jenkins           # preconfigured Jenkins home (jobs, Jenkinsfiles)
+├── node-scripts      # Node job scripts that generate the Bash CD steps
+├── readme            # images and component guides (docker, jenkins, node-scripts)
+├── tests/vagrant     # local jump/target SSH hosts
+├── .github           # CI workflows
+└── data              # local app_data (gitignored); file-based instance DB at runtime
 ```
-
-**node-scripts** is the Node JS scripts area, **docker** holds the Dockerfile (and other resources needed to configure the container) and **jenkins** contains the parts of Jenkins home that are preconfigured, as well as the pipelines' Jenkinsfiles.
 
 Gradle is used to run all build tasks and package all artifacts that make OCD3.
 
