@@ -376,7 +376,7 @@ module.exports = {
     return "recreate";
   },
   /**
-   * GitOps environment folders (instances/<env>/...) where destroy/recreate are refused.
+   * GitOps environment folders (instances/<env>/...) where destroy/reset are refused.
    */
   getGitOpsProtectedEnvironments: function() {
     return ["prod"];

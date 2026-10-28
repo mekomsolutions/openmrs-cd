@@ -207,15 +207,29 @@
         { "type": "string", "enum": ["true", "false"] }
       ]
     },
-    "redeployAt": {
-      "description": "Changing this timestamp redeploys the instance (artifacts, deployment, properties).",
-      "type": "string",
-      "format": "date-time"
-    },
-    "recreateAt": {
-      "description": "Changing this timestamp destroys the instance and recreates it.",
-      "type": "string",
-      "format": "date-time"
+    "actions": {
+      "description":
+        "Lifecycle requests. Changing a requestId triggers that action.",
+      "type": "object",
+      "properties": {
+        "reset": {
+          "type": "object",
+          "required": ["requestId"],
+          "properties": {
+            "requestId": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        },
+        "redeploy": {
+          "type": "object",
+          "required": ["requestId"],
+          "properties": {
+            "requestId": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
     },
     "uuid": {
       "type": "string",

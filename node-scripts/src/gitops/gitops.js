@@ -3,7 +3,7 @@
 /**
  * Processes instance definition changes from the GitOps repository.
  * Saves definitions and reports one action per file (create, update, redeploy,
- * recreate, destroy) that a following SystemGroovy step turns into Jenkins jobs.
+ * reset, destroy) that a following SystemGroovy step turns into Jenkins jobs.
  * The environment is the folder under instances/, never the 'type' field.
  */
 
@@ -44,9 +44,9 @@ const INSTANCE_EVENT_SECTIONS = [
 const ACTION_CREATE = "create";
 const ACTION_UPDATE = "update";
 const ACTION_DESTROY = "destroy";
-const ACTION_RECREATE = "recreate";
+const ACTION_RESET = "reset";
 const ACTION_REDEPLOY = "redeploy";
-const DESTRUCTIVE_ACTIONS = [ACTION_DESTROY, ACTION_RECREATE];
+const DESTRUCTIVE_ACTIONS = [ACTION_DESTROY, ACTION_RESET];
 
 function isInactive(active) {
   return active === false || active === "false";
@@ -100,18 +100,22 @@ function hasDeployableChanges(flags) {
   return _.some(_.values(flags));
 }
 
-function timestampChanged(existingInstance, instanceDefinition, field) {
+function actionRequestId(instance, actionName) {
+  return _.get(instance, ["actions", actionName, "requestId"]);
+}
+
+function actionRequested(existingInstance, instanceDefinition, actionName) {
+  var next = actionRequestId(instanceDefinition, actionName);
   return (
-    !_.isEmpty(instanceDefinition[field]) &&
-    instanceDefinition[field] !== existingInstance[field]
+    !_.isEmpty(next) && next !== actionRequestId(existingInstance, actionName)
   );
 }
 
 /**
  * Determines which lifecycle action an instance file requests.
- * Precedence: inactive (destroy) > new instance (create) > recreateAt > redeployAt
+ * Precedence: inactive (destroy) > new instance (create) > reset > redeploy
  * > changed deployable sections (update).
- * Timestamps are ignored for new instances since creation deploys them anyway.
+ * requestIds are ignored for new instances since creation deploys them anyway.
  */
 function resolveAction(existingInstance, instanceDefinition) {
   if (isInactive(instanceDefinition.active)) {
@@ -120,10 +124,10 @@ function resolveAction(existingInstance, instanceDefinition) {
   if (_.isEmpty(existingInstance)) {
     return ACTION_CREATE;
   }
-  if (timestampChanged(existingInstance, instanceDefinition, "recreateAt")) {
-    return ACTION_RECREATE;
+  if (actionRequested(existingInstance, instanceDefinition, ACTION_RESET)) {
+    return ACTION_RESET;
   }
-  if (timestampChanged(existingInstance, instanceDefinition, "redeployAt")) {
+  if (actionRequested(existingInstance, instanceDefinition, ACTION_REDEPLOY)) {
     return ACTION_REDEPLOY;
   }
   var flags = changeFlags(

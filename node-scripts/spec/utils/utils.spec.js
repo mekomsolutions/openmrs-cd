@@ -282,7 +282,7 @@ describe("Utils", function() {
       "secret/c2c/prod#db_password": "s3cr3t",
       "secret/c2c/prod#api_key": 'quo"te\\slash$&'
     };
-    const obj = {
+    const instanceDef = {
       envVars: {
         DB_PASSWORD: "vault(secret/c2c/prod#db_password)",
         URL: "mysql://root:vault(secret/c2c/prod#db_password)@db",
@@ -291,7 +291,7 @@ describe("Utils", function() {
       name: "c2c-prod"
     };
 
-    expect(utils.substituteVaultSecrets(obj, vaultSecrets)).toEqual({
+    expect(utils.substituteVaultSecrets(instanceDef, vaultSecrets)).toEqual({
       envVars: {
         DB_PASSWORD: "s3cr3t",
         URL: "mysql://root:s3cr3t@db",
@@ -302,12 +302,12 @@ describe("Utils", function() {
   });
 
   it("should fail on unresolved Vault secrets.", function() {
-    const obj = { password: "vault(secret/c2c/prod#missing)" };
+    const instanceDef = { password: "vault(secret/c2c/prod#missing)" };
     expect(function() {
-      utils.substituteVaultSecrets(obj, {});
+      utils.substituteVaultSecrets(instanceDef, {});
     }).toThrowError(/Vault secret 'secret\/c2c\/prod#missing' was not resolved/);
     expect(function() {
-      utils.substituteVaultSecrets(obj, undefined);
+      utils.substituteVaultSecrets(instanceDef, undefined);
     }).toThrowError(/was not resolved/);
   });
 

@@ -328,15 +328,15 @@ module.exports = {
    *
    * Searches for 'vault(path#key)' references and replaces them by the values fetched from Vault by pipeline3
    *
-   * @param {Object} Object to parse through
-   * @param {Object} Map of resolved secrets, keyed by 'path#key'
-   * @returns {Object} The initial passed object, but with Vault references substituted.
+   * @param {Object} instanceDef The instance definition to parse through
+   * @param {Object} vaultSecrets Map of secrets fetched for this instance, keyed by 'path#key'
+   * @returns {Object} The instance definition with Vault references substituted.
    *
    */
-  substituteVaultSecrets: function(obj, vaultSecrets) {
+  substituteVaultSecrets: function(instanceDef, vaultSecrets) {
     // Must stay in sync with findVaultReferences() in the pipeline3 job
     var regExp = /vault\(([^)#]+)#([^)]+)\)/g;
-    var jsonDataAsString = JSON.stringify(obj).replace(regExp, function(
+    var jsonDataAsString = JSON.stringify(instanceDef).replace(regExp, function(
       match,
       secretPath,
       key
