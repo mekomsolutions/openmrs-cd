@@ -109,7 +109,7 @@
       <filterQueue>false</filterQueue>
       <properties class="hudson.model.View$PropertyList"/>
       <jobNames>
-        <comparator class="java.lang.String$CaseInsensitiveComparator"/>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView/jobNames/comparator"/>
         <string>git-instance-events</string>
         <string>Git-Test</string>
         <string>GitOps-Test</string>
@@ -141,7 +141,7 @@
         <unserializable-parents/>
         <tree-map>
           <default>
-            <comparator class="java.lang.String$CaseInsensitiveComparator" reference="../../../../../../views/listView[3]/jobNames/comparator"/>
+            <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../views/listView/jobNames/comparator"/>
           </default>
           <int>2</int>
           <string>APP_DATA_DIR_PATH</string>
