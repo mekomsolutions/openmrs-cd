@@ -108,7 +108,7 @@ pipeline {
   nodejs &apos;NodeJS 14.20.0&apos;
  }
  stages {
-  stage(&apos;Load Jenkins Credentials&apos;) {
+  stage(&apos;Load secrets&apos;) {
    steps {
     script {
      // Fetch the instance definition to retrieve &apos;group&apos; and &apos;type&apos; values
@@ -164,6 +164,7 @@ pipeline {
   stage(&apos;Pre-host connection preparation&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    
    steps {
@@ -201,6 +202,7 @@ pipeline {
   stage(&apos;Host preparation&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
       expression {
@@ -217,6 +219,7 @@ pipeline {
   stage(&apos;Maintenance mode: ON&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/maintenance-on.js&apos;
@@ -228,6 +231,7 @@ pipeline {
   stage(&apos;Production host preparation&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
     expression {
@@ -244,6 +248,7 @@ pipeline {
   stage(&apos;Start or restart the instance&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
       expression {
@@ -260,6 +265,7 @@ pipeline {
   stage(&apos;Instance startup status monitoring&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
       expression {
@@ -276,6 +282,7 @@ pipeline {
   stage(&apos;Post startup actions&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
       expression {
@@ -292,6 +299,7 @@ pipeline {
   stage(&apos;Maintenance mode: OFF&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
       expression {

@@ -224,7 +224,7 @@ describe("Tests suite for pipeline3", function() {
         "'"
     );
 
-    // verif the 'Load Jenkins Credentials' stage
+    // verif the 'Load secrets' stage
     var fetchInstance =
       "     sh 'node /opt/node-scripts/src/$JOB_NAME/" +
       config.getFetchInstanceDefJsScriptName() +
