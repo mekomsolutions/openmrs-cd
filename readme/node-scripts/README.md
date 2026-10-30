@@ -60,6 +60,8 @@ stage ('Pre-host connection preparation') {
 
 To understand how the Bash script is generated one needs to study the logic of **prehost-preparation.js**. There is a systematic method though to approach any job and its Node scripts: 1) look at a job configuration (either config.xml or Jenkinsfile) to understand which Node scripts are used and 2) study those scripts to understand the underlying logic leading to the Bash scripts performing the core CD tasks.
 
+Instance-file authors: [GitOps instance files](../../README.md#gitops-instance-files) and [secrets](../../README.md#secrets-in-instance-definitions) in the User documentation. GitOps dispatch and Vault fetch path: [Design decisions](../../README.md#design-decisions).
+
 #### 'utils'
 ##### config.js
 This module exports `config` that provides an API to anything that is configurable: variables names, file paths, jobs names... etc. It is important to leverage config to avoid the pitfalls of any kind of hardcoding. `config` is used to parameterize pretty much everything. See also below the section 'Parameterize with `config`'.

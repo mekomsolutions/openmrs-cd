@@ -200,6 +200,37 @@
         ]
       }
     },
+    "active": {
+      "description": "Whether the instance should be running. Accepts boolean or string forms used by OCD3.",
+      "oneOf": [
+        { "type": "boolean" },
+        { "type": "string", "enum": ["true", "false"] }
+      ]
+    },
+    "actions": {
+      "description":
+        "Lifecycle requests. Changing a requestId triggers that action.",
+      "type": "object",
+      "properties": {
+        "reset": {
+          "type": "object",
+          "required": ["requestId"],
+          "properties": {
+            "requestId": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        },
+        "redeploy": {
+          "type": "object",
+          "required": ["requestId"],
+          "properties": {
+            "requestId": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
     "uuid": {
       "type": "string",
       "pattern":

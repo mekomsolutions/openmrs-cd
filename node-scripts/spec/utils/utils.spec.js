@@ -277,6 +277,67 @@ describe("Utils", function() {
     }).toThrow();
   });
 
+  it("should substitute Vault secrets.", function() {
+    const vaultSecrets = {
+      "secret/c2c/prod#db_password": "s3cr3t",
+      "secret/c2c/prod#api_key": 'quo"te\\slash$&'
+    };
+    const instanceDef = {
+      envVars: {
+        DB_PASSWORD: "vault(secret/c2c/prod#db_password)",
+        URL: "mysql://root:vault(secret/c2c/prod#db_password)@db",
+        API_KEY: "vault(secret/c2c/prod#api_key)"
+      },
+      name: "c2c-prod"
+    };
+
+    expect(utils.substituteVaultSecrets(instanceDef, vaultSecrets)).toEqual({
+      envVars: {
+        DB_PASSWORD: "s3cr3t",
+        URL: "mysql://root:s3cr3t@db",
+        API_KEY: 'quo"te\\slash$&'
+      },
+      name: "c2c-prod"
+    });
+  });
+
+  it("should fail on unresolved Vault secrets.", function() {
+    const instanceDef = { password: "vault(secret/c2c/prod#missing)" };
+    expect(function() {
+      utils.substituteVaultSecrets(instanceDef, {});
+    }).toThrowError(/Vault secret 'secret\/c2c\/prod#missing' was not resolved/);
+    expect(function() {
+      utils.substituteVaultSecrets(instanceDef, undefined);
+    }).toThrowError(/was not resolved/);
+  });
+
+  it("should resolve Jenkins credentials and Vault secrets from environment.", function() {
+    process.env[config.getSecretsEnvVar()] = JSON.stringify([
+      { openmrs: { password: "fromJenkins" } }
+    ]);
+    process.env[config.getVaultSecretsEnvVar()] = JSON.stringify({
+      "secret/c2c/prod#db_password": "fromVault"
+    });
+
+    const resolved = utils.resolveSecrets({
+      envVars: {
+        OPENMRS_PASSWORD: "jenkinsCredentials(openmrs.password)",
+        DB_PASSWORD: "vault(secret/c2c/prod#db_password)"
+      }
+    });
+    expect(resolved.envVars).toEqual({
+      OPENMRS_PASSWORD: "fromJenkins",
+      DB_PASSWORD: "fromVault"
+    });
+
+    delete process.env[config.getVaultSecretsEnvVar()];
+    expect(
+      utils.resolveSecrets({ a: "jenkinsCredentials(openmrs.password)" })
+    ).toEqual({ a: "fromJenkins" });
+
+    process.env[config.getSecretsEnvVar()] = "";
+  });
+
   it("should find value in object based on path", function() {
     var jsonData = {
       level1: {

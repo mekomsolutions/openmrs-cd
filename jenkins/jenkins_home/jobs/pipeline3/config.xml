@@ -69,6 +69,18 @@ import groovy.json.JsonSlurperClassic
 import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 
 def jenkinsCredentials = &quot;&quot;
+def vaultSecrets = &quot;{}&quot;
+
+// Must stay in sync with the vault() pattern in node-scripts/src/utils/utils.js
+@NonCPS
+def findVaultReferences(String text) {
+ def refs = [] as LinkedHashSet
+ def matcher = text =~ /vault\(([^)#]+)#([^)]+)\)/
+ while (matcher.find()) {
+  refs.add([path: matcher.group(1), key: matcher.group(2)])
+ }
+ return refs as List
+}
 
 node {
  def buildName = &quot;${instanceUuid}&quot;
@@ -96,7 +108,7 @@ pipeline {
   nodejs &apos;NodeJS 14.20.0&apos;
  }
  stages {
-  stage(&apos;Load Jenkins Credentials&apos;) {
+  stage(&apos;Load secrets&apos;) {
    steps {
     script {
      // Fetch the instance definition to retrieve &apos;group&apos; and &apos;type&apos; values
@@ -128,12 +140,31 @@ pipeline {
 
      // Save the Jenkins Credentials as JSON
      jenkinsCredentials = new JsonBuilder(credentials).toPrettyString()
+
+     // Fetch the Vault secrets referenced as &apos;vault(path#key)&apos; in the instance definition
+     def vaultRefs = findVaultReferences(instanceDefJSON)
+     if (vaultRefs.size() &gt; 0) {
+      def vaultSecretsConfig = []
+      for (int i = 0; i &lt; vaultRefs.size(); i++) {
+       vaultSecretsConfig.add([path: vaultRefs[i].path, secretValues: [[envVar: &quot;VAULT_SECRET_&quot; + i, vaultKey: vaultRefs[i].key]]])
+      }
+      println &quot;\033[1m\033[34m[INFO]\033[0m Fetching ${vaultRefs.size()} Vault secret(s).&quot;
+      def resolved = [:]
+      withVault([vaultSecrets: vaultSecretsConfig]) {
+       for (int i = 0; i &lt; vaultRefs.size(); i++) {
+        resolved[vaultRefs[i].path + &quot;#&quot; + vaultRefs[i].key] = env.getProperty(&quot;VAULT_SECRET_&quot; + i)
+       }
+      }
+      vaultSecrets = new JsonBuilder(resolved).toString()
+      println &quot;\033[1m\033[34m[INFO]\033[0m Sucessfully fetched ${resolved.size()} Vault secret(s).&quot;
+     }
     }
    }
   }
   stage(&apos;Pre-host connection preparation&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    
    steps {
@@ -171,6 +202,7 @@ pipeline {
   stage(&apos;Host preparation&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
       expression {
@@ -187,6 +219,7 @@ pipeline {
   stage(&apos;Maintenance mode: ON&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    steps {
     sh &apos;node /opt/node-scripts/src/$JOB_NAME/maintenance-on.js&apos;
@@ -198,6 +231,7 @@ pipeline {
   stage(&apos;Production host preparation&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
     expression {
@@ -214,6 +248,7 @@ pipeline {
   stage(&apos;Start or restart the instance&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
       expression {
@@ -230,6 +265,7 @@ pipeline {
   stage(&apos;Instance startup status monitoring&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
       expression {
@@ -246,6 +282,7 @@ pipeline {
   stage(&apos;Post startup actions&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
       expression {
@@ -262,6 +299,7 @@ pipeline {
   stage(&apos;Maintenance mode: OFF&apos;) {
    environment {
     SECRETS = &quot;${jenkinsCredentials}&quot;
+    VAULT_SECRETS = &quot;${vaultSecrets}&quot;
    }
    when {
       expression {

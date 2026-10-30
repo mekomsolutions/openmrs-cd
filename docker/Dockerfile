@@ -38,3 +38,6 @@ COPY ./config/artifact_repo_default.json /usr/share/jenkins/artifact_repo_defaul
 COPY ./resources/package.json /usr/share/jenkins/package.json
 COPY ./resources/m2_settings.xml.template /usr/share/jenkins/m2_settings.xml.template
 COPY ./config/artifact_types.json /usr/share/jenkins/artifact_types.json
+
+# '.override' makes Jenkins refresh the script in JENKINS_HOME on every start
+COPY ./resources/init.groovy.d/vault.groovy /usr/share/jenkins/ref/init.groovy.d/vault.groovy.override

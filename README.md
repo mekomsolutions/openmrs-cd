@@ -1,19 +1,25 @@
 ![alt tag](readme/ocd3.png)
 
 # OpenMRS CD 3 (OCD3)
+
 > A dockerized [Jenkins](https://jenkins.io/) server ready to manage dockerized [OpenMRS](https://openmrs.org/) and [Bahmni](https://www.bahmni.org/) instances.
 
 OCD3 in a nutshell:
+
 * Builds and deploys all OpenMRS or Bahmni related software artifacts.
 * Provides a definition framework for OpenMRS and Bahmni servers.
 * Delivers server instances to Linux-powered hosts.
 * Tracks code and configuration changes and propagates them to its managed server instances.
 
-## User guide
+- [User documentation](#user-documentation) — define instances, trigger builds, run OCD3.
+- [Developer documentation](#developer-documentation) — change OCD3, including [design decisions](#design-decisions).
 
-*How to build and deploy a project?*
+## User documentation
+
+### Build and deploy a project
 
 There are multiple options depending of the type of project you are deploying, but mainly the 3 following ones should cover 99% of cases:
+
 - default
 - maven
 - distribution
@@ -22,37 +28,34 @@ The build is triggered by a Webhook that must be added to your hosting SCM servi
 The Webhook expects 2 query parameters:
 
 * `[projectType=default|maven|distribution ...]`. Defaults to default. See list of all supported project types here
-
 * `[credentialsId=<arbitrary_name_of_the_credentials_entry_in_Jenkins_to_clone_the_repo>]` . Defaults to gitHubCredentials.
 Eg:
 https://username:password@localhost:8080/generic-webhook-trigger/invoke?projectType=default&credentialsId=myGitLabRepoCredentials
 
-<details>
 
-<summary>How to configure Webhook for OCD3 on GitHub?</summary>
 
-### Add Webhook
+How to configure Webhook for OCD3 on GitHub?
 
-<img src="readme/gh_add_webhook.png" width="700">
+#### Add Webhook
 
-### Create Webhook
+![](readme/gh_add_webhook.png)
 
-<img src="readme/gh_create_webhook.png" width="700">
+#### Create Webhook
 
-### Verify Webhook
+![](readme/gh_create_webhook.png)
 
-<img src="readme/gh_verify_webhook.png" width="700">
+#### Verify Webhook
+
+![](readme/gh_verify_webhook.png)
 
 See [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/about-webhooks) for additional documentation.
 
-</details>
 
 
 #### `default`:
 
-The `default` project type should cover most cases. It assumes that build and deploy instructions are provided in a custom file present at the root of the project and named **.ocd3.yml** (or .ocd3.yaml)
+The `default` project type should cover most cases. Put a **`.ocd3.yml`** file at the **root of the project repository**. If `.ocd3.yml` is missing, OCD3 tries `.ocd3.yaml`.
 
-The **.ocd3.yml** file should display as below:
 ```
 version: 1
 build:
@@ -65,10 +68,23 @@ deploy:
     version: <a version>
 rebuildOnDependencyChanges: true|false
 ```
-Note that the `artifact` section is **required only if your project is not a Maven project**.
-Note that the `rebuildOnDependencyChanges`, if set to `true`, will parse the project's POM file and save its dependencies so to later rebuild when any dependending artifact has changed.
+
+| Field | Purpose |
+|---|---|
+| `version` | File format. Currently `1`. |
+| `build.bash_commands` | Shell run during the build stage. |
+| `deploy.bash_commands` | Shell run during the deploy stage. |
+| `deploy.artifact` | Maven coordinates (`groupId`, `artifactId`, `version`). **Required only if the project has no `pom.xml`.** With a POM, coordinates come from the POM. |
+| `rebuildOnDependencyChanges` | If `true` (boolean or `"true"`) **and** a POM exists, OCD3 stores the POM dependencies and rebuilds this project when one of them is rebuilt. Ignored when there is no POM. `"false"` or omitted does nothing. |
+
+When there is no POM, missing `deploy.artifact` fields default to:
+
+- `groupId`: `net.mekomsolutions`
+- `artifactId`: the Git repository name
+- `version`: the branch name, or the commit id if there is no branch name
 
 See an example for a Maven project:
+
 ```
 version: 1
 build:
@@ -78,42 +94,41 @@ deploy:
 rebuildOnDependencyChanges: "true"
 ```
 
-<details>
-<summary>Show webhook URL:</summary>
+Show webhook URL:
 
 ```
 https://<user>:<password>@openmrs-cd.mekomsolutions.net/generic-webhook-trigger/invoke
 ```
-</details>
+
 
 
 #### `maven`:
 
 This project type will suit to most Maven projects that simply need to apply standard Maven commands:
+
 - `mvn clean install`
 - `mvn clean deploy -DaltDeploymentRepository=...`
 - with some additional nuances
 
-<details>
-<summary>Show webhook URL:</summary>
+Show webhook URL:
 
 ```
 https://<user>:<password>@openmrs-cd.mekomsolutions.net/generic-webhook-trigger/invoke?projectType=maven
 ```
-</details>
+
 
 
 #### `distribution`:
 
 A special project type to not only build the project using standard Maven commands but also save its Maven dependencies in a way that the distribution is rebuilt anytime one of the dependency has been rebuilt.
 
-<details>
-<summary>Show webhook URL:</summary>
+Show webhook URL:
 
 ```
 https://<user>:<password>@openmrs-cd.mekomsolutions.net/generic-webhook-trigger/invoke?projectType=distribution
 ```
-</details>
+
+
 
 #### `openmrsmodule`, `initializer`, `odooaddon`...:
 
@@ -121,151 +136,90 @@ There are other types available but most of them are now deprecated, being repla
 
 The full list can be found in the [src/pipeline1/impl/](node-scripts/src/pipeline1/impl) folder.
 
-*How to deploy a server?*
+### GitOps instance files
 
-**(WIP)**
+Instance definitions live in a GitOps repository under `instances/<env>/*.json`. The environment is the folder immediately under `instances/` (for example `instances/prod/foo.json` is in `prod`). The `type` field is not used to decide the environment.
 
+| Trigger in the instance file | Action | What OCD3 runs |
+|---|---|---|
+| New file (instance not in the OCD3 database) | `create` | `pipeline3` with `creation=true`, and change flags set for each non-empty section |
+| `"active": false` or file deleted | `destroy` | `destroy-instance` with `recreate=false` |
+| `actions.reset.requestId` changed | `reset` | `destroy-instance` with `recreate=true`, which then runs `pipeline3` |
+| `actions.redeploy.requestId` changed | `redeploy` | `pipeline3` with artifacts, deployment and properties changes (data only if the `data` section also changed) |
+| `artifacts`, `deployment`, `data`, `properties`, `envVars`, `scripts` or `active` changed | `update` | `pipeline3` with the matching change flags (`envVars`, `scripts` and `active` map to deployment) |
 
-#### Using secrets in the Instance Event:
-
-To avoid entering clear text secrets in an instance event, one can configure Jenkins Credentials functionality and use the special syntax `jenkinsCredentials(<path>)` anywhere in the instance. See more on Jenkins Credentials [here](https://www.jenkins.io/doc/book/using/using-credentials/).
-For example:
-
-```
+```json
 {
-  group: hsc
-  type: dev
-  envVars:{
-    "OPENMRS_USERNAME": "jenkinsCredentials(openmrs.password)",
-    "PROXY_PORT": "80",
-    ...
+  "name": "c2c-dev",
+  "uuid": "8812bace-07b6-4900-86b1-8911e7f64b7d",
+  "actions": {
+    "reset": { "requestId": "a1b2c3" },
+    "redeploy": { "requestId": "f4e5d6" }
   }
 }
 ```
 
-This will allow to substitute the placeholder with the matching Jenkins Credentials secret value.
+`requestId` is a unique string (a counter, uuid, timestamp, or any other token), not a schedule. An action fires only when the value differs from the one stored in the OCD3 database. Adding one of these fields for the first time to an existing instance also counts as a change. They are ignored on a new instance because creating it already deploys it. Changes limited to metadata (such as `description`, `group` or `labels`) are saved without deploying anything.
 
-However, Jenkins needs to be configured in a specific way for the secrets to be picked up.
+In protected environments (`prod`), these actions are refused and nothing is saved:
 
-- Credentials must be of type "Secret text".
-- The name of the Credentials must either be a `group` or a pair `group_type`
-- The "Secret" (text) should be a JSON object.
-The secret object will then be accessible in the instance event and can be navigated through using **dot notation.**
-Any amount of depth is allowed.
+- `"active": false` and deleting the file (destroy).
+- Changing `actions.reset.requestId` (reset).
+- Moving the file to another environment folder.
 
-In the example above, the secret would look like:
+Create, update and redeploy are allowed in `prod`.
+
+GitOps files own their `uuid`: a new file may already carry one, and it is kept as is. Existing instances are matched by `uuid` first. These files are rejected:
+
+- A newly added file whose `uuid` or `name` matches an instance definition already stored in the OCD3 database.
+- Any file whose `uuid` is also declared by another instance file in the repository.
+- A rename of an instance (same `uuid`, new `name`).
+
+### Secrets in instance definitions
+
+To avoid entering clear text secrets, use either `jenkinsCredentials(<path>)` or `vault(path#key)` anywhere in the instance definition.
+
+| Reference | Source |
+|---|---|
+| `jenkinsCredentials(openmrs.password)` | JSON path in the Jenkins "secret text" credentials named `<group>` and `<group>_<type>` |
+| `vault(secret/c2c/prod#db_password)` | Key `db_password` of the HashiCorp Vault secret at path `secret/c2c/prod` |
+
+```json
+"envVars": {
+  "OPENMRS_USERNAME": "jenkinsCredentials(openmrs.password)",
+  "DB_PASSWORD": "vault(secret/c2c/prod#db_password)",
+  "DB_URL": "mysql://root:vault(secret/c2c/prod#db_password)@mysql:3306/openmrs"
+}
+```
+
+See more on Jenkins Credentials [here](https://www.jenkins.io/doc/book/using/using-credentials/).
+
+**Jenkins credentials.** Credentials must be of type "Secret text". The name must be either a `group` or a pair `group_type`. The secret text is a JSON object, navigated with **dot notation** (any depth). All instances matching the group or group/type pair can use the secret. If keys conflict, group/type takes precedence over group.
+
+Example credential named `hsc` or `hsc_dev`:
 
 ```
 {
   "openmrs": {
-    "password": "password123",
-    ...
-  },
-  ...
+    "password": "password123"
+  }
 }
-
 ```
 
-To be made available in an instance definition, the Jenkins Credential should either be named after the instance group (eg, `hsc`) or the pair group_type (eg, `hsc_dev`).
-All instances matching the group or group/type pair will be able to use the secret.
+**Vault.** The path is the one used by `vault kv get`: for KV v2 the `data/` segment is not written. A reference that cannot be resolved fails the build.
 
-If providing conflicting secret keys, a merge strategy is applied and the group/type credentials will take precedence over the group.
+### Run OCD3 in production
 
-
-## Developer Guide
-
->OCD3 is a Dockerized Jenkins with preconfigured jobs. Those jobs run Node JS scripts or Node-generated Bash scripts.
-
-This explains the structure and content of the root folder of the project:
-
-```
-.
-├── docker
-├── jenkins
-└── node-scripts
-```
-**node-scripts** is the Node JS scripts area, **docker** holds the Dockerfile (and other resources needed to configure the container) and **jenkins** contains the parts of Jenkins home that are preconfigured, as well as the pipelines' Jenkinsfiles.
-
-Gradle is used to run all build tasks and package all artifacts that make OCD3.
-
-### Working out of the sources directly
-
-When developing on the CD the best is to mount the Docker volumes right out of the sources.
-
-**1** - Clone the openmrs-cd repository:
-
-**Note:** _we assume that cloned repositories should go into the home `~/repos` folder. Adapt the commands below in accordance to your own local setup._
-```bash
-mkdir -p ~/repos && cd ~/repos && \
-  git clone https://github.com/mekomsolutions/openmrs-cd && cd openmrs-cd
-```
-**2** - Build the Node scripts:
-```bash
-./gradlew node-scripts:build
-```
-
-**3** - Run the `openmrscd` container:
-```bash
-docker-compose up
-```
-
-### The 'node-scripts' component
-Developing on OCD3 means working in here most of the time.
-That is because the bulk of the logic of what OCD3 does lives here. Almost all Jenkins jobs are built on the following pattern:
->Jenkins jobs run Node scripts that generate Bash scripts that in turn perform the core CD tasks.
-
-This is how one would build the underlying Node JS scripts:
-```bash
-./gradlew node-scripts:build
-```
-And this must be done before submitting code commits.
-However note that the code base is not really built into anything since the container links directly to **/node-scripts**, but this formats the code and runs the test suite.
-
-A detailed developer guide about the Node scripts can be found [here](readme/node-scripts/README.md).
-
-### The 'docker' component
-See [here](readme/docker/README.md).
-
-### The 'jenkins' component
-
-OCD3 not only needs a Docker image for its binaries but also requires a 'Jenkins home' folder that provides a pre-configured Jenkins setup:
-
-```bash
-./gradlew jenkins:build
-```
-This will package a zip archive of the jenkins folder.
-
-**Note:** _Developing with the jenkins component may require to use `git clean -Xdf` from time to time. Please read the [note for developpers](readme/jenkins/README.md) first._
-
-### The parent project (root folder)
-
-Finally it is possible to build everything at once from the root level:
-```bash
-./gradlew build
-```
-This will cascade down to all child builds and run them.
-
-To then deploy:
-
-```
-export mksRepoUrl=...
-export mksRepoUsername=...
-export mksRepoPassword=...
-```
-
-```
-./gradlew deploy
-```
-
-## Starting OCD3 for production
-
-The following steps describe a way to gather OCD3 artifacts locally and run the Docker container based on them. In a Un\*x shell:
+The following steps describe a way to gather OCD3 artifacts locally and run the Docker container based on them. In a Unx shell:
 
 **1** - Set the target version:
+
 ```bash
 export VERSION=3.0.0-SNAPSHOT
 ```
+
 **2** - Copy the artifacts out of the Nexus repo into the local Maven repo:
+
 ```bash
 mvn dependency:get \
   -DgroupId=net.mekomsolutions \
@@ -274,12 +228,15 @@ mvn dependency:get \
   -Dpackaging=zip \
   -DremoteRepositories=https://nexus.mekomsolutions.net/repository/maven-public
 ```
+
 **3** - Unpack everything into openmrs-cd on the home folder:
+
 ```bash
 mvn dependency:copy -Dartifact=net.mekomsolutions:openmrs-cd:$VERSION:zip -DoutputDirectory=/tmp/ && unzip /tmp/openmrs-cd-$VERSION.zip -d /tmp/ && rm /tmp/openmrs-cd-$VERSION.zip && rsync -av --delete /tmp/openmrs-cd-$VERSION/ ~/openmrs-cd/ && rm -r /tmp/openmrs-cd-$VERSION
 ```
 
 **4** - Run the `openmrscd` container:
+
 ```bash
 docker run -dti --name openmrscd  -p 8080:8080 \
   -v ~/openmrs-cd/node-scripts:/opt/node-scripts \
@@ -287,9 +244,11 @@ docker run -dti --name openmrscd  -p 8080:8080 \
   -v ~/openmrs-cd/app_data:/var/lib/openmrs_cd/app_data \
   mekomsolutions/openmrscd:$VERSION
 ```
+
 After the container has started, the customized Jenkins instance will be accessible at [http://localhost:8080](http://localhost:8080) with the following credentials: **admin** / **password**.
 
 Authorize 'jenkins' user to write to the app_data folder:
+
 ```bash
 docker exec -it openmrscd \
   bash -c "sudo chown -R jenkins:jenkins /var/lib/openmrs_cd/app_data/"
@@ -300,10 +259,114 @@ docker exec -it openmrscd \
 **5** - Setup your Maven repo:
 You must configure the coordinates of your Maven repo if you intend to deploy your own Maven artifacts with the CD.
 Launch the **artifact_repo.js** script to configure the artifacts repository credentials and artifacts upload URLs:
+
 ```bash
 docker exec -it openmrscd \
   bash -c "cd /usr/share/jenkins/ && npm install && node artifact_repo.js"
 ```
+
 And answer the prompted questions.
 
 **Note:** _If you do not want to enter the artifacts repository URLs and authentication details by hand (through the CLI) you can just edit **usr/share/jenkins/artifact_repo_default.json** (see the default one [here](docker/config/artifact_repo_default.json) as an example) with your own repo URLs and ID and then run the script again. It will detect the file and ask you to use it._
+
+## Developer documentation
+
+> OCD3 is a Dockerized Jenkins with preconfigured jobs. Those jobs run Node JS scripts or Node-generated Bash scripts.
+
+```
+.
+├── docker            # image: Dockerfile, plugins.txt, vault.groovy, artifact-repo helpers
+├── jenkins           # preconfigured Jenkins home (jobs, Jenkinsfiles)
+├── node-scripts      # Node job scripts that generate the Bash CD steps
+├── readme            # images and component guides (docker, jenkins, node-scripts)
+├── tests/vagrant     # local jump/target SSH hosts
+├── .github           # CI workflows
+└── data              # local app_data (gitignored); file-based instance DB at runtime
+```
+
+Gradle is used to run all build tasks and package all artifacts that make OCD3.
+
+```bash
+./gradlew node-scripts:build   # format and test Node scripts
+./gradlew docker:build        # rebuild the openmrscd image (see readme/docker)
+./gradlew jenkins:build       # package jenkins_home
+./gradlew build               # all of the above
+```
+
+To then deploy:
+
+```
+export mksRepoUrl=...
+export mksRepoUsername=...
+export mksRepoPassword=...
+./gradlew deploy
+```
+
+### Local stack
+
+When developing on the CD the best is to mount the Docker volumes right out of the sources.
+
+**1** - Clone the openmrs-cd repository:
+
+**Note:** _we assume that cloned repositories should go into the home_ `~/repos` _folder. Adapt the commands below in accordance to your own local setup._
+
+```bash
+mkdir -p ~/repos && cd ~/repos && \
+  git clone https://github.com/mekomsolutions/openmrs-cd && cd openmrs-cd
+```
+
+**2** - Build the Node scripts:
+
+```bash
+./gradlew node-scripts:build
+```
+
+**3** - Copy `.env.example` to `.env` (gitignored). For the bundled Vault, use token auth:
+
+```
+VAULT_ADDR=http://vault:8200
+VAULT_AUTH_METHOD=token
+VAULT_TOKEN=root
+```
+
+**4** - Run Jenkins and, optionally, a dev-mode Vault and jump/target hosts:
+
+```bash
+docker compose --profile vault up -d
+(cd tests/vagrant && vagrant up)
+```
+
+The bundled Vault is in-memory, unsealed, root token `root`. Secrets are lost when it stops. AppRole is the default login in production; token is only this local fallback. See [tests/vagrant/README.md](tests/vagrant/README.md) for jump/target SSH hosts.
+
+Rebuild the image after changing Jenkins plugins (`docker/config/plugins.txt`) or `docker/resources/init.groovy.d/vault.groovy`. See [readme/docker/README.md](readme/docker/README.md).
+
+Developing with the jenkins component may require `git clean -Xdf` from time to time. Read [readme/jenkins/README.md](readme/jenkins/README.md) first.
+
+### Components
+
+The bulk of OCD3 logic is in **node-scripts**. Almost all Jenkins jobs follow this pattern:
+
+> Jenkins jobs run Node scripts that generate Bash scripts that in turn perform the core CD tasks.
+
+`./gradlew node-scripts:build` formats the code and runs the test suite. The container links directly to `/node-scripts`. Code structure, conventions and tests: [readme/node-scripts/README.md](readme/node-scripts/README.md).
+
+### Design decisions
+
+**GitOps.** The `git-instance-events` job polls the GitOps repository and runs `gitops/gitops.js` on every instance definition changed under `instances/**/*.json`. The script writes `instance-processing-report.json`. A SystemGroovy step then schedules `pipeline3` or `destroy-instance` for each file that requests an action. GitOps never queues instance events, so `instance-events-cron` and its type-based filtering are not involved.
+
+Action precedence is destroy, then create, then reset, then redeploy, then update. The environment comes from the folder under `instances/`, not the `type` field: type-based prod rules would drop GitOps updates to prod instances, and a `dev`-folder file with `type: prod` would be treated as production incorrectly. The first successful commit is bootstrap (not treated as adding files), so an already populated database does not cause uuid conflicts. Moving a file within `instances/` is not treated as adding a file. Deleting a file whose instance was never deployed does nothing. The SystemGroovy step also refuses to schedule `destroy-instance` for a protected environment.
+
+**Secrets.** pipeline3 scans the instance definition for `vault(path#key)`, fetches those keys with the Jenkins HashiCorp Vault plugin (`withVault`), and puts a `path#key` → value map in the `VAULT_SECRETS` env var. Node scripts call `utils.resolveSecrets()`, which substitutes both `jenkinsCredentials()` (from `SECRETS`) and `vault()` (from `VAULT_SECRETS`). Node never talks to Vault.
+
+Vault is configured from environment variables on the `openmrscd` container by `docker/resources/init.groovy.d/vault.groovy` on every Jenkins start. It creates the `ocd3-vault` credential and sets the global Vault configuration. Vault is disabled when `VAULT_ADDR` is empty. AppRole is the default (`VAULT_ROLE_ID` / `VAULT_SECRET_ID`). Token is used when `VAULT_AUTH_METHOD=token`, or as a local-dev fallback when role id and secret id are missing but `VAULT_TOKEN` is set. The plugin is pinned in `docker/config/plugins.txt`; changing it requires an image rebuild.
+
+| Variable | Description |
+|---|---|
+| `VAULT_ADDR` | Vault URL, for example `http://vault:8200` or `https://vault.example.com` |
+| `VAULT_AUTH_METHOD` | `approle` (default), `token` or `kubernetes` |
+| `VAULT_ROLE_ID`, `VAULT_SECRET_ID`, `VAULT_APPROLE_PATH` | AppRole credentials and mount (default `approle`) |
+| `VAULT_TOKEN` | Token, for `token` auth or the local-dev fallback |
+| `VAULT_K8S_ROLE`, `VAULT_K8S_MOUNT` | Kubernetes auth role and mount (default `kubernetes`) |
+| `VAULT_KV_VERSION` | KV engine version, `2` (default) or `1` |
+| `VAULT_NAMESPACE` | Vault Enterprise namespace (optional) |
+| `VAULT_SKIP_VERIFY` | `true` to skip TLS verification |

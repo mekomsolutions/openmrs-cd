@@ -325,6 +325,55 @@ module.exports = {
   },
 
   /**
+   *
+   * Searches for 'vault(path#key)' references and replaces them by the values fetched from Vault by pipeline3
+   *
+   * @param {Object} instanceDef The instance definition to parse through
+   * @param {Object} vaultSecrets Map of secrets fetched for this instance, keyed by 'path#key'
+   * @returns {Object} The instance definition with Vault references substituted.
+   *
+   */
+  substituteVaultSecrets: function(instanceDef, vaultSecrets) {
+    // Must stay in sync with findVaultReferences() in the pipeline3 job
+    var regExp = /vault\(([^)#]+)#([^)]+)\)/g;
+    var jsonDataAsString = JSON.stringify(instanceDef).replace(regExp, function(
+      match,
+      secretPath,
+      key
+    ) {
+      var reference = secretPath + "#" + key;
+      var secret = (vaultSecrets || {})[reference];
+      if (secret === undefined || secret === null) {
+        throw new Error(
+          "Illegal state: Vault secret '" +
+            reference +
+            "' was not resolved. Check that Vault is configured and that the path and key exist."
+        );
+      }
+      return JSON.stringify(String(secret)).slice(1, -1);
+    });
+    return JSON.parse(jsonDataAsString);
+  },
+
+  /**
+   * Substitutes both 'jenkinsCredentials()' and 'vault()' references using the secrets injected by pipeline3.
+   *
+   * @param {Object} instanceDef The instance definition
+   * @returns {Object} The instance definition with all secrets substituted.
+   */
+  resolveSecrets: function(instanceDef) {
+    var resolved = module.exports.substituteSecrets(
+      instanceDef,
+      module.exports.mergeObjects(process.env[config.getSecretsEnvVar()])
+    );
+    var rawVaultSecrets = process.env[config.getVaultSecretsEnvVar()];
+    return module.exports.substituteVaultSecrets(
+      resolved,
+      rawVaultSecrets ? JSON.parse(rawVaultSecrets) : {}
+    );
+  },
+
+  /**
    * Converts a string path to a value that is existing in a json object.
    *
    * @param {Object} jsonData Json data to use for searching the value.

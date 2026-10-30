@@ -47,6 +47,39 @@ describe("The instances config validator", function() {
     }).toThrow();
   });
 
+  it("should allow editing a prod-type instance only when the type rule is skipped.", function() {
+    var _script_ = require(fileInTest);
+    var prodInstance = { uuid: "cAcb5448", type: "prod", active: true };
+
+    expect(function() {
+      _script_.validateBaseConfig(prodInstance, false);
+    }).toThrow();
+    expect(function() {
+      _script_.validateBaseConfig(prodInstance, false, {
+        skipProdTypeRule: true
+      });
+    }).not.toThrow();
+  });
+
+  it("should accept a UUID on a new instance only when allowed.", function() {
+    var _script_ = require(fileInTest);
+    var newInstance = {
+      uuid: "8812bace-07b6-4900-86b1-8911e7f64b7d",
+      name: "foo-instance",
+      type: "dev",
+      version: "1.0.0"
+    };
+
+    expect(function() {
+      _script_.validateBaseConfig(newInstance, true);
+    }).toThrow();
+    expect(function() {
+      _script_.validateBaseConfig(newInstance, true, {
+        allowUuidOnCreate: true
+      });
+    }).not.toThrow();
+  });
+
   it("should validate instances deployment section.", function() {
     // deps
     const model = require(path.resolve("src/utils/model"));

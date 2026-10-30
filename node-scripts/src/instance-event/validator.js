@@ -16,8 +16,13 @@ const NEW_FLAG_MISSING_MSG =
   "There is no flag indicating whether the instance definition is new or not.";
 
 module.exports = {
-  validateInstanceDefinition: function(instanceDef, isNew) {
-    module.exports.validateBaseConfig(instanceDef, isNew);
+  /**
+   * @param {Object} options - Optional flags.
+   *    allowUuidOnCreate: accept a UUID on a new instance (GitOps files own their UUID).
+   *    skipProdTypeRule: do not refuse edits based on 'type' (GitOps protects by folder instead).
+   */
+  validateInstanceDefinition: function(instanceDef, isNew, options) {
+    module.exports.validateBaseConfig(instanceDef, isNew, options);
 
     module.exports.validateDeploymentConfig(instanceDef.deployment, isNew);
 
@@ -28,10 +33,12 @@ module.exports = {
     module.exports.validatePropertiesConfig(instanceDef.properties, isNew);
   },
 
-  validateBaseConfig: function(instanceDef, isNew) {
+  validateBaseConfig: function(instanceDef, isNew, options) {
     if (_.isUndefined(isNew)) {
       throw new Error(NEW_FLAG_MISSING_MSG);
     }
+    var allowUuidOnCreate = _.get(options, "allowUuidOnCreate", false);
+    var skipProdTypeRule = _.get(options, "skipProdTypeRule", false);
 
     if (
       isNew &&
@@ -41,7 +48,7 @@ module.exports = {
         "A new instance definition must point to a supported implementation version."
       );
     }
-    if (isNew && instanceDef.uuid) {
+    if (isNew && instanceDef.uuid && !allowUuidOnCreate) {
       throw new Error(
         "A new instance definition cannot be provided with an UUID."
       );
@@ -67,6 +74,7 @@ module.exports = {
       throw new Error("A new Instance definition cannot be set to inactive");
     }
     if (
+      !skipProdTypeRule &&
       !isNew &&
       _.isEqual(instanceDef.type, cst.INSTANCETYPE_PROD) &&
       instanceDef.active

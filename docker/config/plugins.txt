@@ -22,3 +22,5 @@ docker-commons:439.va_3cb_0a_6a_fb_29
 git-server:126.v0d945d8d2b_39
 pipeline-stage-view:2.34
 jira:3.13
+hashicorp-vault-plugin:371.v884a_4dd60fb_6
+eddsa-api:0.3.0.1-29.v67e9a_1c969b_b_
