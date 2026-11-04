@@ -10,7 +10,7 @@ describe("GitOps instance processing", function() {
 
   const existing = {
     uuid: "8812bace-07b6-4900-86b1-8911e7f64b7d",
-    name: "c2c-dev",
+    name: "test-instance",
     actions: {
       reset: { requestId: "1" },
       redeploy: { requestId: "1" }
@@ -92,15 +92,43 @@ describe("GitOps instance processing", function() {
     }).toThrowError(/also used by: instances\/dev\/b\.json/);
   });
 
-  it("should reject a new file matching a stored instance.", function() {
+  it("should reject a new file that shares only the instance name with a stored instance.", function() {
     expect(function() {
       gitops.checkUuidConflicts(
-        existing,
+        {
+          name: existing.name,
+          uuid: "11111111-1111-1111-1111-111111111111"
+        },
         "instances/dev/new.json",
         existing,
         {}
       );
-    }).toThrowError(/conflicts with existing instance 'c2c-dev'/);
+    }).toThrowError(/conflicts with existing instance 'test-instance'/);
+  });
+
+  it("should reject a new file that shares only the uuid with a stored instance.", function() {
+    expect(function() {
+      gitops.checkUuidConflicts(
+        {
+          name: "other-name",
+          uuid: existing.uuid
+        },
+        "instances/dev/new.json",
+        existing,
+        {}
+      );
+    }).toThrowError(/conflicts with existing instance 'test-instance'/);
+  });
+
+  it("should accept a new file that updates an existing instance by name and uuid.", function() {
+    expect(function() {
+      gitops.checkUuidConflicts(
+        existing,
+        "instances/dev/test-instance.json",
+        existing,
+        {}
+      );
+    }).not.toThrow();
   });
 
   it("should accept a file with a unique UUID.", function() {
