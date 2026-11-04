@@ -1,0 +1,134 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Git Instance events</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.jira.JiraProjectProperty plugin="jira@3.13"/>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@5.7.0">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>git@github.com:mekomsolutions/ocd3-gitops.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/main</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="empty-list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.SCMTrigger>
+      <spec>H/5 * * * *</spec>
+      <ignorePostCommitHooks>false</ignorePostCommitHooks>
+    </hudson.triggers.SCMTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>node /opt/node-scripts/src/gitops/gitops.js</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+    <hudson.plugins.groovy.SystemGroovy plugin="groovy@442.v817e6d937d6c">
+      <source class="hudson.plugins.groovy.StringSystemScriptSource">
+        <script plugin="script-security@1373.vb_b_4a_a_c26fa_00">
+          <script>import hudson.model.*
+import groovy.json.JsonSlurper
+
+// Hardened scheduling: avoid null/empty values that can break Jenkins internals.
+def run = (binding.hasVariable('build') ? build : Thread.currentThread().executable)
+def env = run?.getEnvironment(listener)
+def workspace = env?.WORKSPACE
+if (!workspace) {
+  println "WORKSPACE env var not found; skipping triggers"
+  return
+}
+
+def reportFile = new File(workspace + "/instance-processing-report.json")
+if (!reportFile.exists()) {
+  println "No instance-processing-report.json found; skipping triggers"
+  return
+}
+
+def report = new JsonSlurper().parse(reportFile)
+def results = report?.results
+if (!(results instanceof List)) {
+  println "instance-processing-report.json has no results list; skipping triggers"
+  return
+}
+
+def getJobOrFail = { name -&gt;
+  def job = Hudson.instance.getJob(name)
+  if (job == null) {
+    throw new IllegalStateException("Job '" + name + "' was not found")
+  }
+  return job
+}
+
+def causeAction = new CauseAction(new Cause.UpstreamCause(run))
+def scheduled = 0
+
+def schedule = { jobName, params, uuid, action -&gt;
+  Hudson.instance.queue.schedule(getJobOrFail(jobName), 0, causeAction, new ParametersAction(params))
+  println "Scheduled " + jobName + " (" + action + ") for " + uuid
+  scheduled++
+}
+
+results.each { result -&gt;
+  def action = result?.action == null ? "" : result.action.toString()
+  def uuidVal = result?.instanceUuid
+  def uuid = (uuidVal == null) ? "" : uuidVal.toString().trim()
+
+  if (!action || !uuid) {
+    return
+  }
+
+  switch (action) {
+    case "destroy":
+    case "reset":
+      // Must mirror getGitOpsProtectedEnvironments() in node-scripts/src/utils/config.js
+      if (result?.environment in ["prod"]) {
+        println "Refusing '" + action + "' for " + uuid + " in protected environment '" + result.environment + "'"
+        return
+      }
+      schedule("destroy-instance", [
+        new StringParameterValue("instanceUuid", uuid),
+        new BooleanParameterValue("recreate", action == "reset")
+      ], uuid, action)
+      break
+    case "create":
+    case "update":
+    case "redeploy":
+      schedule("pipeline3", [
+        new StringParameterValue("instanceUuid", uuid),
+        new BooleanParameterValue("creation", action == "create"),
+        new BooleanParameterValue("artifactsChanges", result.artifactsChanges == true),
+        new BooleanParameterValue("deploymentChanges", result.deploymentChanges == true),
+        new BooleanParameterValue("propertiesChanges", result.propertiesChanges == true),
+        new BooleanParameterValue("dataChanges", result.dataChanges == true),
+        new BooleanParameterValue("instanceActive", true)
+      ], uuid, action)
+      break
+    default:
+      println "Unknown action '" + action + "' for " + uuid + "; skipping"
+  }
+}
+
+println "Scheduled " + scheduled + " job(s)"</script>
+          <sandbox>true</sandbox>
+        </script>
+      </source>
+    </hudson.plugins.groovy.SystemGroovy>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>
