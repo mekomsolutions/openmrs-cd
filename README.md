@@ -169,7 +169,8 @@ In protected environments (`prod`), these actions are refused and nothing is sav
 
 Create, update and redeploy are allowed in `prod`.
 
-GitOps files own their `uuid`: a new file may already carry one, and it is kept as is. Existing instances are matched by `uuid` first. A newly added file whose instance `name` and `uuid` both match a stored instance is allowed (migration: GitOps updates that instance). To redeploy after that, set a new `actions.redeploy.requestId`. These files are rejected:
+GitOps files own their `uuid`: a new file may already carry one, and it is kept as is. Existing instances are matched by `uuid` first. A newly added file whose instance `name` and `uuid` both match a stored instance is allowed (it updates that instance). Set a new `actions.redeploy.requestId` on that file to redeploy it. 
+These files are rejected:
 
 - A newly added file that matches a stored instance by `name` or `uuid` alone (not both).
 - Any file whose `uuid` is also declared by another instance file in the repository.
