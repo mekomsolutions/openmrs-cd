@@ -423,9 +423,25 @@ module.exports = {
     return "SECRETS";
   },
   /**
-   * The environment variable that stores the secrets fetched from Vault, keyed by 'path#key'
+   * The environment variable that stores the secrets fetched from Vault, keyed by 'path#key'.
+   * Kept for compatibility; Vault is resolved on the host via vault-secrets-cli.
    */
   getVaultSecretsEnvVar: function() {
     return "VAULT_SECRETS";
+  },
+  /**
+   * Docker image that resolves vault(path#key) on the deployment host.
+   */
+  getVaultSecretsCliImage: function() {
+    return (
+      process.env.VAULT_SECRETS_CLI_IMAGE ||
+      "mekomsolutions/vault-secrets-cli:latest"
+    );
+  },
+  /**
+   * Host path for the compose env_file written by vault-secrets-cli.
+   */
+  getVaultSecretsEnvFilePath: function(instanceName) {
+    return path.posix.join("/var/run/ocd3", instanceName, "secrets.env");
   }
 };

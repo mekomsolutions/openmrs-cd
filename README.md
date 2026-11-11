@@ -207,7 +207,26 @@ Example credential named `hsc` or `hsc_dev`:
 }
 ```
 
-**Vault.** The path is the one used by `vault kv get`: for KV v2 the `data/` segment is not written. A reference that cannot be resolved fails the build.
+**Vault.** The path is the one used by `vault kv get`: for KV v2 the `data/` segment is not written in the instance definition. Vault refs are **not** resolved inside Jenkins. During host preparation, OCD3 runs `mekomsolutions/vault-secrets-cli` on the deployment host to write `/var/run/ocd3/<instance-name>/secrets.env`. Keys with `vault(...)` are omitted from the instance `.env` and only appear in that secrets file. Compose (or the distribution) must load it, for example:
+
+```yaml
+env_file:
+  - /var/run/ocd3/${INSTANCE_NAME}/secrets.env
+```
+
+AppRole is the default on remote hosts (`VAULT_ROLE_ID` / `VAULT_SECRET_ID` on the host). Token auth is for local use (`VAULT_AUTH_METHOD=token` and `VAULT_TOKEN`). A 403 on `secret/c2c/dev` usually means the role lacks `read` on `secret/data/c2c/dev` and `secret/metadata/c2c/dev` (KV v2).
+
+```bash
+# Local (token) — file or JSON string
+docker run --rm \
+  -e VAULT_ADDR -e VAULT_AUTH_METHOD=token -e VAULT_TOKEN \
+  -v "$PWD/instance.json:/instance.json:ro" \
+  -v "$(pwd):/out" \
+  mekomsolutions/vault-secrets-cli \
+  resolve --instance /instance.json --output /out/secrets.env
+```
+
+See [vault-secrets-cli/](vault-secrets-cli/) for the CLI package.
 
 ### Run OCD3 in production
 
@@ -276,22 +295,24 @@ And answer the prompted questions.
 
 ```
 .
-├── docker            # image: Dockerfile, plugins.txt, vault.groovy, artifact-repo helpers
-├── jenkins           # preconfigured Jenkins home (jobs, Jenkinsfiles)
-├── node-scripts      # Node job scripts that generate the Bash CD steps
-├── readme            # images and component guides (docker, jenkins, node-scripts)
-├── tests/vagrant     # local jump/target SSH hosts
-├── .github           # CI workflows
-└── data              # local app_data (gitignored); file-based instance DB at runtime
+├── docker              # image: Dockerfile, plugins.txt, vault.groovy, artifact-repo helpers
+├── jenkins             # preconfigured Jenkins home (jobs, Jenkinsfiles)
+├── node-scripts        # Node job scripts that generate the Bash CD steps
+├── vault-secrets-cli   # host CLI image: resolve vault() into /var/run secrets.env
+├── readme              # images and component guides (docker, jenkins, node-scripts)
+├── tests/vagrant       # local jump/target SSH hosts
+├── .github             # CI workflows
+└── data                # local app_data (gitignored); file-based instance DB at runtime
 ```
 
 Gradle is used to run all build tasks and package all artifacts that make OCD3.
 
 ```bash
-./gradlew node-scripts:build   # format and test Node scripts
-./gradlew docker:build        # rebuild the openmrscd image (see readme/docker)
-./gradlew jenkins:build       # package jenkins_home
-./gradlew build               # all of the above
+./gradlew node-scripts:build       # format and test Node scripts
+./gradlew vault-secrets-cli:build  # test and build vault-secrets-cli image
+./gradlew docker:build             # rebuild the openmrscd image (see readme/docker)
+./gradlew jenkins:build            # package jenkins_home
+./gradlew build                    # all of the above
 ```
 
 To then deploy:
@@ -357,17 +378,15 @@ The bulk of OCD3 logic is in **node-scripts**. Almost all Jenkins jobs follow th
 
 Action precedence is destroy, then create, then reset, then redeploy, then update. The environment comes from the folder under `instances/`, not the `type` field: type-based prod rules would drop GitOps updates to prod instances, and a `dev`-folder file with `type: prod` would be treated as production incorrectly. The first successful commit is bootstrap (not treated as adding files), so an already populated database does not cause uuid conflicts. Moving a file within `instances/` is not treated as adding a file. Deleting a file whose instance was never deployed does nothing. The SystemGroovy step also refuses to schedule `destroy-instance` for a protected environment.
 
-**Secrets.** pipeline3 scans the instance definition for `vault(path#key)`, fetches those keys with the Jenkins HashiCorp Vault plugin (`withVault`), and puts a `path#key` → value map in the `VAULT_SECRETS` env var. Node scripts call `utils.resolveSecrets()`, which substitutes both `jenkinsCredentials()` (from `SECRETS`) and `vault()` (from `VAULT_SECRETS`). Node never talks to Vault.
-
-Vault is configured from environment variables on the `openmrscd` container by `docker/resources/init.groovy.d/vault.groovy` on every Jenkins start. It creates the `ocd3-vault` credential and sets the global Vault configuration. Vault is disabled when `VAULT_ADDR` is empty. AppRole is the default (`VAULT_ROLE_ID` / `VAULT_SECRET_ID`). Token is used when `VAULT_AUTH_METHOD=token`, or as a local-dev fallback when role id and secret id are missing but `VAULT_TOKEN` is set. The plugin is pinned in `docker/config/plugins.txt`; changing it requires an image rebuild.
+**Secrets.** pipeline3 still loads Jenkins credentials into `SECRETS` for `jenkinsCredentials()`. `vault(path#key)` is left in the instance definition. Host preparation runs `vault-secrets-cli` on the target (via `docker run`) to write `/var/run/ocd3/<name>/secrets.env`. AppRole is the default on servers; token is for local use. The deploy host must reach Vault and have the CLI image available (`mekomsolutions/vault-secrets-cli`, overridable with `VAULT_SECRETS_CLI_IMAGE`).
 
 | Variable | Description |
 |---|---|
 | `VAULT_ADDR` | Vault URL, for example `http://vault:8200` or `https://vault.example.com` |
-| `VAULT_AUTH_METHOD` | `approle` (default), `token` or `kubernetes` |
+| `VAULT_AUTH_METHOD` | `approle` (default) or `token` |
 | `VAULT_ROLE_ID`, `VAULT_SECRET_ID`, `VAULT_APPROLE_PATH` | AppRole credentials and mount (default `approle`) |
 | `VAULT_TOKEN` | Token, for `token` auth or the local-dev fallback |
-| `VAULT_K8S_ROLE`, `VAULT_K8S_MOUNT` | Kubernetes auth role and mount (default `kubernetes`) |
 | `VAULT_KV_VERSION` | KV engine version, `2` (default) or `1` |
 | `VAULT_NAMESPACE` | Vault Enterprise namespace (optional) |
 | `VAULT_SKIP_VERIFY` | `true` to skip TLS verification |
+| `VAULT_SECRETS_CLI_IMAGE` | CLI image (default `mekomsolutions/vault-secrets-cli:latest`) |

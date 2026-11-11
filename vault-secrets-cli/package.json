@@ -1,0 +1,23 @@
+{
+  "name": "vault-secrets-cli",
+  "version": "1.0.0",
+  "description": "Resolve vault(path#key) references from an OCD3 instance definition into a secrets.env file",
+  "bin": {
+    "vault-secrets-cli": "./src/cli.js"
+  },
+  "main": "src/cli.js",
+  "scripts": {
+    "test": "jasmine",
+    "build": "npm install && npm test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jasmine": "^5.1.0",
+    "nock": "^13.5.4"
+  },
+  "author": "Mekom Solutions",
+  "license": "MIT"
+}

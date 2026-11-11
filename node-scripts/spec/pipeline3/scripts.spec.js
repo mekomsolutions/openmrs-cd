@@ -638,6 +638,37 @@ describe("Scripts", function() {
     );
   });
 
+  it("should omit vault envVars from .env and resolve them on the host", function() {
+    var instanceDef = {
+      name: "hsc-dev",
+      deployment: {
+        hostDir: "/var/docker-volumes",
+        host: {
+          type: "ssh",
+          value: { ip: "10.0.0.1", user: "ec2-user", port: "22" }
+        },
+        type: "dockerCompose"
+      },
+      envVars: {
+        PLAIN: "ok",
+        DB_PASSWORD: "vault(secret/c2c/dev#db_password)"
+      }
+    };
+    var script = scripts.createEnvVarFile(instanceDef);
+    expect(script).toContain(
+      scripts.writeProperty(
+        "PLAIN",
+        "ok",
+        "/var/docker-volumes/hsc-dev/hsc-dev.env"
+      )
+    );
+    expect(script).not.toContain("DB_PASSWORD=vault(");
+    expect(script).toContain("docker run --rm");
+    expect(script).toContain("vault-secrets-cli");
+    expect(script).toContain("/var/run/ocd3/hsc-dev");
+    expect(script).toContain("resolve --instance /instance.json");
+  });
+
   it("should generate script to clone a Git repo", function() {
     var gitUrl = "git@github:mekomsolutions/bahmni-docker.git";
     var commitId = "12b9a94";

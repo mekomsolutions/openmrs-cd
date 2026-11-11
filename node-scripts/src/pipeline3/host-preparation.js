@@ -29,7 +29,7 @@ if (_.isEmpty(instanceDef)) {
   throw new Error("Illegal argument: empty or unexisting instance definition.");
 }
 
-// Substitute secrets in the instance definiton with Jenkins credentials and Vault secrets
+// Substitute secrets in the instance definiton with Jenkins credentials (Vault refs resolved on host)
 instanceDef = utils.resolveSecrets(instanceDef);
 
 //

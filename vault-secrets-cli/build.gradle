@@ -1,0 +1,54 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "com.bmuschko:gradle-docker-plugin:7.4.0"
+  }
+}
+
+apply plugin: "com.bmuschko.docker-remote-api"
+
+import com.bmuschko.gradle.docker.tasks.image.*
+
+def dockerHubRepo = "mekomsolutions/vault-secrets-cli"
+def getShortCommit() {
+  def stdout = new ByteArrayOutputStream()
+  exec {
+    commandLine 'git', 'rev-parse', '--short', 'HEAD'
+    standardOutput = stdout
+  }
+  return stdout.toString().trim()
+}
+
+task npmTest(type: Exec) {
+  commandLine 'npm', 'run', 'build'
+}
+
+task buildDockerImage(type: DockerBuildImage) {
+  inputDir = file('.')
+  images = [
+    dockerHubRepo + ':' + version,
+    dockerHubRepo + ':' + 'latest',
+    dockerHubRepo + ':' + getShortCommit()
+  ]
+  dependsOn npmTest
+}
+
+task build() {
+  dependsOn npmTest, buildDockerImage
+}
+
+task pushDockerImages(type: DockerPushImage) {
+  images = [
+    dockerHubRepo + ':' + version,
+    dockerHubRepo + ':' + 'latest',
+    dockerHubRepo + ':' + getShortCommit()
+  ]
+}
+
+task deploy() {
+  dependsOn buildDockerImage, pushDockerImages
+}

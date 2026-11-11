@@ -9,7 +9,63 @@ const heredoc = cst.HEREDOC;
 const heredoc_2 = cst.HEREDOC_2;
 const heredoc_3 = cst.HEREDOC_3;
 const utils = require("../utils/utils");
+const config = require("../utils/config");
 const model = require("../utils/model");
+
+const VAULT_REF_REGEXP = /vault\(([^)#]+)#([^)]+)\)/;
+
+const hasVaultRef = function(value) {
+  return VAULT_REF_REGEXP.test(String(value == null ? "" : value));
+};
+
+const instanceHasVaultRefs = function(instanceDef) {
+  return VAULT_REF_REGEXP.test(JSON.stringify(instanceDef || {}));
+};
+
+/**
+ * Runs vault-secrets-cli on the host to write /var/run/ocd3/<name>/secrets.env.
+ */
+const resolveVaultSecretsOnHost = function(instanceDef) {
+  if (!instanceHasVaultRefs(instanceDef)) {
+    return "";
+  }
+  var instanceName = instanceDef.name;
+  var secretsDir = path.posix.join("/var/run/ocd3", instanceName);
+  var secretsFile = config.getVaultSecretsEnvFilePath(instanceName);
+  var tmpFile = "/tmp/ocd3-" + instanceName + "-instance.json";
+  var image = config.getVaultSecretsCliImage();
+  var instanceJson = JSON.stringify(instanceDef);
+
+  var script = "";
+  script += "mkdir -p " + secretsDir + "\n";
+  script += "cat > " + tmpFile + " <<'" + heredoc + "'\n";
+  script += instanceJson + "\n";
+  script += heredoc + "\n";
+  script +=
+    "docker run --rm" +
+    " -e VAULT_ADDR" +
+    " -e VAULT_AUTH_METHOD" +
+    " -e VAULT_TOKEN" +
+    " -e VAULT_ROLE_ID" +
+    " -e VAULT_SECRET_ID" +
+    " -e VAULT_APPROLE_PATH" +
+    " -e VAULT_KV_VERSION" +
+    " -e VAULT_NAMESPACE" +
+    " -e VAULT_SKIP_VERIFY" +
+    " -v " +
+    tmpFile +
+    ":/instance.json:ro" +
+    " -v " +
+    secretsDir +
+    ":/out" +
+    " " +
+    image +
+    " resolve --instance /instance.json --output /out/secrets.env\n";
+  script += "rm -f " + tmpFile + "\n";
+  script += "chmod 600 " + secretsFile + " || true\n";
+  return script;
+};
+
 const createEnvVarFile = function(instanceDef, deploymentBasePath) {
   let projectPath = path
     .resolve(
@@ -66,12 +122,18 @@ const createEnvVarFile = function(instanceDef, deploymentBasePath) {
   script += "\ncp " + envFile + " " + distEnvFile + "\n";
 
   for (let property in instanceDef.envVars) {
+    // Vault refs are resolved on the host into /var/run/.../secrets.env
+    if (hasVaultRef(instanceDef.envVars[property])) {
+      continue;
+    }
     script += module.exports.writeProperty(
       property,
       instanceDef.envVars[property],
       distEnvFile
     );
   }
+
+  script += resolveVaultSecretsOnHost(instanceDef);
 
   return script;
 };
@@ -755,6 +817,8 @@ module.exports = {
   createEnvVarFileDockerGeneric(instanceDef) {
     return createEnvVarFile(instanceDef, "docker_compose");
   },
+  resolveVaultSecretsOnHost: resolveVaultSecretsOnHost,
+  hasVaultRef: hasVaultRef,
   exit: function() {
     return "exit";
   }
