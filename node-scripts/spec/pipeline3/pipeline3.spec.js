@@ -261,5 +261,13 @@ describe("Tests suite for pipeline3", function() {
       "jenkinsCredentials = new JsonBuilder(credentials).toPrettyString()";
 
     expect(pipelineScript).toContain(saveSecrets);
+
+    expect(pipelineScript).toContain("withVault([vaultSecrets: vaultSecretsConfig])");
+    expect(pipelineScript).toContain(
+      "Vault permission error while fetching secrets"
+    );
+    expect(pipelineScript).toContain(
+      "Leaving vault() refs unsubstituted for downstream handling."
+    );
   });
 });

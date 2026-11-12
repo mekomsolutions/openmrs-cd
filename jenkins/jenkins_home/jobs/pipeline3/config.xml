@@ -150,13 +150,24 @@ pipeline {
       }
       println &quot;\033[1m\033[34m[INFO]\033[0m Fetching ${vaultRefs.size()} Vault secret(s).&quot;
       def resolved = [:]
-      withVault([vaultSecrets: vaultSecretsConfig]) {
-       for (int i = 0; i &lt; vaultRefs.size(); i++) {
-        resolved[vaultRefs[i].path + &quot;#&quot; + vaultRefs[i].key] = env.getProperty(&quot;VAULT_SECRET_&quot; + i)
+      try {
+       withVault([vaultSecrets: vaultSecretsConfig]) {
+        for (int i = 0; i &lt; vaultRefs.size(); i++) {
+         resolved[vaultRefs[i].path + &quot;#&quot; + vaultRefs[i].key] = env.getProperty(&quot;VAULT_SECRET_&quot; + i)
+        }
+       }
+       vaultSecrets = new JsonBuilder(resolved).toString()
+       println &quot;\033[1m\033[34m[INFO]\033[0m Sucessfully fetched ${resolved.size()} Vault secret(s).&quot;
+      } catch (Exception e) {
+       def msg = (e.getMessage() ?: &quot;&quot;).toLowerCase()
+       if (msg.contains(&quot;403&quot;) || msg.contains(&quot;permission&quot;) || msg.contains(&quot;denied&quot;) || msg.contains(&quot;forbidden&quot;)) {
+        println &quot;\033[1m\033[33m[WARN]\033[0m Vault permission error while fetching secrets: ${e.getMessage()}. Leaving vault() refs unsubstituted &quot;
+        vaultSecrets = &quot;{}&quot;
+        currentBuild.result = &apos;SUCCESS&apos;
+       } else {
+        throw e
        }
       }
-      vaultSecrets = new JsonBuilder(resolved).toString()
-      println &quot;\033[1m\033[34m[INFO]\033[0m Sucessfully fetched ${resolved.size()} Vault secret(s).&quot;
      }
     }
    }
