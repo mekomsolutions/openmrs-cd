@@ -200,8 +200,7 @@ function findStoredInstance(instanceDefinition) {
 }
 
 /**
- * Rejects UUIDs that clash with another instance file or, for a newly added
- * file, with an instance definition already stored in the OCD3 database.
+ * Rejects UUIDs that clash with another instance  and having a different name.
  *
  * @param {Object} storedInstance - The stored instance matching a newly added file, {} otherwise.
  */
@@ -220,10 +219,17 @@ function checkUuidConflicts(
     );
   }
   if (!_.isEmpty(storedInstance)) {
-    throw new Error(
-      "New file " + filePath + " conflicts with existing instance '" +
-        storedInstance.name + "' (" + storedInstance.uuid + ")"
-    );
+    var updatesExisting =
+      !_.isEmpty(instanceDefinition.uuid) &&
+      !_.isEmpty(instanceDefinition.name) &&
+      storedInstance.uuid === instanceDefinition.uuid &&
+      storedInstance.name === instanceDefinition.name;
+    if (!updatesExisting) {
+      throw new Error(
+        "New file " + filePath + " conflicts with existing instance '" +
+          storedInstance.name + "' (" + storedInstance.uuid + ")"
+      );
+    }
   }
 }
 

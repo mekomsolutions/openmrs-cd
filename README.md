@@ -169,9 +169,10 @@ In protected environments (`prod`), these actions are refused and nothing is sav
 
 Create, update and redeploy are allowed in `prod`.
 
-GitOps files own their `uuid`: a new file may already carry one, and it is kept as is. Existing instances are matched by `uuid` first. These files are rejected:
+GitOps files own their `uuid`: a new file may already carry one, and it is kept as is. Existing instances are matched by `uuid` first. A newly added file whose instance `name` and `uuid` both match a stored instance is allowed (it updates that instance). Set a new `actions.redeploy.requestId` on that file to redeploy it. 
+These files are rejected:
 
-- A newly added file whose `uuid` or `name` matches an instance definition already stored in the OCD3 database.
+- A newly added file that matches a stored instance by `name` or `uuid` alone (not both).
 - Any file whose `uuid` is also declared by another instance file in the repository.
 - A rename of an instance (same `uuid`, new `name`).
 
@@ -206,7 +207,7 @@ Example credential named `hsc` or `hsc_dev`:
 }
 ```
 
-**Vault.** The path is the one used by `vault kv get`: for KV v2 the `data/` segment is not written. A reference that cannot be resolved fails the build.
+**Vault.** The path is the one used by `vault kv get`: for KV v2 the `data/` segment is not written. pipeline3 fetches referenced secrets with `withVault`. On a Vault **permission** error (for example 403), the build continues and `vault(...)` refs are left unsubstituted for downstream handling. Other Vault errors still fail the build.
 
 ### Run OCD3 in production
 
@@ -356,7 +357,7 @@ The bulk of OCD3 logic is in **node-scripts**. Almost all Jenkins jobs follow th
 
 Action precedence is destroy, then create, then reset, then redeploy, then update. The environment comes from the folder under `instances/`, not the `type` field: type-based prod rules would drop GitOps updates to prod instances, and a `dev`-folder file with `type: prod` would be treated as production incorrectly. The first successful commit is bootstrap (not treated as adding files), so an already populated database does not cause uuid conflicts. Moving a file within `instances/` is not treated as adding a file. Deleting a file whose instance was never deployed does nothing. The SystemGroovy step also refuses to schedule `destroy-instance` for a protected environment.
 
-**Secrets.** pipeline3 scans the instance definition for `vault(path#key)`, fetches those keys with the Jenkins HashiCorp Vault plugin (`withVault`), and puts a `path#key` → value map in the `VAULT_SECRETS` env var. Node scripts call `utils.resolveSecrets()`, which substitutes both `jenkinsCredentials()` (from `SECRETS`) and `vault()` (from `VAULT_SECRETS`). Node never talks to Vault.
+**Secrets.** pipeline3 scans the instance definition for `vault(path#key)`, fetches those keys with the Jenkins HashiCorp Vault plugin (`withVault`), and puts a `path#key` → value map in the `VAULT_SECRETS` env var. Node scripts call `utils.resolveSecrets()`, which substitutes both `jenkinsCredentials()` (from `SECRETS`) and `vault()` (from `VAULT_SECRETS`). Node never talks to Vault. If `withVault` fails with a permission error, `VAULT_SECRETS` stays empty and unresolved `vault(...)` refs are left in the instance definition for downstream handling.
 
 Vault is configured from environment variables on the `openmrscd` container by `docker/resources/init.groovy.d/vault.groovy` on every Jenkins start. It creates the `ocd3-vault` credential and sets the global Vault configuration. Vault is disabled when `VAULT_ADDR` is empty. AppRole is the default (`VAULT_ROLE_ID` / `VAULT_SECRET_ID`). Token is used when `VAULT_AUTH_METHOD=token`, or as a local-dev fallback when role id and secret id are missing but `VAULT_TOKEN` is set. The plugin is pinned in `docker/config/plugins.txt`; changing it requires an image rebuild.
 
