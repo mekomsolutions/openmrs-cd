@@ -343,12 +343,9 @@ module.exports = {
     ) {
       var reference = secretPath + "#" + key;
       var secret = (vaultSecrets || {})[reference];
+      // Leave unresolved refs intact (e.g. Jenkins Vault permission soft-fail)
       if (secret === undefined || secret === null) {
-        throw new Error(
-          "Illegal state: Vault secret '" +
-            reference +
-            "' was not resolved. Check that Vault is configured and that the path and key exist."
-        );
+        return match;
       }
       return JSON.stringify(String(secret)).slice(1, -1);
     });

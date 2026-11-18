@@ -261,8 +261,6 @@ describe("Tests suite for pipeline3", function() {
       "jenkinsCredentials = new JsonBuilder(credentials).toPrettyString()";
 
     expect(pipelineScript).toContain(saveSecrets);
-<<<<<<< Updated upstream
-=======
 
     expect(pipelineScript).toContain("withVault([vaultSecrets: vaultSecretsConfig])");
     expect(pipelineScript).toContain(
@@ -271,6 +269,5 @@ describe("Tests suite for pipeline3", function() {
     expect(pipelineScript).toContain(
       "Leaving vault() refs unsubstituted."
     );
->>>>>>> Stashed changes
   });
 });
