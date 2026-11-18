@@ -106,7 +106,8 @@ describe("Docker Compose Maven implementation", function() {
     expected +=
       scripts.remote(
         instanceDef.deployment.host.value,
-        scripts.createEnvVarFile(instanceDef)
+        scripts.resolveVaultSecretsOnHost(instanceDef) +
+          scripts.createEnvVarFile(instanceDef)
       ) +
       "\n" +
       scripts.remote(

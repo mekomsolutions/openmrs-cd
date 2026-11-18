@@ -183,6 +183,25 @@
         "type": ["string", "number", "boolean", "null"]
       }
     },
+    "vault": {
+      "description": "Host-side Vault settings for resolving envVars vault() refs via vault-secrets-cli during host preparation.",
+      "type": "object",
+      "properties": {
+        "approlePath": {
+          "type": "string",
+          "description": "Vault AppRole auth mount path (default: approle)."
+        },
+        "secretsFile": {
+          "type": "string",
+          "description": "Absolute path for the resolved secrets env_file on the host (default: /run/ocd3/<name>/secrets.env)."
+        },
+        "secretsVolume": {
+          "type": "string",
+          "description": "Optional Docker named volume mounted at /run/ocd3 for vault-secrets-cli (needed when the target uses the host docker.sock, e.g. ocd3-run)."
+        }
+      },
+      "additionalProperties": false
+    },
     "scripts": {
       "type": "array",
       "items": {

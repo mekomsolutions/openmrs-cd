@@ -1,0 +1,27 @@
+{
+  "name": "test-vault-instance",
+  "uuid": "00000000-0000-4000-8000-000000000001",
+  "type": "dev",
+  "group": "ocd3",
+  "vault": {
+    "approlePath": "approle",
+    "secretsFile": "/run/ocd3/test-vault-instance/secrets.env",
+    "secretsVolume": "ocd3-run"
+  },
+  "deployment": {
+    "hostDir": "/var/docker-volumes",
+    "type": "dockerCompose",
+    "host": {
+      "type": "ssh",
+      "value": {
+        "ip": "host.docker.internal",
+        "user": "cdagent",
+        "port": "23023"
+      }
+    }
+  },
+  "envVars": {
+    "PLAIN": "not-a-secret",
+    "DB_PASSWORD": "vault(secret/c2c/dev#db_password)"
+  }
+}

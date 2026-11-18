@@ -9,11 +9,15 @@ RUN apt-get update \
     rsync \
     ncat \
     ca-certificates \
+    curl \
+    docker.io \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /var/run/sshd \
   && useradd -m -s /bin/bash cdagent \
   && echo "cdagent ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/cdagent \
   && chmod 440 /etc/sudoers.d/cdagent \
+  && (getent group docker >/dev/null || groupadd docker) \
+  && usermod -aG docker cdagent \
   && mkdir -p /home/cdagent/.ssh \
   && chmod 700 /home/cdagent/.ssh
 

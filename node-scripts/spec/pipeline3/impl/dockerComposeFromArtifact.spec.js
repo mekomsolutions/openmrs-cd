@@ -98,7 +98,8 @@ describe("Docker Compose Generic Deployment implementation", function() {
     expected +=
       scripts.remote(
         instanceDef.deployment.host.value,
-        scripts.createEnvVarFileDockerGeneric(instanceDef)
+        scripts.resolveVaultSecretsOnHost(instanceDef) +
+          scripts.createEnvVarFileDockerGeneric(instanceDef)
       ) +
       "\n" +
       scripts.remote(

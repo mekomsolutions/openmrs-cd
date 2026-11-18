@@ -105,7 +105,8 @@ describe("Docker Compose implementation", function() {
       "\n" +
       scripts.remote(
         instanceDef.deployment.host.value,
-        scripts.createEnvVarFile(instanceDef)
+        scripts.resolveVaultSecretsOnHost(instanceDef) +
+          scripts.createEnvVarFile(instanceDef)
       ) +
       "\n" +
       scripts.remote(
