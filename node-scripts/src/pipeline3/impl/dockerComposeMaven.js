@@ -77,7 +77,8 @@ module.exports = {
       script += "\n";
       script += scripts.remote(
         instanceDef.deployment.host.value,
-        scripts.createEnvVarFile(instanceDef)
+        scripts.resolveVaultSecretsOnHost(instanceDef) +
+          scripts.createEnvVarFile(instanceDef)
       );
       script += "\n";
 
@@ -94,14 +95,16 @@ module.exports = {
             .toString() +
           " && docker-compose -p " +
           instanceDef.name +
-          " --env-file=" +
+          scripts.composeEnvFileArgs(
+          instanceDef,
           path
             .resolve(
               instanceDef.deployment.hostDir,
               instanceDef.name,
               instanceDef.name + ".env"
             )
-            .toString() +
+            .toString()
+          ) +
           " build --pull" +
           require("./dockerCompose").getInstanceServicesAsStringList(
             instanceDef
@@ -122,14 +125,16 @@ module.exports = {
             .toString() +
           " && docker-compose -p " +
           instanceDef.name +
-          " --env-file=" +
+          scripts.composeEnvFileArgs(
+          instanceDef,
           path
             .resolve(
               instanceDef.deployment.hostDir,
               instanceDef.name,
               instanceDef.name + ".env"
             )
-            .toString() +
+            .toString()
+          ) +
           " pull" +
           require("./dockerCompose").getInstanceServicesAsStringList(
             instanceDef

@@ -10,6 +10,133 @@ const heredoc_2 = cst.HEREDOC_2;
 const heredoc_3 = cst.HEREDOC_3;
 const utils = require("../utils/utils");
 const model = require("../utils/model");
+const config = require("../utils/config");
+
+const VAULT_REF_REGEXP = /vault\(([^)#]+)#([^)]+)\)/;
+
+const hasVaultRef = function(value) {
+  return VAULT_REF_REGEXP.test(String(value == null ? "" : value));
+};
+
+const instanceHasVaultEnvRefs = function(instanceDef) {
+  var envVars = (instanceDef && instanceDef.envVars) || {};
+  return Object.keys(envVars).some(function(key) {
+    return hasVaultRef(envVars[key]);
+  });
+};
+
+const getVaultApprolePath = function(instanceDef) {
+  return (
+    (instanceDef.vault && instanceDef.vault.approlePath) || "approle"
+  );
+};
+
+const getVaultSecretsFilePath = function(instanceDef) {
+  if (instanceDef.vault && instanceDef.vault.secretsFile) {
+    return instanceDef.vault.secretsFile;
+  }
+  return config.getVaultSecretsEnvFilePath(instanceDef.name);
+};
+
+const getVaultSecretsVolume = function(instanceDef) {
+  return (instanceDef.vault && instanceDef.vault.secretsVolume) || "";
+};
+
+/**
+ * Runs vault-secrets-cli on the host to write envVars vault() refs under /run.
+ * AppRole credentials come from the host env; vault.* from the instance.
+ * When vault.secretsVolume is set (e.g. ocd3-run for docker.sock remotes), mount that
+ * named volume at /run/ocd3 so the output is visible inside the target container.
+ */
+const resolveVaultSecretsOnHost = function(instanceDef) {
+  if (!instanceHasVaultEnvRefs(instanceDef)) {
+    return "";
+  }
+  var secretsFile = getVaultSecretsFilePath(instanceDef);
+  var secretsDir = path.posix.dirname(secretsFile);
+  var secretsBasename = path.posix.basename(secretsFile);
+  var secretsVolume = getVaultSecretsVolume(instanceDef);
+  var image = config.getVaultSecretsCliImage();
+  var approlePath = getVaultApprolePath(instanceDef);
+  var instanceJson = JSON.stringify(instanceDef);
+
+  var volumeMount;
+  var outputPath;
+  if (secretsVolume) {
+    // Named volume shares /run/ocd3 with the target (docker.sock path translation).
+    volumeMount = secretsVolume + ":/run/ocd3";
+    outputPath = secretsFile;
+  } else {
+    volumeMount = secretsDir + ":/out";
+    outputPath = "/out/" + secretsBasename;
+  }
+
+  var script = "";
+  script += "mkdir -p " + secretsDir + "\n";
+  // Use --instance-json so docker.sock remotes do not need a host-visible temp file mount.
+  // HEREDOC_3 avoids clashing with remote()'s SSH HEREDOC / nested HEREDOC_2.
+  // Escape $ so remote()'s unquoted SSH heredoc does not expand this on Jenkins.
+  script += "INSTANCE_JSON=\\$(cat <<'" + heredoc_3 + "'\n";
+  script += instanceJson.replace(/\$/g, "\\$") + "\n";
+  script += heredoc_3 + "\n)\n";
+  script +=
+    "docker run --rm" +
+    " -e VAULT_ADDR" +
+    " -e VAULT_AUTH_METHOD=approle" +
+    " -e VAULT_ROLE_ID" +
+    " -e VAULT_SECRET_ID" +
+    " -e VAULT_APPROLE_PATH=" +
+    approlePath +
+    " -e VAULT_KV_VERSION" +
+    " -e VAULT_NAMESPACE" +
+    " -e VAULT_SKIP_VERIFY" +
+    " -v " +
+    volumeMount +
+    " " +
+    image +
+    ' resolve --instance-json "\\$INSTANCE_JSON" --output ' +
+    outputPath +
+    "\n";
+  // docker run writes as root:600; compose --env-file must be readable by the deploy user.
+  // Escape $ for remote()'s unquoted SSH heredoc.
+  script +=
+    'sudo chown "\\$(id -un):\\$(id -gn)" ' + secretsFile + "\n";
+  script += "sudo chmod 600 " + secretsFile + "\n";
+  return script;
+};
+
+/**
+ * Build docker compose --env-file args.
+ * Order: deployment.envFiles (if any), then primaryEnvFile, then vault secretsFile last
+ * so host-resolved secrets override project env when running the stack.
+ *
+ * @param {Object} instanceDef
+ * @param {String} primaryEnvFile - Main project/instance env file path
+ * @return {String} Leading-space joined --env-file=... args (or "" if none)
+ */
+const composeEnvFileArgs = function(instanceDef, primaryEnvFile) {
+  var parts = [];
+  if (
+    instanceDef &&
+    instanceDef.deployment &&
+    instanceDef.deployment.envFiles
+  ) {
+    instanceDef.deployment.envFiles.forEach(function(envFile) {
+      parts.push("--env-file=" + envFile);
+    });
+  }
+  if (primaryEnvFile) {
+    parts.push("--env-file=" + primaryEnvFile);
+  }
+  if (instanceHasVaultEnvRefs(instanceDef)) {
+    parts.push("--env-file=" + getVaultSecretsFilePath(instanceDef));
+  }
+  if (parts.length === 0) {
+    return "";
+  }
+  return " " + parts.join(" ");
+};
+
 const createEnvVarFile = function(instanceDef, deploymentBasePath) {
   let projectPath = path
     .resolve(
@@ -66,6 +193,10 @@ const createEnvVarFile = function(instanceDef, deploymentBasePath) {
   script += "\ncp " + envFile + " " + distEnvFile + "\n";
 
   for (let property in instanceDef.envVars) {
+    // Vault refs are resolved on the host into secretsFile under /run
+    if (hasVaultRef(instanceDef.envVars[property])) {
+      continue;
+    }
     script += module.exports.writeProperty(
       property,
       instanceDef.envVars[property],
@@ -755,6 +886,8 @@ module.exports = {
   createEnvVarFileDockerGeneric(instanceDef) {
     return createEnvVarFile(instanceDef, "docker_compose");
   },
+  resolveVaultSecretsOnHost: resolveVaultSecretsOnHost,
+  composeEnvFileArgs: composeEnvFileArgs,
   exit: function() {
     return "exit";
   }

@@ -29,6 +29,8 @@ On every `vagrant up`, [`prepare-authorized-keys.sh`](prepare-authorized-keys.sh
 
 Shared Docker network: `openmrs-cd-jump`. User on both hosts: `cdagent` (passwordless sudo).
 
+The **target** also mounts the host Docker socket and volume `ocd3-run` at `/run/ocd3` so host preparation can run `vault-secrets-cli` and write secrets under `/run/ocd3`.
+
 If you add a new key under `~/.ssh`, rebuild so the image picks it up:
 
 ```bash
@@ -100,9 +102,50 @@ Use `host.docker.internal` from inside the container to reach published ports on
 
 With ProxyJump, Jenkins only needs to reach the jump; hostname `target` is resolved from the jump container on `openmrs-cd-jump`.
 
+## Vault AppRole on the target (host vault-secrets-cli)
+
+The **target** runs `docker run mekomsolutions/vault-secrets-cli` during host preparation. It uses the host Docker daemon (`/var/run/docker.sock`) and a shared volume `ocd3-run` mounted at `/run/ocd3`.
+
+With local Vault already up (`docker compose --profile vault up -d`):
+
+```bash
+cd tests/vagrant
+./setup-vault-approle.sh
+```
+
+That script:
+
+1. Enables AppRole and KV v2 `secret/` in the local Vault container
+2. Creates policy/role `ocd3-dev` with read on `secret/data/c2c/dev` (+ metadata)
+3. Writes sample `secret/c2c/dev` with `db_password=test-secret`
+4. Installs `/etc/profile.d/ocd3-vault.sh` on the target (`VAULT_ADDR=http://host.docker.internal:8200`, AppRole ids)
+
+### Smoke test
+
+```bash
+ssh -F ssh_config target-direct 'bash --login -c "
+set -e
+mkdir -p /run/ocd3/test-instance
+cat > /run/ocd3/test-instance/instance.json <<EOF
+{\"name\":\"test-instance\",\"vault\":{\"approlePath\":\"approle\",\"secretsFile\":\"/run/ocd3/test-instance/secrets.env\"},\"envVars\":{\"DB_PASSWORD\":\"vault(secret/c2c/dev#db_password)\"}}
+EOF
+docker run --rm \
+  -e VAULT_ADDR -e VAULT_AUTH_METHOD -e VAULT_ROLE_ID -e VAULT_SECRET_ID -e VAULT_APPROLE_PATH \
+  -v ocd3-run:/out \
+  mekomsolutions/vault-secrets-cli:latest \
+  resolve --instance /out/test-instance/instance.json --output /out/test-instance/secrets.env
+sudo cat /run/ocd3/test-instance/secrets.env
+"'
+```
+
+Expect `DB_PASSWORD=test-secret`.
+
+For a full OCD3 deploy against this target, use the host block under **Instance host — direct deploy** and set `vault.approlePath` / `vault.secretsFile` on the instance. Ensure `mekomsolutions/vault-secrets-cli:latest` exists on the host Docker daemon.
+
 ## Tear down
 
 ```bash
 cd tests/vagrant && vagrant destroy -f
 docker network rm openmrs-cd-jump   # optional
+docker volume rm ocd3-run           # optional
 ```

@@ -97,7 +97,8 @@ module.exports = {
       script += "\n";
       script += scripts.remote(
         instanceDef.deployment.host.value,
-        scripts.createEnvVarFileDockerGeneric(instanceDef)
+        scripts.resolveVaultSecretsOnHost(instanceDef) +
+          scripts.createEnvVarFileDockerGeneric(instanceDef)
       );
       script += "\n";
 
@@ -117,14 +118,16 @@ module.exports = {
           " -p " +
           instanceDef.name +
           combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-          " --env-file=" +
+          scripts.composeEnvFileArgs(
+          instanceDef,
           path
             .resolve(
               instanceDef.deployment.hostDir,
               instanceDef.name,
               instanceDef.name + ".env"
             )
-            .toString() +
+            .toString()
+          ) +
           " build --pull" +
           require("./dockerCompose").getInstanceServicesAsStringList(
             instanceDef
@@ -148,14 +151,16 @@ module.exports = {
           " -p " +
           instanceDef.name +
           combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-          " --env-file=" +
+          scripts.composeEnvFileArgs(
+          instanceDef,
           path
             .resolve(
               instanceDef.deployment.hostDir,
               instanceDef.name,
               instanceDef.name + ".env"
             )
-            .toString() +
+            .toString()
+          ) +
           " pull" +
           require("./dockerCompose").getInstanceServicesAsStringList(
             instanceDef
@@ -209,14 +214,16 @@ module.exports = {
                 " -p " +
                 instanceDef.name +
                 combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-                " --env-file=" +
+                scripts.composeEnvFileArgs(
+                instanceDef,
                 path
                   .resolve(
                     instanceDef.deployment.hostDir,
                     instanceDef.name,
                     instanceDef.name + ".env"
                   )
-                  .toString() +
+                  .toString()
+                ) +
                 " rm -vsf " +
                 sql.service +
                 " && " +
@@ -224,14 +231,16 @@ module.exports = {
                 " -p " +
                 instanceDef.name +
                 combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-                " --env-file=" +
+                scripts.composeEnvFileArgs(
+                instanceDef,
                 path
                   .resolve(
                     instanceDef.deployment.hostDir,
                     instanceDef.name,
                     instanceDef.name + ".env"
                   )
-                  .toString() +
+                  .toString()
+                ) +
                 " up -d " +
                 sql.service
             );
@@ -263,14 +272,16 @@ module.exports = {
           " -p " +
           instanceDef.name +
           combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-          " --env-file=" +
+          scripts.composeEnvFileArgs(
+          instanceDef,
           path
             .resolve(
               instanceDef.deployment.hostDir,
               instanceDef.name,
               instanceDef.name + ".env"
             )
-            .toString() +
+            .toString()
+          ) +
           " up -d" +
           require("./dockerCompose").getInstanceServicesAsStringList(
             instanceDef
@@ -306,14 +317,16 @@ module.exports = {
       " -p " +
       instanceDef.name +
       combineComposeFiles(instanceDef.deployment.dockerComposeFiles) +
-      " --env-file=" +
+      scripts.composeEnvFileArgs(
+      instanceDef,
       path
         .resolve(
           instanceDef.deployment.hostDir,
           instanceDef.name,
           instanceDef.name + ".env"
         )
-        .toString() +
+        .toString()
+      ) +
       " restart ";
 
     return script + "\n";
@@ -337,14 +350,16 @@ module.exports = {
       " -p " +
       instanceDef.name;
     script +=
-      " --env-file=" +
+      scripts.composeEnvFileArgs(
+      instanceDef,
       path
         .resolve(
           instanceDef.deployment.hostDir,
           instanceDef.name,
           instanceDef.name + ".env"
         )
-        .toString();
+        .toString()
+      );
     var rmVolumes =
       instanceDef.type.toString() != cst.INSTANCETYPE_PROD ? " -v" : "";
     script += " down" + rmVolumes;
@@ -369,14 +384,16 @@ module.exports = {
       " -p " +
       instanceDef.name;
     script +=
-      " --env-file=" +
+      scripts.composeEnvFileArgs(
+      instanceDef,
       path
         .resolve(
           instanceDef.deployment.hostDir,
           instanceDef.name,
           instanceDef.name + ".env"
         )
-        .toString();
+        .toString()
+      );
     script += " down";
     return script + "\n";
   },
@@ -474,14 +491,16 @@ module.exports = {
       instanceDef.name +
       combineComposeFiles(instanceDef.deployment.dockerComposeFiles);
     script +=
-      " --env-file=" +
+      scripts.composeEnvFileArgs(
+      instanceDef,
       path
         .resolve(
           instanceDef.deployment.hostDir,
           instanceDef.name,
           instanceDef.name + ".env"
         )
-        .toString();
+        .toString()
+      );
     script += " stop";
     return script + "\n";
   },

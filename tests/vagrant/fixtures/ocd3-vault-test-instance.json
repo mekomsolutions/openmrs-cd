@@ -1,0 +1,41 @@
+{
+  "uuid": "e1134f2b-b83a-41c0-891c-66d3ebc9dc4b",
+  "name": "ocd3-vault-test",
+  "type": "dev",
+  "group": "ocd3",
+  "version": "1.0.0",
+  "description": "Local Vagrant test for host vault-secrets-cli AppRole resolve",
+  "vault": {
+    "approlePath": "approle",
+    "secretsFile": "/run/ocd3/ocd3-vault-test/secrets.env",
+    "secretsVolume": "ocd3-run"
+  },
+  "deployment": {
+    "hostDir": "/var/docker-volumes",
+    "type": "dockerComposeFromArtifact",
+    "composePlugin": false,
+    "dockerComposeFiles": [],
+    "timezone": "UTC",
+    "value": {
+      "projectPath": "/var/docker-volumes/ocd3-vault-test/docker_compose",
+      "services": ["web"]
+    },
+    "host": {
+      "type": "ssh",
+      "value": {
+        "ip": "host.docker.internal",
+        "user": "cdagent",
+        "port": "23023"
+      }
+    }
+  },
+  "artifacts": [],
+  "data": [],
+  "properties": [],
+  "envVars": {
+    "PLAIN": "visible",
+    "DB_PASSWORD": "vault(secret/c2c/dev#db_password)",
+    "OPENMRS_PASSWORD": "vault(secret/c2c/dev#openmrs_password)",
+    "MYSQL_ROOT_PASSWORD": "vault(secret/c2c/dev#mysql_root_password)"
+  }
+}

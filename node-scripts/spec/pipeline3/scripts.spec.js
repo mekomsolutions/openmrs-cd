@@ -638,6 +638,86 @@ describe("Scripts", function() {
     );
   });
 
+  it("should omit vault envVars from .env and resolve them on the host via AppRole", function() {
+    var instanceDef = {
+      name: "hsc-dev",
+      deployment: {
+        hostDir: "/var/docker-volumes",
+        host: { type: "ssh", value: { ip: "1.2.3.4", user: "u", port: "22" } },
+        type: "dockerCompose"
+      },
+      vault: {
+        approlePath: "approle-c2c",
+        secretsFile: "/run/ocd3/hsc-dev/secrets.env",
+        secretsVolume: "ocd3-run"
+      },
+      envVars: {
+        PLAIN: "ok",
+        DB_PASSWORD: "vault(secret/c2c/dev#db_password)"
+      }
+    };
+
+    var envScript = scripts.createEnvVarFile(instanceDef);
+    expect(envScript).toContain(
+      scripts.writeProperty("PLAIN", "ok", "/var/docker-volumes/hsc-dev/hsc-dev.env")
+    );
+    expect(envScript).not.toContain("DB_PASSWORD=vault(");
+
+    var resolveScript = scripts.resolveVaultSecretsOnHost(instanceDef);
+    expect(resolveScript).toContain("mkdir -p /run/ocd3/hsc-dev");
+    expect(resolveScript).toContain("VAULT_AUTH_METHOD=approle");
+    expect(resolveScript).toContain("VAULT_APPROLE_PATH=approle-c2c");
+    expect(resolveScript).toContain("-e VAULT_ROLE_ID");
+    expect(resolveScript).toContain("-e VAULT_SECRET_ID");
+    expect(resolveScript).toContain("mekomsolutions/vault-secrets-cli:latest");
+    expect(resolveScript).toContain("--instance-json");
+    expect(resolveScript).toContain("heredoc_delimiter_05bd2e7d");
+    expect(resolveScript).toContain('INSTANCE_JSON=\\$(cat');
+    expect(resolveScript).toContain('"\\$INSTANCE_JSON"');
+    expect(resolveScript).toContain("-v ocd3-run:/run/ocd3");
+    expect(resolveScript).toContain(
+      "--output /run/ocd3/hsc-dev/secrets.env"
+    );
+    expect(resolveScript).toContain(
+      'sudo chown "\\$(id -un):\\$(id -gn)" /run/ocd3/hsc-dev/secrets.env'
+    );
+    expect(resolveScript).toContain(
+      "sudo chmod 600 /run/ocd3/hsc-dev/secrets.env"
+    );
+
+    var bindMountScript = scripts.resolveVaultSecretsOnHost({
+      name: "bare",
+      vault: { secretsFile: "/run/ocd3/bare/secrets.env" },
+      envVars: { DB_PASSWORD: "vault(secret/x#y)" }
+    });
+    expect(bindMountScript).toContain("-v /run/ocd3/bare:/out");
+    expect(bindMountScript).toContain("--output /out/secrets.env");
+
+    expect(scripts.resolveVaultSecretsOnHost({ name: "x", envVars: {} })).toEqual(
+      ""
+    );
+  });
+
+  it("should append vault secretsFile as the last compose --env-file", function() {
+    expect(
+      scripts.composeEnvFileArgs(
+        {
+          name: "hsc-dev",
+          deployment: { envFiles: ["base.env"] },
+          envVars: { DB_PASSWORD: "vault(secret/c2c/dev#db_password)" },
+          vault: { secretsFile: "/run/ocd3/hsc-dev/secrets.env" }
+        },
+        "/var/docker-volumes/hsc-dev/hsc-dev.env"
+      )
+    ).toEqual(
+      " --env-file=base.env --env-file=/var/docker-volumes/hsc-dev/hsc-dev.env --env-file=/run/ocd3/hsc-dev/secrets.env"
+    );
+
+    expect(
+      scripts.composeEnvFileArgs({ name: "x", envVars: {} }, "/x/x.env")
+    ).toEqual(" --env-file=/x/x.env");
+  });
+
   it("should generate script to clone a Git repo", function() {
     var gitUrl = "git@github:mekomsolutions/bahmni-docker.git";
     var commitId = "12b9a94";

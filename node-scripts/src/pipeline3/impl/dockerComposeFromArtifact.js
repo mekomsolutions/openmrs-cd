@@ -43,18 +43,7 @@ const combineEnvFiles = function(instanceDef = {}) {
       instanceDef.name + ".env"
     )
     .toString();
-  let files = " ";
-  if (
-    instanceDef &&
-    instanceDef.deployment &&
-    instanceDef.deployment.envFiles
-  ) {
-    for (const envFile of instanceDef.deployment.envFiles) {
-      files = files + `--env-file=${envFile} `;
-    }
-  }
-  files = files + "--env-file=" + defaultEnvDir;
-  return files;
+  return scripts.composeEnvFileArgs(instanceDef, defaultEnvDir);
 };
 
 /**
@@ -117,7 +106,8 @@ module.exports = {
       script += "\n";
       script += scripts.remote(
         instanceDef.deployment.host.value,
-        scripts.createEnvVarFileDockerGeneric(instanceDef)
+        scripts.resolveVaultSecretsOnHost(instanceDef) +
+          scripts.createEnvVarFileDockerGeneric(instanceDef)
       );
       script += "\n";
 

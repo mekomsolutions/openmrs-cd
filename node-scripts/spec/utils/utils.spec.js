@@ -301,14 +301,23 @@ describe("Utils", function() {
     });
   });
 
-  it("should fail on unresolved Vault secrets.", function() {
-    const instanceDef = { password: "vault(secret/c2c/prod#missing)" };
-    expect(function() {
-      utils.substituteVaultSecrets(instanceDef, {});
-    }).toThrowError(/Vault secret 'secret\/c2c\/prod#missing' was not resolved/);
-    expect(function() {
-      utils.substituteVaultSecrets(instanceDef, undefined);
-    }).toThrowError(/was not resolved/);
+  it("should leave unresolved Vault secrets intact.", function() {
+    const instanceDef = {
+      password: "vault(secret/c2c/prod#missing)",
+      known: "vault(secret/c2c/prod#db_password)"
+    };
+    expect(utils.substituteVaultSecrets(instanceDef, {})).toEqual(instanceDef);
+    expect(utils.substituteVaultSecrets(instanceDef, undefined)).toEqual(
+      instanceDef
+    );
+    expect(
+      utils.substituteVaultSecrets(instanceDef, {
+        "secret/c2c/prod#db_password": "s3cr3t"
+      })
+    ).toEqual({
+      password: "vault(secret/c2c/prod#missing)",
+      known: "s3cr3t"
+    });
   });
 
   it("should resolve Jenkins credentials and Vault secrets from environment.", function() {
@@ -335,7 +344,17 @@ describe("Utils", function() {
       utils.resolveSecrets({ a: "jenkinsCredentials(openmrs.password)" })
     ).toEqual({ a: "fromJenkins" });
 
+    process.env[config.getVaultSecretsEnvVar()] = "{}";
+    expect(
+      utils.resolveSecrets({
+        envVars: { DB_PASSWORD: "vault(secret/c2c/prod#db_password)" }
+      })
+    ).toEqual({
+      envVars: { DB_PASSWORD: "vault(secret/c2c/prod#db_password)" }
+    });
+
     process.env[config.getSecretsEnvVar()] = "";
+    delete process.env[config.getVaultSecretsEnvVar()];
   });
 
   it("should find value in object based on path", function() {
